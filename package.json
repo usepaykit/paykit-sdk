@@ -1,16 +1,45 @@
 {
-  "name": "paykit",
+  "name": "paykit-repo",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "fix-prettier": "prettier --write \"**/*.{js,ts,tsx,md,mdx}\"",
+    "dev": "pnpm --filter web dev"
   },
   "workspaces": [
     "apps/*",
     "packages/*"
   ],
   "keywords": [],
+  "prettier": {
+    "tabWidth": 2,
+    "useTabs": false,
+    "singleQuote": true,
+    "arrowParens": "avoid",
+    "trailingComma": "all",
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports",
+      "prettier-plugin-tailwindcss"
+    ],
+    "importOrder": [
+      "^react$",
+      "^react-dom$",
+      "<THIRD_PARTY_MODULES>",
+      "^@/react/(.*)$",
+      "^[./]"
+    ]
+  },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/devodii/paykit/issues"
+  },
+  "dependencies": {
+    "prettier": "^3.5.3"
+  },
+  "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^4.3.0",
+    "prettier-plugin-tailwindcss": "^0.6.12"
+  }
 }

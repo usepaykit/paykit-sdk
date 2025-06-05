@@ -1,0 +1,16 @@
+{
+  "name": "@paykit/stripe",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.ts",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "paykit": "*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

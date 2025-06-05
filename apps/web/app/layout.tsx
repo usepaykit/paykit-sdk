@@ -9,16 +9,10 @@ export const metadata: Metadata = {
   description: 'The Payment Toolkit for Typescript',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={cn(arizoniaFont.variable, interFont.variable, 'antialiased')}>
-        {children}
-      </body>
+      <body className={cn(arizoniaFont.variable, interFont.variable, 'antialiased')}>{children}</body>
     </html>
   );
 }

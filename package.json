@@ -13,6 +13,7 @@
   ],
   "keywords": [],
   "prettier": {
+    "printWidth": 150,
     "tabWidth": 2,
     "useTabs": false,
     "singleQuote": true,

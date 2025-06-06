@@ -1,7 +1,7 @@
 import { Checkout, CreateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
 import { Subscription, UpdateSubscriptionParams } from './resources/subscription';
-import { WebhookEvent, WebhookEventLiteral, WebhookEventPayload } from './webhook-provider';
+import { WebhookEventPayload } from './resources/webhook';
 
 export interface PayKitProvider {
   /**

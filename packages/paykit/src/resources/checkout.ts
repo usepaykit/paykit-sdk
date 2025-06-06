@@ -18,7 +18,7 @@ export type Checkout = {
   metadata?: Record<string, string>;
   mode: 'payment' | 'subscription';
   success_url: string;
-  cancel_url: string;
+  cancel_url: string | undefined;
   products: Array<{ id: string; quantity: number }>;
   url: string;
 };

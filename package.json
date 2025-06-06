@@ -37,6 +37,7 @@
     "url": "https://github.com/devodii/paykit/issues"
   },
   "dependencies": {
+    "@types/node": "^20",
     "prettier": "^3.5.3"
   },
   "devDependencies": {

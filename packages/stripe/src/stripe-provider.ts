@@ -6,9 +6,9 @@ import Stripe from 'stripe';
 import { Checkout, CreateCheckoutParams } from '../../paykit/src/resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from '../../paykit/src/resources/customer';
 import { Subscription, UpdateSubscriptionParams } from '../../paykit/src/resources/subscription';
+import { toPaykitEvent, WebhookEventPayload } from '../../paykit/src/resources/webhook';
 import { WithPaymentProviderConfig } from '../../paykit/src/types';
-import { WebhookEvent, WebhookEventLiteral, WebhookEventPayload } from '../../paykit/src/webhook-provider';
-import { toPaykitCheckout, toPaykitCustomer, toPaykitEvent, toPaykitSubscription } from '../lib/mapper';
+import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 import { PayKitProvider } from './../../paykit/src/paykit-provider';
 
 export interface StripeConfig extends WithPaymentProviderConfig<Stripe.StripeConfig> {
@@ -81,10 +81,7 @@ export class StripeProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async ( payload: string,
-    signature: string,
-    secret: string,
-  ): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: string, signature: string, secret: string): Promise<WebhookEventPayload> => {
     const event = this.stripe.webhooks.constructEvent(payload, signature, secret);
 
     if (event.type === 'checkout.session.completed') {

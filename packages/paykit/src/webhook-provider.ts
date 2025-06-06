@@ -3,26 +3,7 @@ import { PayKitProvider } from './paykit-provider';
 import { Checkout } from './resources/checkout';
 import { Customer } from './resources/customer';
 import { Subscription } from './resources/subscription';
-
-export type WebhookEventLiteral =
-  | 'customer.created'
-  | 'customer.updated'
-  | 'customer.deleted'
-  | 'subscription.created'
-  | 'subscription.updated'
-  | 'subscription.canceled'
-  | 'checkout.created';
-
-export interface WebhookEvent<T extends any> {
-  id: string;
-  type: string;
-  created: number;
-  data: T;
-}
-
-export type WebhookHandler<T extends any> = (event: WebhookEvent<T>) => Promise<void>;
-
-export type WebhookEventPayload = WebhookEvent<Checkout> | WebhookEvent<Customer | null> | WebhookEvent<Subscription>;
+import { WebhookEvent, WebhookHandler } from './resources/webhook';
 
 export interface WebhookConfig {
   provider: PayKitProvider;

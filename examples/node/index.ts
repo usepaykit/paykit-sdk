@@ -1,9 +1,12 @@
 import { PayKit, Webhook } from '../../packages/paykit/src';
 import { stripe } from '../../packages/stripe/src';
 
-const paykit = new PayKit(stripe());
+const provider = stripe();
+const paykit = new PayKit(provider);
 
-const checkout = await paykit.checkouts.create({
+const customer = await paykit.customers.create({ email: 'test@test.com' });
+
+export const stripeCheckout = await paykit.checkouts.create({
   customer_id: 'cus_123',
   metadata: { order_id: '123' },
   mode: 'payment',
@@ -13,8 +16,8 @@ const checkout = await paykit.checkouts.create({
   quantity: 1,
 });
 
-const webhook = new Webhook({
-  provider: stripe(),
+export const webhook = new Webhook({
+  provider,
   webhookSecret: '123',
   onCheckoutCreated: async event => {
     console.log(event);

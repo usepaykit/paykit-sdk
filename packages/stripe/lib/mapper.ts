@@ -2,6 +2,7 @@ import Stripe from 'stripe';
 import { Checkout } from '../../paykit/src/resources/checkout';
 import { Customer } from '../../paykit/src/resources/customer';
 import { Subscription, SubscriptionStatus } from '../../paykit/src/resources/subscription';
+import { WebhookEvent, WebhookEventLiteral } from '../../paykit/src/webhook-provider';
 
 export const toPaykitStatus = (status: Stripe.Subscription.Status): SubscriptionStatus => {
   if (['active', 'trialing'].includes(status)) return 'active';
@@ -36,4 +37,8 @@ export const toPaykitSubscription = (subscription: Stripe.Subscription): Subscri
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
   };
+};
+
+export const toPaykitEvent = <T extends any>(event: { id: string; type: WebhookEventLiteral; created: number; data: T }): WebhookEvent<T> => {
+  return event;
 };

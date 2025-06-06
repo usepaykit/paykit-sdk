@@ -1,4 +1,4 @@
-import { PayKit } from '../../packages/paykit/src';
+import { PayKit, Webhook } from '../../packages/paykit/src';
 import { stripe } from '../../packages/stripe/src';
 
 const paykit = new PayKit(stripe());
@@ -11,4 +11,12 @@ const checkout = await paykit.checkouts.create({
   cancel_url: 'https://example.com/cancel',
   price_id: 'price_123',
   quantity: 1,
+});
+
+const webhook = new Webhook({
+  provider: stripe(),
+  webhookSecret: '123',
+  onCheckoutCreated: async event => {
+    console.log(event);
+  },
 });

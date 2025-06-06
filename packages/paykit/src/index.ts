@@ -2,8 +2,9 @@ import { PayKitProvider } from './paykit-provider';
 import { CreateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, UpdateCustomerParams } from './resources/customer';
 import { UpdateSubscriptionParams } from './resources/subscription';
+import { Webhook } from './webhook-provider';
 
-export class PayKit {
+class PayKit {
   constructor(private provider: PayKitProvider) {}
 
   checkouts = {
@@ -22,3 +23,5 @@ export class PayKit {
     cancel: (id: string) => this.provider.cancelSubscription(id),
   };
 }
+
+export { PayKit, Webhook };

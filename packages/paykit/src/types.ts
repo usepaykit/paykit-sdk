@@ -3,10 +3,10 @@ export type WithPaymentProviderConfig<T extends object> = T & {
   environment?: 'test' | 'live';
 };
 
-export type NonNullable<T> = T extends null | undefined
-  ? never
-  : T extends object
-    ? {
-        [P in keyof T]: NonNullable<T[P]>;
-      }
-    : T;
+export type OverrideProps<T, V> = V & Omit<T, keyof V>;
+
+export type LooseAutoComplete<T extends string> = T | Omit<string, T>;
+
+export type StringMetadata = {
+  [key: string]: string;
+};

@@ -12,9 +12,21 @@ export type WebhookEventLiteral =
   | 'checkout.created';
 
 export interface WebhookEvent<T extends any> {
+  /**
+   * The ID of the webhook event.
+   */
   id: string;
+  /**
+   * The type of the webhook event.
+   */
   type: string;
+  /**
+   * The created timestamp of the webhook event.
+   */
   created: number;
+  /**
+   * The data of the webhook event.
+   */
   data: T;
 }
 

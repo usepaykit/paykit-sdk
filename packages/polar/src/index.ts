@@ -6,7 +6,7 @@ const createPolar = (config: WithPaymentProviderConfig<PolarConfig>) => {
 };
 
 export const polar = () => {
-  const apiKey = process.env.POLAR_API_KEY;
+  const apiKey = process.env.POLAR_ACCESS_TOKEN;
 
   if (!apiKey) throw new Error('POLAR_ACCESS_TOKEN is not set');
 

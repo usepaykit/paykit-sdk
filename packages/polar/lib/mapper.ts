@@ -4,6 +4,7 @@ import { Subscription } from '@polar-sh/sdk/models/components/subscription.js';
 import { Checkout as PaykitCheckout } from '../../paykit/src/resources/checkout.ts';
 import { Customer as PaykitCustomer } from '../../paykit/src/resources/customer.ts';
 import { Subscription as PaykitSubscription, toPaykitSubscriptionStatus } from '../../paykit/src/resources/subscription.ts';
+import { StringMetadata } from '../../paykit/src/types.ts';
 
 export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
   return {
@@ -14,7 +15,7 @@ export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
     mode: 'payment',
     success_url: checkout.successUrl,
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
-    metadata: checkout.metadata as Record<string, string>,
+    metadata: checkout.metadata as StringMetadata,
   };
 };
 

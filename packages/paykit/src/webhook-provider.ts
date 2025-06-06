@@ -1,4 +1,3 @@
-import { Stripe } from 'stripe';
 import { PayKitProvider } from './paykit-provider';
 import { Checkout } from './resources/checkout';
 import { Customer } from './resources/customer';

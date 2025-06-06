@@ -1,7 +1,7 @@
 {
   "name": "paykit",
   "version": "1.0.0",
-  "description": "",
+  "description": "The Payment Toolkit for Typescript",
   "main": "dist/index.ts",
   "types": "dist/index.d.ts",
   "scripts": {

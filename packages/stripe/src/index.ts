@@ -1,8 +1,6 @@
-import Stripe from 'stripe';
-import { WithPaymentProviderConfig } from '../../paykit/src/types';
-import { StripeProvider } from './stripe-provider';
+import { StripeProvider, StripeConfig } from './stripe-provider';
 
-const createStripe = (config: WithPaymentProviderConfig<Stripe.StripeConfig>) => {
+const createStripe = (config: StripeConfig) => {
   return new StripeProvider(config);
 };
 

@@ -1,7 +1,5 @@
-import { Checkout } from '../../paykit/src/resources/checkout';
-import { Customer } from '../../paykit/src/resources/customer';
-import { WebhookEvent, WebhookEventLiteral, WebhookEventPayload } from '../../paykit/src/resources/webhook';
-import { WebhookConfig } from '../../paykit/src/webhook-provider';
+import { Checkout, Customer, WebhookEvent, WebhookEventLiteral, WebhookEventPayload } from '@paykit-sdk/core/src/resources';
+import { WebhookConfig } from '@paykit-sdk/core/src/webhook-provider';
 
 export const stripeWebhookParser = async (
   paykitEvent: WebhookEventLiteral,

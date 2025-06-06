@@ -1,10 +1,18 @@
+import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
+import {
+  toPaykitEvent,
+  WebhookEventLiteral,
+  WebhookEventPayload,
+  CreateCustomerParams,
+  Customer,
+  UpdateCustomerParams,
+  Checkout,
+  CreateCheckoutParams,
+  Subscription,
+  UpdateSubscriptionParams,
+} from '@paykit-sdk/core/src/resources';
+import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
 import { Polar, SDKOptions } from '@polar-sh/sdk';
-import { PayKitProvider } from '../../paykit/src/paykit-provider';
-import { Checkout, CreateCheckoutParams } from '../../paykit/src/resources/checkout';
-import { CreateCustomerParams, Customer, UpdateCustomerParams } from '../../paykit/src/resources/customer';
-import { Subscription, UpdateSubscriptionParams } from '../../paykit/src/resources/subscription';
-import { toPaykitEvent, WebhookEventLiteral, WebhookEventPayload } from '../../paykit/src/resources/webhook';
-import { WithPaymentProviderConfig } from '../../paykit/src/types';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
 export interface PolarConfig extends WithPaymentProviderConfig<Omit<SDKOptions, 'accessToken'>> {}

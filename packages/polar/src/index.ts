@@ -1,4 +1,4 @@
-import { WithPaymentProviderConfig } from '../../paykit/src/types';
+import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
 import { PolarProvider, PolarConfig } from './polar-provider';
 
 const createPolar = (config: WithPaymentProviderConfig<PolarConfig>) => {

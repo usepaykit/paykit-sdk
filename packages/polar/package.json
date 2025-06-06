@@ -1,16 +1,44 @@
 {
-  "name": "polar",
+  "name": "@paykit-sdk/polar",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Polar provider for PayKit",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": [],
-  
-  "author": "",
+  "keywords": [
+    "polar",
+    "paykit",
+    "payment",
+    "typescript"
+  ],
+  "author": "Emmanuel Odii",
   "license": "ISC",
-    "dependencies": {
-      "@polar-sh/sdk": "^0.33.0"
-    }
+  "dependencies": {
+    "@polar-sh/sdk": "^0.33.0"
+  },
+  "peerDependencies": {
+    "@paykit-sdk/core": "^1.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0",
+    "@paykit-sdk/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devodii/paykit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devodii/paykit/issues"
+  }
 }

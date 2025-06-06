@@ -1,15 +1,18 @@
+import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
+import {
+  Checkout,
+  CreateCheckoutParams,
+  CreateCustomerParams,
+  Customer,
+  UpdateCustomerParams,
+  Subscription,
+  UpdateSubscriptionParams,
+  toPaykitEvent,
+  WebhookEventPayload,
+} from '@paykit-sdk/core/src/resources';
+import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
 import Stripe from 'stripe';
-
-/**
- * Todo: resolve import from paykit package
- */
-import { Checkout, CreateCheckoutParams } from '../../paykit/src/resources/checkout';
-import { CreateCustomerParams, Customer, UpdateCustomerParams } from '../../paykit/src/resources/customer';
-import { Subscription, UpdateSubscriptionParams } from '../../paykit/src/resources/subscription';
-import { toPaykitEvent, WebhookEventPayload } from '../../paykit/src/resources/webhook';
-import { WithPaymentProviderConfig } from '../../paykit/src/types';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
-import { PayKitProvider } from './../../paykit/src/paykit-provider';
 
 export interface StripeConfig extends WithPaymentProviderConfig<Stripe.StripeConfig> {
   apiVersion?: Stripe.LatestApiVersion;

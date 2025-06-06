@@ -94,12 +94,32 @@ importers:
       '@polar-sh/sdk':
         specifier: ^0.33.0
         version: 0.33.0(zod@3.25.52)
+    devDependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(jiti@2.4.2)(postcss@8.5.4)(typescript@5.8.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.8.3
 
   packages/stripe:
     dependencies:
       stripe:
         specifier: ^18.2.1
         version: 18.2.1(@types/node@20.17.58)
+    devDependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(jiti@2.4.2)(postcss@8.5.4)(typescript@5.8.3)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.8.3
 
 packages:
 

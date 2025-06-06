@@ -1,10 +1,13 @@
-import { Checkout } from '@polar-sh/sdk/models/components/checkout.js';
-import { Customer } from '@polar-sh/sdk/models/components/customer.js';
-import { Subscription } from '@polar-sh/sdk/models/components/subscription.js';
-import { Checkout as PaykitCheckout } from '../../paykit/src/resources/checkout.ts';
-import { Customer as PaykitCustomer } from '../../paykit/src/resources/customer.ts';
-import { Subscription as PaykitSubscription, toPaykitSubscriptionStatus } from '../../paykit/src/resources/subscription.ts';
-import { StringMetadata } from '../../paykit/src/types.ts';
+import {
+  Subscription as PaykitSubscription,
+  toPaykitSubscriptionStatus,
+  Checkout as PaykitCheckout,
+  Customer as PaykitCustomer,
+} from '@paykit-sdk/core/src/resources/';
+import { StringMetadata } from '@paykit-sdk/core/src/types';
+import { Checkout } from '@polar-sh/sdk/dist/commonjs/models/components/checkout';
+import { Customer } from '@polar-sh/sdk/dist/commonjs/models/components/customer';
+import { Subscription } from '@polar-sh/sdk/dist/commonjs/models/components/subscription';
 
 export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
   return {

@@ -1,8 +1,5 @@
+import { Checkout, Customer, Subscription, toPaykitSubscriptionStatus } from '@paykit-sdk/core/src/resources';
 import Stripe from 'stripe';
-import { Checkout } from '../../paykit/src/resources/checkout';
-import { Customer } from '../../paykit/src/resources/customer';
-import { Subscription, toPaykitSubscriptionStatus } from '../../paykit/src/resources/subscription';
-import { WebhookEvent, WebhookEventLiteral } from '../../paykit/src/resources/webhook';
 
 export const toPaykitCheckout = (checkout: Stripe.Checkout.Session): Checkout => {
   return {

@@ -7,7 +7,7 @@ const paykit = new PayKit(provider);
 const customer = await paykit.customers.create({ email: 'test@test.com' });
 
 export const stripeCheckout = await paykit.checkouts.create({
-  customer_id: 'cus_123',
+  customer_id: customer.id,
   metadata: { order_id: '123' },
   mode: 'payment',
   success_url: 'https://example.com/success',

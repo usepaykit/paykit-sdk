@@ -10,8 +10,7 @@
   ],
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "prepublishOnly": "npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "payment",
@@ -28,5 +27,12 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/devodii/paykit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/devodii/paykit/issues"
+  } 
 }

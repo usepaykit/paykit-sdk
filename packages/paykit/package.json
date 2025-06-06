@@ -1,13 +1,32 @@
 {
-  "name": "paykit",
+  "name": "@paykit-sdk/core",
   "version": "1.0.0",
   "description": "The Payment Toolkit for Typescript",
-  "main": "dist/index.ts",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "prepublishOnly": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC"
+  "keywords": [
+    "payment",
+    "typescript",
+    "sdk",
+    "paykit",
+    "payment-processing"
+  ],
+  "author": "Emmanuel Odii",
+  "license": "ISC",
+  "devDependencies": {
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
 }

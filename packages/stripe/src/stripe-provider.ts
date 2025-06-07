@@ -9,6 +9,7 @@ import {
   UpdateSubscriptionParams,
   toPaykitEvent,
   WebhookEventPayload,
+  InternalWebhookHandlerParams,
 } from '@paykit-sdk/core/src/resources';
 import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
 import Stripe from 'stripe';
@@ -84,7 +85,8 @@ export class StripeProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (payload: string, signature: string, secret: string): Promise<WebhookEventPayload> => {
+  handleWebhook = async (params: InternalWebhookHandlerParams): Promise<WebhookEventPayload> => {
+    const { payload, signature, secret } = params;
     const event = this.stripe.webhooks.constructEvent(payload, signature, secret);
 
     if (event.type === 'checkout.session.completed') {

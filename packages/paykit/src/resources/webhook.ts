@@ -34,4 +34,13 @@ export type WebhookHandler<T extends any> = (event: WebhookEvent<T>) => Promise<
 
 export type WebhookEventPayload = WebhookEvent<Checkout> | WebhookEvent<Customer | null> | WebhookEvent<Subscription>;
 
+/**
+ * todo: accept the request object instead of the payload and signature
+ */
+export interface InternalWebhookHandlerParams {
+  payload: string;
+  signature: string;
+  secret: string;
+}
+
 export const toPaykitEvent = <T extends any>(event: { id: string; type: WebhookEventLiteral; created: number; data: T }): WebhookEvent<T> => event;

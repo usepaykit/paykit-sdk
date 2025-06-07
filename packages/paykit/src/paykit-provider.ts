@@ -1,7 +1,7 @@
 import { Checkout, CreateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
 import { Subscription, UpdateSubscriptionParams } from './resources/subscription';
-import { WebhookEventPayload } from './resources/webhook';
+import { InternalWebhookHandlerParams, WebhookEventPayload } from './resources/webhook';
 
 export interface PayKitProvider {
   /**
@@ -27,5 +27,5 @@ export interface PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook(payload: string, signature: string, secret: string): Promise<WebhookEventPayload>;
+  handleWebhook(params: InternalWebhookHandlerParams): Promise<WebhookEventPayload>;
 }

@@ -1,7 +1,8 @@
 import { PayKit, Webhook } from '../../packages/paykit/src';
 import { stripe } from '../../packages/stripe/src';
+import { polar } from './../../packages/polar/src/index';
 
-const provider = stripe();
+const provider = polar();
 const paykit = new PayKit(provider);
 
 const customer = await paykit.customers.create({ email: 'test@test.com' });

@@ -31,9 +31,10 @@ export interface WebhookConfig {
 export class Webhook {
   constructor(private config: WebhookConfig) {}
 
-  async handleWebhook(payload: string, signature: string): Promise<void> {
+  handleWebhook = async (payload: string, signature: string): Promise<void> => {
     const { provider, webhookSecret, ...handlers } = this.config;
-    const event = await provider.handleWebhook(payload, signature, this.config.webhookSecret);
+
+    const event = await provider.handleWebhook({ payload, signature, secret: webhookSecret });
     switch (event.type) {
       case 'customer.created':
         return handlers.onCustomerCreated?.(event as WebhookEvent<Customer>);
@@ -48,5 +49,5 @@ export class Webhook {
       case 'subscription.canceled':
         return handlers.onSubscriptionCanceled?.(event as WebhookEvent<Subscription>);
     }
-  }
+  };
 }

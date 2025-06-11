@@ -24,4 +24,7 @@ class PayKit {
   };
 }
 
-export { PayKit, Webhook };
+export { PayKit, Webhook, PayKitProvider };
+
+export * from './resources';
+export * from './types';

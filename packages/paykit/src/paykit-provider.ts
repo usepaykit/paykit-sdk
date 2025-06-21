@@ -27,5 +27,5 @@ export interface PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook(params: InternalWebhookHandlerParams): Promise<WebhookEventPayload>;
+  // handleWebhook(params: InternalWebhookHandlerParams): Promise<WebhookEventPayload>;
 }

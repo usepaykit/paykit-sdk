@@ -31,23 +31,23 @@ export interface WebhookConfig {
 export class Webhook {
   constructor(private config: WebhookConfig) {}
 
-  handleWebhook = async (payload: string, signature: string): Promise<void> => {
-    const { provider, webhookSecret, ...handlers } = this.config;
+  // handleWebhook = async (payload: string, signature: string): Promise<void> => {
+  //   const { provider, webhookSecret, ...handlers } = this.config;
 
-    const event = await provider.handleWebhook({ payload, signature, secret: webhookSecret });
-    switch (event.type) {
-      case 'customer.created':
-        return handlers.onCustomerCreated?.(event as WebhookEvent<Customer>);
-      case 'customer.updated':
-        return handlers.onCustomerUpdated?.(event as WebhookEvent<Customer>);
-      case 'customer.deleted':
-        return handlers.onCustomerDeleted?.(event as WebhookEvent<Customer>);
-      case 'subscription.created':
-        return handlers.onSubscriptionCreated?.(event as WebhookEvent<Subscription>);
-      case 'subscription.updated':
-        return handlers.onSubscriptionUpdated?.(event as WebhookEvent<Subscription>);
-      case 'subscription.canceled':
-        return handlers.onSubscriptionCanceled?.(event as WebhookEvent<Subscription>);
-    }
-  };
+  //   const event = await provider.handleWebhook({ payload, signature, secret: webhookSecret });
+  //   switch (event.type) {
+  //     case 'customer.created':
+  //       return handlers.onCustomerCreated?.(event as WebhookEvent<Customer>);
+  //     case 'customer.updated':
+  //       return handlers.onCustomerUpdated?.(event as WebhookEvent<Customer>);
+  //     case 'customer.deleted':
+  //       return handlers.onCustomerDeleted?.(event as WebhookEvent<Customer>);
+  //     case 'subscription.created':
+  //       return handlers.onSubscriptionCreated?.(event as WebhookEvent<Subscription>);
+  //     case 'subscription.updated':
+  //       return handlers.onSubscriptionUpdated?.(event as WebhookEvent<Subscription>);
+  //     case 'subscription.canceled':
+  //       return handlers.onSubscriptionCanceled?.(event as WebhookEvent<Subscription>);
+  //   }
+  // };
 }

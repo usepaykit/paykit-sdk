@@ -1,5 +1,5 @@
-import { PayKit, Webhook } from '../../packages/paykit/src';
-import { stripe } from '../../packages/stripe/src';
+import { PayKit, Webhook } from '@paykit-sdk/core';
+import { stripe } from '@paykit-sdk/stripe';
 
 const provider = stripe();
 const paykit = new PayKit(provider);
@@ -8,7 +8,7 @@ const customer = await paykit.customers.create({ email: 'test@test.com' });
 
 export const webhook = new Webhook({
   provider,
-  webhookSecret: '123',
+  webhookSecret: 'whsec_123',
   onCustomerCreated: async event => console.log({ event }),
 });
 

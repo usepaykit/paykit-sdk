@@ -80,6 +80,15 @@ importers:
         specifier: ^5
         version: 5.8.3
 
+  examples/node:
+    dependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../../packages/paykit
+      '@paykit-sdk/stripe':
+        specifier: workspace:*
+        version: link:../../packages/stripe
+
   packages/paykit:
     devDependencies:
       tsup:

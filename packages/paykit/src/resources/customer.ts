@@ -1,4 +1,4 @@
-import { StringMetadata } from '../types';
+import { PaykitMetadata } from '../types';
 
 export interface Customer {
   /**
@@ -16,7 +16,7 @@ export interface Customer {
   /**
    * The metadata of the customer.
    */
-  metadata?: StringMetadata;
+  metadata?: PaykitMetadata;
 }
 
 export interface CreateCustomerParams {
@@ -31,7 +31,7 @@ export interface CreateCustomerParams {
   /**
    * The metadata of the customer.
    */
-  metadata?: StringMetadata;
+  metadata?: PaykitMetadata;
 }
 
 export interface UpdateCustomerParams {
@@ -46,5 +46,5 @@ export interface UpdateCustomerParams {
   /**
    * The metadata of the customer.
    */
-  metadata?: StringMetadata;
+  metadata?: PaykitMetadata;
 }

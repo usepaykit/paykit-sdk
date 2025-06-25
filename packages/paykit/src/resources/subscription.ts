@@ -1,4 +1,4 @@
-import { StringMetadata } from '../types';
+import { PaykitMetadata } from '../types';
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'expired';
 
@@ -26,14 +26,14 @@ export interface Subscription {
   /**
    * The metadata of the subscription.
    */
-  metadata?: StringMetadata;
+  metadata?: PaykitMetadata;
 }
 
 export type UpdateSubscriptionParams = {
   /**
    * The metadata of the subscription.
    */
-  metadata: StringMetadata;
+  metadata: PaykitMetadata;
 };
 
 export const toPaykitSubscriptionStatus = <T extends string>(status: T): SubscriptionStatus => {

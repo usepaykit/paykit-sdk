@@ -1,11 +1,13 @@
+import { PaymentProvider } from './resources/providers';
+
 export class PayKitError extends Error {
-  constructor(
-    message: string,
-    public code: string,
-    public type: string,
-    public statusCode?: number,
-  ) {
+  public readonly code: string;
+  public readonly provider: PaymentProvider;
+
+  constructor(message: string, code: string, provider: PaymentProvider) {
     super(message);
     this.name = 'PayKitError';
+    this.code = code;
+    this.provider = provider;
   }
 }

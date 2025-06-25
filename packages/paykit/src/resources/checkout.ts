@@ -1,35 +1,32 @@
-import { StringMetadata } from '../types';
+import { PaykitMetadata } from '../types';
+
+export type CheckoutSessionType = 'one_time' | 'recurring';
 
 export type CreateCheckoutParams = {
   /**
    * The ID of the customer.
    */
   customer_id: string;
+
   /**
    * The metadata of the checkout.
    */
-  metadata: StringMetadata;
+  metadata: PaykitMetadata;
 
   /**
    * The mode of the checkout.
    */
-  mode: 'payment' | 'subscription';
+  session_type: CheckoutSessionType;
+
   /**
-   * The success URL of the checkout.
+   * The item ID of the checkout.
    */
-  success_url: string;
+  item_id: string;
+
   /**
-   * The cancel URL of the checkout.
+   * Extra information to be sent to the provider e.g tax, trial days, etc.
    */
-  cancel_url: string;
-  /**
-   * The price ID of the checkout.
-   */
-  price_id: string;
-  /**
-   * The quantity of the checkout.
-   */
-  quantity: number;
+  provider_metadata?: Record<string, unknown>;
 };
 
 export type RetrieveCheckoutParams = {
@@ -44,32 +41,39 @@ export type Checkout = {
    * The ID of the checkout.
    */
   id: string;
+
   /**
    * The ID of the customer.
    */
   customer_id: string;
+
+  /**
+   * The payment URL where customer completes the transaction.
+   */
+  payment_url: string;
+
   /**
    * The metadata of the checkout.
    */
-  metadata?: StringMetadata;
+  metadata?: PaykitMetadata;
+
   /**
    * The mode of the checkout.
    */
-  mode: 'payment' | 'subscription';
-  /**
-   * The success URL of the checkout.
-   */
-  success_url: string;
-  /**
-   * The cancel URL of the checkout.
-   */
-  cancel_url: string | undefined;
+  session_type: CheckoutSessionType;
+
   /**
    * The products of the checkout.
    */
   products: Array<{ id: string; quantity: number }>;
+
   /**
-   * The URL of the checkout.
+   * The currency code (ISO 4217).
    */
-  url: string;
+  currency: string;
+
+  /**
+   * Total amount in the smallest currency unit (e.g., cents).
+   */
+  amount: number;
 };

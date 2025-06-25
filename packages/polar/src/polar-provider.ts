@@ -34,8 +34,12 @@ export class PolarProvider implements PayKitProvider {
    * Checkout management
    */
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const { metadata, success_url, price_id } = params;
-    const response = await this.polar.checkouts.create({ ...(metadata && { metadata }), successUrl: success_url, products: [price_id] });
+    const { metadata, item_id, provider_metadata } = params;
+    const response = await this.polar.checkouts.create({
+      ...(metadata && { metadata }),
+      products: [item_id],
+      ...provider_metadata,
+    });
     return toPaykitCheckout(response);
   };
 

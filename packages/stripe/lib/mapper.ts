@@ -5,11 +5,11 @@ export const toPaykitCheckout = (checkout: Stripe.Checkout.Session): Checkout =>
   return {
     id: checkout.id,
     customer_id: checkout.customer as string,
-    mode: checkout.mode as 'payment' | 'subscription',
-    success_url: checkout.success_url!,
-    cancel_url: checkout.cancel_url!,
+    session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time', // todo: handle `setup` mode
+    payment_url: checkout.url!,
     products: checkout.line_items!.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })),
-    url: checkout.url!,
+    currency: checkout.currency!,
+    amount: checkout.amount_total!,
     ...(checkout.metadata && { metadata: checkout.metadata }),
   };
 };

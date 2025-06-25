@@ -4,7 +4,7 @@ import {
   Checkout as PaykitCheckout,
   Customer as PaykitCustomer,
 } from '@paykit-sdk/core/src/resources/';
-import { StringMetadata } from '@paykit-sdk/core/src/types';
+import { PaykitMetadata } from '@paykit-sdk/core/src/types';
 import { Checkout } from '@polar-sh/sdk/dist/commonjs/models/components/checkout';
 import { Customer } from '@polar-sh/sdk/dist/commonjs/models/components/customer';
 import { Subscription } from '@polar-sh/sdk/dist/commonjs/models/components/subscription';
@@ -12,13 +12,13 @@ import { Subscription } from '@polar-sh/sdk/dist/commonjs/models/components/subs
 export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
   return {
     id: checkout.id,
-    url: checkout.url,
-    cancel_url: undefined,
+    payment_url: checkout.url,
     customer_id: checkout.customerId!,
-    mode: 'payment',
-    success_url: checkout.successUrl,
+    session_type: checkout.subscriptionId ? 'recurring' : 'one_time',
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
-    metadata: checkout.metadata as StringMetadata,
+    metadata: checkout.metadata as PaykitMetadata,
+    currency: checkout.currency,
+    amount: checkout.amount,
   };
 };
 

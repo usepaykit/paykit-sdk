@@ -1,5 +1,13 @@
 import { PaykitMetadata } from '../types';
 
+/**
+ * @internal
+ * Some important notes for the checkout resource:
+ * item_id -> price_id(stripe) -> plan_code(paystack) -> order_id(square) -> reference(ayden)
+ * session_type -> mode(stripe) -> transaction_type(paystack) -> payment_type(square) -> recurring(ayden)
+ * payment_url -> url(stripe) -> authorization_url(paystack) -> checkout_url(square) -> redirect_url(ayden)
+ */
+
 export type CheckoutSessionType = 'one_time' | 'recurring';
 
 export type CreateCheckoutParams = {

@@ -10,7 +10,7 @@ export const toPaykitCheckout = (checkout: Stripe.Checkout.Session): Checkout =>
     products: checkout.line_items!.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })),
     currency: checkout.currency!,
     amount: checkout.amount_total!,
-    ...(checkout.metadata && { metadata: checkout.metadata }),
+    metadata: checkout.metadata,
   };
 };
 

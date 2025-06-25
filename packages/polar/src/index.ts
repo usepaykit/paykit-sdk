@@ -1,15 +1,15 @@
-import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
+import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
 import { PolarProvider, PolarConfig } from './polar-provider';
 
-export const createPolar = (config: WithPaymentProviderConfig<PolarConfig>) => {
+export const createPolar = (config: PaykitProviderBaseWithAuthConfig<PolarConfig>) => {
   return new PolarProvider(config);
 };
 
 export const polar = () => {
-  const apiKey = process.env.POLAR_ACCESS_TOKEN;
+  const accessToken = process.env.POLAR_ACCESS_TOKEN;
   const isDev = process.env.NODE_ENV === 'development';
 
-  if (!apiKey) throw new Error('POLAR_ACCESS_TOKEN is not set');
+  if (!accessToken) throw new Error('POLAR_ACCESS_TOKEN is not set');
 
-  return createPolar({ apiKey, environment: isDev ? 'test' : 'live' });
+  return createPolar({ debug: true, accessToken, server: isDev ? 'sandbox' : 'production' });
 };

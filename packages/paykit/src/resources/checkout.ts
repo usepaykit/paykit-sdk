@@ -55,7 +55,7 @@ export type Checkout = {
   /**
    * The metadata of the checkout.
    */
-  metadata?: PaykitMetadata;
+  metadata: PaykitMetadata | null;
 
   /**
    * The mode of the checkout.

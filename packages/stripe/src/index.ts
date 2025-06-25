@@ -12,5 +12,5 @@ export const stripe = () => {
     throw new Error('STRIPE_API_KEY is not set');
   }
 
-  return createStripe({ apiKey, apiVersion: '2025-05-28.basil', environment: isDev ? 'test' : 'live' });
+  return createStripe({ apiKey, debug: isDev, apiVersion: '2025-05-28.basil' });
 };

@@ -11,19 +11,22 @@ import {
   WebhookEventPayload,
   InternalWebhookHandlerParams,
 } from '@paykit-sdk/core/src/resources';
-import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
+import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
 import Stripe from 'stripe';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
-export interface StripeConfig extends WithPaymentProviderConfig<Stripe.StripeConfig> {
-  apiVersion?: Stripe.LatestApiVersion;
+export interface StripeConfig extends PaykitProviderBaseWithAuthConfig<Stripe.StripeConfig> {
+  apiKey: string;
 }
 
 export class StripeProvider implements PayKitProvider {
   private stripe: Stripe;
 
   constructor(config: StripeConfig) {
-    const { apiKey, ...rest } = config;
+    const { debug, apiKey, ...rest } = config;
+
+    // todo: use debug mode internally
+
     this.stripe = new Stripe(apiKey, rest);
   }
 

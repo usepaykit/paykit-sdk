@@ -16,7 +16,7 @@ export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
     customer_id: checkout.customerId!,
     session_type: checkout.subscriptionId ? 'recurring' : 'one_time',
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
-    metadata: checkout.metadata as PaykitMetadata,
+    metadata: (checkout.metadata as PaykitMetadata) ?? null,
     currency: checkout.currency,
     amount: checkout.amount,
   };

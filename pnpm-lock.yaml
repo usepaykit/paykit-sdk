@@ -85,6 +85,9 @@ importers:
       '@paykit-sdk/core':
         specifier: workspace:*
         version: link:../../packages/paykit
+      '@paykit-sdk/polar':
+        specifier: workspace:*
+        version: link:../../packages/polar
       '@paykit-sdk/stripe':
         specifier: workspace:*
         version: link:../../packages/stripe

@@ -12,22 +12,22 @@ import {
   UpdateSubscriptionParams,
   InternalWebhookHandlerParams,
 } from '@paykit-sdk/core/src/resources';
-import { WithPaymentProviderConfig } from '@paykit-sdk/core/src/types';
-import { Polar, SDKOptions } from '@polar-sh/sdk';
+import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
+import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/src/webhooks';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
-export interface PolarConfig extends WithPaymentProviderConfig<Omit<SDKOptions, 'accessToken'>> {}
+export interface PolarConfig extends PaykitProviderBaseWithAuthConfig<SDKOptions> {}
 
 export class PolarProvider implements PayKitProvider {
   private polar: Polar;
 
-  private readonly productionURL = 'https://api.polar.sh';
-  private readonly sandboxURL = 'https://api.sandbox.polar.sh';
+  private readonly productionURL = ServerList['production'];
+  private readonly sandboxURL = ServerList['sandbox'];
 
   constructor(private config: PolarConfig) {
-    const { apiKey, environment = 'test', ...rest } = config;
-    this.polar = new Polar({ ...rest, accessToken: apiKey, serverURL: environment === 'test' ? this.sandboxURL : this.productionURL });
+    const { accessToken, server, ...rest } = config;
+    this.polar = new Polar({ ...rest, accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL });
   }
 
   /**
@@ -36,7 +36,7 @@ export class PolarProvider implements PayKitProvider {
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { metadata, item_id, provider_metadata } = params;
     const response = await this.polar.checkouts.create({
-      ...(metadata && { metadata }),
+      metadata,
       products: [item_id],
       ...provider_metadata,
     });

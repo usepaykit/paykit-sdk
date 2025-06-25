@@ -1,7 +1,12 @@
-export type WithPaymentProviderConfig<T extends object> = T & {
-  apiKey: string;
-  environment?: 'test' | 'live';
+export type PaykitProviderBaseConfig = {
+  /**
+   * Enable debug logging for development.
+   * @default false
+   */
+  debug?: boolean;
 };
+
+export type PaykitProviderBaseWithAuthConfig<T extends object> = PaykitProviderBaseConfig & T;
 
 export type OverrideProps<T, V> = V & Omit<T, keyof V>;
 

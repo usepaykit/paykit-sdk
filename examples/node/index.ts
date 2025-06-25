@@ -1,7 +1,8 @@
 import { PayKit, Webhook } from '@paykit-sdk/core';
+import { polar } from '@paykit-sdk/polar';
 import { stripe } from '@paykit-sdk/stripe';
 
-const provider = stripe();
+const provider = polar();
 const paykit = new PayKit(provider);
 
 const customer = await paykit.customers.create({ email: 'test@test.com' });
@@ -15,9 +16,6 @@ export const webhook = new Webhook({
 export const checkout = await paykit.checkouts.create({
   customer_id: customer.id,
   metadata: { order_id: '123' },
-  mode: 'payment',
-  success_url: 'https://example.com/success',
-  cancel_url: 'https://example.com/cancel',
-  price_id: 'price_123',
-  quantity: 1,
+  session_type: 'one_time',
+  item_id: 'price_123',
 });

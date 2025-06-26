@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/core",
-  "version": "1.0.1",
+  "version": "1.0.1-alpha.0",
   "description": "The Payment Toolkit for Typescript",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -34,5 +34,5 @@
   },
   "bugs": {
     "url": "https://github.com/devodii/paykit/issues"
-  } 
+  }
 }

@@ -1,6 +1,9 @@
 import { Checkout, Customer, Subscription, toPaykitSubscriptionStatus } from '@paykit-sdk/core/src/resources';
 import Stripe from 'stripe';
 
+/**
+ * @internal
+ */
 export const toPaykitCheckout = (checkout: Stripe.Checkout.Session): Checkout => {
   return {
     id: checkout.id,
@@ -14,10 +17,16 @@ export const toPaykitCheckout = (checkout: Stripe.Checkout.Session): Checkout =>
   };
 };
 
+/**
+ * @internal
+ */
 export const toPaykitCustomer = (customer: Stripe.Customer): Customer => {
   return { id: customer.id, email: customer.email ?? undefined, name: customer.name ?? undefined };
 };
 
+/**
+ * @internal
+ */
 export const toPaykitSubscription = (subscription: Stripe.Subscription): Subscription => {
   return {
     id: subscription.id,

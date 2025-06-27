@@ -55,3 +55,11 @@ export function isAbortError(err: unknown): boolean {
 
   return isNative || isLegacyNative || isGenericErr;
 }
+
+export function isUnauthorizedError(err: unknown): boolean {
+  if (typeof err !== 'object' || err == null) {
+    return false;
+  }
+
+  return err instanceof Error && err.message.toLowerCase().includes('unauthorized');
+}

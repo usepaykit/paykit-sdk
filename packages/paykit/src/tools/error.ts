@@ -23,18 +23,26 @@ export class HTTPError extends Error {
   }
 }
 
-export class PaykitUnauthorizedError extends HTTPError {
+export class UnauthorizedError extends HTTPError {
   override readonly name = 'PaykitUnauthorizedError';
 }
 
-export class PaykitConnectionError extends HTTPError {
+export class ConnectionError extends HTTPError {
   override readonly name = 'PaykitConnectionError';
 }
 
-export class PaykitAbortedError extends HTTPError {
+export class AbortedError extends HTTPError {
   override readonly name = 'PaykitAbortedError';
 }
 
-export class PaykitTimeoutError extends HTTPError {
+export class TimeoutError extends HTTPError {
   override readonly name = 'PaykitTimeoutError';
+}
+
+export class ValidationError extends HTTPError {
+  override readonly name = 'PaykitValidationError';
+}
+
+export class UnknownError extends HTTPError {
+  override readonly name = 'PaykitUnknownError';
 }

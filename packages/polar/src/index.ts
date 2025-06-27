@@ -1,7 +1,6 @@
-import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
 import { PolarProvider, PolarConfig } from './polar-provider';
 
-export const createPolar = (config: PaykitProviderBaseWithAuthConfig<PolarConfig>) => {
+export const createPolar = (config: PolarConfig) => {
   return new PolarProvider(config);
 };
 

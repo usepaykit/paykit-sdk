@@ -92,6 +92,15 @@ importers:
         specifier: workspace:*
         version: link:../../packages/stripe
 
+  packages/gumroad:
+    dependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
+      zod:
+        specifier: ^3.25.67
+        version: 3.25.67
+
   packages/paykit:
     devDependencies:
       tsup:
@@ -105,7 +114,7 @@ importers:
     dependencies:
       '@polar-sh/sdk':
         specifier: ^0.33.0
-        version: 0.33.0(zod@3.25.52)
+        version: 0.33.0(zod@3.25.67)
     devDependencies:
       '@paykit-sdk/core':
         specifier: workspace:*
@@ -2598,8 +2607,8 @@ packages:
     resolution: {integrity: sha512-rVksvsnNCdJ/ohGc6xgPwyN8eheCxsiLM8mxuE/t/mOVqJewPuO1miLpTHQiRgTKCLexL4MeAFVagts7HmNZ2Q==}
     engines: {node: '>=10'}
 
-  zod@3.25.52:
-    resolution: {integrity: sha512-uAbT2zN2aCdHH4OmFrV/GhZy1rsnIgIOaQ+YDLUAzMe4560rscckxxg4Myk+KHarIAUhya2clp4EnCqXWF0eew==}
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -2999,10 +3008,10 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@polar-sh/sdk@0.33.0(zod@3.25.52)':
+  '@polar-sh/sdk@0.33.0(zod@3.25.67)':
     dependencies:
       standardwebhooks: 1.0.0
-      zod: 3.25.52
+      zod: 3.25.67
 
   '@radix-ui/react-compose-refs@1.1.2(@types/react@19.1.6)(react@19.1.0)':
     dependencies:
@@ -5153,4 +5162,4 @@ snapshots:
 
   yocto-queue@0.1.0: {}
 
-  zod@3.25.52: {}
+  zod@3.25.67: {}

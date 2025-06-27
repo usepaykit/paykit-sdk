@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/stripe",
-  "version": "1.0.1-alpha.1",
+  "version": "1.0.1-alpha.2",
   "description": "Stripe provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

@@ -32,7 +32,7 @@ export interface WebhookConfig {
 export class Webhook {
   constructor(
     private config: WebhookConfig,
-    private opts: WebhookProviderPayload,
+    private opts: Omit<WebhookProviderPayload, 'webhookSecret'>,
   ) {}
 
   handle = async (): Promise<void> => {

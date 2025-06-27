@@ -85,6 +85,9 @@ importers:
       '@paykit-sdk/core':
         specifier: workspace:*
         version: link:../../packages/paykit
+      '@paykit-sdk/gumroad':
+        specifier: workspace:*
+        version: link:../../packages/gumroad
       '@paykit-sdk/polar':
         specifier: workspace:*
         version: link:../../packages/polar

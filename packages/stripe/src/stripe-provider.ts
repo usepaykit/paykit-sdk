@@ -9,8 +9,9 @@ import {
   UpdateSubscriptionParams,
   toPaykitEvent,
   WebhookEventPayload,
-  InternalWebhookHandlerParams,
+  WebhookProviderPayload,
 } from '@paykit-sdk/core/src/resources';
+import { headersExtractor } from '@paykit-sdk/core/src/tools/webhook';
 import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
 import Stripe from 'stripe';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
@@ -94,21 +95,29 @@ export class StripeProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (params: InternalWebhookHandlerParams): Promise<WebhookEventPayload> => {
-    const { payload, signature, secret } = params;
-    const event = this.stripe.webhooks.constructEvent(payload, signature, secret);
+  handleWebhook = async (params: WebhookProviderPayload): Promise<WebhookEventPayload> => {
+    const { body, headers, webhookSecret } = params;
+
+    const stripeHeaders = headersExtractor(headers, ['x-stripe-signature']);
+    const signature = stripeHeaders[0].value;
+
+    const event = this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
     if (event.type === 'checkout.session.completed') {
       const checkout = await this.retrieveCheckout(event.data.object.id);
       return toPaykitEvent<Checkout>({ type: 'checkout.created', created: event.created, id: event.id, data: checkout });
     } else if (event.type === 'customer.created') {
-      const customer = await this.retrieveCustomer(event.data.object.id);
-      return toPaykitEvent<Customer | null>({ type: 'customer.created', created: event.created, id: event.id, data: customer });
+      const customer = await this.createCustomer({ email: event.data.object.email!, name: event.data.object.name ?? undefined });
+      return toPaykitEvent<Customer>({ type: 'customer.created', created: event.created, id: event.id, data: customer });
     } else if (event.type === 'customer.updated') {
-      const customer = await this.retrieveCustomer(event.data.object.id);
-      return toPaykitEvent<Customer | null>({ type: 'customer.updated', created: event.created, id: event.id, data: customer });
+      const customer = await this.updateCustomer(event.data.object.id, {
+        email: event.data.object.email!,
+        name: event.data.object.name ?? undefined,
+      });
+      return toPaykitEvent<Customer>({ type: 'customer.updated', created: event.created, id: event.id, data: customer });
     } else if (event.type === 'customer.deleted') {
-      return toPaykitEvent<Customer | null>({ type: 'customer.deleted', created: event.created, id: event.id, data: null });
+      await this.deleteCustomer(event.data.object.id);
+      return toPaykitEvent<null>({ type: 'customer.deleted', created: event.created, id: event.id, data: null });
     } else if (event.type === 'customer.subscription.created') {
       const subscription = await this.retrieveSubscription(event.data.object.id);
       return toPaykitEvent<Subscription>({ type: 'subscription.created', created: event.created, id: event.id, data: subscription });

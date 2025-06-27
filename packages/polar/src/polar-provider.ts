@@ -1,7 +1,6 @@
 import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
 import {
   toPaykitEvent,
-  WebhookEventLiteral,
   WebhookEventPayload,
   CreateCustomerParams,
   Customer,
@@ -10,8 +9,9 @@ import {
   CreateCheckoutParams,
   Subscription,
   UpdateSubscriptionParams,
-  InternalWebhookHandlerParams,
+  WebhookProviderPayload,
 } from '@paykit-sdk/core/src/resources';
+import { headersExtractor } from '@paykit-sdk/core/src/tools/webhook';
 import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/src/webhooks';
@@ -27,7 +27,7 @@ export class PolarProvider implements PayKitProvider {
 
   constructor(private config: PolarConfig) {
     const { accessToken, server, ...rest } = config;
-    this.polar = new Polar({ ...rest, accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL });
+    this.polar = new Polar({ accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL, ...rest });
   }
 
   /**
@@ -90,18 +90,21 @@ export class PolarProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (params: InternalWebhookHandlerParams): Promise<WebhookEventPayload> => {
-    const { payload, signature, secret } = params;
-    /**
-     * Polar webhook signature format: id.timestamp.signature
-     */
-    const parts = signature.split('.');
-    const id = parts[0];
-    const timestamp = parts[1];
-    const actualSignature = parts[2];
+  handleWebhook = async (params: WebhookProviderPayload): Promise<WebhookEventPayload> => {
+    const { body, headers, webhookSecret } = params;
 
-    const webhookHeaders = { 'webhook-id': id, 'webhook-timestamp': timestamp, 'webhook-signature': actualSignature };
-    const webhookEvent = validateEvent(payload, webhookHeaders, secret);
+    const webhookHeaders = headersExtractor(headers, ['webhook-id', 'webhook-timestamp', 'webhook-signature']).reduce(
+      (acc, kv) => {
+        acc[kv.key] = Array.isArray(kv.value) ? kv.value.join(',') : kv.value;
+        return acc;
+      },
+      {} as Record<string, string>,
+    );
+
+    const webhookEvent = validateEvent(body, webhookHeaders, webhookSecret);
+
+    const id = webhookHeaders['webhook-id'];
+    const timestamp = webhookHeaders['webhook-timestamp'];
 
     if (webhookEvent.type === 'subscription.updated') {
       const subscription = await this.retrieveSubscription(webhookEvent.data.id);

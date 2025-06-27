@@ -2,6 +2,7 @@ import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
 import { Checkout, CreateCheckoutParams } from '@paykit-sdk/core/src/resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from '@paykit-sdk/core/src/resources/customer';
 import { Subscription, UpdateSubscriptionParams } from '@paykit-sdk/core/src/resources/subscription';
+import { WebhookProviderPayload, WebhookEventPayload } from '@paykit-sdk/core/src/resources/webhook';
 import { AbortedError, ConnectionError, TimeoutError, UnauthorizedError, UnknownError, ValidationError } from '@paykit-sdk/core/src/tools/error';
 import { ERR, OK, unwrapAsync } from '@paykit-sdk/core/src/tools/fp';
 import { isAbortError, isConnectionError, isTimeoutError, isUnauthorizedError } from '@paykit-sdk/core/src/tools/http';
@@ -65,6 +66,10 @@ export class GumroadProvider implements PayKitProvider {
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
+    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+  };
+
+  handleWebhook = async (payload: WebhookProviderPayload): Promise<WebhookEventPayload> => {
     throw new UnknownError('Not implemented', { provider: 'gumroad' });
   };
 }

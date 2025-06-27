@@ -1,4 +1,4 @@
-import { PayKit } from '@paykit-sdk/core';
+import { PayKit, Webhook } from '@paykit-sdk/core';
 import { stripe } from '@paykit-sdk/stripe';
 
 const provider = stripe();
@@ -22,3 +22,15 @@ console.log({ updatedSubscription });
 const canceledSubscription = await paykit.subscriptions.cancel('sub_123');
 
 console.log({ canceledSubscription });
+
+const webhook = new Webhook(
+  {
+    provider,
+    webhookSecret: 'whsec_123',
+    onCustomerCreated: async event => console.log({ event }),
+    onSubscriptionCreated: async subscription => console.log({ subscription }),
+  },
+  { body: '123', headers: { 'x-stripe-signature': '123' } },
+);
+
+console.log({ webhook });

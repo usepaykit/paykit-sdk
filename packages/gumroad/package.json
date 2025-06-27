@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/gumroad",
-  "version": "1.0.0-alpha.0",
+  "version": "1.0.1-alpha.1",
   "description": "Gumroad provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -28,5 +28,8 @@
     "tsup": "^8.0.0",
     "typescript": "^5.0.0",
     "@paykit-sdk/core": "workspace:*"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }

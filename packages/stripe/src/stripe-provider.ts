@@ -11,11 +11,11 @@ import {
   WebhookEventPayload,
   InternalWebhookHandlerParams,
 } from '@paykit-sdk/core/src/resources';
-import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
+import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
 import Stripe from 'stripe';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
-export interface StripeConfig extends PaykitProviderBaseWithAuthConfig<Stripe.StripeConfig> {
+export interface StripeConfig extends PaykitProviderOptions<Stripe.StripeConfig> {
   apiKey: string;
 }
 

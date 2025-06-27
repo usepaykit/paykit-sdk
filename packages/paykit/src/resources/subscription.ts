@@ -36,6 +36,9 @@ export type UpdateSubscriptionParams = {
   metadata: PaykitMetadata;
 };
 
+/**
+ * todo: return from provider
+ */
 export const toPaykitSubscriptionStatus = <T extends string>(status: T): SubscriptionStatus => {
   if (['active', 'trialing'].includes(status)) return 'active';
   if (['incomplete_expired', 'incomplete', 'past_due'].includes(status)) return 'past_due';

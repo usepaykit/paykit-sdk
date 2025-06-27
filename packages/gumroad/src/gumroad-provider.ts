@@ -5,9 +5,9 @@ import { Subscription, UpdateSubscriptionParams } from '@paykit-sdk/core/src/res
 import { AbortedError, ConnectionError, TimeoutError, UnauthorizedError, UnknownError, ValidationError } from '@paykit-sdk/core/src/tools/error';
 import { ERR, OK, unwrapAsync } from '@paykit-sdk/core/src/tools/fp';
 import { isAbortError, isConnectionError, isTimeoutError, isUnauthorizedError } from '@paykit-sdk/core/src/tools/http';
-import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
+import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
 
-export interface GumroadConfig extends PaykitProviderBaseWithAuthConfig<{ accessToken: string }> {}
+export interface GumroadConfig extends PaykitProviderOptions<{ accessToken: string }> {}
 
 export class GumroadProvider implements PayKitProvider {
   constructor(private config: GumroadConfig) {}

@@ -12,12 +12,12 @@ import {
   UpdateSubscriptionParams,
   InternalWebhookHandlerParams,
 } from '@paykit-sdk/core/src/resources';
-import { PaykitProviderBaseWithAuthConfig } from '@paykit-sdk/core/src/types';
+import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/src/webhooks';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
-export interface PolarConfig extends PaykitProviderBaseWithAuthConfig<SDKOptions> {}
+export interface PolarConfig extends PaykitProviderOptions<SDKOptions> {}
 
 export class PolarProvider implements PayKitProvider {
   private polar: Polar;

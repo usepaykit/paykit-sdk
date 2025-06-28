@@ -1,4 +1,3 @@
-import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
 import {
   toPaykitEvent,
   WebhookEventPayload,
@@ -10,9 +9,10 @@ import {
   Subscription,
   UpdateSubscriptionParams,
   WebhookProviderPayload,
-} from '@paykit-sdk/core/src/resources';
-import { headersExtractor } from '@paykit-sdk/core/src/tools/webhook';
-import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
+  headersExtractor,
+  PayKitProvider,
+  PaykitProviderOptions,
+} from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/src/webhooks';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';

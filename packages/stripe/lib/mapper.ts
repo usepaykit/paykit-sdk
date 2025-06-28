@@ -1,4 +1,4 @@
-import { Checkout, Customer, Subscription, toPaykitSubscriptionStatus } from '@paykit-sdk/core/src/resources';
+import { Checkout, Customer, Subscription, toPaykitSubscriptionStatus } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 
 /**

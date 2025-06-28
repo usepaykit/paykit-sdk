@@ -3,8 +3,8 @@ import {
   toPaykitSubscriptionStatus,
   Checkout as PaykitCheckout,
   Customer as PaykitCustomer,
-} from '@paykit-sdk/core/src/resources/';
-import { PaykitMetadata } from '@paykit-sdk/core/src/types';
+  PaykitMetadata,
+} from '@paykit-sdk/core';
 import { Checkout } from '@polar-sh/sdk/dist/commonjs/models/components/checkout';
 import { Customer } from '@polar-sh/sdk/dist/commonjs/models/components/customer';
 import { Subscription } from '@polar-sh/sdk/dist/commonjs/models/components/subscription';

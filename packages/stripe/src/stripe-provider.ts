@@ -1,5 +1,5 @@
-import { PayKitProvider } from '@paykit-sdk/core/src/paykit-provider';
 import {
+  PayKitProvider,
   Checkout,
   CreateCheckoutParams,
   CreateCustomerParams,
@@ -10,9 +10,9 @@ import {
   toPaykitEvent,
   WebhookEventPayload,
   WebhookProviderPayload,
-} from '@paykit-sdk/core/src/resources';
-import { headersExtractor } from '@paykit-sdk/core/src/tools/webhook';
-import { PaykitProviderOptions } from '@paykit-sdk/core/src/types';
+  PaykitProviderOptions,
+  headersExtractor,
+} from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 

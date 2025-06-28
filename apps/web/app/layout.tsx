@@ -1,3 +1,4 @@
+import { ThemeProvider } from '@/components/theme-provider';
 import { arizoniaFont } from '@/fonts/arizonia';
 import { interFont } from '@/fonts/inter';
 import { cn } from '@/lib/utils';
@@ -11,8 +12,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={cn(arizoniaFont.variable, interFont.variable, 'antialiased')}>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body className={cn(arizoniaFont.variable, interFont.variable, 'antialiased')}>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
+      </body>
     </html>
   );
 }

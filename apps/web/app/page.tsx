@@ -1,4 +1,5 @@
 import React from 'react';
+import { Spinner } from '@/components/spinner';
 import { Button } from '@/components/ui/button';
 import { Github, BookOpen, ArrowRight, Zap } from 'lucide-react';
 
@@ -33,6 +34,8 @@ const Index = () => {
           <p className="font-inter mx-auto max-w-3xl text-xl leading-relaxed text-slate-600 md:text-2xl">
             Paykit SDK is a free open-source library that gives you the tools you need to add payments to your app.
           </p>
+
+          <Spinner />
 
           {/* CTA Buttons */}
           <div className="flex flex-col items-center justify-center gap-4 pt-8 sm:flex-row">

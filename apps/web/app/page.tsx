@@ -1,17 +1,16 @@
 import React from 'react';
+import { ProviderDemo } from '@/components/provider-demo';
 import { Spinner } from '@/components/spinner';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@/components/ui/button';
-import { Github, BookOpen, ArrowRight, Zap } from 'lucide-react';
+import { Github, BookOpen, ArrowRight, Zap, Sparkles } from 'lucide-react';
 
 const Index = () => {
   return (
     <div className="font-inter bg-background min-h-screen">
       <nav className="mx-auto flex max-w-7xl items-center justify-between p-6">
         <div className="flex items-center space-x-2">
-          <div className="bg-foreground flex h-8 w-8 items-center justify-center rounded-lg">
-            <Zap className="text-background h-5 w-5" />
-          </div>
+          <Sparkles className="text-foreground h-5 w-5" />
           <span className="text-foreground text-xl font-semibold">Paykit</span>
         </div>
         <div className="flex items-center space-x-4">
@@ -29,7 +28,7 @@ const Index = () => {
 
       <main className="mx-auto max-w-7xl px-6 pb-24 pt-16">
         <div className="animate-fade-in space-y-8 text-center">
-          <h1 className="font-arizonia text-foreground text-6xl font-bold leading-tight tracking-tight md:text-7xl lg:text-8xl">
+          <h1 className="text-foreground text-3xl font-bold leading-tight tracking-tight md:text-4xl lg:text-6xl">
             The Payment Toolkit for TypeScript
           </h1>
 
@@ -54,6 +53,9 @@ const Index = () => {
           </div>
         </div>
       </main>
+
+      {/* Provider Demo */}
+      <ProviderDemo />
     </div>
   );
 };

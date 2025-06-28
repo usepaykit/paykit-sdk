@@ -49,6 +49,11 @@
   --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 8px 10px -1px hsl(0 0% 0% / 0.17);
   --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.43);
   --tracking-normal: 0.025em;
+
+  /* Provider brand colors */
+  --stripe: oklch(0.6745 0.1692 248.3478);
+  --polar: oklch(0.6074 0.1739 217.8914);
+  --gumroad: oklch(0.7686 0.2189 318.1876);
 }
 
 .dark {
@@ -96,6 +101,11 @@
   --shadow-lg: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 4px 6px -1px hsl(0 0% 0% / 0.17);
   --shadow-xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.17), 0px 8px 10px -1px hsl(0 0% 0% / 0.17);
   --shadow-2xl: 0px 1px 3px 0px hsl(0 0% 0% / 0.43);
+
+  /* Provider brand colors - same for dark mode */
+  --stripe: oklch(0.6846 0.233 276.77);
+  --polar: oklch(0.6074 0.1739 217.8914);
+  --gumroad: oklch(0.7686 0.2189 318.1876);
 }
 
 @theme inline {
@@ -132,6 +142,11 @@
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
 
+  /* Provider brand colors */
+  --color-stripe: var(--stripe);
+  --color-polar: var(--polar);
+  --color-gumroad: var(--gumroad);
+
   --font-sans: var(--font-sans);
   --font-mono: var(--font-mono);
   --font-serif: var(--font-serif);
@@ -163,6 +178,20 @@ body {
 }
 
 @layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+  .font-arizonia {
+    font-family: var(--font-arizonia);
+  }
+
+  .font-inter {
+    font-family: var(--font-inter);
+  }
+
   .font-pt-sans {
     font-family: var(--font-pt-sans);
   }

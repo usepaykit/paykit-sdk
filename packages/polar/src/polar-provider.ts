@@ -14,7 +14,7 @@ import {
   PaykitProviderOptions,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
-import { validateEvent } from '@polar-sh/sdk/src/webhooks';
+import { validateEvent } from '@polar-sh/sdk/webhooks';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
 
 export interface PolarConfig extends PaykitProviderOptions<SDKOptions> {}

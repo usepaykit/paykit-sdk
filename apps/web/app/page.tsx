@@ -311,7 +311,7 @@ const Index = () => {
         <div className="mb-16 space-y-8 text-center">
           <div className="space-y-2">
             <h2 className="text-3xl font-bold md:text-4xl">Perfect for every use case</h2>
-            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">Whether you're prototyping or scaling to millions of users</p>
+            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">Whether you&apos;re prototyping or scaling to millions of users</p>
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -416,7 +416,7 @@ const Index = () => {
                   built for developers
                 </span>
               </h2>
-              <p className="text-muted-foreground mx-auto max-w-2xl text-xl">See what your customers experience with PayKit's local provider</p>
+              <p className="text-muted-foreground mx-auto max-w-2xl text-xl">See what your customers experience with PayKit&apos;s local provider</p>
             </div>
 
             <div className="bg-muted/20 relative rounded-2xl border p-1">

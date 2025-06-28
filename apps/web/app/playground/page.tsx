@@ -201,7 +201,7 @@ export default function PlaygroundPage() {
               Live Testing
             </Badge>
           </div>
-          <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">Test PayKit's Local Provider</h1>
+          <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">Test PayKit&apos;s Local Provider</h1>
           <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
             Experiment with payments, webhooks, and different scenarios without any external APIs or configuration.
           </p>
@@ -262,7 +262,7 @@ export default function PlaygroundPage() {
                         className={`w-full rounded-lg border p-3 text-left transition-colors ${
                           selectedScenario === scenario.id ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20' : 'border-border hover:bg-muted/50'
                         }`}
-                        onClick={() => setSelectedScenario(scenario.id as any)}
+                        onClick={() => setSelectedScenario(scenario.id as 'success' | 'failure' | 'delayed')}
                       >
                         <div className="text-sm font-medium">{scenario.label}</div>
                         <div className="text-muted-foreground text-xs">{scenario.description}</div>

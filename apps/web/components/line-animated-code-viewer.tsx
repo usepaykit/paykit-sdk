@@ -8,28 +8,9 @@ import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 interface LineAnimatedCodeViewerProps {
-  provider: string;
   className?: string;
+  lines?: string[];
 }
-
-const getCodeLines = (provider: string) => [
-  "import { PayKit } from '@paykit-sdk/core';",
-  `import { ${provider} } from '@paykit-sdk/${provider}';`,
-  '',
-  `const provider = ${provider}();`,
-  'const paykit = new PayKit(provider);',
-  '',
-  'const customer = await paykit.customers.create({',
-  "  email: 'customer@example.com',",
-  '});',
-  '',
-  'const checkout = await paykit.checkouts.create({',
-  '  customer_id: customer.id,',
-  "  metadata: { order_id: '123' },",
-  "  session_type: 'one_time',",
-  "  item_id: 'price_123',",
-  '});',
-];
 
 interface AnimatedLineProps {
   content: string;
@@ -107,13 +88,11 @@ function AnimatedLine({ content, isChangingLine }: AnimatedLineProps) {
   );
 }
 
-export function LineAnimatedCodeViewer({ provider, className = '' }: LineAnimatedCodeViewerProps) {
-  const codeLines = getCodeLines(provider);
-
+export function LineAnimatedCodeViewer({ className = '', lines = [] }: LineAnimatedCodeViewerProps) {
   return (
     <div className={cn('bg-card border-border overflow-hidden rounded-lg border', className)}>
       <div className="p-6">
-        {codeLines.map((line, index) => {
+        {lines.map((line, index) => {
           // Only lines 1 and 3 (import and provider init) should be marked as changing
           const isChangingLine = index === 1 || index === 3;
 

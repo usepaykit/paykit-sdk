@@ -24,8 +24,10 @@ import {
   Terminal,
   Settings,
   Layers,
+  CreditCard,
 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 const Index = () => {
   return (
@@ -41,6 +43,12 @@ const Index = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden items-center space-x-1 md:flex">
+            <Link href="/playground">
+              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                <Play className="mr-2 h-4 w-4" />
+                Playground
+              </Button>
+            </Link>
             <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <BookOpen className="mr-2 h-4 w-4" />
               Documentation
@@ -89,11 +97,13 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <Button size="lg" className="group">
-              <Play className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-              Try Locally
-              <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-            </Button>
+            <Link href="/playground">
+              <Button size="lg" className="group">
+                <Play className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
+                Try Playground
+                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+              </Button>
+            </Link>
             <Button variant="outline" size="lg">
               <Github className="mr-2 h-5 w-5" />
               View Source
@@ -386,6 +396,126 @@ const Index = () => {
 
       {/* Provider Demo */}
       <ProviderDemo />
+
+      {/* Checkout Experience Section */}
+      <section className="relative py-16">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mb-16 text-center">
+            <div className="mb-8 space-y-2">
+              <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
+                <CreditCard className="h-4 w-4 text-green-500" />
+                <span className="text-muted-foreground">Complete Checkout Experience</span>
+                <Badge variant="outline" className="ml-2">
+                  Demo
+                </Badge>
+              </div>
+              <h2 className="text-3xl font-bold md:text-4xl">
+                Production-ready checkout flows
+                <br />
+                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                  built for developers
+                </span>
+              </h2>
+              <p className="text-muted-foreground mx-auto max-w-2xl text-xl">See what your customers experience with PayKit's local provider</p>
+            </div>
+
+            <div className="bg-muted/20 relative rounded-2xl border p-1">
+              <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20"></div>
+              <div className="bg-background relative space-y-6 rounded-xl p-8 md:p-12">
+                {/* Browser Chrome */}
+                <div className="mx-auto max-w-4xl">
+                  <div className="bg-muted rounded-t-lg border p-3">
+                    <div className="flex items-center space-x-2">
+                      <div className="flex space-x-1">
+                        <div className="h-3 w-3 rounded-full bg-red-400"></div>
+                        <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
+                        <div className="h-3 w-3 rounded-full bg-green-400"></div>
+                      </div>
+                      <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">localhost:3000/checkout</div>
+                    </div>
+                  </div>
+
+                  {/* Checkout Preview */}
+                  <div className="bg-background rounded-b-lg border border-t-0 p-6">
+                    <div className="grid gap-6 md:grid-cols-2">
+                      {/* Form Preview */}
+                      <div className="space-y-4">
+                        <div className="space-y-2">
+                          <h3 className="text-left font-semibold">Secure Checkout</h3>
+                          <p className="text-muted-foreground text-left text-sm">Powered by PayKit Local Provider</p>
+                        </div>
+
+                        <div className="space-y-3">
+                          <div className="bg-muted/30 rounded-lg border p-3">
+                            <div className="mb-2 text-left text-xs font-medium">Customer Information</div>
+                            <div className="space-y-2">
+                              <div className="bg-background text-muted-foreground h-6 rounded border px-2 py-1 text-xs">john@example.com</div>
+                              <div className="grid grid-cols-2 gap-2">
+                                <div className="bg-background text-muted-foreground h-6 rounded border px-2 py-1 text-xs">John</div>
+                                <div className="bg-background text-muted-foreground h-6 rounded border px-2 py-1 text-xs">Doe</div>
+                              </div>
+                            </div>
+                          </div>
+
+                          <div className="bg-muted/30 rounded-lg border p-3">
+                            <div className="mb-2 text-left text-xs font-medium">Payment Method</div>
+                            <div className="bg-background text-muted-foreground h-6 rounded border px-2 py-1 text-xs">4242 4242 4242 4242</div>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Order Summary Preview */}
+                      <div className="space-y-4">
+                        <div className="bg-muted/30 rounded-lg border p-4">
+                          <div className="mb-3 text-left text-xs font-medium">Order Summary</div>
+                          <div className="space-y-2">
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">PayKit Pro License</span>
+                              <span className="font-medium">$99.00</span>
+                            </div>
+                            <div className="flex justify-between text-xs">
+                              <span className="text-muted-foreground">Local provider fee</span>
+                              <span className="font-medium text-green-600">$0.00</span>
+                            </div>
+                            <div className="border-t pt-2">
+                              <div className="flex justify-between text-sm font-bold">
+                                <span>Total</span>
+                                <span>$99.00</span>
+                              </div>
+                            </div>
+                          </div>
+                          <div className="mt-3">
+                            <div className="bg-primary text-primary-foreground w-full rounded px-3 py-2 text-center text-xs font-medium">
+                              Complete Payment - $99.00
+                            </div>
+                          </div>
+                        </div>
+
+                        <div className="text-center">
+                          <div className="inline-flex items-center space-x-1 rounded-full bg-green-50 px-2 py-1 text-xs text-green-600 dark:bg-green-900/20">
+                            <Shield className="h-3 w-3" />
+                            <span>Local Provider Active</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex justify-center">
+                  <Link href="/checkout">
+                    <Button size="lg" variant="outline" className="group">
+                      <CreditCard className="mr-2 h-5 w-5" />
+                      Try Live Checkout Demo
+                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* Social Proof Section */}
       <section className="relative py-16">

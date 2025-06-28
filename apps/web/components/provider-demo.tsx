@@ -7,6 +7,25 @@ import { LineAnimatedCodeViewer } from './line-animated-code-viewer';
 import { ProviderList } from './provider-list';
 import { Badge } from './ui/badge';
 
+const getCodeLines = (provider: string) => [
+  "import { PayKit } from '@paykit-sdk/core';",
+  `import { ${provider} } from '@paykit-sdk/${provider}';`,
+  '',
+  `const provider = ${provider}();`,
+  'const paykit = new PayKit(provider);',
+  '',
+  'const customer = await paykit.customers.create({',
+  "  email: 'customer@example.com',",
+  '});',
+  '',
+  'const checkout = await paykit.checkouts.create({',
+  '  customer_id: customer.id,',
+  "  metadata: { order_id: '123' },",
+  "  session_type: 'one_time',",
+  "  item_id: 'price_123',",
+  '});',
+];
+
 export function ProviderDemo() {
   const [selectedProvider, setSelectedProvider] = React.useState<PaymentProvider>('stripe');
 
@@ -72,7 +91,7 @@ export function ProviderDemo() {
                         </div>
                       </div>
                     </div>
-                    <LineAnimatedCodeViewer provider={selectedProvider} />
+                    <LineAnimatedCodeViewer lines={getCodeLines(selectedProvider)} />
                   </div>
                 </div>
               </div>

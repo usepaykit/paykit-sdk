@@ -13,11 +13,11 @@ const Index = () => {
           <span className="text-xl font-semibold text-slate-900">Paykit</span>
         </div>
         <div className="flex items-center space-x-4">
-          <Button variant="ghost" size="sm" className="text-slate-600">
+          <Button variant="ghost" size="sm" className="">
             <BookOpen className="mr-2 h-4 w-4" />
             Docs
           </Button>
-          <Button variant="ghost" size="sm" className="text-slate-600">
+          <Button variant="ghost" size="sm" className="">
             <Github className="mr-2 h-4 w-4" />
             GitHub
           </Button>
@@ -36,21 +36,13 @@ const Index = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col items-center justify-center gap-4 pt-8 sm:flex-row">
-            <Button
-              size="lg"
-              variant="default"
-              className="rounded-xl px-8 py-6 text-lg font-semibold text-white shadow-lg transition-all duration-200 hover:scale-105 hover:shadow-xl"
-            >
+            <Button size="lg" variant="default">
               <BookOpen className="mr-2 h-5 w-5" />
               Explore Docs
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
 
-            <Button
-              variant="outline"
-              size="lg"
-              className="rounded-xl border-2 border-slate-300 px-8 py-6 text-lg font-semibold transition-all duration-200 hover:border-slate-400"
-            >
+            <Button variant="default" size="lg">
               <Github className="mr-2 h-5 w-5" />
               View on GitHub
             </Button>

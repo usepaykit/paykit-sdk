@@ -1,0 +1,25 @@
+{
+  "name": "@paykit-sdk/cli",
+  "version": "1.0.0",
+  "description": "PayKit CLI for product setup",
+  "main": "dist/index.js",
+  "bin": {
+    "paykit-cli": "dist/index.js"
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.12.1",
+  "dependencies": {
+    "commander": "^14.0.0",
+    "inquirer": "^12.6.3"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "tsup": "^8.0.0"
+  }
+}

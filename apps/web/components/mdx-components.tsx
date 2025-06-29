@@ -9,8 +9,34 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useMDXComponent } from 'next-contentlayer/hooks';
+import ShikiCodeBlock from './shiki-code-block';
 
 type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['components'];
+
+function extractCodeString(children: React.ReactNode): string {
+  if (typeof children === 'string') return children;
+  if (Array.isArray(children)) return children.map(extractCodeString).join('');
+  if (React.isValidElement(children) && 'children' in (children.props as { children: React.ReactNode })) return extractCodeString((children.props as { children: React.ReactNode }).children);
+  return '';
+}
+
+// Wrapper for MDX pre/code blocks
+const CodeBlock = async ({
+  children,
+  className,
+  __rawString__,
+  ...props
+}: React.HTMLAttributes<HTMLPreElement> & {
+  __rawString__?: string;
+}) => {
+  // Extract language
+  const language = className?.replace('language-', '') || 'typescript';
+  // Extract code string
+  let code = __rawString__ || extractCodeString(children);
+  code = String(code).trim();
+
+  return <ShikiCodeBlock code={code} language={language} />;
+};
 
 const components = {
   Accordion,
@@ -71,19 +97,20 @@ const components = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td className={cn('px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right', className)} {...props} />
   ),
-  pre: ({
-    className,
-    __rawString__,
-    ...props
-  }: React.HTMLAttributes<HTMLPreElement> & {
-    __rawString__?: string;
-  }) => {
-    console.log('__rawString__', __rawString__);
-    return <pre className={cn('mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-xl bg-zinc-950 py-4 dark:bg-zinc-900', className)} {...props} />;
+  pre: CodeBlock,
+  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
+    /**
+     * If this is a code block (not inline code), don't render it here
+     * as it will be handled by the pre component
+     */
+    if (className?.includes('language-')) {
+      return null;
+    }
+    
+    return (
+      <code className={cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props} />
+    );
   },
-  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
-    <code className={cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props} />
-  ),
   Callout,
   CodeBlockWrapper: ({ children, ...props }: CodeBlockWrapperProps) => (
     <CodeBlockWrapper className="rounded-md border" {...props}>

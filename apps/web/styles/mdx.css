@@ -181,31 +181,25 @@
   color: hsl(var(--foreground));
 }
 
+/* Override default pre styles for our custom code blocks */
 .mdx pre {
-  background-color: hsl(var(--muted));
-  border: 1px solid hsl(var(--border));
-  border-radius: 0.5rem;
-  padding: 1.25rem;
-  overflow-x: auto;
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace;
-  font-size: 0.875rem;
-  line-height: 1.45;
-  margin-top: 1.5em;
-  margin-bottom: 1.5em;
-  position: relative;
+  background-color: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  overflow: visible;
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  position: static;
 }
 
 .mdx pre::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 3px;
-  background: linear-gradient(90deg, hsl(var(--primary)), hsl(var(--primary) / 0.7));
-  border-radius: 0.5rem 0.5rem 0 0;
+  display: none;
 }
 
+/* Ensure code inside pre (from syntax highlighter) inherits properly */
 .mdx pre code {
   background-color: transparent;
   border: none;
@@ -213,6 +207,25 @@
   padding: 0;
   font-size: inherit;
   color: inherit;
+}
+
+/* Custom styles for our syntax highlighted code blocks */
+.mdx .group {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+
+.mdx .group .rounded-lg {
+  overflow: hidden;
+}
+
+/* Ensure syntax highlighter styles work properly */
+.mdx .react-syntax-highlighter-line-number {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.mdx .react-syntax-highlighter-line-number:hover {
+  color: hsl(var(--foreground)) !important;
 }
 
 .mdx a {
@@ -267,4 +280,77 @@
   font-size: 0.75rem;
   font-weight: 600;
   margin-right: 0.5rem;
+}
+
+/* Shiki code block custom styles */
+.shiki-codeblock {
+  border-radius: 0.5rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--muted));
+  font-size: 0.85rem;
+  line-height: 1.6;
+  padding: 1.1rem 1.25rem;
+  margin: 1.5em 0;
+  overflow-x: auto;
+  box-shadow: 0 2px 8px 0 rgb(0 0 0 / 2%);
+}
+
+.shiki-codeblock pre {
+  background: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.shiki-codeblock code {
+  background: none !important;
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace);
+  font-size: inherit;
+  color: inherit;
+  padding: 0;
+  border: none;
+}
+
+.shiki-codeblock .line {
+  min-height: 1.3em;
+}
+
+.shiki-codeblock .line.highlighted {
+  background: hsl(var(--primary) / 0.08);
+}
+
+.shiki-codeblock .line > span {
+  font-variant-ligatures: none;
+}
+
+.shiki-codeblock .shiki {
+  background: none !important;
+}
+
+.shiki-codeblock .line-number {
+  color: hsl(var(--muted-foreground));
+  opacity: 0.7;
+  font-size: 0.75em;
+  padding-right: 1.25em;
+  user-select: none;
+}
+
+.shiki-codeblock .line-number::before {
+  content: '';
+}
+
+.shiki-codeblock .language-id {
+  position: absolute;
+  top: 0.5rem;
+  right: 1rem;
+  background: hsl(var(--muted));
+  color: hsl(var(--muted-foreground));
+  font-size: 0.7em;
+  padding: 0.1em 0.6em;
+  border-radius: 0.25em;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  pointer-events: none;
 } 

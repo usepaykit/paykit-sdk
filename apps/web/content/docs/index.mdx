@@ -1,0 +1,96 @@
+---
+title: 'Introduction'
+description: 'Welcome to PayKit - A modern payment processing library for React and Next.js applications.'
+date: '2024-01-01'
+published: true
+toc: true
+---
+
+# Welcome to PayKit
+
+PayKit is a modern, lightweight payment processing library designed specifically for React and Next.js applications. It provides a unified interface for integrating multiple payment providers like Stripe, Polar, and Gumroad.
+
+## Why PayKit?
+
+- **Unified API**: Single interface for multiple payment providers
+- **React Native**: Built with React and TypeScript from the ground up
+- **Lightweight**: Minimal bundle size with tree-shaking support
+- **Type Safe**: Full TypeScript support with excellent developer experience
+- **Flexible**: Easy to customize and extend for your specific needs
+
+## Key Features
+
+- 🔄 **Multiple Providers**: Support for Stripe, Polar, Gumroad, and more
+- 🎯 **Type Safe**: Full TypeScript support with excellent IntelliSense
+- ⚡ **Performance**: Optimized for React with minimal re-renders
+- 🛡️ **Security**: Built-in security best practices and validation
+- 📱 **Responsive**: Works seamlessly across all devices and screen sizes
+- 🎨 **Customizable**: Easy to style and customize to match your brand
+
+## Quick Start
+
+Get started with PayKit in just a few minutes:
+
+```bash
+npm install @paykit-sdk/react
+```
+
+```tsx
+import { PayKitProvider, usePayKit } from '@paykit-sdk/react';
+
+function App() {
+  return (
+    <PayKitProvider>
+      <PaymentForm />
+    </PayKitProvider>
+  );
+}
+```
+
+Ready to get started? Check out our [Installation Guide](/docs/installation) or jump straight to the [Quick Start](/docs/getting-started) tutorial.
+
+## Features
+
+- **Unified API**: One interface for multiple payment providers
+- **TypeScript Support**: Full type safety and IntelliSense
+- **Framework Agnostic**: Works with React, Next.js, Vue, and more
+- **Webhook Support**: Built-in webhook handling and verification
+- **Error Handling**: Comprehensive error handling and recovery
+- **Testing**: Easy testing with local provider
+
+## Quick Start
+
+```bash
+npm install @paykit-sdk/core @paykit-sdk/stripe
+```
+
+```typescript
+import { PayKit } from '@paykit-sdk/core';
+import { stripe } from '@paykit-sdk/stripe';
+
+const provider = stripe()
+const paykit = new PayKit(provider);
+
+const payment = await paykit.checkout.create({
+  customerId: 'cus_123',
+  amount: 1000, // $10.00
+  currency: 'usd',
+  description: 'Test payment',
+});
+```
+
+## Payment Providers
+
+PayKit supports multiple payment providers:
+
+- **Stripe** - Credit cards, digital wallets, and more
+- **Polar** - Subscription and membership payments
+- **Gumroad** - Digital product sales
+
+## Getting Started
+
+Choose your path to get started with PayKit:
+
+- [Installation](/docs/installation) - Set up PayKit in your project
+- [Quick Start](/docs/getting-started) - Create your first payment
+- [Payment Providers](/docs/providers/stripe) - Learn about specific providers

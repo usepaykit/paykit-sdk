@@ -74,14 +74,14 @@ importers:
         specifier: ^3
         version: 3.3.1
       '@paykit-sdk/core':
-        specifier: workspace:*
-        version: link:../../packages/paykit
+        specifier: 1.0.1-alpha.4
+        version: 1.0.1-alpha.4
       '@paykit-sdk/polar':
-        specifier: workspace:*
-        version: link:../../packages/polar
+        specifier: 1.0.1-alpha.4
+        version: 1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(zod@3.25.67)
       '@paykit-sdk/stripe':
-        specifier: workspace:*
-        version: link:../../packages/stripe
+        specifier: 1.0.1-alpha.4
+        version: 1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(@types/node@20.17.58)
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.8
@@ -694,6 +694,19 @@ packages:
   '@nolyfill/is-core-module@1.0.39':
     resolution: {integrity: sha512-nn5ozdjYQpUCZlWGuxcJY/KpxkWQs4DcbMCmKojjyrYDEAGy4Ce19NN4v5MduafTwJlbKc99UA8YhSVqq9yPZA==}
     engines: {node: '>=12.4.0'}
+
+  '@paykit-sdk/core@1.0.1-alpha.4':
+    resolution: {integrity: sha512-7ztT6gjzIsJUo9leq7pgzIkTN9wjQdLD3pVYIdxsIPsjtaym9jYcfBFxv7JOc4F/sYLdxx/memK2VHZrf3ca1w==}
+
+  '@paykit-sdk/polar@1.0.1-alpha.4':
+    resolution: {integrity: sha512-4LCj3ky3N29cJfc+4rVaVQIuGfXbgyTjV/ZaN1sa25+3vTo0/IN1obETweMG3cqjn+2XMpEOiWqEzTi1t/NuOg==}
+    peerDependencies:
+      '@paykit-sdk/core': ^1.0.0
+
+  '@paykit-sdk/stripe@1.0.1-alpha.4':
+    resolution: {integrity: sha512-k8vjw1sV4tlERGSB/yccUOw/DqgDLwFGsKeGEMoNTLDRpWNqbJyCxxAWnYuociM2OvA4F4goY1ZfqJZDzXn+pw==}
+    peerDependencies:
+      '@paykit-sdk/core': ^1.0.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -3338,6 +3351,23 @@ snapshots:
       fastq: 1.19.1
 
   '@nolyfill/is-core-module@1.0.39': {}
+
+  '@paykit-sdk/core@1.0.1-alpha.4': {}
+
+  '@paykit-sdk/polar@1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(zod@3.25.67)':
+    dependencies:
+      '@paykit-sdk/core': 1.0.1-alpha.4
+      '@polar-sh/sdk': 0.33.0(zod@3.25.67)
+    transitivePeerDependencies:
+      - '@modelcontextprotocol/sdk'
+      - zod
+
+  '@paykit-sdk/stripe@1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(@types/node@20.17.58)':
+    dependencies:
+      '@paykit-sdk/core': 1.0.1-alpha.4
+      stripe: 18.2.1(@types/node@20.17.58)
+    transitivePeerDependencies:
+      - '@types/node'
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

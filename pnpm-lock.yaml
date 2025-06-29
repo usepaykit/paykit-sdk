@@ -164,6 +164,9 @@ importers:
         specifier: ^12.6.3
         version: 12.6.3(@types/node@20.17.58)
     devDependencies:
+      '@paykit-sdk/local':
+        specifier: workspace:*
+        version: link:../local
       tsup:
         specifier: ^8.0.0
         version: 8.5.0(jiti@2.4.2)(postcss@8.5.4)(typescript@5.8.3)(yaml@2.8.0)
@@ -180,6 +183,18 @@ importers:
         specifier: ^3.25.67
         version: 3.25.67
     devDependencies:
+      tsup:
+        specifier: ^8.0.0
+        version: 8.5.0(jiti@2.4.2)(postcss@8.5.4)(typescript@5.8.3)(yaml@2.8.0)
+      typescript:
+        specifier: ^5.0.0
+        version: 5.8.3
+
+  packages/local:
+    devDependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
       tsup:
         specifier: ^8.0.0
         version: 8.5.0(jiti@2.4.2)(postcss@8.5.4)(typescript@5.8.3)(yaml@2.8.0)

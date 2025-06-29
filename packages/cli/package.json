@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "typescript": "^5.0.0",
-    "tsup": "^8.0.0"
+    "tsup": "^8.0.0",
+    "@paykit-sdk/local": "workspace:*"
   }
 }

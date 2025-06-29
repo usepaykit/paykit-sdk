@@ -16,7 +16,8 @@ type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['compon
 function extractCodeString(children: React.ReactNode): string {
   if (typeof children === 'string') return children;
   if (Array.isArray(children)) return children.map(extractCodeString).join('');
-  if (React.isValidElement(children) && 'children' in (children.props as { children: React.ReactNode })) return extractCodeString((children.props as { children: React.ReactNode }).children);
+  if (React.isValidElement(children) && 'children' in (children.props as { children: React.ReactNode }))
+    return extractCodeString((children.props as { children: React.ReactNode }).children);
   return '';
 }
 
@@ -106,10 +107,8 @@ const components = {
     if (className?.includes('language-')) {
       return null;
     }
-    
-    return (
-      <code className={cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props} />
-    );
+
+    return <code className={cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props} />;
   },
   Callout,
   CodeBlockWrapper: ({ children, ...props }: CodeBlockWrapperProps) => (

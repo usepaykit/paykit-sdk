@@ -15,10 +15,5 @@ export default async function ShikiCodeBlock({ code, language }: ShikiCodeBlockP
     lang: language || 'text',
     theme: 'github-dark',
   });
-  return (
-    <div
-      className="shiki-codeblock"
-      dangerouslySetInnerHTML={{ __html: html }}
-    />
-  );
-} 
+  return <div className="shiki-codeblock" dangerouslySetInnerHTML={{ __html: html }} />;
+}

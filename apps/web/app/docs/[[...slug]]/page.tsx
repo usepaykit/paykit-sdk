@@ -71,35 +71,43 @@ export default async function DocPage({ params }: DocPageProps) {
     <div className="flex w-full">
       <div className="flex-1 px-6 py-8 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
-          <div className="mb-6 flex items-center space-x-1 text-sm text-muted-foreground">
+          <div className="text-muted-foreground mb-6 flex items-center space-x-1 text-sm">
             <Link href="/docs" className="hover:text-foreground transition-colors">
               Docs
             </Link>
             <ChevronRight className="h-3.5 w-3.5" />
             <span className="text-foreground font-medium">{doc.title}</span>
           </div>
-          
-          <div className="space-y-4 mb-8">
-            <h1 className="text-4xl font-bold tracking-tight text-foreground">
-              {doc.title}
-            </h1>
+
+          <div className="mb-8 space-y-4">
+            <h1 className="text-foreground text-4xl font-bold tracking-tight">{doc.title}</h1>
             {doc.description && (
-              <p className="text-lg text-muted-foreground leading-relaxed">
+              <p className="text-muted-foreground text-lg leading-relaxed">
                 <Balancer>{doc.description}</Balancer>
               </p>
             )}
           </div>
 
           {doc.links ? (
-            <div className="flex items-center space-x-2 mb-8">
+            <div className="mb-8 flex items-center space-x-2">
               {doc.links?.doc && (
-                <Link href={doc.links.doc} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1 hover:bg-secondary/80 transition-colors')}>
+                <Link
+                  href={doc.links.doc}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                >
                   Docs
                   <ExternalLink className="h-3 w-3" />
                 </Link>
               )}
               {doc.links?.api && (
-                <Link href={doc.links.api} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1 hover:bg-secondary/80 transition-colors')}>
+                <Link
+                  href={doc.links.api}
+                  target="_blank"
+                  rel="noreferrer"
+                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                >
                   API Reference
                   <ExternalLink className="h-3 w-3" />
                 </Link>
@@ -110,20 +118,18 @@ export default async function DocPage({ params }: DocPageProps) {
           <div className="prose prose-gray dark:prose-invert max-w-none">
             <Mdx code={doc.body.code} />
           </div>
-          
-          <div className="mt-12 pt-8 border-t">
+
+          <div className="mt-12 border-t pt-8">
             <DocsPager doc={doc} />
           </div>
         </div>
       </div>
-      
+
       {doc.toc && (
-        <div className="hidden xl:block w-80 shrink-0 border-l bg-muted/30">
+        <div className="bg-muted/30 hidden w-80 shrink-0 border-l xl:block">
           <div className="sticky top-20 p-6">
             <div className="space-y-4">
-              <h4 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider">
-                On this page
-              </h4>
+              <h4 className="text-foreground/80 text-sm font-semibold uppercase tracking-wider">On this page</h4>
               <DashboardTableOfContents toc={toc} />
             </div>
           </div>

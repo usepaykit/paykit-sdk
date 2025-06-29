@@ -68,7 +68,7 @@ npm install @paykit-sdk/core @paykit-sdk/stripe
 import { PayKit } from '@paykit-sdk/core';
 import { stripe } from '@paykit-sdk/stripe';
 
-const provider = stripe()
+const provider = stripe();
 const paykit = new PayKit(provider);
 
 const payment = await paykit.checkout.create({

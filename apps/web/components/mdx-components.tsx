@@ -78,6 +78,7 @@ const components = {
   }: React.HTMLAttributes<HTMLPreElement> & {
     __rawString__?: string;
   }) => {
+    console.log('__rawString__', __rawString__);
     return <pre className={cn('mb-4 mt-6 max-h-[650px] overflow-x-auto rounded-xl bg-zinc-950 py-4 dark:bg-zinc-900', className)} {...props} />;
   },
   code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (

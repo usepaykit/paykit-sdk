@@ -25,8 +25,7 @@ export function DashboardTableOfContents({ toc }: DashboardTableOfContentsProps)
   }
 
   return (
-    <div className="space-y-2">
-      <p className="font-medium">On This Page</p>
+    <div className="space-y-3">
       <Tree tree={toc} activeItem={activeHeading} />
     </div>
   );
@@ -75,16 +74,18 @@ interface TreeProps {
 
 function Tree({ tree, level = 1, activeItem }: TreeProps) {
   return tree?.length && level < 3 ? (
-    <ul className={cn('m-0 list-none', { 'pl-4': level !== 1 })}>
+    <ul className={cn('m-0 list-none space-y-1', { 'pl-4 border-l border-border/50': level !== 1 })}>
       {tree.map((item, index) => {
         return (
-          <li key={index} className={cn('mt-0 pt-2')}>
+          <li key={index}>
             <a
               href={`#${item.id}`}
               className={cn(
-                buttonVariants({ variant: 'ghost' }),
-                item.id === activeItem ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground',
-                'h-auto justify-start p-0 text-sm font-normal',
+                'block text-sm transition-colors hover:text-foreground',
+                item.id === activeItem 
+                  ? 'text-primary font-medium' 
+                  : 'text-muted-foreground',
+                level === 1 ? 'py-1' : 'py-0.5 text-xs'
               )}
             >
               {item.title}

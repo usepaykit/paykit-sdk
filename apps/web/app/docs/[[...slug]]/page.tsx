@@ -68,49 +68,67 @@ export default async function DocPage({ params }: DocPageProps) {
   const toc = await getTableOfContents(doc.body.raw);
 
   return (
-    <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
-      <div className="mx-auto w-full min-w-0 max-w-2xl">
-        <div className="text-muted-foreground mb-4 flex items-center space-x-1 text-sm leading-none">
-          <Link href="/docs" className="truncate">
-            Docs
-          </Link>
-          <ChevronRight className="h-3.5 w-3.5" />
-          <div className="text-foreground">{doc.title}</div>
-        </div>
-        <div className="space-y-2">
-          <h1 className={cn('scroll-m-20 text-3xl font-bold tracking-tight')}>{doc.title}</h1>
-          {doc.description && (
-            <p className="text-muted-foreground text-base">
-              <Balancer>{doc.description}</Balancer>
-            </p>
-          )}
-        </div>
-        {doc.links ? (
-          <div className="flex items-center space-x-2 pt-4">
-            {doc.links?.doc && (
-              <Link href={doc.links.doc} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1')}>
-                Docs
-                <ExternalLink className="h-3 w-3" />
-              </Link>
-            )}
-            {doc.links?.api && (
-              <Link href={doc.links.api} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1')}>
-                API Reference
-                <ExternalLink className="h-3 w-3" />
-              </Link>
+    <div className="flex w-full">
+      <div className="flex-1 px-6 py-8 lg:px-8 lg:py-12">
+        <div className="mx-auto max-w-3xl">
+          <div className="mb-6 flex items-center space-x-1 text-sm text-muted-foreground">
+            <Link href="/docs" className="hover:text-foreground transition-colors">
+              Docs
+            </Link>
+            <ChevronRight className="h-3.5 w-3.5" />
+            <span className="text-foreground font-medium">{doc.title}</span>
+          </div>
+          
+          <div className="space-y-4 mb-8">
+            <h1 className="text-4xl font-bold tracking-tight text-foreground">
+              {doc.title}
+            </h1>
+            {doc.description && (
+              <p className="text-lg text-muted-foreground leading-relaxed">
+                <Balancer>{doc.description}</Balancer>
+              </p>
             )}
           </div>
-        ) : null}
-        <div className="pb-12 pt-8">
-          <Mdx code={doc.body.code} />
+
+          {doc.links ? (
+            <div className="flex items-center space-x-2 mb-8">
+              {doc.links?.doc && (
+                <Link href={doc.links.doc} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1 hover:bg-secondary/80 transition-colors')}>
+                  Docs
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+              {doc.links?.api && (
+                <Link href={doc.links.api} target="_blank" rel="noreferrer" className={cn(badgeVariants({ variant: 'secondary' }), 'gap-1 hover:bg-secondary/80 transition-colors')}>
+                  API Reference
+                  <ExternalLink className="h-3 w-3" />
+                </Link>
+              )}
+            </div>
+          ) : null}
+
+          <div className="prose prose-gray dark:prose-invert max-w-none">
+            <Mdx code={doc.body.code} />
+          </div>
+          
+          <div className="mt-12 pt-8 border-t">
+            <DocsPager doc={doc} />
+          </div>
         </div>
-        <DocsPager doc={doc} />
       </div>
-      <div className="hidden text-sm xl:block">
-        <div className="sticky top-20 -mt-6 h-[calc(100vh-3.5rem)] pt-4">
-          <div className="no-scrollbar h-full overflow-auto pb-10">{doc.toc && <DashboardTableOfContents toc={toc} />}</div>
+      
+      {doc.toc && (
+        <div className="hidden xl:block w-80 shrink-0 border-l bg-muted/30">
+          <div className="sticky top-20 p-6">
+            <div className="space-y-4">
+              <h4 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider">
+                On this page
+              </h4>
+              <DashboardTableOfContents toc={toc} />
+            </div>
+          </div>
         </div>
-      </div>
-    </main>
+      )}
+    </div>
   );
 }

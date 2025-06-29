@@ -7,14 +7,16 @@ interface DocsLayoutProps {
 
 export default function DocsLayout({ children }: DocsLayoutProps) {
   return (
-    <div className="container-wrapper">
-      <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
-        <aside className="border-grid fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-full shrink-0 border-r md:sticky md:block">
-          <div className="no-scrollbar h-full overflow-auto py-6 pr-4 lg:py-8">
+    <div className="min-h-screen bg-background">
+      <div className="flex w-full">
+        <aside className="fixed top-14 z-30 hidden h-[calc(100vh-3.5rem)] w-64 shrink-0 border-r bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:sticky md:block">
+          <div className="h-full overflow-auto py-6 pr-4 lg:py-8">
             <DocsNav config={docsConfig} />
           </div>
         </aside>
-        {children}
+        <main className="flex-1 md:ml-64">
+          {children}
+        </main>
       </div>
     </div>
   );

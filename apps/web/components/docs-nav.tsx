@@ -1,8 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { buttonVariants } from '@/components/ui/button';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import { DocsSidebarNav } from '@/config/docs';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
@@ -16,28 +14,33 @@ export function DocsNav({ config }: DocsNavProps) {
   const pathname = usePathname();
 
   return (
-    <ScrollArea className="my-4 h-[calc(100vh-8rem)] pb-10">
-      <div className="grid grid-flow-row auto-rows-max text-sm">
+    <div className="h-[calc(100vh-8rem)] pb-1 pl-8 no-scrollbar overflow-auto">
+      <div className="space-y-6">
         {config.sidebarNav.map((group, index) => (
-          <div key={index} className="grid grid-flow-row auto-rows-max">
-            <h4 className="my-4 text-lg font-medium">{group.title}</h4>
+          <div key={index} className="space-y-3">
+            <h4 className="text-sm font-semibold text-foreground/80 uppercase tracking-wider">
+              {group.title}
+            </h4>
             {group.items?.length && (
-              <div className="grid grid-flow-row auto-rows-max text-sm">
+              <div className="space-y-1">
                 {group.items.map((item, index) =>
                   item.href ? (
                     <Link
                       key={index}
                       href={item.href}
                       className={cn(
-                        buttonVariants({ variant: 'ghost' }),
-                        item.href === pathname ? 'bg-muted font-medium' : 'not-italic',
-                        'justify-start',
+                        'block w-full text-left px-3 py-2 text-sm rounded-md transition-colors',
+                        item.href === pathname 
+                          ? 'bg-primary/10 text-primary border-r-2 border-primary font-semibold' 
+                          : 'text-muted-foreground hover:text-foreground hover:bg-muted/50'
                       )}
                     >
                       {item.title}
                     </Link>
                   ) : (
-                    item.title
+                    <div key={index} className="px-3 py-1 text-sm font-medium text-muted-foreground">
+                      {item.title}
+                    </div>
                   ),
                 )}
               </div>
@@ -45,6 +48,6 @@ export function DocsNav({ config }: DocsNavProps) {
           </div>
         ))}
       </div>
-    </ScrollArea>
+    </div>
   );
 }

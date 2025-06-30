@@ -25,3 +25,11 @@ export function safeParse<Inp, Out>(rawValue: Inp, fn: (value: Inp) => Out, erro
     return ERR(new ValidationError(errorMessage, { cause: err, provider: 'paykit' }));
   }
 }
+
+export const safeEncode = <T>(value: T) => {
+  return safeParse(value, (value) => Buffer.from(JSON.stringify(value)).toString('base64'), 'Failed to encode value');
+};
+
+export const safeDecode = <T>(value: string) => {
+  return safeParse(value, (value) => JSON.parse(Buffer.from(value, 'base64').toString('utf-8')) as T, 'Failed to decode value');
+};

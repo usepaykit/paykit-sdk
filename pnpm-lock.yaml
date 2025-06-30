@@ -104,14 +104,17 @@ importers:
         specifier: ^3
         version: 3.3.1
       '@paykit-sdk/core':
-        specifier: 1.0.1-alpha.4
-        version: 1.0.1-alpha.4
+        specifier: workspace:*
+        version: link:../../packages/paykit
+      '@paykit-sdk/local':
+        specifier: workspace:*
+        version: link:../../packages/local
       '@paykit-sdk/polar':
-        specifier: 1.0.1-alpha.4
-        version: 1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(zod@3.25.67)
+        specifier: workspace:*
+        version: link:../../packages/polar
       '@paykit-sdk/stripe':
-        specifier: 1.0.1-alpha.4
-        version: 1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(@types/node@20.17.58)
+        specifier: workspace:*
+        version: link:../../packages/stripe
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.8
@@ -164,6 +167,9 @@ importers:
         specifier: ^12.6.3
         version: 12.6.3(@types/node@20.17.58)
     devDependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
       '@paykit-sdk/local':
         specifier: workspace:*
         version: link:../local
@@ -1665,19 +1671,6 @@ packages:
   '@opentelemetry/semantic-conventions@1.34.0':
     resolution: {integrity: sha512-aKcOkyrorBGlajjRdVoJWHTxfxO1vCNHLJVlSDaRHDIdjU+pX8IYQPvPDkYiujKLbRnWU+1TBwEt0QRgSm4SGA==}
     engines: {node: '>=14'}
-
-  '@paykit-sdk/core@1.0.1-alpha.4':
-    resolution: {integrity: sha512-7ztT6gjzIsJUo9leq7pgzIkTN9wjQdLD3pVYIdxsIPsjtaym9jYcfBFxv7JOc4F/sYLdxx/memK2VHZrf3ca1w==}
-
-  '@paykit-sdk/polar@1.0.1-alpha.4':
-    resolution: {integrity: sha512-4LCj3ky3N29cJfc+4rVaVQIuGfXbgyTjV/ZaN1sa25+3vTo0/IN1obETweMG3cqjn+2XMpEOiWqEzTi1t/NuOg==}
-    peerDependencies:
-      '@paykit-sdk/core': ^1.0.0
-
-  '@paykit-sdk/stripe@1.0.1-alpha.4':
-    resolution: {integrity: sha512-k8vjw1sV4tlERGSB/yccUOw/DqgDLwFGsKeGEMoNTLDRpWNqbJyCxxAWnYuociM2OvA4F4goY1ZfqJZDzXn+pw==}
-    peerDependencies:
-      '@paykit-sdk/core': ^1.0.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -6931,23 +6924,6 @@ snapshots:
   '@opentelemetry/semantic-conventions@1.28.0': {}
 
   '@opentelemetry/semantic-conventions@1.34.0': {}
-
-  '@paykit-sdk/core@1.0.1-alpha.4': {}
-
-  '@paykit-sdk/polar@1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(zod@3.25.67)':
-    dependencies:
-      '@paykit-sdk/core': 1.0.1-alpha.4
-      '@polar-sh/sdk': 0.33.0(zod@3.25.67)
-    transitivePeerDependencies:
-      - '@modelcontextprotocol/sdk'
-      - zod
-
-  '@paykit-sdk/stripe@1.0.1-alpha.4(@paykit-sdk/core@1.0.1-alpha.4)(@types/node@20.17.58)':
-    dependencies:
-      '@paykit-sdk/core': 1.0.1-alpha.4
-      stripe: 18.2.1(@types/node@20.17.58)
-    transitivePeerDependencies:
-      - '@types/node'
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

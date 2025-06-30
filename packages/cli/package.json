@@ -8,12 +8,11 @@
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "node dist/index.js init"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "packageManager": "pnpm@10.12.1",
   "dependencies": {
     "commander": "^14.0.0",
     "inquirer": "^12.6.3"
@@ -21,6 +20,7 @@
   "devDependencies": {
     "typescript": "^5.0.0",
     "tsup": "^8.0.0",
-    "@paykit-sdk/local": "workspace:*"
+    "@paykit-sdk/local": "workspace:*",
+    "@paykit-sdk/core": "workspace:*"
   }
 }

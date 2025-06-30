@@ -1,6 +1,5 @@
-import { PaykitProviderOptions } from '@paykit-sdk/core';
+import { PaykitProviderOptions, safeEncode } from '@paykit-sdk/core';
 import { PaymentInfo } from './types';
-import { encodePaymentInfo } from './utils';
 
 export interface LocalConfig extends PaykitProviderOptions {}
 
@@ -10,7 +9,7 @@ export class LocalProvider {
   #paymentUrl = 'https://paykit.com/pay';
 
   async createPaymentLink(paymentInfo: PaymentInfo) {
-    const encoded = encodePaymentInfo(paymentInfo);
+    const encoded = safeEncode(paymentInfo);
     return `${this.#paymentUrl}/${encoded}`;
   }
 }

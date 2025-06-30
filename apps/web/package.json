@@ -37,9 +37,10 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@paykit-sdk/core": "1.0.1-alpha.4",
-    "@paykit-sdk/polar": "1.0.1-alpha.4",
-    "@paykit-sdk/stripe": "1.0.1-alpha.4",
+    "@paykit-sdk/core": "workspace:*",
+    "@paykit-sdk/polar": "workspace:*",
+    "@paykit-sdk/stripe": "workspace:*",
+    "@paykit-sdk/local": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

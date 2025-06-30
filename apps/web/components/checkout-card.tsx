@@ -4,36 +4,25 @@ import * as React from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local';
 import { Lock, Zap, CreditCard } from 'lucide-react';
+import * as RHF from 'react-hook-form';
+import { z } from 'zod';
+import { Spinner } from './spinner';
 
-interface CheckoutCardProps {
-  name: string;
-  price: string;
-}
+const formSchema = z.object({
+  cardNumber: z.string().min(16, { message: 'Card number must be 16 digits' }).transform(formatCardNumber),
+});
 
-export function CheckoutCard({ name, price }: CheckoutCardProps) {
+type CheckoutFormSchema = z.infer<typeof formSchema>;
+
+export const CheckoutCard = ({ name, price, description, customerName, customerEmail }: CheckoutInfo) => {
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
-  const [cardNumber, setCardNumber] = React.useState<string>('');
 
-  const formatCardNumber = (value: string) => {
-    // Remove all non-digit characters
-    const digitsOnly = value.replace(/\D/g, '');
+  const form = RHF.useForm<CheckoutFormSchema>({resolver: zodResolver(formSchema)});
 
-    // Limit to 16 digits
-    const limitedDigits = digitsOnly.slice(0, 16);
-
-    // Add spaces after every 4 digits
-    const formatted = limitedDigits.replace(/(\d{4})(?=\d)/g, '$1 ');
-
-    return formatted;
-  };
-
-  const handleCardNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const formatted = formatCardNumber(e.target.value);
-    setCardNumber(formatted);
-  };
-
-  const handleCheckout = async () => {
+  const onSubmit = async (data: CheckoutFormSchema) => {
     setIsProcessing(true);
 
     setTimeout(() => {
@@ -55,52 +44,73 @@ export function CheckoutCard({ name, price }: CheckoutCardProps) {
                 <p className="text-muted-foreground mb-4 text-left text-sm">Powered by PayKit Local Provider</p>
               </div>
 
-              {/* Customer Info (static for demo) */}
-              <div className="bg-muted/30 mb-4 rounded-lg border p-4">
-                <div className="mb-2 text-left text-xs font-medium">Customer Information</div>
-                <div className="space-y-2">
-                  <div className="bg-background text-muted-foreground flex h-8 items-center rounded border px-3 py-1 text-sm">john@example.com</div>
-                  <div className="grid grid-cols-2 gap-2">
-                    <div className="bg-background text-muted-foreground flex h-8 items-center rounded border px-3 py-1 text-sm">John</div>
-                    <div className="bg-background text-muted-foreground flex h-8 items-center rounded border px-3 py-1 text-sm">Doe</div>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Customer Info */}
+                <div className="bg-muted/30 mb-4 rounded-lg border p-4">
+                  <div className="mb-2 text-left text-xs font-medium">Customer Information</div>
+                  <div className="space-y-2">
+                    <Input
+                      type="email"
+                      value={customerEmail || 'customer@example.com'}
+                      disabled
+                      className="bg-background text-muted-foreground h-8 text-sm"
+                    />
+                    <div className="grid grid-cols-2 gap-2">
+                      <Input
+                        type="text"
+                        value={customerName ? customerName.split(' ')[0] : 'John'}
+                        disabled
+                        className="bg-background text-muted-foreground h-8 text-sm"
+                      />
+                      <Input
+                        type="text"
+                        value={customerName ? customerName.split(' ').slice(1).join(' ') || 'Doe' : 'Doe'}
+                        disabled
+                        className="bg-background text-muted-foreground h-8 text-sm"
+                      />
+                    </div>
                   </div>
                 </div>
-              </div>
 
-              {/* Payment Method */}
-              <div className="bg-muted/30 rounded-lg border p-4">
-                <div className="mb-2 text-left text-xs font-medium">Payment Method</div>
-                <Input
-                  type="text"
-                  placeholder="4242 4242 4242 4242"
-                  value={cardNumber}
-                  onChange={handleCardNumberChange}
-                  maxLength={19}
-                  className="bg-background text-center font-mono text-base tracking-widest"
+                {/* Payment Method */}
+                <RHF.Controller
+                  control={form.control}
+                  name="cardNumber"
+                  render={({ field, fieldState: { error } }) => (
+                    <div className="bg-muted/30 rounded-lg border p-4">
+                      <div className="mb-2 text-left text-xs font-medium">Payment Method</div>
+                      <Input
+                        {...field}
+                        type="text"
+                        placeholder="4242 4242 4242 4242"
+                        className="bg-background text-center font-mono text-base tracking-widest"
+                      />
+                      {error && <p className="text-xs text-red-400 mt-2">{error.message}</p>}
+                    </div>
+                  )}
                 />
-                <p className="text-muted-foreground mt-2 text-xs">Use test card: 4242 4242 4242 4242</p>
-              </div>
 
-              <Button onClick={handleCheckout} disabled={isProcessing || !cardNumber.trim()} size="lg" className="mt-4 w-full">
-                {isProcessing ? (
-                  <>
-                    <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <Lock className="mr-2 h-4 w-4" />
-                    Complete Payment - {price}
-                  </>
-                )}
-              </Button>
+                <Button type="submit" disabled={isProcessing} size="lg" className="mt-4 w-full">
+                  {isProcessing ? (
+                    <div className="flex items-center justify-center">
+                      <Spinner />
+                      <span className="ml-2">Processing...</span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center">
+                      <Lock className="mr-2 h-4 w-4" />
+                      <span className="ml-2">Complete Payment - {price}</span>
+                    </div>
+                  )}
+                </Button>
 
-              <div className="flex items-center justify-center pt-2">
-                <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                  <Zap className="mr-1 h-3 w-3" />
-                  Local Provider Active
-                </Badge>
-              </div>
+                <div className="flex items-center justify-center pt-2">
+                  <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                    <Zap className="mr-1 h-3 w-3" />
+                    Local Provider Active
+                  </Badge>
+                </div>
+              </form>
             </div>
 
             {/* Right: Order Summary */}
@@ -109,9 +119,12 @@ export function CheckoutCard({ name, price }: CheckoutCardProps) {
                 <div className="mb-4">
                   <h3 className="text-lg font-semibold">Order Summary</h3>
                 </div>
-                <div className="flex items-center justify-between py-2 text-sm">
-                  <span>{name}</span>
-                  <span className="font-medium">{price}</span>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between py-2 text-sm">
+                    <span className="font-medium">{name}</span>
+                    <span className="font-medium">{price}</span>
+                  </div>
+                  {description && <div className="text-muted-foreground py-1 text-xs">{description}</div>}
                 </div>
                 <div className="flex items-center justify-between py-2 text-sm">
                   <span>Local provider fee</span>
@@ -124,12 +137,12 @@ export function CheckoutCard({ name, price }: CheckoutCardProps) {
                 </div>
               </div>
               <div className="pt-6">
-                <Button onClick={handleCheckout} disabled={isProcessing || !cardNumber.trim()} size="lg" className="w-full">
+                <Button onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
                   {isProcessing ? (
-                    <>
-                      <div className="mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                      Processing...
-                    </>
+                     <div className="flex items-center justify-center">
+                     <Spinner />
+                     <span className="ml-2">Processing...</span>
+                   </div>
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-4 w-4" />

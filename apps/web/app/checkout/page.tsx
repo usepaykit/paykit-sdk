@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { CheckoutCard } from '@/components/checkout-card';
 import { safeDecode } from '@paykit-sdk/core';
-import { PaymentInfo } from '@paykit-sdk/local';
+import { CheckoutInfo } from '@paykit-sdk/local';
 import { notFound } from 'next/navigation';
 
 interface CheckoutPageProps {
@@ -11,11 +11,9 @@ interface CheckoutPageProps {
 export default async function CheckoutPage({ searchParams }: CheckoutPageProps) {
   const { id } = await searchParams;
 
-  const paymentInfo = safeDecode<PaymentInfo>(id);
+  const checkoutInfo = safeDecode<CheckoutInfo>(id);
 
-  console.log({paymentInfo})
+  if (!checkoutInfo.ok) return notFound();
 
-  if (!paymentInfo.ok) return notFound();
-
-  return <CheckoutCard {...paymentInfo.value} />;
+  return <CheckoutCard {...checkoutInfo.value} />;
 }

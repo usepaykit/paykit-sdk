@@ -1,3 +1,6 @@
 {
-  "priceId": "eyJuYW1lIjoiVGVzdCAiLCJwcmljZSI6IiQxMCJ9"
+  "paymentInfo": {
+    "ok": true,
+    "value": "eyJuYW1lIjoiQnV5IFByZW1pdW0iLCJkZXNjcmlwdGlvbiI6IkdldCB1bmxpbWl0ZWQgYWNjZXNzIHRvIHRoZSBwbGF0Zm9ybSIsInByaWNlIjoiJDI1IiwiY3VzdG9tZXJOYW1lIjoiRW1tYW51ZWwgT2RpaSIsImN1c3RvbWVyRW1haWwiOiJlbW1hbnVlbG9kaWlAZ21haWwuY29tIn0="
+  }
 }

@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@mdx-js/loader": "^3.1.0",
     "@mdx-js/react": "^3.1.0",
     "@monaco-editor/react": "^4.7.0",
@@ -30,17 +31,19 @@
     "next-themes": "^0.4.6",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-hook-form": "^7.59.0",
     "react-syntax-highlighter": "^15.6.1",
     "react-wrap-balancer": "^1.1.1",
     "shiki": "^3.7.0",
-    "tailwind-merge": "^3.3.0"
+    "tailwind-merge": "^3.3.0",
+    "zod": "^3.25.67"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
     "@paykit-sdk/core": "workspace:*",
+    "@paykit-sdk/local": "workspace:*",
     "@paykit-sdk/polar": "workspace:*",
     "@paykit-sdk/stripe": "workspace:*",
-    "@paykit-sdk/local": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

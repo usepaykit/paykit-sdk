@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/core",
-  "version": "1.0.1-alpha.4",
+  "version": "1.0.1-alpha.5",
   "description": "The Payment Toolkit for Typescript",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",

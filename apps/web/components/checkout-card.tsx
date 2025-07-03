@@ -20,7 +20,7 @@ type CheckoutFormSchema = z.infer<typeof formSchema>;
 export const CheckoutCard = ({ name, price, description, customerName, customerEmail }: CheckoutInfo) => {
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
 
-  const form = RHF.useForm<CheckoutFormSchema>({resolver: zodResolver(formSchema)});
+  const form = RHF.useForm<CheckoutFormSchema>({ resolver: zodResolver(formSchema) });
 
   const onSubmit = async (data: CheckoutFormSchema) => {
     setIsProcessing(true);
@@ -85,7 +85,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                         placeholder="4242 4242 4242 4242"
                         className="bg-background text-center font-mono text-base tracking-widest"
                       />
-                      {error && <p className="text-xs text-red-400 mt-2">{error.message}</p>}
+                      {error && <p className="mt-2 text-xs text-red-400">{error.message}</p>}
                     </div>
                   )}
                 />
@@ -139,10 +139,10 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
               <div className="pt-6">
                 <Button onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
                   {isProcessing ? (
-                     <div className="flex items-center justify-center">
-                     <Spinner />
-                     <span className="ml-2">Processing...</span>
-                   </div>
+                    <div className="flex items-center justify-center">
+                      <Spinner />
+                      <span className="ml-2">Processing...</span>
+                    </div>
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-4 w-4" />
@@ -157,4 +157,4 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
       </div>
     </div>
   );
-}
+};

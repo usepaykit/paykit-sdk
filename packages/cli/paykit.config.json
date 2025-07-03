@@ -1,0 +1,13 @@
+{
+  "product": {
+    "name": "Test",
+    "description": "Unlimited",
+    "price": "$41",
+    "priceId": "eyJuYW1lIjoiVGVzdCIsImRlc2NyaXB0aW9uIjoiVW5saW1pdGVkIiwicHJpY2UiOiIkNDEiLCJjdXN0b21lck5hbWUiOiJFbW1hbnVlbCBPZGlpIiwiY3VzdG9tZXJFbWFpbCI6ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSJ9"
+  },
+  "customer": {
+    "id": "ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSI=",
+    "name": "Emmanuel Odii",
+    "email": "emmanuelodii80@gmail.com"
+  }
+}

@@ -1,13 +1,12 @@
 {
   "name": "@paykit-sdk/local",
-  "version": "1.0.1-alpha.5",
+  "version": "1.0.1-alpha.6",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
-  
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",
     "prepublishOnly": "npm run build"

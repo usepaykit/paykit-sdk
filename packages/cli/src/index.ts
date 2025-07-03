@@ -1,10 +1,8 @@
 #!/usr/bin/env node
 import { safeEncode, ValidationError, logger } from '@paykit-sdk/core';
-import { CheckoutInfo } from '@paykit-sdk/local';
+import { CheckoutInfo, writePaykitConfig } from '@paykit-sdk/local';
 import { Command } from 'commander';
-import fs from 'fs';
 import inquirer from 'inquirer';
-import path from 'path';
 
 const program = new Command();
 
@@ -53,7 +51,6 @@ program
     logger.progress('Validating product info');
 
     const itemId = safeEncode<CheckoutInfo>(answers);
-    const outPath = path.resolve(process.cwd(), 'paykit.config.json');
     const customerId = safeEncode<string>(answers.customerEmail);
 
     logger.clearProgress();
@@ -62,15 +59,10 @@ program
 
     if (!itemId.ok) throw new ValidationError('Invalid product info', itemId.error);
 
-    const product = { name: answers.name, description: answers.description, price: answers.price, priceId: itemId.value };
-    const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail };
+    const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
+    const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
-    const data = { product, customer };
-
-    fs.writeFileSync(outPath, JSON.stringify(data, null, 2));
-
-    logger.success(`Product info saved to ${outPath}`);
-    logger.tip('You can now use this file in your hosted page to decode and display product info.');
+    writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
   });
 
 program.parse(process.argv);

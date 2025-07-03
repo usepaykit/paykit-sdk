@@ -7,55 +7,41 @@ import {
   UpdateCustomerParams,
   Subscription,
   UpdateSubscriptionParams,
-  ERR,
-  OK,
   unwrapAsync,
   WebhookConfig,
   WebhookEventPayload,
-  AbortedError,
-  ConnectionError,
-  TimeoutError,
-  UnauthorizedError,
   UnknownError,
-  ValidationError,
-  isAbortError,
-  isConnectionError,
-  isTimeoutError,
-  isUnauthorizedError,
   PaykitProviderOptions,
+  HTTPClient,
 } from '@paykit-sdk/core';
 
 export interface GumroadConfig extends PaykitProviderOptions<{ accessToken: string }> {}
 
 export class GumroadProvider implements PayKitProvider {
-  constructor(private config: GumroadConfig) {}
+  private _client: HTTPClient;
 
-  private readonly baseUrl = 'https://api.gumroad.com/v2';
+  constructor(private config: GumroadConfig) {
+    this._client = new HTTPClient({ baseUrl: 'https://api.gumroad.com/v2', headers: { Authorization: `Bearer ${config.accessToken}` } });
+  }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const response = await unwrapAsync(
-      fetch(`${this.baseUrl}/checkouts`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${this.config.accessToken}` },
-      })
-        .then(res => OK<{ url: string }>(res))
-        .catch(err => {
-          switch (true) {
-            case isUnauthorizedError(err):
-              return ERR(new UnauthorizedError('Unauthorized', { provider: 'gumroad' }));
-            case isConnectionError(err):
-              return ERR(new ConnectionError('Connection error', { provider: 'gumroad' }));
-            case isTimeoutError(err):
-              return ERR(new TimeoutError('Timeout error', { cause: err, provider: 'gumroad' }));
-            case isAbortError(err):
-              return ERR(new AbortedError('Aborted error', { provider: 'gumroad' }));
-            default:
-              return ERR(new UnknownError('Unknown error', { cause: err, provider: 'gumroad' }));
-          }
-        }),
+      this._client.post<{ url: string }>('checkouts', {
+        body: JSON.stringify(params),
+        headers: { Authorization: `Bearer ${this.config.accessToken}` },
+      }),
     );
 
-    throw new ValidationError(response.url, { provider: 'gumroad', cause: 'fix everything' });
+    return {
+      id: 'id',
+      amount: 100,
+      currency: 'USD',
+      customer_id: 'customer_id',
+      metadata: {},
+      payment_url: response.url,
+      session_type: 'one_time',
+      products: [],
+    };
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {

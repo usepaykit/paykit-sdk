@@ -126,6 +126,9 @@ export class PolarProvider implements PayKitProvider {
     } else if (webhookEvent.type === 'checkout.created') {
       const checkout = await this.retrieveCheckout(webhookEvent.data.id);
       return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: checkout });
+    } else if (webhookEvent.type === 'order.created') {
+      const checkout = await this.retrieveCheckout(webhookEvent.data.id);
+      return toPaykitEvent<Checkout>({ type: '$paymentReceived', created: parseInt(timestamp), id, data: checkout });
     }
 
     throw new Error(`Unknown event type: ${webhookEvent.type}`);

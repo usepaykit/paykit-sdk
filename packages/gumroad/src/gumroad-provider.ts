@@ -10,7 +10,7 @@ import {
   ERR,
   OK,
   unwrapAsync,
-  WebhookProviderPayload,
+  WebhookConfig,
   WebhookEventPayload,
   AbortedError,
   ConnectionError,
@@ -86,7 +86,7 @@ export class GumroadProvider implements PayKitProvider {
     throw new UnknownError('Not implemented', { provider: 'gumroad' });
   };
 
-  handleWebhook = async (payload: WebhookProviderPayload): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: WebhookConfig): Promise<WebhookEventPayload> => {
     throw new UnknownError('Not implemented', { provider: 'gumroad' });
   };
 }

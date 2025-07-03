@@ -1,60 +1,60 @@
 import { PayKitProvider } from './paykit-provider';
-import { Checkout } from './resources/checkout';
-import { Customer } from './resources/customer';
-import { Subscription } from './resources/subscription';
-import { WebhookEvent, WebhookHandler, WebhookProviderPayload } from './resources/webhook';
+import {
+  CheckoutCreated,
+  CustomerCreated,
+  CustomerDeleted,
+  CustomerUpdated,
+  SubscriptionCanceled,
+  SubscriptionCreated,
+  SubscriptionUpdated,
+  PaymentReceived,
+} from './resources/webhook';
 import { UnknownError } from './tools/error';
 
-export interface WebhookConfig {
+export type WebhookHandler = Partial<{
+  $customerCreated: (event: CustomerCreated) => Promise<void>;
+  $customerUpdated: (event: CustomerUpdated) => Promise<void>;
+  $customerDeleted: (event: CustomerDeleted) => Promise<void>;
+  $subscriptionCreated: (event: SubscriptionCreated) => Promise<void>;
+  $subscriptionUpdated: (event: SubscriptionUpdated) => Promise<void>;
+  $subscriptionCanceled: (event: SubscriptionCanceled) => Promise<void>;
+  $checkoutCreated: (event: CheckoutCreated) => Promise<void>;
+  $paymentReceived: (event: PaymentReceived) => Promise<void>;
+}>;
+
+export type WebhookConfig = {
   provider: PayKitProvider;
   webhookSecret: string;
-
-  /**
-   * Customer events
-   */
-  onCustomerCreated?: WebhookHandler<Customer>;
-  onCustomerUpdated?: WebhookHandler<Customer>;
-  onCustomerDeleted?: WebhookHandler<Customer>;
-
-  /**
-   * Subscription events
-   */
-  onSubscriptionCreated?: WebhookHandler<Subscription>;
-  onSubscriptionUpdated?: WebhookHandler<Subscription>;
-  onSubscriptionCanceled?: WebhookHandler<Subscription>;
-
-  /**
-   * Checkout events
-   */
-  onCheckoutCreated?: WebhookHandler<Checkout>;
-}
+  body: string;
+  headers: Record<string, string | string[]>;
+};
 
 export class Webhook {
   constructor(
     private config: WebhookConfig,
-    private opts: Omit<WebhookProviderPayload, 'webhookSecret'>,
+    private handlers: WebhookHandler,
   ) {}
 
   handle = async (): Promise<void> => {
-    const { provider, ...handlers } = this.config;
-
-    const event = await provider.handleWebhook({ ...this.opts, webhookSecret: this.config.webhookSecret });
+    const event = await this.config.provider.handleWebhook(this.config);
 
     switch (event.type) {
-      case 'customer.created':
-        return handlers.onCustomerCreated?.(event as WebhookEvent<Customer>);
-      case 'customer.updated':
-        return handlers.onCustomerUpdated?.(event as WebhookEvent<Customer>);
-      case 'customer.deleted':
-        return handlers.onCustomerDeleted?.(event as WebhookEvent<Customer>);
-      case 'subscription.created':
-        return handlers.onSubscriptionCreated?.(event as WebhookEvent<Subscription>);
-      case 'subscription.updated':
-        return handlers.onSubscriptionUpdated?.(event as WebhookEvent<Subscription>);
-      case 'subscription.canceled':
-        return handlers.onSubscriptionCanceled?.(event as WebhookEvent<Subscription>);
-      case 'checkout.created':
-        return handlers.onCheckoutCreated?.(event as WebhookEvent<Checkout>);
+      case '$customerCreated':
+        return this.handlers.$customerCreated?.(event as CustomerCreated);
+      case '$customerUpdated':
+        return this.handlers.$customerUpdated?.(event as CustomerUpdated);
+      case '$customerDeleted':
+        return this.handlers.$customerDeleted?.(event as CustomerDeleted);
+      case '$subscriptionCreated':
+        return this.handlers.$subscriptionCreated?.(event as SubscriptionCreated);
+      case '$subscriptionUpdated':
+        return this.handlers.$subscriptionUpdated?.(event as SubscriptionUpdated);
+      case '$subscriptionCanceled':
+        return this.handlers.$subscriptionCanceled?.(event as SubscriptionCanceled);
+      case '$checkoutCreated':
+        return this.handlers.$checkoutCreated?.(event as CheckoutCreated);
+      case '$paymentReceived':
+        return this.handlers.$paymentReceived?.(event as PaymentReceived);
       default:
         throw new UnknownError(`Unknown event type: ${event.type}`, { provider: this.config.provider.constructor.name });
     }

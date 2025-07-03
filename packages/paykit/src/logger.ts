@@ -41,7 +41,7 @@ export class Logger {
   // Debug messages (gray, only in verbose mode)
   debug(message: string) {
     if (this.silent || !this.verbose) return;
-    console.log(chalk.gray(`🔍 ${message}`))
+    console.log(chalk.gray(`🔍 ${message}`));
   }
 
   // Tip messages (cyan)
@@ -79,7 +79,7 @@ export class Logger {
   table(data: Record<string, string>) {
     if (this.silent) return;
     const maxKeyLength = Math.max(...Object.keys(data).map(k => k.length));
-    
+
     Object.entries(data).forEach(([key, value]) => {
       const paddedKey = key.padEnd(maxKeyLength);
       console.log(chalk.gray(`${paddedKey}: `) + chalk.white(value));
@@ -110,4 +110,3 @@ export class Logger {
 }
 
 export const logger = new Logger();
-

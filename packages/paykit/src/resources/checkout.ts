@@ -85,3 +85,5 @@ export type Checkout = {
    */
   amount: number;
 };
+
+export type $SchemaPaymentReceived = Omit<Checkout, 'id'> & { checkoutId: string };

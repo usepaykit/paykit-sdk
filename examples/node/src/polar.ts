@@ -22,3 +22,18 @@ console.log({ updatedSubscription });
 const canceledSubscription = await paykit.subscriptions.cancel('sub_123');
 
 console.log({ canceledSubscription });
+
+paykit.webhooks.listen(
+  { webhookSecret: '123', body: '123', headers: { 'x-webhook-secret': '123' } },
+  {
+    $customerCreated: async event => {
+      console.log({ event });
+    },
+    $customerUpdated: async event => {
+      console.log({ event });
+    },
+    $customerDeleted: async event => {
+      console.log({ event });
+    },
+  },
+);

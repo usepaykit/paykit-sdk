@@ -2,7 +2,7 @@ import { PayKitProvider } from './paykit-provider';
 import { CreateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, UpdateCustomerParams } from './resources/customer';
 import { UpdateSubscriptionParams } from './resources/subscription';
-import { Webhook } from './webhook-provider';
+import { Webhook, WebhookConfig, WebhookHandler } from './webhook-provider';
 
 class PayKit {
   constructor(private provider: PayKitProvider) {}
@@ -22,11 +22,19 @@ class PayKit {
     update: (id: string, params: UpdateSubscriptionParams) => this.provider.updateSubscription(id, params),
     cancel: (id: string) => this.provider.cancelSubscription(id),
   };
+
+  webhooks = {
+    listen: async (config: Omit<WebhookConfig, 'provider'>, handlers: WebhookHandler) => {
+      const webhook = new Webhook({ ...config, provider: this.provider }, handlers);
+      return await webhook.handle();
+    },
+  };
 }
 
-export { PayKit, Webhook, PayKitProvider };
+export { PayKit, PayKitProvider };
 
 export * from './resources';
 export * from './types';
 export * from './tools';
 export * from './logger';
+export * from './webhook-provider';

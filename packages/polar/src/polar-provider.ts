@@ -8,7 +8,7 @@ import {
   CreateCheckoutParams,
   Subscription,
   UpdateSubscriptionParams,
-  WebhookProviderPayload,
+  WebhookConfig,
   headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
@@ -90,7 +90,7 @@ export class PolarProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (params: WebhookProviderPayload): Promise<WebhookEventPayload> => {
+  handleWebhook = async (params: WebhookConfig): Promise<WebhookEventPayload> => {
     const { body, headers, webhookSecret } = params;
 
     const webhookHeaders = headersExtractor(headers, ['webhook-id', 'webhook-timestamp', 'webhook-signature']).reduce(
@@ -108,24 +108,24 @@ export class PolarProvider implements PayKitProvider {
 
     if (webhookEvent.type === 'subscription.updated') {
       const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: 'subscription.updated', created: parseInt(timestamp), id, data: subscription });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: subscription });
     } else if (webhookEvent.type === 'subscription.created') {
       const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: 'subscription.created', created: parseInt(timestamp), id, data: subscription });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: subscription });
     } else if (webhookEvent.type === 'subscription.revoked') {
       const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: 'subscription.canceled', created: parseInt(timestamp), id, data: subscription });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCanceled', created: parseInt(timestamp), id, data: subscription });
     } else if (webhookEvent.type === 'customer.created') {
       const customer = await this.retrieveCustomer(webhookEvent.data.id);
-      return toPaykitEvent<Customer>({ type: 'customer.created', created: parseInt(timestamp), id, data: customer });
+      return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: customer });
     } else if (webhookEvent.type === 'customer.updated') {
       const customer = await this.retrieveCustomer(webhookEvent.data.id);
-      return toPaykitEvent<Customer>({ type: 'customer.updated', created: parseInt(timestamp), id, data: customer });
+      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: customer });
     } else if (webhookEvent.type === 'customer.deleted') {
-      return toPaykitEvent<Customer | null>({ type: 'customer.deleted', created: parseInt(timestamp), id, data: null });
+      return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
     } else if (webhookEvent.type === 'checkout.created') {
       const checkout = await this.retrieveCheckout(webhookEvent.data.id);
-      return toPaykitEvent<Checkout>({ type: 'checkout.created', created: parseInt(timestamp), id, data: checkout });
+      return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: checkout });
     }
 
     throw new Error(`Unknown event type: ${webhookEvent.type}`);

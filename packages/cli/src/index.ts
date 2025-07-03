@@ -1,6 +1,4 @@
 #!/usr/bin/env node
-
-
 import { safeEncode, ValidationError, logger } from '@paykit-sdk/core';
 import { CheckoutInfo } from '@paykit-sdk/local';
 import { Command } from 'commander';
@@ -51,7 +49,6 @@ program
         },
       },
     ])) as CheckoutInfo;
-
 
     logger.progress('Validating product info');
 

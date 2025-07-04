@@ -1,0 +1,42 @@
+{
+  "name": "@paykit-sdk/react",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
+    "prepublishOnly": "npm run build"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "react-dom": ">=16.8.0",
+    "@tanstack/react-query": "^5.80.5"
+  },
+  "devDependencies": {
+    "@paykit-sdk/core": "workspace:*",
+    "@tanstack/react-query": "^5.80.5",
+    "@types/react": "^18.0.0",
+    "@types/react-dom": "^18.0.0",
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
+  },
+  "keywords": [
+    "paykit",
+    "react",
+    "hooks",
+    "payments"
+  ],
+  "author": "",
+  "license": "ISC",
+  "description": "React hooks for PayKit SDK"
+}

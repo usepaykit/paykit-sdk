@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/react",
-  "version": "1.0.0",
+  "version": "1.0.1-alpha.6",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
@@ -8,20 +8,24 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "npm run build",
+    "typecheck": "tsc --noEmit"
   },
   "publishConfig": {
     "access": "public"
   },
+  "dependencies": {
+    "@paykit-sdk/core": "workspace:*"
+  },
   "peerDependencies": {
+    "@tanstack/react-query": "^5.80.5",
     "react": ">=16.8.0",
-    "react-dom": ">=16.8.0",
-    "@tanstack/react-query": "^5.80.5"
+    "react-dom": ">=16.8.0"
   },
   "devDependencies": {
-    "@paykit-sdk/core": "workspace:*",
+    "@swc/core": "^1.12.9",
     "@tanstack/react-query": "^5.80.5",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
@@ -30,13 +34,18 @@
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"
   },
+  "description": "React hooks and components for PayKit SDK - Universal payment processing with Stripe, Polar, and more",
   "keywords": [
     "paykit",
     "react",
     "hooks",
-    "payments"
+    "payments",
+    "stripe",
+    "polar",
+    "subscriptions",
+    "checkout"
   ],
-  "author": "",
+  "author": "Emmanuel Odii",
   "license": "ISC",
-  "description": "React hooks for PayKit SDK"
+  "homepage": "https://paykit-web.vercel.app"
 }

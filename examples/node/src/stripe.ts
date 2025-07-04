@@ -27,10 +27,13 @@ const webhook = new Webhook(
   {
     provider,
     webhookSecret: 'whsec_123',
-    onCustomerCreated: async event => console.log({ event }),
-    onSubscriptionCreated: async subscription => console.log({ subscription }),
+    body: '123',
+    headers: { 'x-webhook-secret': '123' },
   },
-  { body: '123', headers: { 'x-stripe-signature': '123' } },
+  {
+    $customerCreated: async event => console.log({ event }),
+    $subscriptionCreated: async subscription => console.log({ subscription }),
+  },
 );
 
 console.log({ webhook });

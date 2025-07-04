@@ -13,6 +13,7 @@
     "@paykit-sdk/core": "workspace:*",
     "@paykit-sdk/stripe": "workspace:*",
     "@paykit-sdk/polar": "workspace:*",
-    "@paykit-sdk/gumroad": "workspace:*"
+    "@paykit-sdk/gumroad": "workspace:*",
+    "@paykit-sdk/react": "workspace:*"
   }
 }

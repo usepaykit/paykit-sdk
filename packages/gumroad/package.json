@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/gumroad",
-  "version": "1.0.1-alpha.6",
+  "version": "1.0.1",
   "description": "Gumroad provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -22,7 +22,7 @@
     "@paykit-sdk/core": "workspace:*"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": "^1.0.0"
+    "@paykit-sdk/core": "^1.0.1"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

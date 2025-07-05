@@ -5,7 +5,11 @@
   "main": "index.js",
   "scripts": {
     "fix-prettier": "prettier --write \"**/*.{js,ts,tsx,md,mdx}\"",
-    "dev": "pnpm --filter web dev"
+    "web:dev": "pnpm --filter web dev",
+    "changeset": "changeset",
+    "version-packages": "changeset version",
+    "version-packages:alpha": "changeset version --tag alpha",
+    "release": "changeset publish"
   },
   "workspaces": [
     "apps/*",
@@ -41,6 +45,7 @@
     "prettier": "^3.5.3"
   },
   "devDependencies": {
+    "@changesets/cli": "^2.29.5",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.6.12"
   }

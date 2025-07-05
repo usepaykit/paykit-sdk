@@ -4,7 +4,7 @@
   "description": "PayKit CLI for product setup",
   "main": "dist/index.js",
   "bin": {
-    "paykit-cli": "dist/index.js"
+    "@paykit-sdk/cli": "dist/index.js"
   },
   "scripts": {
     "build": "tsup src/index.ts --format cjs,esm --dts",

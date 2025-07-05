@@ -1,4 +1,5 @@
 import { ValidationError } from './error';
+import { tryCatchSync } from './try-catch';
 
 export type Result<T, E = unknown> = { ok: true; value: T; error?: never } | { ok: false; value?: never; error: E };
 
@@ -19,11 +20,11 @@ export const unwrapAsync = async <T>(pr: Promise<Result<T, unknown>>): Promise<T
 };
 
 export function safeParse<Inp, Out>(rawValue: Inp, fn: (value: Inp) => Out, errorMessage: string): Result<Out, ValidationError> {
-  try {
-    return OK(fn(rawValue));
-  } catch (err) {
-    return ERR(new ValidationError(errorMessage, { cause: err, provider: 'paykit' }));
-  }
+  const [result, error] = tryCatchSync(() => fn(rawValue));
+
+  if (error) return ERR(new ValidationError(errorMessage, { cause: error, provider: 'paykit' }));
+
+  return OK(result);
 }
 
 export const safeEncode = <T>(value: T) => {

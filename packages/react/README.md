@@ -5,7 +5,7 @@ React hooks and components for PayKit SDK - Universal payment processing with St
 ## Installation
 
 ```bash
-npm install @paykit-sdk/react @tanstack/react-query
+npm install @paykit-sdk/react
 ```
 
 ## Quick Start
@@ -15,21 +15,17 @@ npm install @paykit-sdk/react @tanstack/react-query
 ```tsx
 import { PaykitProvider } from '@paykit-sdk/react';
 import { stripe } from '@paykit-sdk/stripe';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 // or import { local } from '@paykit-sdk/local';
 // or import { polar } from '@paykit-sdk/polar';
 
-const queryClient = new QueryClient();
 const provider = stripe();
 
 function App() {
   return (
-    <QueryClientProvider client={queryClient}>
-      <PaykitProvider provider={provider}>
-        <YourApp />
-      </PaykitProvider>
-    </QueryClientProvider>
+    <PaykitProvider provider={provider}>
+      <YourApp />
+    </PaykitProvider>
   );
 }
 ```
@@ -40,27 +36,16 @@ function App() {
 import { useCustomer, useSubscription, useCheckout } from '@paykit-sdk/react';
 
 function CustomerDashboard() {
-  const { customer, create, update } = useCustomer({ customerId: 'cus_123' });
-  const { subscriptions, cancel } = useSubscription('sub_456');
-  const { checkout, create: createCheckout } = useCheckout();
+  const { retrieve, create, update } = useCustomer();
 
-  const handleCreateCheckout = async () => {
-    const newCheckout = await createCheckout.mutate({
-      customer_id: 'cus_123',
-      item_id: 'price_123',
-      session_type: 'one_time',
-    });
+  React.useEffect(() => {
+    retrieve.run(customerId);
+  }, [customerId]);
 
-    // Redirect to payment URL
-    window.location.href = newCheckout.payment_url;
-  };
+  if (retrieve.loading) return <Spinner />;
+  if (retrieve.error) return <Error error={retrieve.error} />;
 
-  return (
-    <div>
-      <h1>Welcome, {customer?.name}</h1>
-      <button onClick={handleCreateCheckout}>Buy Now</button>
-    </div>
-  );
+  return <CustomerView customer={retrieve.data} />;
 }
 ```
 

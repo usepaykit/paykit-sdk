@@ -258,9 +258,6 @@ importers:
       '@swc/core':
         specifier: ^1.12.9
         version: 1.12.9
-      '@tanstack/react-query':
-        specifier: ^5.80.5
-        version: 5.81.5(react@18.3.1)
       '@types/react':
         specifier: ^18.0.0
         version: 18.3.23
@@ -2292,14 +2289,6 @@ packages:
 
   '@tailwindcss/postcss@4.1.8':
     resolution: {integrity: sha512-vB/vlf7rIky+w94aWMw34bWW1ka6g6C3xIOdICKX2GC0VcLtL6fhlLiafF0DVIwa9V6EHz8kbWMkS2s2QvvNlw==}
-
-  '@tanstack/query-core@5.81.5':
-    resolution: {integrity: sha512-ZJOgCy/z2qpZXWaj/oxvodDx07XcQa9BF92c0oINjHkoqUPsmm3uG08HpTaviviZ/N9eP1f9CM7mKSEkIo7O1Q==}
-
-  '@tanstack/react-query@5.81.5':
-    resolution: {integrity: sha512-lOf2KqRRiYWpQT86eeeftAGnjuTR35myTP8MXyvHa81VlomoAWNEd8x5vkcAfQefu0qtYCvyqLropFZqgI2EQw==}
-    peerDependencies:
-      react: ^18 || ^19
 
   '@trivago/prettier-plugin-sort-imports@4.3.0':
     resolution: {integrity: sha512-r3n0onD3BTOVUNPhR4lhVK4/pABGpbA7bW3eumZnYdKaHkf1qEC+Mag6DPbGNuuh0eG8AaYj+YqmVHSiGslaTQ==}
@@ -7563,13 +7552,6 @@ snapshots:
       '@tailwindcss/oxide': 4.1.8
       postcss: 8.5.4
       tailwindcss: 4.1.8
-
-  '@tanstack/query-core@5.81.5': {}
-
-  '@tanstack/react-query@5.81.5(react@18.3.1)':
-    dependencies:
-      '@tanstack/query-core': 5.81.5
-      react: 18.3.1
 
   '@trivago/prettier-plugin-sort-imports@4.3.0(prettier@3.5.3)':
     dependencies:

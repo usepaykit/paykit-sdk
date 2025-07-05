@@ -20,13 +20,11 @@
     "@paykit-sdk/core": "workspace:*"
   },
   "peerDependencies": {
-    "@tanstack/react-query": "^5.80.5",
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0"
   },
   "devDependencies": {
     "@swc/core": "^1.12.9",
-    "@tanstack/react-query": "^5.80.5",
     "@types/react": "^18.0.0",
     "@types/react-dom": "^18.0.0",
     "react": "^18.0.0",

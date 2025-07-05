@@ -5,7 +5,6 @@ import {
   UpdateSubscriptionParams,
   Subscription,
   $ExtWebhookHandlerConfig,
-  WebhookEventPayload,
   UpdateCustomerParams,
   safeEncode,
   ValidationError,
@@ -136,7 +135,7 @@ export class LocalProvider implements PayKitProvider {
     return subscription;
   };
 
-  handleWebhook = async (payload: WebhookConfig) => {
+  handleWebhook = async (payload: $ExtWebhookHandlerConfig) => {
     const { body } = payload;
 
     const parsedBody = safeParse(body, JSON.parse, 'Invalid webhook body');

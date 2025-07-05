@@ -32,7 +32,7 @@ export type WebhookSetupConfig = {
 export type WebhookHandlerConfig = {
   body: string;
   headers: Record<string, string | string[]>;
-}
+};
 
 export type $ExtWebhookHandlerConfig = WebhookHandlerConfig & Pick<WebhookSetupConfig, 'webhookSecret'>;
 
@@ -46,23 +46,18 @@ export class Webhook {
   }
 
   on<T extends WebhookEventType>(eventType: T, handler: NonNullable<WebhookEventHandlers[T]>): Webhook {
-    if (!this.config) {
-      throw new Error('Webhook not configured. Call setup() first.');
-    }
+    if (!this.config) throw new Error('Webhook not configured. Call setup() first.');
 
-    if (!this.handlers.has(eventType)) {
-      this.handlers.set(eventType, []);
-    }
-   
+    if (!this.handlers.has(eventType)) this.handlers.set(eventType, []);
+
     this.handlers.get(eventType)?.push(handler as (event: WebhookEventPayload) => Promise<void>);
     return this;
   }
 
   async handle(dto: WebhookHandlerConfig): Promise<void> {
-    if (!this.config) {
-      throw new Error('Webhook not configured. Call setup() first.');
-    }
-    const { webhookSecret, provider } = this.config;  
+    if (!this.config) throw new Error('Webhook not configured. Call setup() first.');
+
+    const { webhookSecret, provider } = this.config;
     const event = await provider.handleWebhook({ ...dto, webhookSecret });
     const handlers = this.handlers.get(event.type as WebhookEventType);
 

@@ -1,13 +1,17 @@
 {
   "product": {
-    "name": "Test",
-    "description": "Unlimited",
-    "price": "$41",
-    "priceId": "eyJuYW1lIjoiVGVzdCIsImRlc2NyaXB0aW9uIjoiVW5saW1pdGVkIiwicHJpY2UiOiIkNDEiLCJjdXN0b21lck5hbWUiOiJFbW1hbnVlbCBPZGlpIiwiY3VzdG9tZXJFbWFpbCI6ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSJ9"
+    "name": "Viewmax Unlimited",
+    "description": "Unlimited access to edit videos",
+    "price": "$20",
+    "itemId": "eyJuYW1lIjoiVmlld21heCBVbmxpbWl0ZWQiLCJkZXNjcmlwdGlvbiI6IlVubGltaXRlZCBhY2Nlc3MgdG8gZWRpdCB2aWRlb3MiLCJwcmljZSI6IiQyMCIsImN1c3RvbWVyTmFtZSI6Ikt1c2giLCJjdXN0b21lckVtYWlsIjoia3VzaEBnbWFpbC5jb20ifQ=="
   },
   "customer": {
-    "id": "ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSI=",
-    "name": "Emmanuel Odii",
-    "email": "emmanuelodii80@gmail.com"
-  }
+    "id": "Imt1c2hAZ21haWwuY29tIg==",
+    "name": "Kush",
+    "email": "kush@gmail.com",
+    "metadata": {}
+  },
+  "subscriptions": [],
+  "checkouts": [],
+  "payments": []
 }

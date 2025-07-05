@@ -2,7 +2,8 @@ import { Checkout, Customer, logger, Subscription } from '@paykit-sdk/core';
 import fs from 'fs';
 import path from 'path';
 
-const fileName = 'paykit.config.json';
+const configDir = '.paykit';
+const fileName = 'config.json';
 
 export interface PaykitConfig {
   /**
@@ -32,54 +33,63 @@ export interface PaykitConfig {
 }
 
 /**
- * Read the paykit.config.json file from the current working directory
+ *  Helper to get the full config path and ensure directory exists
+ */
+const getConfigPath = () => {
+  const dirPath = path.resolve(process.cwd(), configDir);
+  if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
+  return path.join(dirPath, fileName);
+};
+
+/**
+ * Read the .paykit/config.json file from the current working directory
  */
 export function readPaykitConfig(): PaykitConfig | null {
   try {
-    const configPath = path.resolve(process.cwd(), fileName);
+    const configPath = getConfigPath();
 
     if (!fs.existsSync(configPath)) {
-      logger.warn(`${fileName} not found`);
+      logger.warn(`${configDir}/${fileName} not found`);
       return null;
     }
 
     const configData = fs.readFileSync(configPath, 'utf8');
     const config = JSON.parse(configData) as PaykitConfig;
 
-    logger.info(`Successfully read ${fileName}`);
+    logger.info(`Successfully read ${configDir}/${fileName}`);
     return config;
   } catch (error) {
-    logger.error(`Failed to read ${fileName}: ${error}`);
+    logger.error(`Failed to read ${configDir}/${fileName}: ${error}`);
     return null;
   }
 }
 
 /**
- * Write the paykit.config.json file to the current working directory
+ * Write the .paykit/config.json file to the current working directory
  */
 export const writePaykitConfig = (config: PaykitConfig): boolean => {
   try {
-    const configPath = path.resolve(process.cwd(), fileName);
+    const configPath = getConfigPath();
     const configData = JSON.stringify(config, null, 2);
 
     fs.writeFileSync(configPath, configData, 'utf8');
-    logger.success(`Successfully wrote ${fileName}`);
+    logger.success(`Successfully wrote ${configDir}/${fileName}`);
     return true;
   } catch (error) {
-    logger.error(`Failed to write ${fileName}: ${error}`);
+    logger.error(`Failed to write ${configDir}/${fileName}: ${error}`);
     return false;
   }
 };
 
 /**
- * Updates a key in the paykit.config.json file
+ * Updates a key in the .paykit/config.json file
  */
 export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitConfig[T]): boolean => {
   try {
     const config = readPaykitConfig();
 
     if (!config) {
-      logger.error(`Cannot update data: ${fileName} not found`);
+      logger.error(`Cannot update data: ${configDir}/${fileName} not found`);
       return false;
     }
 
@@ -97,7 +107,7 @@ export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitCon
 };
 
 /**
- * Retrieve a key from the paykit.config.json file
+ * Retrieve a key from the .paykit/config.json file
  */
 export const getKeyValue = <T extends keyof PaykitConfig>(key: T): PaykitConfig[T] | null => {
   try {

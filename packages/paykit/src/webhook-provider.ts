@@ -8,10 +8,10 @@ import {
   SubscriptionCreated,
   SubscriptionUpdated,
   PaymentReceived,
+  WebhookEventPayload,
 } from './resources/webhook';
-import { UnknownError } from './tools/error';
 
-export type WebhookHandler = Partial<{
+export type WebhookEventHandlers = Partial<{
   $customerCreated: (event: CustomerCreated) => Promise<void>;
   $customerUpdated: (event: CustomerUpdated) => Promise<void>;
   $customerDeleted: (event: CustomerDeleted) => Promise<void>;
@@ -22,41 +22,52 @@ export type WebhookHandler = Partial<{
   $paymentReceived: (event: PaymentReceived) => Promise<void>;
 }>;
 
-export type WebhookConfig = {
-  provider: PayKitProvider;
+export type WebhookEventType = keyof WebhookEventHandlers;
+
+export type WebhookSetupConfig = {
   webhookSecret: string;
-  body: string;
-  headers: Record<string, string | string[]>;
+  provider: PayKitProvider;
 };
 
+export type WebhookHandlerConfig = {
+  body: string;
+  headers: Record<string, string | string[]>;
+}
+
+export type $ExtWebhookHandlerConfig = WebhookHandlerConfig & Pick<WebhookSetupConfig, 'webhookSecret'>;
+
 export class Webhook {
-  constructor(
-    private config: WebhookConfig,
-    private handlers: WebhookHandler,
-  ) {}
+  private handlers: Map<WebhookEventType, ((event: WebhookEventPayload) => Promise<void>)[]> = new Map();
+  private config: WebhookSetupConfig | null = null;
 
-  handle = async (): Promise<void> => {
-    const event = await this.config.provider.handleWebhook(this.config);
+  setup(config: WebhookSetupConfig): Webhook {
+    this.config = config;
+    return this;
+  }
 
-    switch (event.type) {
-      case '$customerCreated':
-        return this.handlers.$customerCreated?.(event as CustomerCreated);
-      case '$customerUpdated':
-        return this.handlers.$customerUpdated?.(event as CustomerUpdated);
-      case '$customerDeleted':
-        return this.handlers.$customerDeleted?.(event as CustomerDeleted);
-      case '$subscriptionCreated':
-        return this.handlers.$subscriptionCreated?.(event as SubscriptionCreated);
-      case '$subscriptionUpdated':
-        return this.handlers.$subscriptionUpdated?.(event as SubscriptionUpdated);
-      case '$subscriptionCanceled':
-        return this.handlers.$subscriptionCanceled?.(event as SubscriptionCanceled);
-      case '$checkoutCreated':
-        return this.handlers.$checkoutCreated?.(event as CheckoutCreated);
-      case '$paymentReceived':
-        return this.handlers.$paymentReceived?.(event as PaymentReceived);
-      default:
-        throw new UnknownError(`Unknown event type: ${event.type}`, { provider: this.config.provider.constructor.name });
+  on<T extends WebhookEventType>(eventType: T, handler: NonNullable<WebhookEventHandlers[T]>): Webhook {
+    if (!this.config) {
+      throw new Error('Webhook not configured. Call setup() first.');
     }
-  };
+
+    if (!this.handlers.has(eventType)) {
+      this.handlers.set(eventType, []);
+    }
+   
+    this.handlers.get(eventType)?.push(handler as (event: WebhookEventPayload) => Promise<void>);
+    return this;
+  }
+
+  async handle(dto: WebhookHandlerConfig): Promise<void> {
+    if (!this.config) {
+      throw new Error('Webhook not configured. Call setup() first.');
+    }
+    const { webhookSecret, provider } = this.config;  
+    const event = await provider.handleWebhook({ ...dto, webhookSecret });
+    const handlers = this.handlers.get(event.type as WebhookEventType);
+
+    if (handlers && handlers.length > 0) {
+      await Promise.all(handlers.map(handler => handler(event)));
+    }
+  }
 }

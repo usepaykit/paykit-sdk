@@ -8,7 +8,7 @@ import {
   CreateCheckoutParams,
   Subscription,
   UpdateSubscriptionParams,
-  WebhookConfig,
+  $ExtWebhookHandlerConfig,
   headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
@@ -90,7 +90,7 @@ export class PolarProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (params: WebhookConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (params: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
     const { body, headers, webhookSecret } = params;
 
     const webhookHeaders = headersExtractor(headers, ['webhook-id', 'webhook-timestamp', 'webhook-signature']).reduce(

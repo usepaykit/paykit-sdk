@@ -178,6 +178,7 @@ export class LocalProvider implements PayKitProvider {
       });
     } else if (type == 'customer.deleted') {
       updateKey('customer', {});
+
       return toPaykitEvent<null>({ type: '$customerDeleted', created: Date.now(), id: data.id, data: null });
     } else if (type == 'subscription.created') {
       const subscription = safeDecode<Subscription>(data.id);
@@ -198,6 +199,7 @@ export class LocalProvider implements PayKitProvider {
       if (!subscription.ok) throw new ValidationError('Invalid subscription data', subscription.error);
 
       updateKey('subscriptions', [...(getKeyValue('subscriptions') || []), subscription.value]);
+
       return toPaykitEvent<Subscription>({
         type: '$subscriptionUpdated',
         created: Date.now(),

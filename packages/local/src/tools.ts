@@ -2,6 +2,8 @@ import { Checkout, Customer, logger, Subscription } from '@paykit-sdk/core';
 import fs from 'fs';
 import path from 'path';
 
+const fileName = 'paykit.config.json';
+
 export interface PaykitConfig {
   /**
    * Product info
@@ -34,20 +36,20 @@ export interface PaykitConfig {
  */
 export function readPaykitConfig(): PaykitConfig | null {
   try {
-    const configPath = path.resolve(process.cwd(), 'paykit.config.json');
+    const configPath = path.resolve(process.cwd(), fileName);
 
     if (!fs.existsSync(configPath)) {
-      logger.warn('paykit.config.json not found');
+      logger.warn(`${fileName} not found`);
       return null;
     }
 
     const configData = fs.readFileSync(configPath, 'utf8');
     const config = JSON.parse(configData) as PaykitConfig;
 
-    logger.info('Successfully read paykit.config.json');
+    logger.info(`Successfully read ${fileName}`);
     return config;
   } catch (error) {
-    logger.error(`Failed to read paykit.config.json: ${error}`);
+    logger.error(`Failed to read ${fileName}: ${error}`);
     return null;
   }
 }
@@ -57,14 +59,14 @@ export function readPaykitConfig(): PaykitConfig | null {
  */
 export const writePaykitConfig = (config: PaykitConfig): boolean => {
   try {
-    const configPath = path.resolve(process.cwd(), 'paykit.config.json');
+    const configPath = path.resolve(process.cwd(), fileName);
     const configData = JSON.stringify(config, null, 2);
 
     fs.writeFileSync(configPath, configData, 'utf8');
-    logger.success('Successfully wrote paykit.config.json');
+    logger.success(`Successfully wrote ${fileName}`);
     return true;
   } catch (error) {
-    logger.error(`Failed to write paykit.config.json: ${error}`);
+    logger.error(`Failed to write ${fileName}: ${error}`);
     return false;
   }
 };
@@ -77,7 +79,7 @@ export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitCon
     const config = readPaykitConfig();
 
     if (!config) {
-      logger.error('Cannot update data: paykit.config.json not found');
+      logger.error(`Cannot update data: ${fileName} not found`);
       return false;
     }
 

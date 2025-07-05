@@ -3,21 +3,16 @@ import { tryCatchAsync } from '@paykit-sdk/core';
 
 export const useAsyncFn = <Args extends unknown[], R>(fn: (...args: Args) => Promise<R>) => {
   const [loading, setLoading] = React.useState(false);
-  const [error, setError] = React.useState<Error | null>(null);
-  const [data, setData] = React.useState<R | null>(null);
 
   const run = React.useCallback(
     async (...args: Args) => {
       setLoading(true);
-      setError(null);
-      setData(null);
-      const [result, error] = await tryCatchAsync(fn(...args));
-      if (result) setData(result);
-      if (error) setError(error);
+      const [data, error] = await tryCatchAsync(fn(...args));
       setLoading(false);
+      return { data, error };
     },
     [fn],
   );
 
-  return { run, loading, error, data };
+  return { run, loading };
 };

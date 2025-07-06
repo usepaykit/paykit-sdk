@@ -5,7 +5,7 @@ export const createLocal = (config: LocalConfig) => {
 };
 
 export const local = () => {
-  return createLocal({ debug: true });
+  return createLocal({ debug: true, baseUrl: 'http://localhost:3000', paymentUrl: 'http://localhost:3000/checkout' });
 };
 
 export * from './types';

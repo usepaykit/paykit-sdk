@@ -17,12 +17,13 @@ import {
 } from '@paykit-sdk/core';
 import { getKeyValue, updateKey } from './tools';
 
-export interface LocalConfig extends PaykitProviderOptions {}
-export class LocalProvider implements PayKitProvider {
-  #paymentUrl = process.env.PAYKIT_PAYMENT_URL;
-  #baseUrl = process.env.PAYKIT_BASE_URL!;
+export interface LocalConfig extends PaykitProviderOptions {
+  paymentUrl: string;
+  baseUrl: string;
+}
 
-  constructor(config: LocalConfig) {}
+export class LocalProvider implements PayKitProvider {
+  constructor(private config: LocalConfig) {}
 
   private updateSubscriptionHelper = async (id: string, updates: Partial<Subscription>) => {
     const subscriptions = getKeyValue('subscriptions');
@@ -48,7 +49,7 @@ export class LocalProvider implements PayKitProvider {
 
     if (!dataEncoded.ok) throw new ValidationError('Invalid data', dataEncoded.error);
 
-    const redirectUrl = `${this.#paymentUrl}?${new URLSearchParams({ flowId: dataEncoded.value }).toString()}`;
+    const redirectUrl = `${this.config.paymentUrl}?${new URLSearchParams({ flowId: dataEncoded.value }).toString()}`;
 
     return {
       id: 'id',
@@ -67,7 +68,7 @@ export class LocalProvider implements PayKitProvider {
 
     if (!dataDecoded.ok) throw new ValidationError('Invalid data', dataDecoded.error);
 
-    const paymentUrl = `${this.#paymentUrl}?${new URLSearchParams({ flowId: id }).toString()}`;
+    const paymentUrl = `${this.config.paymentUrl}?${new URLSearchParams({ flowId: id }).toString()}`;
 
     const { customer_id, session_type, metadata } = dataDecoded.value;
 

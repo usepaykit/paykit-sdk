@@ -1,7 +1,9 @@
+'use client';
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { provider } from '@/paykit';
+import { provider } from '@/lib/paykit';
 import { PaykitProvider, useCheckout } from '@paykit-sdk/react';
 import { Loader2 } from 'lucide-react';
 
@@ -34,7 +36,7 @@ const PaywallModal = ({
               <span className="font-medium">Premium Plan</span>
               <span className="text-2xl font-bold">$29/mo</span>
             </div>
-            <p className="text-muted-foreground text-sm">Access to all features</p>
+            <p className="text-sm text-gray-600">Access to all features</p>
           </div>
           <div className="flex gap-2">
             <Button variant="outline" onClick={onClose} className="flex-1">
@@ -52,7 +54,17 @@ const PaywallModal = ({
 };
 
 // Feature Card Component
-const FeatureCard = ({ title, description, icon, onAccess }: { title: string; description: string; icon: string; onAccess: () => void }) => (
+const FeatureCard = ({ 
+  title, 
+  description, 
+  icon, 
+  onAccess 
+}: { 
+  title: string; 
+  description: string; 
+  icon: string; 
+  onAccess: () => void 
+}) => (
   <Card className="cursor-pointer transition-shadow hover:shadow-md" onClick={onAccess}>
     <CardHeader>
       <CardTitle className="flex items-center gap-2">
@@ -61,7 +73,7 @@ const FeatureCard = ({ title, description, icon, onAccess }: { title: string; de
       </CardTitle>
     </CardHeader>
     <CardContent>
-      <p className="text-muted-foreground">{description}</p>
+      <p className="text-gray-600">{description}</p>
     </CardContent>
   </Card>
 );
@@ -81,18 +93,27 @@ const Dashboard = () => {
 
   const handleUpgrade = async () => {
     setPaywallModal({ isOpen: false, feature: '' });
-    const { error, data } = await create.run({ customer_id: '123', item_id: '123', metadata: {}, session_type: 'recurring' });
-    if (error) throw error;
+    const { error, data } = await create.run({ 
+      customer_id: '123', 
+      item_id: '123', 
+      metadata: {}, 
+      session_type: 'recurring' 
+    });
+    if (error) {
+      console.error('Checkout error:', error);
+    } else {
+      console.log('Checkout created:', data);
+    }
   };
 
   return (
-    <div className="bg-background min-h-screen">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="border-b">
+      <header className="border-b bg-white">
         <div className="container mx-auto flex items-center justify-between px-6 py-4">
           <h1 className="text-2xl font-bold">PayKit Dashboard</h1>
           <div className="flex items-center gap-4">
-            <span className="text-muted-foreground text-sm">Welcome, John Doe</span>
+            <span className="text-sm text-gray-600">Welcome, John Doe</span>
             <Button variant="secondary" size="sm">
               Free Plan
             </Button>
@@ -105,7 +126,7 @@ const Dashboard = () => {
         {/* Hero Section */}
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-4xl font-bold">Unlock Premium Features</h2>
-          <p className="text-muted-foreground mx-auto mb-8 max-w-2xl text-xl">
+          <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
             Get access to advanced analytics, priority support, and exclusive tools
           </p>
           <Button size="lg" onClick={() => handleFeatureAccess('Premium Dashboard')}>
@@ -195,10 +216,10 @@ const Dashboard = () => {
   );
 };
 
-export const Homepage = () => {
+export default function HomePage() {
   return (
     <PaykitProvider provider={provider}>
       <Dashboard />
     </PaykitProvider>
   );
-};
+}

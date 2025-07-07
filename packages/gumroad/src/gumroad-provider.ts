@@ -25,12 +25,7 @@ export class GumroadProvider implements PayKitProvider {
   }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const response = await unwrapAsync(
-      this._client.post<{ url: string }>('checkouts', {
-        body: JSON.stringify(params),
-        headers: { Authorization: `Bearer ${this.config.accessToken}` },
-      }),
-    );
+    const response = await unwrapAsync(this._client.post<{ url: string }>('checkouts', { body: JSON.stringify(params) }));
 
     return {
       id: 'id',

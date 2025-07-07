@@ -1,6 +1,4 @@
 import { Checkout, Customer, logger, Subscription } from '@paykit-sdk/core';
-import fs from 'fs';
-import path from 'path';
 
 const configDir = '.paykit';
 const fileName = 'config.json';
@@ -33,9 +31,21 @@ export interface PaykitConfig {
 }
 
 /**
+ * Lazy load Node.js modules to avoid bundling them for browser
+ */
+const getNodeModules = () => {
+  // Dynamic imports to avoid bundling in browser
+  const fs = require('fs');
+  const path = require('path');
+  
+  return { fs, path };
+};
+
+/**
  *  Helper to get the full config path and ensure directory exists
  */
 const getConfigPath = () => {
+  const { fs, path } = getNodeModules();
   const dirPath = path.resolve(process.cwd(), configDir);
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
   return path.join(dirPath, fileName);
@@ -46,6 +56,7 @@ const getConfigPath = () => {
  */
 export function readPaykitConfig(): PaykitConfig | null {
   try {
+    const { fs } = getNodeModules();
     const configPath = getConfigPath();
 
     if (!fs.existsSync(configPath)) {
@@ -69,6 +80,7 @@ export function readPaykitConfig(): PaykitConfig | null {
  */
 export const writePaykitConfig = (config: PaykitConfig): boolean => {
   try {
+    const { fs } = getNodeModules();
     const configPath = getConfigPath();
     const configData = JSON.stringify(config, null, 2);
 
@@ -86,11 +98,17 @@ export const writePaykitConfig = (config: PaykitConfig): boolean => {
  */
 export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitConfig[T]): boolean => {
   try {
-    const config = readPaykitConfig();
+    let config = readPaykitConfig();
 
     if (!config) {
-      logger.error(`Cannot update data: ${configDir}/${fileName} not found`);
-      return false;
+      // Create a default config if it doesn't exist
+      config = {
+        product: { name: '', description: '', price: '', itemId: '' },
+        customer: {},
+        subscriptions: [],
+        checkouts: [],
+        payments: []
+      };
     }
 
     config[key] = value;

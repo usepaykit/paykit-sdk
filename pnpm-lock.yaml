@@ -253,6 +253,12 @@ importers:
         specifier: ^5.0.0
         version: 5.8.3
 
+  packages/crypto:
+    dependencies:
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../paykit
+
   packages/gumroad:
     dependencies:
       '@paykit-sdk/core':

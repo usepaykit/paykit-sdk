@@ -57,20 +57,12 @@ function App() {
 ### 2. Configure your payment providers
 
 ```tsx
+import { local } from '@paykit-sdk/local';
 import { PayKitProvider } from '@paykit-sdk/react';
 
 function App() {
   return (
-    <PayKitProvider
-      config={{
-        stripe: {
-          publishableKey: process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY,
-        },
-        polar: {
-          apiKey: process.env.NEXT_PUBLIC_POLAR_API_KEY,
-        },
-      }}
-    >
+    <PayKitProvider provider={local()}>
       <YourApp />
     </PayKitProvider>
   );

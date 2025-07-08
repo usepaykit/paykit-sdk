@@ -4,7 +4,6 @@ import { DashboardTableOfContents } from '@/components/toc';
 import { badgeVariants } from '@/components/ui/badge';
 import { getTableOfContents } from '@/lib/toc';
 import { absoluteUrl, cn } from '@/lib/utils';
-import '@/styles/mdx.css';
 import { allDocs } from 'contentlayer/generated';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -13,18 +12,14 @@ import { notFound } from 'next/navigation';
 import Balancer from 'react-wrap-balancer';
 
 interface DocPageProps {
-  params: {
-    slug: string[];
-  };
+  params: { slug: string[] };
 }
 
 async function getDocFromParams({ params }: DocPageProps) {
   const slug = params.slug?.join('/') || '';
   const doc = allDocs.find(doc => doc.slugAsParams === slug);
 
-  if (!doc) {
-    return null;
-  }
+  if (!doc) return null;
 
   return doc;
 }
@@ -32,9 +27,7 @@ async function getDocFromParams({ params }: DocPageProps) {
 export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
   const doc = await getDocFromParams({ params });
 
-  if (!doc) {
-    return {};
-  }
+  if (!doc) return {};
 
   return {
     title: doc.title,
@@ -51,7 +44,7 @@ export async function generateMetadata({ params }: DocPageProps): Promise<Metada
       title: doc.title,
       description: doc.description,
       images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
-      creator: '@paykit-sdk',
+      creator: '@devodii',
     },
   };
 }
@@ -65,7 +58,7 @@ export default async function DocPage({ params }: DocPageProps) {
 
   if (!doc) notFound();
 
-  const toc = await getTableOfContents(doc.body.raw);
+  const toc = getTableOfContents(doc.body.raw);
 
   return (
     <div className="flex w-full">

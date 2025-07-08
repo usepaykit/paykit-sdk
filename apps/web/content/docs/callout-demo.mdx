@@ -1,0 +1,72 @@
+---
+title: MDX Components Demo
+description: Demonstrates all custom MDX components
+date: 2024-06-10
+published: true
+toc: true
+links:
+  doc: "/docs/callout-demo"
+  api: "https://example.com/api"
+---
+
+# MDX Components Demo
+
+This document demonstrates how to use the custom MDX components available in your docs.
+
+## Callout Example
+
+<Callout type="info">
+  This is an info callout! You can use the `Callout` component in your MDX like this.
+</Callout>
+
+<Callout type="warning">
+  This is a warning callout! Use `type` to change the style.
+</Callout>
+
+## Code Block Example
+
+```ts
+function hello(name: string) {
+  return `Hello, ${name}!`;
+}
+```
+
+## Table Example
+
+| Feature   | Supported |
+|-----------|-----------|
+| Callout   | ✅        |
+| Code Block| ✅        |
+| Table     | ✅        |
+
+## Tabs Example
+
+<Tabs>
+  <TabsList>
+    <TabsTrigger value="one">Tab One</TabsTrigger>
+    <TabsTrigger value="two">Tab Two</TabsTrigger>
+  </TabsList>
+  <TabsContent value="one">
+    Content for Tab One
+  </TabsContent>
+  <TabsContent value="two">
+    Content for Tab Two
+  </TabsContent>
+</Tabs>
+
+## Accordion Example
+
+<Accordion type="single" collapsible>
+  <AccordionItem value="item-1">
+    <AccordionTrigger>Section 1</AccordionTrigger>
+    <AccordionContent>
+      This is the content for section 1.
+    </AccordionContent>
+  </AccordionItem>
+  <AccordionItem value="item-2">
+    <AccordionTrigger>Section 2</AccordionTrigger>
+    <AccordionContent>
+      This is the content for section 2.
+    </AccordionContent>
+  </AccordionItem>
+</Accordion> 

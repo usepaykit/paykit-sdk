@@ -1,43 +1,31 @@
 'use client';
 
 import * as React from 'react';
-import { Callout } from '@/components/callout';
-import { CodeBlockWrapper, type CodeBlockWrapperProps } from '@/components/code-block-wrapper';
+import { CodeBlock } from '@/components/code-block';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
 import { useMDXComponent } from 'next-contentlayer/hooks';
-import ShikiCodeBlock from './shiki-code-block';
 
 type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['components'];
+
+function hasChildrenProp(props: unknown): props is { children: React.ReactNode } {
+  return !!props && typeof props === 'object' && 'children' in props;
+}
 
 function extractCodeString(children: React.ReactNode): string {
   if (typeof children === 'string') return children;
   if (Array.isArray(children)) return children.map(extractCodeString).join('');
-  if (React.isValidElement(children) && 'children' in (children.props as { children: React.ReactNode }))
-    return extractCodeString((children.props as { children: React.ReactNode }).children);
+  if (React.isValidElement(children)) {
+    const el = children as React.ReactElement;
+    if (hasChildrenProp(el.props)) {
+      return extractCodeString(el.props.children);
+    }
+  }
   return '';
 }
-
-// Wrapper for MDX pre/code blocks
-const CodeBlock = async ({
-  children,
-  className,
-  __rawString__,
-  ...props
-}: React.HTMLAttributes<HTMLPreElement> & {
-  __rawString__?: string;
-}) => {
-  // Extract language
-  const language = className?.replace('language-', '') || 'typescript';
-  // Extract code string
-  let code = __rawString__ || extractCodeString(children);
-  code = String(code).trim();
-
-  return <ShikiCodeBlock code={code} language={language} />;
-};
 
 const components = {
   Accordion,
@@ -98,23 +86,14 @@ const components = {
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td className={cn('px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right', className)} {...props} />
   ),
-  pre: CodeBlock,
-  code: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => {
-    /**
-     * If this is a code block (not inline code), don't render it here
-     * as it will be handled by the pre component
-     */
-    if (className?.includes('language-')) {
-      return null;
-    }
-
-    return <code className={cn('bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props} />;
-  },
-  Callout,
-  CodeBlockWrapper: ({ children, ...props }: CodeBlockWrapperProps) => (
-    <CodeBlockWrapper className="rounded-md border" {...props}>
-      {children}
-    </CodeBlockWrapper>
+  Callout: ({ type, ...props }: React.HTMLAttributes<HTMLDivElement> & { type: 'warning' | 'info' }) => (
+    <Alert
+      className={cn('my-6', {
+        'bg-accent text-accent-foreground border-red-200 dark:border-red-200/30 dark:text-red-200': type === 'warning',
+        'bg-accent text-accent-foreground border-blue-200 dark:border-blue-200/30 dark:text-blue-200': type === 'info',
+      })}
+      {...props}
+    />
   ),
   Tabs: ({ className, ...props }: React.ComponentProps<typeof Tabs>) => <Tabs className={cn('relative mt-6 w-full', className)} {...props} />,
   TabsList: ({ className, ...props }: React.ComponentProps<typeof TabsList>) => (
@@ -123,7 +102,7 @@ const components = {
   TabsTrigger: ({ className, ...props }: React.ComponentProps<typeof TabsTrigger>) => (
     <TabsTrigger
       className={cn(
-        'text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-none border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none',
+        'text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-lg border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none',
         className,
       )}
       {...props}
@@ -132,6 +111,25 @@ const components = {
   TabsContent: ({ className, ...props }: React.ComponentProps<typeof TabsContent>) => (
     <TabsContent className={cn('relative [&_h3.font-heading]:text-base [&_h3.font-heading]:font-semibold', className)} {...props} />
   ),
+  code: ({ className = '', children, ...props }) => {
+    const isBlock = className && className.startsWith('language-');
+
+    if (isBlock) {
+      const language = className.replace('language-', '') || 'typescript';
+
+      return (
+        <CodeBlock
+          className="bg-muted border-border selection:bg-primary/20 w-full overflow-x-auto rounded-lg border px-6 py-2"
+          language={language}
+          children={extractCodeString(children)}
+          customStyle={{ fontSize: '13px' }}
+          {...props}
+        />
+      );
+    }
+
+    return <code className={className} children={children} {...props} />;
+  },
 } as MDXComponents;
 
 interface MdxProps {

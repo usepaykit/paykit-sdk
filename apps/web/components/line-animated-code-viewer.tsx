@@ -1,11 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { useMounted } from '@/hooks/use-mounted';
 import { cn } from '@/lib/utils';
-import { useTheme } from 'next-themes';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
-import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { CodeBlock } from './code-block';
 
 interface LineAnimatedCodeViewerProps {
   className?: string;
@@ -17,11 +14,9 @@ interface AnimatedLineProps {
   isChangingLine: boolean;
 }
 
-function AnimatedLine({ content, isChangingLine }: AnimatedLineProps) {
-  const { theme, resolvedTheme } = useTheme();
+const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
   const [currentContent, setCurrentContent] = React.useState(content);
   const [isAnimating, setIsAnimating] = React.useState(false);
-  const mounted = useMounted();
 
   React.useEffect(() => {
     if (content !== currentContent) {
@@ -42,27 +37,10 @@ function AnimatedLine({ content, isChangingLine }: AnimatedLineProps) {
     }
   }, [content, currentContent, isChangingLine]);
 
-  const customStyle = {
-    margin: 0,
-    padding: 0,
-    background: 'hsl(var(--card))',
-    fontSize: '14px',
-    lineHeight: '1.6',
-    fontFamily: 'ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace',
-  };
-
   // Empty lines should just be spacing
   if (currentContent === '') {
     return <div className="h-4" />;
   }
-
-  // Don't render until mounted to avoid hydration mismatch
-  if (!mounted) {
-    return <div className="bg-muted/20 h-6 animate-pulse rounded" />;
-  }
-
-  // Use resolvedTheme for more reliable theme detection
-  const isDark = resolvedTheme === 'dark' || theme === 'dark';
 
   return (
     <div
@@ -73,20 +51,11 @@ function AnimatedLine({ content, isChangingLine }: AnimatedLineProps) {
       )}
     >
       <div className="[&_*]:!bg-transparent">
-        <SyntaxHighlighter
-          language="typescript"
-          style={isDark ? oneDark : oneLight}
-          customStyle={customStyle}
-          PreTag="span"
-          showLineNumbers={false}
-          wrapLines={false}
-        >
-          {currentContent}
-        </SyntaxHighlighter>
+        <CodeBlock language="typescript" children={currentContent} />
       </div>
     </div>
   );
-}
+};
 
 export function LineAnimatedCodeViewer({ className = '', lines = [] }: LineAnimatedCodeViewerProps) {
   return (

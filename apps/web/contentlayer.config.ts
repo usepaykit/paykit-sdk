@@ -10,33 +10,12 @@ export const Doc = defineDocumentType(() => ({
   filePathPattern: `docs/**/*.mdx`,
   contentType: 'mdx',
   fields: {
-    title: {
-      type: 'string',
-      required: true,
-    },
-    description: {
-      type: 'string',
-      required: true,
-    },
-    date: {
-      type: 'date',
-      required: true,
-    },
-    published: {
-      type: 'boolean',
-      default: true,
-    },
-    toc: {
-      type: 'boolean',
-      default: true,
-    },
-    links: {
-      type: 'json',
-      of: {
-        doc: { type: 'string' },
-        api: { type: 'string' },
-      },
-    },
+    title: { type: 'string', required: true },
+    description: { type: 'string', required: true },
+    date: { type: 'date', required: true },
+    published: { type: 'boolean', default: true },
+    toc: { type: 'boolean', default: true },
+    links: { type: 'json', of: { doc: { type: 'string' }, api: { type: 'string' } } },
   },
   computedFields: {
     slug: {
@@ -53,4 +32,7 @@ export const Doc = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: join(process.cwd(), 'content'),
   documentTypes: [Doc],
+  mdx: {
+    rehypePlugins: [],
+  },
 });

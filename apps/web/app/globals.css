@@ -207,3 +207,22 @@ body {
     display: none;
   }
 }
+
+/* Custom scrollbar for code blocks */
+pre, code, .react-syntax-highlighter {
+  scrollbar-width: thin;
+  scrollbar-color: hsl(var(--muted-foreground)) hsl(var(--card));
+}
+
+pre::-webkit-scrollbar, code::-webkit-scrollbar, .react-syntax-highlighter::-webkit-scrollbar {
+  height: 8px;
+  background: hsl(var(--card));
+  border-radius: 8px;
+}
+pre::-webkit-scrollbar-thumb, code::-webkit-scrollbar-thumb, .react-syntax-highlighter::-webkit-scrollbar-thumb {
+  background: hsl(var(--muted-foreground) / 0.2);
+  border-radius: 8px;
+}
+pre::-webkit-scrollbar-thumb:hover, code::-webkit-scrollbar-thumb:hover, .react-syntax-highlighter::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--muted-foreground) / 0.4);
+}

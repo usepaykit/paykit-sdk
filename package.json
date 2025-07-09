@@ -47,6 +47,7 @@
   "devDependencies": {
     "@changesets/cli": "^2.29.5",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
-    "prettier-plugin-tailwindcss": "^0.6.12"
+    "prettier-plugin-tailwindcss": "^0.6.12",
+    "tailwindcss": "^4.1.11"
   }
 }

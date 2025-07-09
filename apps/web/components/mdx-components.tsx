@@ -2,10 +2,8 @@
 
 import * as React from 'react';
 import { CodeBlock } from '@/components/code-block';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Accordion, Button, Tabs } from '@paykit-sdk/ui';
+import { Alert } from '@paykit-sdk/ui';
 import { cn } from '@/lib/utils';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
@@ -28,14 +26,14 @@ function extractCodeString(children: React.ReactNode): string {
 }
 
 const components = {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-  Alert,
-  AlertTitle,
-  AlertDescription,
-  Button,
+  Accordion: Accordion.Root,
+  AccordionContent: Accordion.Content,
+  AccordionItem: Accordion.Item,
+  AccordionTrigger: Accordion.Trigger,
+  Alert: Alert.Root,
+  AlertTitle: Alert.Title,
+  AlertDescription: Alert.Description,
+  Button: Button.Root,
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
   ),
@@ -87,7 +85,7 @@ const components = {
     <td className={cn('px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right', className)} {...props} />
   ),
   Callout: ({ type, ...props }: React.HTMLAttributes<HTMLDivElement> & { type: 'warning' | 'info' }) => (
-    <Alert
+    <Alert.Root
       className={cn('my-6', {
         'bg-accent text-accent-foreground border-red-200 dark:border-red-200/30 dark:text-red-200': type === 'warning',
         'bg-accent text-accent-foreground border-blue-200 dark:border-blue-200/30 dark:text-blue-200': type === 'info',
@@ -95,22 +93,10 @@ const components = {
       {...props}
     />
   ),
-  Tabs: ({ className, ...props }: React.ComponentProps<typeof Tabs>) => <Tabs className={cn('relative mt-6 w-full', className)} {...props} />,
-  TabsList: ({ className, ...props }: React.ComponentProps<typeof TabsList>) => (
-    <TabsList className={cn('w-full justify-start rounded-none border-b bg-transparent p-0', className)} {...props} />
-  ),
-  TabsTrigger: ({ className, ...props }: React.ComponentProps<typeof TabsTrigger>) => (
-    <TabsTrigger
-      className={cn(
-        'text-muted-foreground data-[state=active]:border-b-primary data-[state=active]:text-foreground relative h-9 rounded-lg border-b-2 border-b-transparent bg-transparent px-4 pb-3 pt-2 font-semibold shadow-none transition-none data-[state=active]:shadow-none',
-        className,
-      )}
-      {...props}
-    />
-  ),
-  TabsContent: ({ className, ...props }: React.ComponentProps<typeof TabsContent>) => (
-    <TabsContent className={cn('relative [&_h3.font-heading]:text-base [&_h3.font-heading]:font-semibold', className)} {...props} />
-  ),
+  Tabs: Tabs.Root,
+  TabsList: Tabs.List,
+  TabsTrigger: Tabs.Trigger,
+  TabsContent: Tabs.Content,
   code: ({ className = '', children, ...props }) => {
     const isBlock = className && className.startsWith('language-');
 

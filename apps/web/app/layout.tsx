@@ -1,8 +1,8 @@
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn } from '@/lib/utils';
+import '@paykit-sdk/ui/dist/output.css';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
-import './globals.css';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],

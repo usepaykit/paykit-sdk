@@ -43,6 +43,7 @@
     "@paykit-sdk/local": "workspace:*",
     "@paykit-sdk/polar": "workspace:*",
     "@paykit-sdk/stripe": "workspace:*",
+    "@paykit-sdk/ui": "workspace:*",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

@@ -127,6 +127,9 @@ importers:
       '@paykit-sdk/stripe':
         specifier: workspace:*
         version: link:../../packages/stripe
+      '@paykit-sdk/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.8

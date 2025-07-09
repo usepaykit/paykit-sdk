@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '@paykit-sdk/ui';
 import { Copy, Check } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
@@ -51,14 +51,14 @@ export function CodeEditor({ code, language = 'typescript', showCopyButton = tru
   return (
     <div className={`group relative ${className}`}>
       {showCopyButton && (
-        <Button
+        <Button.Root
           size="sm"
           variant="ghost"
           onClick={handleCopy}
           className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-        </Button>
+        </Button.Root>
       )}
 
       <SyntaxHighlighter

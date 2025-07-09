@@ -1,11 +1,9 @@
 'use client';
 
 import * as React from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local';
+import { Badge, Button, Input } from '@paykit-sdk/ui';
 import { Lock, Zap, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
 import { z } from 'zod';
@@ -51,9 +49,10 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                   <div className="space-y-2">
                     <Input
                       type="email"
-                      value={customerEmail || 'customer@example.com'}
+                      value={customerEmail}
                       disabled
                       className="bg-background text-muted-foreground h-8 text-sm"
+                      children={<div />}
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <Input
@@ -90,7 +89,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                   )}
                 />
 
-                <Button type="submit" disabled={isProcessing} size="lg" className="mt-4 w-full">
+                <Button.Root type="submit" disabled={isProcessing} size="lg" className="mt-4 w-full">
                   {isProcessing ? (
                     <div className="flex items-center justify-center">
                       <Spinner />
@@ -102,13 +101,13 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                       <span className="ml-2">Complete Payment - {price}</span>
                     </div>
                   )}
-                </Button>
+                </Button.Root>
 
                 <div className="flex items-center justify-center pt-2">
-                  <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+                  <Badge.Root variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
                     <Zap className="mr-1 h-3 w-3" />
                     Local Provider Active
-                  </Badge>
+                  </Badge.Root>
                 </div>
               </form>
             </div>
@@ -137,7 +136,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 </div>
               </div>
               <div className="pt-6">
-                <Button onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
+                <Button.Root onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
                   {isProcessing ? (
                     <div className="flex items-center justify-center">
                       <Spinner />
@@ -149,7 +148,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                       Complete Payment - {price}
                     </>
                   )}
-                </Button>
+                </Button.Root>
               </div>
             </div>
           </div>

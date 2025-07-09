@@ -17,6 +17,6 @@ const Root = React.forwardRef<HTMLInputElement, RootProps>(({ className, type, .
   );
 });
 
-export const Input = { Root };
+export { Root as Input };
 
 Root.displayName = 'Input';

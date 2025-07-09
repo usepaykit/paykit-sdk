@@ -2,10 +2,10 @@
 
 import * as React from 'react';
 import { PaymentProvider } from '@paykit-sdk/core';
+import { Badge } from '@paykit-sdk/ui';
 import { Code2, Sparkles } from 'lucide-react';
 import { LineAnimatedCodeViewer } from './line-animated-code-viewer';
 import { ProviderList } from './provider-list';
-import { Badge } from './ui/badge';
 
 const getCodeLines = (provider: string) => [
   "import { PayKit } from '@paykit-sdk/core';",
@@ -34,16 +34,16 @@ export function ProviderDemo() {
       {/* Background Pattern */}
       <div className="from-muted/30 via-background to-muted/20 absolute inset-0 bg-gradient-to-br"></div>
 
-      <div className="container relative mx-auto px-6">
+      <div className="relative container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
           {/* Enhanced Section Header */}
           <div className="mb-16 text-center">
             <div className="bg-muted/50 mb-6 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
               <Code2 className="h-4 w-4 text-blue-500" />
               <span className="text-muted-foreground">Interactive Demo</span>
-              <Badge variant="secondary" className="ml-2">
+              <Badge.Root variant="secondary" className="ml-2">
                 Live Code
-              </Badge>
+              </Badge.Root>
             </div>
 
             <h2 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl">

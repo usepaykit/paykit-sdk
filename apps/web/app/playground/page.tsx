@@ -2,10 +2,7 @@
 
 import React, { useState } from 'react';
 import { LineAnimatedCodeViewer } from '@/components/line-animated-code-viewer';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Badge, Button, Card, Separator } from '@paykit-sdk/ui';
 import {
   Play,
   Zap,
@@ -171,21 +168,21 @@ export default function PlaygroundPage() {
               <Sparkles className="h-5 w-5 text-blue-500" />
               <span className="text-lg font-bold">PayKit</span>
             </Link>
-            <Separator orientation="vertical" className="h-4" />
+            <Separator.Root orientation="vertical" className="h-4" />
             <div className="flex items-center space-x-2">
               <Terminal className="text-muted-foreground h-4 w-4" />
               <span className="text-sm font-medium">Playground</span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+            <Badge.Root variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
               Local Provider
-            </Badge>
+            </Badge.Root>
             <Link href="/">
-              <Button variant="ghost" size="sm">
+              <Button.Root variant="ghost" size="sm">
                 <Home className="mr-2 h-4 w-4" />
                 Back to Home
-              </Button>
+              </Button.Root>
             </Link>
           </div>
         </div>
@@ -197,9 +194,9 @@ export default function PlaygroundPage() {
           <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
             <Play className="h-4 w-4 text-green-500" />
             <span className="text-muted-foreground">Interactive Playground</span>
-            <Badge variant="outline" className="ml-2">
+            <Badge.Root variant="outline" className="ml-2">
               Live Testing
-            </Badge>
+            </Badge.Root>
           </div>
           <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">Test PayKit&apos;s Local Provider</h1>
           <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
@@ -211,43 +208,43 @@ export default function PlaygroundPage() {
           {/* Control Panel */}
           <div className="space-y-6 lg:col-span-1">
             {/* Code Example */}
-            <Card>
-              <CardHeader>
+            <Card.Root>
+              <Card.Header>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Code2 className="h-4 w-4 text-blue-500" />
-                    <CardTitle className="text-lg">Code Example</CardTitle>
+                    <Card.Title className="text-lg">Code Example</Card.Title>
                   </div>
-                  <Button variant="ghost" size="sm" onClick={copyCode}>
+                  <Button.Root variant="ghost" size="sm" onClick={copyCode}>
                     <Copy className="h-4 w-4" />
-                  </Button>
+                  </Button.Root>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </Card.Header>
+              <Card.Content>
                 <LineAnimatedCodeViewer lines={codeExample} />
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
 
             {/* Payment Controls */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-lg">Payment Controls</CardTitle>
-                <CardDescription>Configure and test different payment scenarios</CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
+            <Card.Root>
+              <Card.Header>
+                <Card.Title className="text-lg">Payment Controls</Card.Title>
+                <Card.Description>Configure and test different payment scenarios</Card.Description>
+              </Card.Header>
+              <Card.Content className="space-y-4">
                 {/* Amount Selector */}
                 <div>
                   <label className="mb-2 block text-sm font-medium">Amount</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[9.99, 29.99, 99.99].map(amount => (
-                      <Button
+                      <Button.Root
                         key={amount}
                         variant={selectedAmount === amount ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setSelectedAmount(amount)}
                       >
                         ${amount}
-                      </Button>
+                      </Button.Root>
                     ))}
                   </div>
                 </div>
@@ -273,7 +270,7 @@ export default function PlaygroundPage() {
 
                 {/* Action Buttons */}
                 <div className="space-y-2 pt-2">
-                  <Button onClick={simulatePayment} disabled={isProcessing} className="w-full" size="lg">
+                  <Button.Root onClick={simulatePayment} disabled={isProcessing} className="w-full" size="lg">
                     {isProcessing ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -286,35 +283,35 @@ export default function PlaygroundPage() {
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
-                  </Button>
-                  <Button variant="outline" onClick={clearLogs} className="w-full">
+                  </Button.Root>
+                  <Button.Root variant="outline" onClick={clearLogs} className="w-full">
                     Clear Logs
-                  </Button>
+                  </Button.Root>
                   <Link href="/checkout">
-                    <Button variant="secondary" className="w-full">
+                    <Button.Root variant="secondary" className="w-full">
                       <CreditCard className="mr-2 h-4 w-4" />
                       Try Checkout Flow
-                    </Button>
+                    </Button.Root>
                   </Link>
                 </div>
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
           </div>
 
           {/* Activity Feed */}
           <div className="space-y-6 lg:col-span-2">
             {/* Payments Log */}
-            <Card>
-              <CardHeader>
+            <Card.Root>
+              <Card.Header>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <CreditCard className="h-4 w-4 text-green-500" />
-                    <CardTitle className="text-lg">Payment Activity</CardTitle>
+                    <Card.Title className="text-lg">Payment Activity</Card.Title>
                   </div>
-                  <Badge variant="outline">{payments.length} payments</Badge>
+                  <Badge.Root variant="outline">{payments.length} payments</Badge.Root>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </Card.Header>
+              <Card.Content>
                 {payments.length === 0 ? (
                   <div className="text-muted-foreground py-8 text-center">
                     <CreditCard className="mx-auto mb-4 h-12 w-12 opacity-50" />
@@ -335,32 +332,32 @@ export default function PlaygroundPage() {
                           <div className="font-medium">
                             ${payment.amount} {payment.currency}
                           </div>
-                          <Badge
+                          <Badge.Root
                             variant={payment.status === 'success' ? 'default' : payment.status === 'failed' ? 'destructive' : 'secondary'}
                             className="text-xs"
                           >
                             {payment.status}
-                          </Badge>
+                          </Badge.Root>
                         </div>
                       </div>
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
 
             {/* Webhooks Log */}
-            <Card>
-              <CardHeader>
+            <Card.Root>
+              <Card.Header>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
                     <Webhook className="h-4 w-4 text-blue-500" />
-                    <CardTitle className="text-lg">Webhook Events</CardTitle>
+                    <Card.Title className="text-lg">Webhook Events</Card.Title>
                   </div>
-                  <Badge variant="outline">{webhooks.length} events</Badge>
+                  <Badge.Root variant="outline">{webhooks.length} events</Badge.Root>
                 </div>
-              </CardHeader>
-              <CardContent>
+              </Card.Header>
+              <Card.Content>
                 {webhooks.length === 0 ? (
                   <div className="text-muted-foreground py-8 text-center">
                     <Webhook className="mx-auto mb-4 h-12 w-12 opacity-50" />
@@ -377,15 +374,15 @@ export default function PlaygroundPage() {
                             <div className="text-muted-foreground text-xs">{webhook.timestamp.toLocaleTimeString()}</div>
                           </div>
                         </div>
-                        <Badge variant={webhook.status === 'received' ? 'default' : 'secondary'} className="text-xs">
+                        <Badge.Root variant={webhook.status === 'received' ? 'default' : 'secondary'} className="text-xs">
                           {webhook.status}
-                        </Badge>
+                        </Badge.Root>
                       </div>
                     ))}
                   </div>
                 )}
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
           </div>
         </div>
       </main>

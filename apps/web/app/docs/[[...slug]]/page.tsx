@@ -1,9 +1,9 @@
 import { Mdx } from '@/components/mdx-components';
 import { DocsPager } from '@/components/pager';
 import { DashboardTableOfContents } from '@/components/toc';
-import { badgeVariants } from '@/components/ui/badge';
 import { getTableOfContents } from '@/lib/toc';
 import { absoluteUrl, cn } from '@/lib/utils';
+import { Badge } from '@paykit-sdk/ui';
 import { allDocs } from 'contentlayer/generated';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import type { Metadata } from 'next';
@@ -88,7 +88,7 @@ export default async function DocPage({ params }: DocPageProps) {
                   href={doc.links.doc}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                  className={cn(Badge.badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
                 >
                   Docs
                   <ExternalLink className="h-3 w-3" />
@@ -99,7 +99,7 @@ export default async function DocPage({ params }: DocPageProps) {
                   href={doc.links.api}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                  className={cn(Badge.badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
                 >
                   API Reference
                   <ExternalLink className="h-3 w-3" />
@@ -122,7 +122,7 @@ export default async function DocPage({ params }: DocPageProps) {
         <div className="bg-muted/30 hidden w-80 shrink-0 border-l xl:block">
           <div className="sticky top-20 p-6">
             <div className="space-y-4">
-              <h4 className="text-foreground/80 text-sm font-semibold uppercase tracking-wider">On this page</h4>
+              <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">On this page</h4>
               <DashboardTableOfContents toc={toc} />
             </div>
           </div>

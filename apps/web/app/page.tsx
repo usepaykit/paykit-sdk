@@ -1,13 +1,10 @@
 import React from 'react';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ThemeToggle } from '@/components/theme-toggle';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import GumroadLogo from '@/public/providers/gumroad.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
+import { Separator, Card, Button, Badge } from '@paykit-sdk/ui';
 import {
   Github,
   BookOpen,
@@ -44,46 +41,46 @@ const Index = () => {
           {/* Desktop Navigation */}
           <div className="hidden items-center space-x-1 md:flex">
             <Link href="/playground">
-              <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+              <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                 <Play className="mr-2 h-4 w-4" />
                 Playground
-              </Button>
+              </Button.Root>
             </Link>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <BookOpen className="mr-2 h-4 w-4" />
               Documentation
-            </Button>
-            <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+            </Button.Root>
+            <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
               <Github className="mr-2 h-4 w-4" />
               GitHub
-            </Button>
+            </Button.Root>
             <div className="bg-border mx-2 h-4 w-px"></div>
             <ThemeToggle />
-            <Button size="sm" className="ml-2">
+            <Button.Root size="sm" className="ml-2">
               Get Started
               <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
+            </Button.Root>
           </div>
 
           {/* Mobile Navigation */}
           <div className="flex items-center space-x-2 md:hidden">
             <ThemeToggle />
-            <Button variant="ghost" size="sm">
+            <Button.Root variant="ghost" size="sm">
               <Github className="h-4 w-4" />
-            </Button>
+            </Button.Root>
           </div>
         </nav>
       </header>
 
-      <main className="mx-auto max-w-7xl px-6 pb-24 pt-12">
+      <main className="mx-auto max-w-7xl px-6 pt-12 pb-24">
         {/* Hero Section */}
         <div className="mb-16 space-y-6 text-center">
           <div className="bg-muted/50 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
             <Zap className="h-4 w-4 text-yellow-500" />
             <span className="text-muted-foreground">Open Source Payment Toolkit</span>
-            <Badge variant="secondary" className="ml-2">
+            <Badge.Root variant="secondary" className="ml-2">
               TypeScript
-            </Badge>
+            </Badge.Root>
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
@@ -98,33 +95,33 @@ const Index = () => {
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <Link href="/playground">
-              <Button size="lg" className="group">
+              <Button.Root size="lg" className="group">
                 <Play className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
                 Try Playground
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
+              </Button.Root>
             </Link>
-            <Button variant="outline" size="lg">
+            <Button.Root variant="outline" size="lg">
               <Github className="mr-2 h-5 w-5" />
               View Source
-            </Button>
+            </Button.Root>
           </div>
         </div>
 
         {/* Interactive Features Grid */}
         <div className="mb-16 grid gap-6 md:grid-cols-3">
           {/* Local Development */}
-          <Card className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
-            <CardHeader>
+          <Card.Root className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Header>
               <div className="flex items-center space-x-3">
                 <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/20">
                   <Terminal className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
-                <CardTitle className="text-lg">Local Provider</CardTitle>
+                <Card.Title className="text-lg">Local Provider</Card.Title>
               </div>
-              <CardDescription>Start building without any payment provider setup</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              <Card.Description>Start building without any payment provider setup</Card.Description>
+            </Card.Header>
+            <Card.Content className="space-y-4">
               {/* Visual representation of local payment testing */}
               <div className="bg-muted/30 relative h-24 rounded-lg p-3">
                 <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10"></div>
@@ -174,21 +171,21 @@ const Index = () => {
                   <span>Full development workflow</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </Card.Content>
+          </Card.Root>
 
           {/* Provider Switching */}
-          <Card className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
-            <CardHeader>
+          <Card.Root className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Header>
               <div className="flex items-center space-x-3">
                 <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/20">
                   <Layers className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
-                <CardTitle className="text-lg">Provider Agnostic</CardTitle>
+                <Card.Title className="text-lg">Provider Agnostic</Card.Title>
               </div>
-              <CardDescription>Switch between Stripe, Polar, or Gumroad instantly</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              <Card.Description>Switch between Stripe, Polar, or Gumroad instantly</Card.Description>
+            </Card.Header>
+            <Card.Content className="space-y-4">
               {/* Visual representation of providers connecting to PayKit */}
               <div className="bg-muted/30 relative flex h-24 items-center justify-center rounded-lg p-4">
                 <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-blue-500/10 to-purple-500/10"></div>
@@ -233,21 +230,21 @@ const Index = () => {
                   <span>Zero refactoring needed</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </Card.Content>
+          </Card.Root>
 
           {/* Production Ready */}
-          <Card className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
-            <CardHeader>
+          <Card.Root className="group border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Header>
               <div className="flex items-center space-x-3">
                 <div className="rounded-lg bg-purple-100 p-2 dark:bg-purple-900/20">
                   <Rocket className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
-                <CardTitle className="text-lg">Production Ready</CardTitle>
+                <Card.Title className="text-lg">Production Ready</Card.Title>
               </div>
-              <CardDescription>Deploy with confidence using battle-tested patterns</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              <Card.Description>Deploy with confidence using battle-tested patterns</Card.Description>
+            </Card.Header>
+            <Card.Content className="space-y-4">
               {/* Visual representation of production deployment */}
               <div className="bg-muted/30 relative flex h-24 items-center justify-center rounded-lg p-4">
                 <div className="absolute inset-0 rounded-lg bg-gradient-to-r from-purple-500/10 to-pink-500/10"></div>
@@ -269,7 +266,7 @@ const Index = () => {
                       <div className="flex h-6 w-6 items-center justify-center rounded border-2 border-purple-300 bg-gradient-to-br from-purple-500 to-pink-600">
                         <Rocket className="h-3 w-3 text-white" />
                       </div>
-                      <div className="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-green-500">
+                      <div className="absolute -top-1 -right-1 flex h-3 w-3 items-center justify-center rounded-full bg-green-500">
                         <Shield className="h-2 w-2 text-white" />
                       </div>
                     </div>
@@ -303,8 +300,8 @@ const Index = () => {
                   <span>Enterprise-grade security patterns</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </Card.Content>
+          </Card.Root>
         </div>
 
         {/* Use Cases Section */}
@@ -316,82 +313,86 @@ const Index = () => {
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* MVP Development */}
-            <Card className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Root className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-cyan-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <CardHeader className="relative pb-4">
+              <Card.Header className="relative pb-4">
                 <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-blue-100 dark:bg-blue-900/20">
                   <Code2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
                 </div>
-                <CardTitle className="text-lg font-semibold">MVP Development</CardTitle>
-              </CardHeader>
-              <CardContent className="relative pt-0">
-                <CardDescription className="text-sm leading-relaxed">
+                <Card.Title className="text-lg font-semibold">MVP Development</Card.Title>
+              </Card.Header>
+              <Card.Content className="relative pt-0">
+                <Card.Description className="text-sm leading-relaxed">
                   Build and test billing locally before choosing a payment provider
-                </CardDescription>
+                </Card.Description>
                 <div className="mt-4 inline-flex items-center text-xs font-medium text-blue-600 dark:text-blue-400">
                   <span>Start building today</span>
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
 
             {/* Multi-tenant SaaS */}
-            <Card className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Root className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-pink-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <CardHeader className="relative pb-4">
+              <Card.Header className="relative pb-4">
                 <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-purple-100 dark:bg-purple-900/20">
                   <Settings className="h-6 w-6 text-purple-600 dark:text-purple-400" />
                 </div>
-                <CardTitle className="text-lg font-semibold">Multi-tenant SaaS</CardTitle>
-              </CardHeader>
-              <CardContent className="relative pt-0">
-                <CardDescription className="text-sm leading-relaxed">Different providers per tenant or region with the same codebase</CardDescription>
+                <Card.Title className="text-lg font-semibold">Multi-tenant SaaS</Card.Title>
+              </Card.Header>
+              <Card.Content className="relative pt-0">
+                <Card.Description className="text-sm leading-relaxed">
+                  Different providers per tenant or region with the same codebase
+                </Card.Description>
                 <div className="mt-4 inline-flex items-center text-xs font-medium text-purple-600 dark:text-purple-400">
                   <span>Scale globally</span>
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
 
             {/* A/B Testing */}
-            <Card className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Root className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <CardHeader className="relative pb-4">
+              <Card.Header className="relative pb-4">
                 <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-yellow-100 dark:bg-yellow-900/20">
                   <Zap className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
                 </div>
-                <CardTitle className="text-lg font-semibold">A/B Testing</CardTitle>
-              </CardHeader>
-              <CardContent className="relative pt-0">
-                <CardDescription className="text-sm leading-relaxed">Test different payment providers to optimize conversion rates</CardDescription>
+                <Card.Title className="text-lg font-semibold">A/B Testing</Card.Title>
+              </Card.Header>
+              <Card.Content className="relative pt-0">
+                <Card.Description className="text-sm leading-relaxed">Test different payment providers to optimize conversion rates</Card.Description>
                 <div className="mt-4 inline-flex items-center text-xs font-medium text-yellow-600 dark:text-yellow-400">
                   <span>Optimize conversions</span>
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
 
             {/* Migration */}
-            <Card className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
+            <Card.Root className="group relative overflow-hidden border-dashed transition-all duration-300 hover:border-solid hover:shadow-lg">
               <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-emerald-500/5 opacity-0 transition-opacity group-hover:opacity-100"></div>
-              <CardHeader className="relative pb-4">
+              <Card.Header className="relative pb-4">
                 <div className="mb-3 inline-flex h-12 w-12 items-center justify-center rounded-xl bg-green-100 dark:bg-green-900/20">
                   <Clock className="h-6 w-6 text-green-600 dark:text-green-400" />
                 </div>
-                <CardTitle className="text-lg font-semibold">Migration</CardTitle>
-              </CardHeader>
-              <CardContent className="relative pt-0">
-                <CardDescription className="text-sm leading-relaxed">Migrate between providers without rewriting your billing logic</CardDescription>
+                <Card.Title className="text-lg font-semibold">Migration</Card.Title>
+              </Card.Header>
+              <Card.Content className="relative pt-0">
+                <Card.Description className="text-sm leading-relaxed">
+                  Migrate between providers without rewriting your billing logic
+                </Card.Description>
                 <div className="mt-4 inline-flex items-center text-xs font-medium text-green-600 dark:text-green-400">
                   <span>Seamless migration</span>
                   <ArrowRight className="ml-1 h-3 w-3" />
                 </div>
-              </CardContent>
-            </Card>
+              </Card.Content>
+            </Card.Root>
           </div>
         </div>
 
-        <Separator className="my-16" />
+        <Separator.Root className="my-16" />
       </main>
 
       {/* Provider Demo */}
@@ -405,9 +406,9 @@ const Index = () => {
               <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
                 <CreditCard className="h-4 w-4 text-green-500" />
                 <span className="text-muted-foreground">Complete Checkout Experience</span>
-                <Badge variant="outline" className="ml-2">
+                <Badge.Root variant="outline" className="ml-2">
                   Demo
-                </Badge>
+                </Badge.Root>
               </div>
               <h2 className="text-3xl font-bold md:text-4xl">
                 Production-ready checkout flows
@@ -504,11 +505,11 @@ const Index = () => {
 
                 <div className="flex justify-center">
                   <Link href="/checkout">
-                    <Button size="lg" variant="outline" className="group">
+                    <Button.Root size="lg" variant="outline" className="group">
                       <CreditCard className="mr-2 h-5 w-5" />
                       Try Live Checkout Demo
                       <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Button>
+                    </Button.Root>
                   </Link>
                 </div>
               </div>
@@ -566,15 +567,15 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button size="lg" className="group">
+              <Button.Root size="lg" className="group">
                 <Terminal className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
                 npx paykit-sdk@latest
                 <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button>
-              <Button variant="outline" size="lg">
+              </Button.Root>
+              <Button.Root variant="outline" size="lg">
                 <BookOpen className="mr-2 h-5 w-5" />
                 Read Documentation
-              </Button>
+              </Button.Root>
             </div>
           </div>
         </div>
@@ -594,12 +595,12 @@ const Index = () => {
                 The payment toolkit for TypeScript developers. Build locally, deploy anywhere.
               </p>
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm">
+                <Button.Root variant="ghost" size="sm">
                   <Github className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
+                </Button.Root>
+                <Button.Root variant="ghost" size="sm">
                   <BookOpen className="h-4 w-4" />
-                </Button>
+                </Button.Root>
               </div>
             </div>
 
@@ -685,7 +686,7 @@ const Index = () => {
             </div>
           </div>
 
-          <Separator className="my-8" />
+          <Separator.Root className="my-8" />
 
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <p className="text-muted-foreground text-sm">© 2024 PayKit. All rights reserved.</p>

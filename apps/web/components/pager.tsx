@@ -1,4 +1,4 @@
-import { Button } from '@/components/ui/button';
+import { Button } from '@paykit-sdk/ui';
 import { NavItem, NavItemWithChildren } from '@/config/docs';
 import { docsConfig } from '@/config/docs';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
@@ -24,20 +24,20 @@ export function DocsPager({ doc }: DocsPagerProps) {
   return (
     <div className="flex flex-row items-center justify-between">
       {pager?.prev?.href && (
-        <Button variant="ghost" asChild>
+        <Button.Root variant="ghost" asChild>
           <Link href={pager.prev.href}>
             <ChevronLeft className="mr-2 h-4 w-4" />
             {pager.prev.title}
           </Link>
-        </Button>
+        </Button.Root>
       )}
       {pager?.next?.href && (
-        <Button variant="ghost" className="ml-auto" asChild>
+        <Button.Root variant="ghost" className="ml-auto" asChild>
           <Link href={pager.next.href}>
             {pager.next.title}
             <ChevronRight className="ml-2 h-4 w-4" />
           </Link>
-        </Button>
+        </Button.Root>
       )}
     </div>
   );

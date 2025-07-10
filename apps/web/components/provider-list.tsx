@@ -10,17 +10,22 @@ interface ProviderListProps {
 
 const providers = [
   {
-    key: 'stripe' as PaymentProvider,
+    key: 'local' as const,
+    name: 'Local',
+    description: 'Local payment processing',
+  },
+  {
+    key: 'stripe' as const,
     name: 'Stripe',
     description: 'Global payment processing',
   },
   {
-    key: 'polar' as PaymentProvider,
+    key: 'polar' as const,
     name: 'Polar',
     description: 'Creator monetization',
   },
   {
-    key: 'gumroad' as PaymentProvider,
+    key: 'gumroad' as const,
     name: 'Gumroad',
     description: 'Digital product sales',
   },

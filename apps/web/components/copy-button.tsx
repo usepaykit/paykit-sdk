@@ -1,12 +1,10 @@
 'use client';
 
 import * as React from 'react';
-import { Button, cn } from '@paykit-sdk/ui';
-import { Check, Copy } from 'lucide-react';
+import { Button, Toast } from '@paykit-sdk/ui';
 
-interface CopyButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
+interface CopyButtonProps extends React.ComponentProps<typeof Button> {
   value: string;
-  src?: string;
 }
 
 export function CopyButton({ value, className, ...props }: CopyButtonProps) {
@@ -20,17 +18,13 @@ export function CopyButton({ value, className, ...props }: CopyButtonProps) {
 
   return (
     <Button
-      size="icon"
       variant="ghost"
-      className={cn('relative z-10 size-6 text-zinc-50 hover:bg-zinc-700 hover:text-zinc-50', className)}
       onClick={() => {
         navigator.clipboard.writeText(value);
         setHasCopied(true);
+        Toast.success({ title: 'Copied to clipboard', options: { duration: 4000, position: 'bottom-right', className: 'font-pt-sans' } });
       }}
       {...props}
-    >
-      <span className="sr-only">Copy</span>
-      {hasCopied ? <Check className="size-3" /> : <Copy className="size-3" />}
-    </Button>
+    />
   );
 }

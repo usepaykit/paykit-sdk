@@ -1,4 +1,5 @@
 import React from 'react';
+import { CopyButton } from '@/components/copy-button';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ThemeToggle } from '@/components/theme-toggle';
 import GumroadLogo from '@/public/providers/gumroad.webp';
@@ -69,9 +70,9 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <Button variant="outline" size="lg">
+            <CopyButton value="npx @paykit-sdk/cli@latest init" variant="outline" size="lg">
               npx @paykit-sdk/cli@latest init
-            </Button>
+            </CopyButton>
           </div>
         </div>
 

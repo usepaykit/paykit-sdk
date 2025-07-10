@@ -20,17 +20,23 @@
   ],
   "dependencies": {
     "commander": "^12.0.0",
-    "inquirer": "^10.0.0",
-    "@paykit-sdk/core": "workspace:*",
-    "@paykit-sdk/local": "workspace:*"
+    "inquirer": "^10.0.0"
   },
   "devDependencies": {
     "typescript": "^5.0.0",
     "@types/node": "^20.0.0",
     "@types/inquirer": "^9.0.0",
-    "tsup": "^8.0.0"
+    "tsup": "^8.0.0",
+    "@paykit-sdk/core": "workspace:*",
+    "@paykit-sdk/local": "workspace:*",
+    "@paykit-sdk/ui": "workspace:*"
   },
-  "keywords": ["paykit", "cli", "payment", "development"],
+  "keywords": [
+    "paykit",
+    "cli",
+    "payment",
+    "development"
+  ],
   "author": "PayKit Team",
   "license": "MIT"
-} 
+}

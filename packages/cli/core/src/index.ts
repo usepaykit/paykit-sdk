@@ -99,7 +99,6 @@ program
       const installProcess = spawn('npm', ['install', '--production'], {
         cwd: devAppPath,
         stdio: 'pipe', // Capture output to avoid spam
-        shell: true,
       });
 
       // Wait for installation to complete
@@ -130,7 +129,6 @@ program
     const nextProcess = spawn('npm', ['start'], {
       cwd: devAppPath,
       stdio: 'inherit',
-      shell: true,
     });
 
     logger.clearProgress();

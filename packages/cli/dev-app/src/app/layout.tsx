@@ -1,4 +1,4 @@
-import '@paykit-sdk/ui/dist/output.css';
+import { Toaster } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
 import './globals.css';
@@ -22,7 +22,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${ptSans.variable} font-pt-sans antialiased`}>{children}</body>
+      <body className={`${ptSans.variable} font-pt-sans antialiased`}>
+        {children}
+        <Toaster />
+      </body>
     </html>
   );
 }

@@ -11,7 +11,8 @@
     "build": "npm run build:cli && npm run build:dev-app && npm run copy-assets",
     "build:cli": "tsup core/src/index.ts --format esm --out-dir dist",
     "build:dev-app": "cd dev-app && npm run build",
-    "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && cp dev-app/package.json dist/dev-app/ && echo '{\"type\": \"module\"}' > dist/package.json",
+    "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && npm run create-prod-package",
+    "create-prod-package": "echo '{\"name\": \"@paykit-sdk/cli-dev-app\", \"version\": \"0.1.0\", \"private\": true, \"scripts\": {\"start\": \"next start -p 3001\"}, \"dependencies\": {\"next\": \"^15.3.5\", \"react\": \"^19.1.0\", \"react-dom\": \"^19.1.0\"}}' > dist/dev-app/package.json && echo '{\"type\": \"module\"}' > dist/package.json",
     "dev": "npm run build && node dist/index.js",
     "prepublishOnly": "npm run build"
   },
@@ -20,16 +21,17 @@
   ],
   "dependencies": {
     "commander": "^12.0.0",
-    "inquirer": "^10.0.0"
+    "inquirer": "^10.0.0",
+    "tw-animate-css": "^1.3.4"
   },
   "devDependencies": {
-    "typescript": "^5.0.0",
-    "@types/node": "^20.0.0",
-    "@types/inquirer": "^9.0.0",
-    "tsup": "^8.0.0",
     "@paykit-sdk/core": "workspace:*",
     "@paykit-sdk/local": "workspace:*",
-    "@paykit-sdk/ui": "workspace:*"
+    "@paykit-sdk/ui": "workspace:*",
+    "@types/inquirer": "^9.0.0",
+    "@types/node": "^20.0.0",
+    "tsup": "^8.0.0",
+    "typescript": "^5.0.0"
   },
   "keywords": [
     "paykit",

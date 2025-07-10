@@ -19,6 +19,10 @@ program
   .command('init')
   .description('Initialize your product info for PayKit')
   .action(async () => {
+    logger.brand();
+    logger.info("Welcome to PayKit! Let's set up your product.");
+    logger.spacer();
+
     const answers = (await inquirer.prompt([
       {
         type: 'input',
@@ -69,20 +73,27 @@ program
     const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
     writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
+
+    logger.spacer();
     logger.success('PayKit configuration initialized successfully!');
+    logger.tip('Run `paykit dev` to start the development server');
   });
 
 program
   .command('dev')
   .description('Start the PayKit development server')
   .action(async () => {
+    logger.brand();
+    logger.info('Starting PayKit development server...');
+    logger.spacer();
+
     // Path to the built dev-app directory (same directory as this compiled CLI file)
     const devAppPath = path.join(__dirname, 'dev-app');
     const nodeModulesPath = path.join(devAppPath, 'node_modules');
 
     // Check if dependencies are installed
     if (!existsSync(nodeModulesPath)) {
-      logger.progress('Installing development dependencies (first time setup)...');
+      logger.progress('Installing development dependencies (first time setup)');
 
       // Install dependencies
       const installProcess = spawn('npm', ['install', '--production'], {
@@ -95,22 +106,25 @@ program
       await new Promise((resolve, reject) => {
         installProcess.on('close', code => {
           if (code === 0) {
+            logger.clearProgress();
             logger.success('Dependencies installed successfully!');
             resolve(undefined);
           } else {
-            logger.error(' Failed to install dependencies');
+            logger.clearProgress();
+            logger.error('Failed to install dependencies');
             reject(new Error(`npm install failed with code ${code}`));
           }
         });
 
         installProcess.on('error', error => {
-          logger.error(' Failed to install dependencies');
+          logger.clearProgress();
+          logger.error('Failed to install dependencies');
           reject(error);
         });
       });
     }
 
-    logger.progress('Serving PayKit development app...');
+    logger.progress('Serving PayKit development app');
 
     // Start the Next.js production server
     const nextProcess = spawn('npm', ['start'], {
@@ -119,11 +133,14 @@ program
       shell: true,
     });
 
-    logger.info('PayKit dev server running on http://localhost:3001');
+    logger.clearProgress();
+    logger.success('PayKit dev server running on http://localhost:3001');
+    logger.tip('Press Ctrl+C to stop the server');
 
     // Handle process termination
     process.on('SIGINT', () => {
-      logger.error('Stopping PayKit dev server...');
+      logger.spacer();
+      logger.warn('Stopping PayKit dev server...');
       nextProcess.kill();
       process.exit();
     });

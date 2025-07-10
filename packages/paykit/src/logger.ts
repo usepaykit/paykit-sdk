@@ -8,6 +8,9 @@ export interface LoggerOptions {
 export class Logger {
   private silent: boolean;
   private verbose: boolean;
+  private spinnerInterval: NodeJS.Timeout | null = null;
+  private spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
+  private currentSpinnerFrame = 0;
 
   constructor(options: LoggerOptions = {}) {
     this.silent = options.silent || false;
@@ -15,27 +18,27 @@ export class Logger {
   }
 
   /**
-   * Success messages (green)
+   * Success messages (dark green)
    */
   success(message: string) {
     if (this.silent) return;
-    console.log(chalk.green(`✔ ${message}`));
+    console.log(chalk.hex('#166534')(`✔ ${message}`));
   }
 
   /**
-   * Info messages (blue)
+   * Info messages (dark green)
    */
   info(message: string) {
     if (this.silent) return;
-    console.log(chalk.blue(`ℹ ${message}`));
+    console.log(chalk.hex('#15803d')(`ℹ ${message}`));
   }
 
   /**
-   * Warning messages (yellow)
+   * Warning messages (amber)
    */
   warn(message: string) {
     if (this.silent) return;
-    console.log(chalk.yellow(`⚠ ${message}`));
+    console.log(chalk.hex('#d97706')(`⚠ ${message}`));
   }
 
   /**
@@ -43,7 +46,7 @@ export class Logger {
    */
   error(message: string) {
     if (this.silent) return;
-    console.error(chalk.red(`✖ ${message}`));
+    console.error(chalk.hex('#dc2626')(`✖ ${message}`));
   }
 
   /**
@@ -55,11 +58,11 @@ export class Logger {
   }
 
   /**
-   * Tip messages (cyan)
+   * Tip messages (dark green)
    */
   tip(message: string) {
     if (this.silent) return;
-    console.log(chalk.cyan(`💡 ${message}`));
+    console.log(chalk.hex('#16a34a')(`💡 ${message}`));
   }
 
   /**
@@ -75,15 +78,49 @@ export class Logger {
    */
   section(title: string) {
     if (this.silent) return;
-    console.log(chalk.bold.underline(`\n${title}`));
+    console.log(chalk.hex('#166534').bold.underline(`\n${title}`));
   }
 
   /**
-   * Progress indicator
+   * Progress indicator with spinning animation
    */
   progress(message: string) {
     if (this.silent) return;
-    process.stdout.write(chalk.blue(`⏳ ${message}... `));
+
+    // Clear any existing spinner
+    this.stopSpinner();
+
+    // Start the spinning animation
+    this.startSpinner(message);
+  }
+
+  /**
+   * Start the spinner animation
+   */
+  private startSpinner(message: string) {
+    const updateSpinner = () => {
+      process.stdout.clearLine(0);
+      process.stdout.cursorTo(0);
+      const spinner = this.spinnerFrames[this.currentSpinnerFrame];
+      process.stdout.write(chalk.hex('#15803d')(`${spinner} ${message}... `));
+      this.currentSpinnerFrame = (this.currentSpinnerFrame + 1) % this.spinnerFrames.length;
+    };
+
+    // Initial display
+    updateSpinner();
+
+    // Update every 80ms for smooth animation
+    this.spinnerInterval = setInterval(updateSpinner, 80);
+  }
+
+  /**
+   * Stop the spinner animation
+   */
+  private stopSpinner() {
+    if (this.spinnerInterval) {
+      clearInterval(this.spinnerInterval);
+      this.spinnerInterval = null;
+    }
   }
 
   /**
@@ -91,6 +128,7 @@ export class Logger {
    */
   clearProgress() {
     if (this.silent) return;
+    this.stopSpinner();
     process.stdout.clearLine(0);
     process.stdout.cursorTo(0);
   }
@@ -114,7 +152,7 @@ export class Logger {
   list(items: string[], bullet = '•') {
     if (this.silent) return;
     items.forEach(item => {
-      console.log(chalk.gray(`${bullet} `) + chalk.white(item));
+      console.log(chalk.hex('#16a34a')(`${bullet} `) + chalk.white(item));
     });
   }
 
@@ -123,7 +161,7 @@ export class Logger {
    */
   divider(char = '─', length = 50) {
     if (this.silent) return;
-    console.log(chalk.gray(char.repeat(length)));
+    console.log(chalk.hex('#16a34a')(char.repeat(length)));
   }
 
   /**
@@ -134,6 +172,15 @@ export class Logger {
     for (let i = 0; i < lines; i++) {
       console.log('');
     }
+  }
+
+  /**
+   * Brand header
+   */
+  brand() {
+    if (this.silent) return;
+    console.log(chalk.hex('#166534').bold('PayKit CLI'));
+    this.divider();
   }
 }
 

@@ -9,7 +9,10 @@ export const useAsyncFn = <Args extends unknown[], R>(fn: (...args: Args) => Pro
       setLoading(true);
       const [data, error] = await tryCatchAsync(fn(...args));
       setLoading(false);
-      return { data, error };
+
+      if (error) return { data: undefined, error };
+
+      return { data, error: undefined };
     },
     [fn],
   );

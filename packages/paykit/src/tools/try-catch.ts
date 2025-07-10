@@ -7,7 +7,7 @@ type Result<T, E = Error> = Success<T> | Failure<E>;
 export async function tryCatchAsync<T, E = Error>(promise: Promise<T>): Promise<Result<T, E>> {
   try {
     const data = await promise;
-    return [data, undefined];
+    return [data as T, undefined];
   } catch (error) {
     return [undefined, error as E];
   }

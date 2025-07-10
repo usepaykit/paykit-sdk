@@ -103,13 +103,6 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                     </div>
                   )}
                 </Button>
-
-                <div className="flex items-center justify-center pt-2">
-                  <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                    <Zap className="mr-1 h-3 w-3" />
-                    Local Provider Active
-                  </Badge>
-                </div>
               </form>
             </div>
 

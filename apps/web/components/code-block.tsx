@@ -1,10 +1,19 @@
 import { useMounted } from '@/hooks/use-mounted';
-import { OverrideProps } from '@paykit-sdk/core';
 import { useTheme } from 'next-themes';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { oneDark, oneLight } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
-interface CodeBlockProps extends OverrideProps<React.ComponentProps<typeof SyntaxHighlighter>, { language: string }> {}
+/**
+ * @description Type assertion to fix React 19 compatibility
+ */
+const TypedSyntaxHighlighter = SyntaxHighlighter as any;
+
+interface CodeBlockProps {
+  language?: string;
+  children: string;
+  customStyle?: React.CSSProperties;
+  [key: string]: any;
+}
 
 export const CodeBlock = ({ language = '', children, ...props }: CodeBlockProps) => {
   const { resolvedTheme } = useTheme();
@@ -23,7 +32,7 @@ export const CodeBlock = ({ language = '', children, ...props }: CodeBlockProps)
   if (!mounted) return <div className="bg-muted/20 h-6 animate-pulse rounded" />;
 
   return (
-    <SyntaxHighlighter
+    <TypedSyntaxHighlighter
       language={language}
       style={resolvedTheme === 'dark' ? oneDark : oneLight}
       customStyle={{ ...customStyle, ...props.customStyle }}
@@ -33,6 +42,6 @@ export const CodeBlock = ({ language = '', children, ...props }: CodeBlockProps)
       {...props}
     >
       {children}
-    </SyntaxHighlighter>
+    </TypedSyntaxHighlighter>
   );
 };

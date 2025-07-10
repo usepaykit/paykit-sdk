@@ -29,45 +29,20 @@ import Link from 'next/link';
 const Index = () => {
   return (
     <div className="font-inter bg-background min-h-screen">
-      {/* Modern Header */}
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          {/* Logo */}
           <div className="flex items-center space-x-3">
-            <Sparkles className="h-4 w-4 text-white" />
+            <Sparkles className="text-foreground size-4" />
             <span className="text-xl font-bold tracking-tight">PayKit</span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden items-center space-x-1 md:flex">
-            <Link href="/playground">
-              <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                <Play className="mr-2 h-4 w-4" />
-                Playground
-              </Button.Root>
-            </Link>
-            <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Documentation
-            </Button.Root>
-            <Button.Root variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-              <Github className="mr-2 h-4 w-4" />
-              GitHub
-            </Button.Root>
-            <div className="bg-border mx-2 h-4 w-px"></div>
-            <ThemeToggle />
-            <Button.Root size="sm" className="ml-2">
-              Get Started
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button.Root>
-          </div>
-
-          {/* Mobile Navigation */}
           <div className="flex items-center space-x-2 md:hidden">
             <ThemeToggle />
-            <Button.Root variant="ghost" size="sm">
-              <Github className="h-4 w-4" />
-            </Button.Root>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="/docs">
+                <BookOpen className="size-4" />
+              </Link>
+            </Button>
           </div>
         </nav>
       </header>
@@ -78,9 +53,9 @@ const Index = () => {
           <div className="bg-muted/50 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
             <Zap className="h-4 w-4 text-yellow-500" />
             <span className="text-muted-foreground">Open Source Payment Toolkit</span>
-            <Badge.Root variant="secondary" className="ml-2">
+            <Badge variant="secondary" className="ml-2">
               TypeScript
-            </Badge.Root>
+            </Badge>
           </div>
 
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
@@ -94,17 +69,9 @@ const Index = () => {
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <Link href="/playground">
-              <Button.Root size="lg" className="group">
-                <Play className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-                Try Playground
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button.Root>
-            </Link>
-            <Button.Root variant="outline" size="lg">
-              <Github className="mr-2 h-5 w-5" />
-              View Source
-            </Button.Root>
+            <Button variant="outline" size="lg">
+              npx @paykit-sdk/cli@latest init
+            </Button>
           </div>
         </div>
 
@@ -392,7 +359,7 @@ const Index = () => {
           </div>
         </div>
 
-        <Separator.Root className="my-16" />
+        <Separator className="my-16" />
       </main>
 
       {/* Provider Demo */}
@@ -406,9 +373,9 @@ const Index = () => {
               <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
                 <CreditCard className="h-4 w-4 text-green-500" />
                 <span className="text-muted-foreground">Complete Checkout Experience</span>
-                <Badge.Root variant="outline" className="ml-2">
+                <Badge variant="outline" className="ml-2">
                   Demo
-                </Badge.Root>
+                </Badge>
               </div>
               <h2 className="text-3xl font-bold md:text-4xl">
                 Production-ready checkout flows
@@ -432,7 +399,7 @@ const Index = () => {
                         <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
                         <div className="h-3 w-3 rounded-full bg-green-400"></div>
                       </div>
-                      <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">localhost:3000/checkout</div>
+                      <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">localhost:3001/checkout</div>
                     </div>
                   </div>
 
@@ -491,59 +458,10 @@ const Index = () => {
                             </div>
                           </div>
                         </div>
-
-                        <div className="text-center">
-                          <div className="inline-flex items-center space-x-1 rounded-full bg-green-50 px-2 py-1 text-xs text-green-600 dark:bg-green-900/20">
-                            <Shield className="h-3 w-3" />
-                            <span>Local Provider Active</span>
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-
-                <div className="flex justify-center">
-                  <Link href="/checkout">
-                    <Button.Root size="lg" variant="outline" className="group">
-                      <CreditCard className="mr-2 h-5 w-5" />
-                      Try Live Checkout Demo
-                      <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-                    </Button.Root>
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Social Proof Section */}
-      <section className="relative py-16">
-        <div className="from-muted/20 via-background to-muted/20 absolute inset-0 bg-gradient-to-r"></div>
-        <div className="relative mx-auto max-w-7xl px-6">
-          <div className="space-y-8 text-center">
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold md:text-3xl">Trusted by developers worldwide</h2>
-              <p className="text-muted-foreground mx-auto max-w-2xl">Join thousands of developers building the future of payments</p>
-            </div>
-
-            <div className="grid grid-cols-2 items-center gap-8 md:grid-cols-4">
-              <div className="space-y-2 text-center">
-                <div className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">10K+</div>
-                <div className="text-muted-foreground text-sm">Downloads</div>
-              </div>
-              <div className="space-y-2 text-center">
-                <div className="bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-3xl font-bold text-transparent">500+</div>
-                <div className="text-muted-foreground text-sm">Developers</div>
-              </div>
-              <div className="space-y-2 text-center">
-                <div className="bg-gradient-to-r from-pink-600 to-orange-600 bg-clip-text text-3xl font-bold text-transparent">99.9%</div>
-                <div className="text-muted-foreground text-sm">Uptime</div>
-              </div>
-              <div className="space-y-2 text-center">
-                <div className="bg-gradient-to-r from-orange-600 to-blue-600 bg-clip-text text-3xl font-bold text-transparent">24/7</div>
-                <div className="text-muted-foreground text-sm">Support</div>
               </div>
             </div>
           </div>
@@ -567,15 +485,12 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Button.Root size="lg" className="group">
-                <Terminal className="mr-2 h-5 w-5 transition-transform group-hover:scale-110" />
-                npx paykit-sdk@latest
-                <ArrowRight className="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-              </Button.Root>
-              <Button.Root variant="outline" size="lg">
-                <BookOpen className="mr-2 h-5 w-5" />
-                Read Documentation
-              </Button.Root>
+              <Button asChild variant="outline" size="lg">
+                <Link href="/docs">
+                  <BookOpen className="mr-2 h-5 w-5" />
+                  Read Documentation
+                </Link>
+              </Button>
             </div>
           </div>
         </div>
@@ -595,12 +510,12 @@ const Index = () => {
                 The payment toolkit for TypeScript developers. Build locally, deploy anywhere.
               </p>
               <div className="flex items-center space-x-4">
-                <Button.Root variant="ghost" size="sm">
+                <Button variant="ghost" size="sm">
                   <Github className="h-4 w-4" />
-                </Button.Root>
-                <Button.Root variant="ghost" size="sm">
+                </Button>
+                <Button variant="ghost" size="sm">
                   <BookOpen className="h-4 w-4" />
-                </Button.Root>
+                </Button>
               </div>
             </div>
 
@@ -609,24 +524,19 @@ const Index = () => {
               <h3 className="font-semibold">Product</h3>
               <ul className="text-muted-foreground space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/docs/features" className="hover:text-foreground transition-colors">
                     Features
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Pricing
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/docs/provider" className="hover:text-foreground transition-colors">
                     Providers
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/docs/provider/local" className="hover:text-foreground transition-colors">
                     Local Development
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -636,24 +546,19 @@ const Index = () => {
               <h3 className="font-semibold">Developers</h3>
               <ul className="text-muted-foreground space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/docs" className="hover:text-foreground transition-colors">
                     Documentation
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/docs" className="hover:text-foreground transition-colors">
                     API Reference
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="docs/examples" className="hover:text-foreground transition-colors">
                     Examples
-                  </a>
-                </li>
-                <li>
-                  <a href="https://github.com/devodii/paykit" target="_blank" className="hover:text-foreground transition-colors">
-                    GitHub
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
@@ -663,44 +568,23 @@ const Index = () => {
               <h3 className="font-semibold">Company</h3>
               <ul className="text-muted-foreground space-y-2 text-sm">
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="/about" className="hover:text-foreground transition-colors">
                     About
-                  </a>
+                  </Link>
                 </li>
                 <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Blog
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
-                    Support
-                  </a>
-                </li>
-                <li>
-                  <a href="#" className="hover:text-foreground transition-colors">
+                  <Link href="mailto:emmanuelodii80@gmail.com" className="hover:text-foreground transition-colors">
                     Contact
-                  </a>
+                  </Link>
                 </li>
               </ul>
             </div>
           </div>
 
-          <Separator.Root className="my-8" />
+          <Separator className="my-8" />
 
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <p className="text-muted-foreground text-sm">© 2024 PayKit. All rights reserved.</p>
-            <div className="text-muted-foreground flex items-center space-x-6 text-sm">
-              <a href="#" className="hover:text-foreground transition-colors">
-                Privacy Policy
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-foreground transition-colors">
-                Cookie Policy
-              </a>
-            </div>
           </div>
         </div>
       </footer>

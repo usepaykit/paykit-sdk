@@ -2,9 +2,9 @@
 
 import * as React from 'react';
 import { CodeBlock } from '@/components/code-block';
+import { cn } from '@/lib/utils';
 import { Accordion, Button, Tabs } from '@paykit-sdk/ui';
 import { Alert } from '@paykit-sdk/ui';
-import { cn } from '@/lib/utils';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 
 type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['components'];
@@ -33,7 +33,7 @@ const components = {
   Alert: Alert.Root,
   AlertTitle: Alert.Title,
   AlertDescription: Alert.Description,
-  Button: Button.Root,
+  Button: Button,
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
   ),

@@ -15,6 +15,11 @@ interface CodeEditorProps {
   className?: string;
 }
 
+/**
+ * @description Type assertion to fix React 19 compatibility
+ */
+const TypedSyntaxHighlighter = SyntaxHighlighter as any;
+
 export function CodeEditor({ code, language = 'typescript', showCopyButton = true, highlightLines = [], className = '' }: CodeEditorProps) {
   const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
@@ -51,17 +56,17 @@ export function CodeEditor({ code, language = 'typescript', showCopyButton = tru
   return (
     <div className={`group relative ${className}`}>
       {showCopyButton && (
-        <Button.Root
+        <Button
           size="sm"
           variant="ghost"
           onClick={handleCopy}
-          className="absolute right-3 top-3 z-10 opacity-0 transition-opacity group-hover:opacity-100"
+          className="absolute top-3 right-3 z-10 opacity-0 transition-opacity group-hover:opacity-100"
         >
           {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
-        </Button.Root>
+        </Button>
       )}
 
-      <SyntaxHighlighter
+      <TypedSyntaxHighlighter
         language={language}
         style={theme === 'dark' ? oneDark : oneLight}
         customStyle={customStyle}
@@ -70,7 +75,7 @@ export function CodeEditor({ code, language = 'typescript', showCopyButton = tru
         wrapLines
       >
         {code}
-      </SyntaxHighlighter>
+      </TypedSyntaxHighlighter>
     </div>
   );
 }

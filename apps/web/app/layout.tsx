@@ -1,6 +1,6 @@
+import '@/app/globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
-import { cn } from '@/lib/utils';
-import '@paykit-sdk/ui/dist/output.css';
+import { cn, Toaster } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
 
@@ -23,6 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
           {children}
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

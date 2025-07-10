@@ -47,13 +47,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 <div className="bg-muted/30 mb-4 rounded-lg border p-4">
                   <div className="mb-2 text-left text-xs font-medium">Customer Information</div>
                   <div className="space-y-2">
-                    <Input
-                      type="email"
-                      value={customerEmail}
-                      disabled
-                      className="bg-background text-muted-foreground h-8 text-sm"
-                      children={<div />}
-                    />
+                    <Input type="email" value={customerEmail} disabled className="bg-background text-muted-foreground h-8 text-sm" />
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         type="text"
@@ -89,7 +83,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                   )}
                 />
 
-                <Button.Root type="submit" disabled={isProcessing} size="lg" className="mt-4 w-full">
+                <Button type="submit" disabled={isProcessing} size="lg" className="mt-4 w-full">
                   {isProcessing ? (
                     <div className="flex items-center justify-center">
                       <Spinner />
@@ -101,14 +95,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                       <span className="ml-2">Complete Payment - {price}</span>
                     </div>
                   )}
-                </Button.Root>
-
-                <div className="flex items-center justify-center pt-2">
-                  <Badge.Root variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
-                    <Zap className="mr-1 h-3 w-3" />
-                    Local Provider Active
-                  </Badge.Root>
-                </div>
+                </Button>
               </form>
             </div>
 
@@ -136,7 +123,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 </div>
               </div>
               <div className="pt-6">
-                <Button.Root onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
+                <Button onClick={form.handleSubmit(onSubmit)} disabled={isProcessing} size="lg" className="w-full">
                   {isProcessing ? (
                     <div className="flex items-center justify-center">
                       <Spinner />
@@ -148,7 +135,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                       Complete Payment - {price}
                     </>
                   )}
-                </Button.Root>
+                </Button>
               </div>
             </div>
           </div>

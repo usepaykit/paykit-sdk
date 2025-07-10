@@ -18,18 +18,18 @@ export default function NotFound() {
         <Card.Content className="space-y-4">
           <p className="text-muted-foreground">Sorry, we couldn&apos;t find the page you&apos;re looking for.</p>
           <div className="flex flex-col justify-center gap-3 sm:flex-row">
-            <Button.Root asChild variant="outline">
+            <Button asChild variant="outline">
               <Link href="/" className="flex items-center gap-2">
                 <ArrowLeft className="h-4 w-4" />
                 Go back
               </Link>
-            </Button.Root>
-            <Button.Root asChild>
+            </Button>
+            <Button asChild>
               <Link href="/" className="flex items-center gap-2">
                 <Home className="h-4 w-4" />
                 Home
               </Link>
-            </Button.Root>
+            </Button>
           </div>
         </Card.Content>
       </Card.Root>

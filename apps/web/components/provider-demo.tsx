@@ -41,9 +41,9 @@ export function ProviderDemo() {
             <div className="bg-muted/50 mb-6 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
               <Code2 className="h-4 w-4 text-blue-500" />
               <span className="text-muted-foreground">Interactive Demo</span>
-              <Badge.Root variant="secondary" className="ml-2">
+              <Badge variant="secondary" className="ml-2">
                 Live Code
-              </Badge.Root>
+              </Badge>
             </div>
 
             <h2 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl">

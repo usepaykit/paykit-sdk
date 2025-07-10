@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { LineAnimatedCodeViewer } from '@/components/line-animated-code-viewer';
+import { ToastDemo } from '@/components/toast-demo';
 import { Badge, Button, Card, Separator } from '@paykit-sdk/ui';
 import {
   Play,
@@ -168,21 +169,21 @@ export default function PlaygroundPage() {
               <Sparkles className="h-5 w-5 text-blue-500" />
               <span className="text-lg font-bold">PayKit</span>
             </Link>
-            <Separator.Root orientation="vertical" className="h-4" />
+            <Separator orientation="vertical" className="h-4" />
             <div className="flex items-center space-x-2">
               <Terminal className="text-muted-foreground h-4 w-4" />
               <span className="text-sm font-medium">Playground</span>
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <Badge.Root variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
+            <Badge variant="secondary" className="bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400">
               Local Provider
-            </Badge.Root>
+            </Badge>
             <Link href="/">
-              <Button.Root variant="ghost" size="sm">
+              <Button variant="ghost" size="sm">
                 <Home className="mr-2 h-4 w-4" />
                 Back to Home
-              </Button.Root>
+              </Button>
             </Link>
           </div>
         </div>
@@ -194,9 +195,9 @@ export default function PlaygroundPage() {
           <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
             <Play className="h-4 w-4 text-green-500" />
             <span className="text-muted-foreground">Interactive Playground</span>
-            <Badge.Root variant="outline" className="ml-2">
+            <Badge variant="outline" className="ml-2">
               Live Testing
-            </Badge.Root>
+            </Badge>
           </div>
           <h1 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">Test PayKit&apos;s Local Provider</h1>
           <p className="text-muted-foreground mx-auto max-w-2xl text-lg">
@@ -215,9 +216,9 @@ export default function PlaygroundPage() {
                     <Code2 className="h-4 w-4 text-blue-500" />
                     <Card.Title className="text-lg">Code Example</Card.Title>
                   </div>
-                  <Button.Root variant="ghost" size="sm" onClick={copyCode}>
+                  <Button variant="ghost" size="sm" onClick={copyCode}>
                     <Copy className="h-4 w-4" />
-                  </Button.Root>
+                  </Button>
                 </div>
               </Card.Header>
               <Card.Content>
@@ -237,14 +238,14 @@ export default function PlaygroundPage() {
                   <label className="mb-2 block text-sm font-medium">Amount</label>
                   <div className="grid grid-cols-3 gap-2">
                     {[9.99, 29.99, 99.99].map(amount => (
-                      <Button.Root
+                      <Button
                         key={amount}
                         variant={selectedAmount === amount ? 'default' : 'outline'}
                         size="sm"
                         onClick={() => setSelectedAmount(amount)}
                       >
                         ${amount}
-                      </Button.Root>
+                      </Button>
                     ))}
                   </div>
                 </div>
@@ -270,7 +271,7 @@ export default function PlaygroundPage() {
 
                 {/* Action Buttons */}
                 <div className="space-y-2 pt-2">
-                  <Button.Root onClick={simulatePayment} disabled={isProcessing} className="w-full" size="lg">
+                  <Button onClick={simulatePayment} disabled={isProcessing} className="w-full" size="lg">
                     {isProcessing ? (
                       <>
                         <RefreshCw className="mr-2 h-4 w-4 animate-spin" />
@@ -283,15 +284,15 @@ export default function PlaygroundPage() {
                         <ArrowRight className="ml-2 h-4 w-4" />
                       </>
                     )}
-                  </Button.Root>
-                  <Button.Root variant="outline" onClick={clearLogs} className="w-full">
+                  </Button>
+                  <Button variant="outline" onClick={clearLogs} className="w-full">
                     Clear Logs
-                  </Button.Root>
+                  </Button>
                   <Link href="/checkout">
-                    <Button.Root variant="secondary" className="w-full">
+                    <Button variant="secondary" className="w-full">
                       <CreditCard className="mr-2 h-4 w-4" />
                       Try Checkout Flow
-                    </Button.Root>
+                    </Button>
                   </Link>
                 </div>
               </Card.Content>
@@ -308,7 +309,7 @@ export default function PlaygroundPage() {
                     <CreditCard className="h-4 w-4 text-green-500" />
                     <Card.Title className="text-lg">Payment Activity</Card.Title>
                   </div>
-                  <Badge.Root variant="outline">{payments.length} payments</Badge.Root>
+                  <Badge variant="outline">{payments.length} payments</Badge>
                 </div>
               </Card.Header>
               <Card.Content>
@@ -332,12 +333,12 @@ export default function PlaygroundPage() {
                           <div className="font-medium">
                             ${payment.amount} {payment.currency}
                           </div>
-                          <Badge.Root
+                          <Badge
                             variant={payment.status === 'success' ? 'default' : payment.status === 'failed' ? 'destructive' : 'secondary'}
                             className="text-xs"
                           >
                             {payment.status}
-                          </Badge.Root>
+                          </Badge>
                         </div>
                       </div>
                     ))}
@@ -354,7 +355,7 @@ export default function PlaygroundPage() {
                     <Webhook className="h-4 w-4 text-blue-500" />
                     <Card.Title className="text-lg">Webhook Events</Card.Title>
                   </div>
-                  <Badge.Root variant="outline">{webhooks.length} events</Badge.Root>
+                  <Badge variant="outline">{webhooks.length} events</Badge>
                 </div>
               </Card.Header>
               <Card.Content>
@@ -374,13 +375,30 @@ export default function PlaygroundPage() {
                             <div className="text-muted-foreground text-xs">{webhook.timestamp.toLocaleTimeString()}</div>
                           </div>
                         </div>
-                        <Badge.Root variant={webhook.status === 'received' ? 'default' : 'secondary'} className="text-xs">
+                        <Badge variant={webhook.status === 'received' ? 'default' : 'secondary'} className="text-xs">
                           {webhook.status}
-                        </Badge.Root>
+                        </Badge>
                       </div>
                     ))}
                   </div>
                 )}
+              </Card.Content>
+            </Card.Root>
+
+            {/* Toast Demo */}
+            <Card.Root>
+              <Card.Header>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Sparkles className="h-4 w-4 text-purple-500" />
+                    <Card.Title className="text-lg">Toast Notifications</Card.Title>
+                  </div>
+                  <Badge variant="outline">UI Components</Badge>
+                </div>
+                <Card.Description>Test the modern toast notification system with different variants and interactions.</Card.Description>
+              </Card.Header>
+              <Card.Content>
+                <ToastDemo />
               </Card.Content>
             </Card.Root>
           </div>

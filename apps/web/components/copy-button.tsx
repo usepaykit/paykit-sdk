@@ -1,8 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@paykit-sdk/ui';
-import { cn } from '@/lib/utils';
+import { Button, cn } from '@paykit-sdk/ui';
 import { Check, Copy } from 'lucide-react';
 
 interface CopyButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
@@ -20,7 +19,7 @@ export function CopyButton({ value, className, ...props }: CopyButtonProps) {
   }, [hasCopied]);
 
   return (
-    <Button.Root
+    <Button
       size="icon"
       variant="ghost"
       className={cn('relative z-10 size-6 text-zinc-50 hover:bg-zinc-700 hover:text-zinc-50', className)}
@@ -32,6 +31,6 @@ export function CopyButton({ value, className, ...props }: CopyButtonProps) {
     >
       <span className="sr-only">Copy</span>
       {hasCopied ? <Check className="size-3" /> : <Copy className="size-3" />}
-    </Button.Root>
+    </Button>
   );
 }

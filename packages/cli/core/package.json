@@ -1,15 +1,14 @@
 {
   "name": "@paykit-sdk/cli",
-  "version": "1.1.0-alpha-1",
-  "description": "PayKit CLI for product setup",
+  "version": "1.1.0-alpha-2",
   "main": "dist/index.js",
   "bin": {
     "cli": "dist/index.js"
   },
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
-    "dev": "node dist/index.js init",
-    "prepublishOnly": "npm run build"
+    "build": "tsc --project tsconfig.json",
+    "dev": "node dist/index.js dev",
+    "prepublishOnly": "tsup src/index.ts --format cjs,esm --dts"
   },
   "keywords": [
     "cli",
@@ -30,6 +29,7 @@
     "typescript": "^5.0.0",
     "tsup": "^8.0.0",
     "@paykit-sdk/local": "workspace:*",
-    "@paykit-sdk/core": "workspace:*"
+    "@paykit-sdk/core": "workspace:*",
+    "@types/node": "^18.0.0"
   }
 }

@@ -21,4 +21,4 @@ const Root = ({ className, orientation = 'horizontal', decorative = true, ...pro
   );
 };
 
-export const Separator = { Root };
+export { Root as Separator };

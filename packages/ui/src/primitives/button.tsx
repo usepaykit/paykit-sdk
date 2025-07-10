@@ -41,4 +41,4 @@ const Root = ({ className, variant, size, asChild = false, ...props }: ButtonPro
   return <Comp data-slot="button" className={cn(buttonVariants({ variant, size, className }))} {...props} />;
 };
 
-export const Button = { Root, buttonVariants };
+export { Root as Button, buttonVariants };

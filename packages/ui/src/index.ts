@@ -8,3 +8,4 @@ export * from './primitives/input';
 export * from './primitives/scroll-area';
 export * from './primitives/separator';
 export * from './primitives/tabs';
+export { cn } from './lib/utils';

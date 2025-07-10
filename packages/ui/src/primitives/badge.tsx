@@ -31,4 +31,4 @@ const Root = ({ className, variant, asChild = false, ...props }: RootProps) => {
   return <Comp data-slot="badge" className={cn(badgeVariants({ variant }), className)} {...props} />;
 };
 
-export const Badge = { Root, badgeVariants };
+export { Root as Badge, badgeVariants };

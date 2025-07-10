@@ -19,9 +19,9 @@ export const Billing = () => {
       onClick={async () => {
         const { data, error } = await handleCreateCheckout();
 
-        if (error) alert(error.message);
+        if (error) return alert(error.message);
 
-        window.location.href = data?.payment_url || '';
+        window.location.href = data.payment_url || '';
       }}
     >
       Buy now

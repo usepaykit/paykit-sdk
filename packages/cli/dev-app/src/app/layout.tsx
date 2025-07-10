@@ -1,4 +1,3 @@
-import { cn } from '@paykit-sdk/ui';
 import '@paykit-sdk/ui/dist/output.css';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
@@ -23,7 +22,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={cn(ptSans.variable, 'font-pt-sans antialiased')}>{children}</body>
+      <body className={`${ptSans.variable} font-pt-sans antialiased`}>{children}</body>
     </html>
   );
 }

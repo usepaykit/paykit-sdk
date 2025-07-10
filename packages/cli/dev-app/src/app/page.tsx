@@ -1,3 +1,3 @@
 export default function IndexPage() {
-  return <div className="bg-red-500">Welcome to PayKit</div>;
+  return <div className="bg-background text-foreground">Welcome to PayKit</div>;
 }

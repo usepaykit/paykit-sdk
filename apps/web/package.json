@@ -35,7 +35,12 @@
     "react-syntax-highlighter": "^15.6.1",
     "react-wrap-balancer": "^1.1.1",
     "tailwind-merge": "^3.3.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "@paykit-sdk/core": "1.1.0",
+    "@paykit-sdk/local": "1.1.0",
+    "@paykit-sdk/polar": "1.1.0",
+    "@paykit-sdk/stripe": "1.1.0",
+    "@paykit-sdk/ui": "0.1.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

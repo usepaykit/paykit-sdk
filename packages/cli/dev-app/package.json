@@ -1,5 +1,5 @@
 {
-  "name": "dev-app",
+  "name": "@paykit-sdk/cli/dev-app",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -15,7 +15,10 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-hook-form": "^7.59.0",
-    "zod": "^3.25.67"
+    "zod": "^3.25.67",
+    "@paykit-sdk/local": "1.1.0",
+    "@paykit-sdk/ui": "0.1.0",
+    "@paykit-sdk/core": "1.1.0"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -23,8 +26,6 @@
     "@types/react-dom": "^18",
     "eslint": "^8",
     "eslint-config-next": "14.2.30",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "@paykit-sdk/local": "workspace:*",
     "@paykit-sdk/ui": "workspace:*",

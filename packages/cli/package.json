@@ -1,0 +1,36 @@
+{
+  "name": "@paykit-sdk/cli",
+  "version": "0.1.0",
+  "description": "PayKit CLI for product setup and development",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "paykit": "dist/index.js"
+  },
+  "scripts": {
+    "build": "npm run build:cli && npm run build:dev-app && npm run copy-assets",
+    "build:cli": "tsup core/src/index.ts --format esm --out-dir dist",
+    "build:dev-app": "cd dev-app && npm run build",
+    "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && cp dev-app/package.json dist/dev-app/ && echo '{\"type\": \"module\"}' > dist/package.json",
+    "dev": "npm run build && node dist/index.js",
+    "prepublishOnly": "npm run build"
+  },
+  "files": [
+    "dist"
+  ],
+  "dependencies": {
+    "commander": "^12.0.0",
+    "inquirer": "^10.0.0",
+    "@paykit-sdk/core": "workspace:*",
+    "@paykit-sdk/local": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "@types/node": "^20.0.0",
+    "@types/inquirer": "^9.0.0",
+    "tsup": "^8.0.0"
+  },
+  "keywords": ["paykit", "cli", "payment", "development"],
+  "author": "PayKit Team",
+  "license": "MIT"
+} 

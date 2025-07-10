@@ -3,13 +3,17 @@ import { safeEncode, ValidationError, logger } from '@paykit-sdk/core';
 import { CheckoutInfo, writePaykitConfig } from '@paykit-sdk/local';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
+import { existsSync } from 'fs';
 import inquirer from 'inquirer';
 import path from 'path';
+import { fileURLToPath } from 'url';
 
-/** CORE CLI */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const program = new Command();
 
-program.name('@paykit-sdk/cli').description('PayKit CLI for product setup').version('1.0.0');
+program.name('@paykit-sdk/cli').description('PayKit CLI for product setup and development').version('0.1.0');
 
 program
   .command('init')
@@ -59,50 +63,75 @@ program
     logger.clearProgress();
 
     if (!customerId.ok) throw new ValidationError('Invalid customer email', customerId.error);
-
     if (!itemId.ok) throw new ValidationError('Invalid product info', itemId.error);
 
     const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
     const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
     writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
+    logger.success('PayKit configuration initialized successfully!');
+  });
+
+program
+  .command('dev')
+  .description('Start the PayKit development server')
+  .action(async () => {
+    // Path to the built dev-app directory (same directory as this compiled CLI file)
+    const devAppPath = path.join(__dirname, 'dev-app');
+    const nodeModulesPath = path.join(devAppPath, 'node_modules');
+
+    // Check if dependencies are installed
+    if (!existsSync(nodeModulesPath)) {
+      logger.progress('Installing development dependencies (first time setup)...');
+
+      // Install dependencies
+      const installProcess = spawn('npm', ['install', '--production'], {
+        cwd: devAppPath,
+        stdio: 'pipe', // Capture output to avoid spam
+        shell: true,
+      });
+
+      // Wait for installation to complete
+      await new Promise((resolve, reject) => {
+        installProcess.on('close', code => {
+          if (code === 0) {
+            logger.success('Dependencies installed successfully!');
+            resolve(undefined);
+          } else {
+            logger.error(' Failed to install dependencies');
+            reject(new Error(`npm install failed with code ${code}`));
+          }
+        });
+
+        installProcess.on('error', error => {
+          logger.error(' Failed to install dependencies');
+          reject(error);
+        });
+      });
+    }
+
+    logger.progress('Serving PayKit development app...');
+
+    // Start the Next.js production server
+    const nextProcess = spawn('npm', ['start'], {
+      cwd: devAppPath,
+      stdio: 'inherit',
+      shell: true,
+    });
+
+    logger.info('PayKit dev server running on http://localhost:3001');
+
+    // Handle process termination
+    process.on('SIGINT', () => {
+      logger.error('Stopping PayKit dev server...');
+      nextProcess.kill();
+      process.exit();
+    });
+
+    nextProcess.on('close', code => {
+      logger.info(`PayKit dev server exited with code ${code}`);
+      process.exit(code || 0);
+    });
   });
 
 program.parse(process.argv);
-
-/** DEV CLI */
-
-const command = process.argv[2];
-
-if (command === 'dev') {
-  logger.success('Starting PayKit development server...');
-
-  // Path to the dev-app directory
-  const devAppPath = path.join(__dirname, '../../dev-app');
-
-  // Start the Next.js dev server
-  const nextProcess = spawn('npm', ['run', 'dev'], {
-    cwd: devAppPath,
-    stdio: 'inherit',
-    shell: true,
-  });
-
-  logger.info('PayKit dev server running on http://localhost:3001');
-
-  // Handle process termination
-  process.on('SIGINT', () => {
-    logger.info('Stopping PayKit dev server...');
-    nextProcess.kill();
-    process.exit();
-  });
-
-  nextProcess.on('close', code => {
-    logger.info(`PayKit dev server exited with code ${code}`);
-    process.exit(code);
-  });
-} else {
-  logger.info('PayKit CLI');
-  logger.info('Usage: paykit <command>');
-  logger.info('Commands:');
-  logger.info('  dev    Start the development server');
-}

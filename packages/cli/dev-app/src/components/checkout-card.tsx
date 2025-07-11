@@ -3,8 +3,8 @@
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local';
-import { Badge, Button, Input } from '@paykit-sdk/ui';
-import { Lock, Zap, CreditCard } from 'lucide-react';
+import { Button, Input } from '@paykit-sdk/ui';
+import { Lock, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
 import { z } from 'zod';
 

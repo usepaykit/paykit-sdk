@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { DocsSidebarNav } from '@/config/docs';
-import { cn } from '@/lib/utils';
+import { cn } from '@paykit-sdk/ui';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -18,7 +18,7 @@ export function DocsNav({ config }: DocsNavProps) {
       <div className="space-y-6">
         {config.sidebarNav.map((group, index) => (
           <div key={index} className="space-y-3">
-            <h4 className="text-foreground/80 text-sm font-semibold uppercase tracking-wider">{group.title}</h4>
+            <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">{group.title}</h4>
             {group.items?.length && (
               <div className="space-y-1">
                 {group.items.map((item, index) =>

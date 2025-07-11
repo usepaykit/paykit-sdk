@@ -7,7 +7,6 @@ import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Card, Button, Badge } from '@paykit-sdk/ui';
 import {
-  Github,
   BookOpen,
   ArrowRight,
   Zap,
@@ -511,11 +510,10 @@ const Index = () => {
                 The payment toolkit for TypeScript developers. Build locally, deploy anywhere.
               </p>
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" size="sm">
-                  <Github className="h-4 w-4" />
-                </Button>
-                <Button variant="ghost" size="sm">
-                  <BookOpen className="h-4 w-4" />
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/docs">
+                    <BookOpen className="size-4" />
+                  </Link>
                 </Button>
               </div>
             </div>

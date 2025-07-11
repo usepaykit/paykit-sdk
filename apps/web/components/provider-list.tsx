@@ -1,7 +1,7 @@
 'use client';
 
-import { cn } from '@/lib/utils';
 import { PaymentProvider } from '@paykit-sdk/core';
+import { cn } from '@paykit-sdk/ui';
 
 interface ProviderListProps {
   selectedProvider: PaymentProvider;

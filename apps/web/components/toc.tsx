@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { type Toc } from '@/lib/toc';
-import { cn } from '@/lib/utils';
+import { cn } from '@paykit-sdk/ui';
 
 interface DashboardTableOfContentsProps {
   toc: Toc;

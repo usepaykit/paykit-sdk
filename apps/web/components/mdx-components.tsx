@@ -107,14 +107,19 @@ const components = {
         <CodeBlock
           className="bg-muted border-border selection:bg-primary/20 w-full overflow-x-auto rounded-lg border px-6 py-2"
           language={language}
-          children={extractCodeString(children)}
           customStyle={{ fontSize: '13px' }}
           {...props}
-        />
+        >
+          {extractCodeString(children)}
+        </CodeBlock>
       );
     }
 
-    return <code className={className} children={children} {...props} />;
+    return (
+      <code className={className} {...props}>
+        {children}
+      </code>
+    );
   },
 } as MDXComponents;
 

@@ -7,7 +7,7 @@ interface CopyButtonProps extends React.ComponentProps<typeof Button> {
   value: string;
 }
 
-export function CopyButton({ value, className, ...props }: CopyButtonProps) {
+export function CopyButton({ value, ...props }: CopyButtonProps) {
   const [hasCopied, setHasCopied] = React.useState(false);
 
   React.useEffect(() => {

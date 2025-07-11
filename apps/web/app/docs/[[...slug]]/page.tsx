@@ -2,54 +2,58 @@ import { Mdx } from '@/components/mdx-components';
 import { DocsPager } from '@/components/pager';
 import { DashboardTableOfContents } from '@/components/toc';
 import { getTableOfContents } from '@/lib/toc';
-import { absoluteUrl } from '@/lib/utils';
 import { badgeVariants, cn } from '@paykit-sdk/ui';
 import { allDocs } from 'contentlayer/generated';
 import { ChevronRight, ExternalLink } from 'lucide-react';
-import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import Balancer from 'react-wrap-balancer';
 
+export const dynamic = 'force-dynamic';
+
 interface DocPageProps {
-  params: { slug: string[] };
+  params: Promise<{ slug: string[] }>;
 }
 
 async function getDocFromParams({ params }: DocPageProps) {
-  const slug = params.slug?.join('/') || '';
-  const doc = allDocs.find(doc => doc.slugAsParams === slug);
+  const { slug } = await params;
+
+  const doc = allDocs.find(doc => doc.slugAsParams === (slug?.join('/') || ''));
 
   if (!doc) return null;
 
   return doc;
 }
 
-export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
-  const doc = await getDocFromParams({ params });
+/**
+ * todo:
+ */
+// export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
+//   const doc = await getDocFromParams({ params });
 
-  if (!doc) return {};
+//   if (!doc) return {};
 
-  return {
-    title: doc.title,
-    description: doc.description,
-    openGraph: {
-      title: doc.title,
-      description: doc.description,
-      type: 'article',
-      url: absoluteUrl(doc.slug),
-      images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: doc.title,
-      description: doc.description,
-      images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
-      creator: '@devodii',
-    },
-  };
-}
+//   return {
+//     title: doc.title,
+//     description: doc.description,
+//     openGraph: {
+//       title: doc.title,
+//       description: doc.description,
+//       type: 'article',
+//       url: absoluteUrl(doc.slug),
+//       images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
+//     },
+//     twitter: {
+//       card: 'summary_large_image',
+//       title: doc.title,
+//       description: doc.description,
+//       images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
+//       creator: '@devodii',
+//     },
+//   };
+// }
 
-export async function generateStaticParams(): Promise<DocPageProps['params'][]> {
+export async function generateStaticParams() {
   return allDocs.map(doc => ({ slug: doc.slugAsParams.split('/') }));
 }
 

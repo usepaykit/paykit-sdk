@@ -51,7 +51,7 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
       )}
     >
       <div className="[&_*]:!bg-transparent">
-        <CodeBlock language="typescript" children={currentContent} />
+        <CodeBlock language="typescript">{currentContent}</CodeBlock>
       </div>
     </div>
   );

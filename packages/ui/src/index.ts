@@ -9,4 +9,8 @@ export * from './primitives/scroll-area';
 export * from './primitives/separator';
 export * from './primitives/tabs';
 export * from './primitives/toast';
+export * from './primitives/dialog';
+export * from './primitives/calendar';
+export * from './primitives/carousel';
+export * from './primitives/label';
 export { cn } from './lib/utils';

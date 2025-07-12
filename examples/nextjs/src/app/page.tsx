@@ -1,220 +1,323 @@
 'use client';
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { provider } from '@/lib/paykit';
+import { Card, Button, Badge } from '@paykit-sdk/ui';
 import { PaykitProvider, useCheckout } from '@paykit-sdk/react';
-import { Loader2 } from 'lucide-react';
+import { provider } from '@/lib/paykit';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { CustomerInfoModal } from '@/components/customer-info-modal';
+import * as React from 'react';
+import { TrendingUp, Users, CreditCard, DollarSign, Zap, ArrowUpRight, BarChart3, Clock, CheckCircle, Star, Crown, Eye, UserPlus } from 'lucide-react';
 
-// Paywall Modal Component
-const PaywallModal = ({
-  isOpen,
-  onClose,
-  onUpgrade,
-  feature,
-  isLoading,
-}: {
-  isOpen: boolean;
-  onClose: () => void;
-  onUpgrade: () => void;
-  feature: string;
-  isLoading: boolean;
-}) => {
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-      <Card className="mx-4 w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Upgrade Required</CardTitle>
-          <p className="text-muted-foreground">You need Premium access to use {feature}</p>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="rounded-lg border p-4">
-            <div className="mb-2 flex items-center justify-between">
-              <span className="font-medium">Premium Plan</span>
-              <span className="text-2xl font-bold">$29/mo</span>
-            </div>
-            <p className="text-sm text-gray-600">Access to all features</p>
-          </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button onClick={onUpgrade} className="flex-1" disabled={isLoading}>
-              Upgrade Now
-              {isLoading && <Loader2 className="ml-2 h-4 w-4 animate-spin" />}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
-  );
-};
-
-// Feature Card Component
-const FeatureCard = ({ 
+function MetricCard({ 
   title, 
-  description, 
-  icon, 
-  onAccess 
+  value, 
+  change, 
+  icon: Icon, 
+  trend = 'up',
 }: { 
   title: string; 
-  description: string; 
-  icon: string; 
-  onAccess: () => void 
-}) => (
-  <Card className="cursor-pointer transition-shadow hover:shadow-md" onClick={onAccess}>
-    <CardHeader>
-      <CardTitle className="flex items-center gap-2">
-        <span className="text-2xl">{icon}</span>
-        {title}
-      </CardTitle>
-    </CardHeader>
-    <CardContent>
-      <p className="text-gray-600">{description}</p>
-    </CardContent>
-  </Card>
-);
+  value: string; 
+  change: string; 
+  icon: any; 
+  trend?: 'up' | 'down';
+}) {
+  return (
+    <Card.Root className="p-6 transition-shadow hover:shadow-md">
+      <div className="flex items-center justify-between">
+        <div className="space-y-2">
+          <p className="text-muted-foreground text-sm font-medium">{title}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-3xl font-bold tracking-tight">{value}</p>
+            <Badge variant={trend === 'up' ? 'default' : 'destructive'} className="text-xs">
+              {trend === 'up' ? '+' : '-'}
+              {change}
+            </Badge>
+          </div>
+        </div>
+        <div className="bg-primary/10 flex h-12 w-12 items-center justify-center rounded-xl">
+          <Icon className="text-primary h-6 w-6" />
+        </div>
+      </div>
+    </Card.Root>
+  );
+}
 
-// Dashboard Component (wrapped with provider)
-const Dashboard = () => {
-  const [paywallModal, setPaywallModal] = useState<{ isOpen: boolean; feature: string }>({
-    isOpen: false,
-    feature: '',
-  });
-
+function UpgradeCard() {
   const { create } = useCheckout();
 
-  const handleFeatureAccess = (feature: string) => {
-    setPaywallModal({ isOpen: true, feature });
-  };
-
   const handleUpgrade = async () => {
-    setPaywallModal({ isOpen: false, feature: '' });
-    const { error, data } = await create.run({ 
-      customer_id: '123', 
-      item_id: '123', 
-      metadata: {}, 
-      session_type: 'recurring' 
+    const result = await create.run({
+      customer_id: 'demo_customer',
+      item_id: 'pro_plan',
+      session_type: 'recurring',
+      metadata: { plan: 'pro', billing: 'monthly' },
     });
-    if (error) {
-      console.error('Checkout error:', error);
-    } else {
-      console.log('Checkout created:', data);
+    
+    if (result.data && 'checkout_url' in result.data) {
+      window.open(result.data.checkout_url as string, '_blank');
+    } else if (result.data) {
+      console.log('Checkout created:', result.data);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="border-b bg-white">
-        <div className="container mx-auto flex items-center justify-between px-6 py-4">
-          <h1 className="text-2xl font-bold">PayKit Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <span className="text-sm text-gray-600">Welcome, John Doe</span>
-            <Button variant="secondary" size="sm">
-              Free Plan
-            </Button>
+    <Card.Root className="relative overflow-hidden border-purple-200 bg-gradient-to-br from-purple-50 to-blue-50">
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-blue-500/5" />
+      <div className="relative p-6">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-center gap-2">
+            <Crown className="h-5 w-5 text-purple-600" />
+            <Badge variant="secondary" className="border-purple-200 bg-purple-100 text-purple-700">
+              Pro Plan
+            </Badge>
+          </div>
+          <div className="text-right">
+            <p className="text-muted-foreground text-sm">Starting at</p>
+            <p className="text-2xl font-bold text-purple-600">$29/mo</p>
           </div>
         </div>
-      </header>
-
-      {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
-        {/* Hero Section */}
-        <div className="mb-12 text-center">
-          <h2 className="mb-4 text-4xl font-bold">Unlock Premium Features</h2>
-          <p className="mx-auto mb-8 max-w-2xl text-xl text-gray-600">
-            Get access to advanced analytics, priority support, and exclusive tools
-          </p>
-          <Button size="lg" onClick={() => handleFeatureAccess('Premium Dashboard')}>
-            Try Premium Features
-          </Button>
+        
+        <h3 className="mb-2 text-lg font-semibold">Unlock Advanced Analytics</h3>
+        <p className="text-muted-foreground mb-4 text-sm">
+          Get real-time insights, advanced reporting, and priority support to grow your business faster.
+        </p>
+        
+        <div className="mb-6 grid grid-cols-2 gap-3">
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span>Real-time analytics</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span>Custom reports</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span>Priority support</span>
+          </div>
+          <div className="flex items-center gap-2 text-sm">
+            <CheckCircle className="h-4 w-4 text-green-500" />
+            <span>API access</span>
+          </div>
         </div>
+        
+        <Button onClick={handleUpgrade} disabled={create.loading} className="w-full bg-purple-600 hover:bg-purple-700">
+          {create.loading ? (
+            <div className="flex items-center gap-2">
+              <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+              Creating checkout...
+            </div>
+          ) : (
+            <>
+              Upgrade Now
+              <ArrowUpRight className="ml-2 h-4 w-4" />
+            </>
+          )}
+        </Button>
+      </div>
+    </Card.Root>
+  );
+}
 
-        {/* Features Grid */}
-        <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          <FeatureCard
-            title="Advanced Analytics"
-            description="Deep insights into your data with custom reports and real-time metrics"
-            icon="📊"
-            onAccess={() => handleFeatureAccess('Advanced Analytics')}
-          />
-          <FeatureCard
-            title="Priority Support"
-            description="Get 24/7 premium support with dedicated account management"
-            icon="🎧"
-            onAccess={() => handleFeatureAccess('Priority Support')}
-          />
-          <FeatureCard
-            title="Custom Integrations"
-            description="Connect with 100+ third-party tools and custom APIs"
-            icon="🔗"
-            onAccess={() => handleFeatureAccess('Custom Integrations')}
-          />
-          <FeatureCard
-            title="Team Collaboration"
-            description="Invite unlimited team members with role-based permissions"
-            icon="👥"
-            onAccess={() => handleFeatureAccess('Team Collaboration')}
-          />
-          <FeatureCard
-            title="Export & Backup"
-            description="Download your data in multiple formats with automated backups"
-            icon="💾"
-            onAccess={() => handleFeatureAccess('Export & Backup')}
-          />
-          <FeatureCard
-            title="White Label"
-            description="Customize the platform with your brand colors and logo"
-            icon="🎨"
-            onAccess={() => handleFeatureAccess('White Label')}
-          />
+function RevenueChart() {
+  return (
+    <Card.Root className="p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Revenue Overview</h3>
+          <p className="text-muted-foreground text-sm">Last 30 days performance</p>
         </div>
+        <BarChart3 className="text-muted-foreground h-5 w-5" />
+      </div>
+      
+      <div className="space-y-4">
+        <div className="bg-muted/50 flex items-center justify-between rounded-lg p-3">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-blue-500" />
+            <span className="text-sm font-medium">Subscription Revenue</span>
+          </div>
+          <span className="text-sm font-semibold">$12,450</span>
+        </div>
+        <div className="bg-muted/50 flex items-center justify-between rounded-lg p-3">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-green-500" />
+            <span className="text-sm font-medium">One-time Purchases</span>
+          </div>
+          <span className="text-sm font-semibold">$8,230</span>
+        </div>
+        <div className="bg-muted/50 flex items-center justify-between rounded-lg p-3">
+          <div className="flex items-center gap-3">
+            <div className="h-2 w-2 rounded-full bg-purple-500" />
+            <span className="text-sm font-medium">Upgrades</span>
+          </div>
+          <span className="text-sm font-semibold">$3,120</span>
+        </div>
+      </div>
+      
+      <div className="mt-6 border-t pt-4">
+        <div className="flex items-center justify-between">
+          <span className="text-muted-foreground text-sm">Total Revenue</span>
+          <span className="text-xl font-bold text-green-600">$23,800</span>
+        </div>
+      </div>
+    </Card.Root>
+  );
+}
 
-        {/* Pricing Section */}
-        <Card className="mx-auto max-w-md">
-          <CardHeader className="text-center">
-            <CardTitle className="text-2xl">Premium Plan</CardTitle>
-            <div className="text-4xl font-bold">$29/month</div>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <ul className="space-y-2 text-sm">
-              <li className="flex items-center gap-2">
-                <span className="text-green-600">✓</span>
-                All premium features included
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-green-600">✓</span>
-                Priority customer support
-              </li>
-              <li className="flex items-center gap-2">
-                <span className="text-green-600">✓</span>
-                Cancel anytime
-              </li>
-            </ul>
-            <div className="flex gap-2">
-              <Button onClick={() => handleFeatureAccess('One-time Purchase')} className="flex-1">
-                Buy Now
+function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: string) => void }) {
+  const customers = [
+    { id: 'cus_1234', name: 'John Smith', email: 'john@example.com', status: 'active', joined: '2 min ago' },
+    { id: 'cus_1235', name: 'Sarah Wilson', email: 'sarah@example.com', status: 'active', joined: '15 min ago' },
+    { id: 'cus_1236', name: 'Mike Johnson', email: 'mike@example.com', status: 'inactive', joined: '1 hour ago' },
+    { id: 'cus_1237', name: 'Emma Davis', email: 'emma@example.com', status: 'active', joined: '2 hours ago' },
+  ];
+
+  return (
+    <Card.Root className="p-6">
+      <div className="mb-4 flex items-center justify-between">
+        <div>
+          <h3 className="text-lg font-semibold">Recent Customers</h3>
+          <p className="text-muted-foreground text-sm">Latest customer activity</p>
+        </div>
+        <Button variant="ghost" size="sm">
+          <UserPlus className="mr-2 h-4 w-4" />
+          Add Customer
+        </Button>
+      </div>
+      
+      <div className="space-y-3">
+        {customers.map((customer) => (
+          <div key={customer.id} className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
+                <Users className="h-4 w-4 text-blue-600" />
+              </div>
+              <div>
+                <p className="text-sm font-medium">{customer.name}</p>
+                <p className="text-muted-foreground text-xs">{customer.email}</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className="text-right">
+                <Badge 
+                  variant={customer.status === 'active' ? 'default' : 'secondary'} 
+                  className="mb-1 text-xs"
+                >
+                  {customer.status}
+                </Badge>
+                <p className="text-muted-foreground text-xs">{customer.joined}</p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="sm"
+                onClick={() => onViewCustomer(customer.id)}
+                className="ml-2"
+              >
+                <Eye className="h-4 w-4" />
               </Button>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        ))}
+      </div>
+    </Card.Root>
+  );
+}
+
+function QuickStats() {
+  return (
+    <Card.Root className="p-6">
+      <h3 className="mb-4 text-lg font-semibold">Quick Insights</h3>
+      
+      <div className="grid grid-cols-2 gap-4">
+        <div className="bg-muted/50 rounded-lg p-4 text-center">
+          <Clock className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
+          <p className="text-2xl font-bold">24h</p>
+          <p className="text-muted-foreground text-xs">Avg Response Time</p>
+        </div>
+        <div className="bg-muted/50 rounded-lg p-4 text-center">
+          <Star className="mx-auto mb-2 h-5 w-5 text-yellow-500" />
+          <p className="text-2xl font-bold">4.9</p>
+          <p className="text-muted-foreground text-xs">Customer Rating</p>
+        </div>
+        <div className="bg-muted/50 rounded-lg p-4 text-center">
+          <TrendingUp className="mx-auto mb-2 h-5 w-5 text-green-500" />
+          <p className="text-2xl font-bold">28%</p>
+          <p className="text-muted-foreground text-xs">Growth Rate</p>
+        </div>
+        <div className="bg-muted/50 rounded-lg p-4 text-center">
+          <Zap className="mx-auto mb-2 h-5 w-5 text-blue-500" />
+          <p className="text-2xl font-bold">99.9%</p>
+          <p className="text-muted-foreground text-xs">Uptime</p>
+        </div>
+      </div>
+    </Card.Root>
+  );
+}
+
+function Dashboard() {
+  const [selectedCustomerId, setSelectedCustomerId] = React.useState<string | null>(null);
+  const [customerModalOpen, setCustomerModalOpen] = React.useState(false);
+
+  const handleViewCustomer = (customerId: string) => {
+    setSelectedCustomerId(customerId);
+    setCustomerModalOpen(true);
+  };
+
+  return (
+    <div className="bg-background min-h-screen">
+      <DashboardHeader />
+      
+      <main className="container mx-auto max-w-7xl px-4 py-8">
+        {/* Hero Section */}
+        <div className="mb-8">
+          <h1 className="mb-2 text-4xl font-bold tracking-tight">Analytics Dashboard</h1>
+          <p className="text-muted-foreground text-lg">Monitor your payment performance and grow your business with real-time insights.</p>
+        </div>
+
+        {/* Key Metrics */}
+        <div className="mb-8 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+          <MetricCard title="Total Revenue" value="$45,231" change="20.1%" icon={DollarSign} trend="up" />
+          <MetricCard title="Active Customers" value="2,350" change="18.1%" icon={Users} trend="up" />
+          <MetricCard title="Subscriptions" value="1,234" change="19%" icon={CreditCard} trend="up" />
+          <MetricCard title="Conversion Rate" value="3.2%" change="4.3%" icon={TrendingUp} trend="up" />
+        </div>
+
+        {/* Main Content Grid */}
+        <div className="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Revenue Chart - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <RevenueChart />
+          </div>
+          
+          {/* Upgrade Card */}
+          <div>
+            <UpgradeCard />
+          </div>
+        </div>
+
+        {/* Secondary Content */}
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
+          {/* Recent Customers - Takes 2 columns */}
+          <div className="lg:col-span-2">
+            <RecentCustomers onViewCustomer={handleViewCustomer} />
+          </div>
+          
+          {/* Quick Stats */}
+          <div>
+            <QuickStats />
+          </div>
+        </div>
       </main>
 
-      {/* Paywall Modal */}
-      <PaywallModal
-        isOpen={paywallModal.isOpen}
-        onClose={() => setPaywallModal({ isOpen: false, feature: '' })}
-        onUpgrade={handleUpgrade}
-        isLoading={create.loading}
-        feature={paywallModal.feature}
+      {/* Customer Info Modal */}
+      <CustomerInfoModal 
+        customerId={selectedCustomerId}
+        open={customerModalOpen}
+        onOpenChange={setCustomerModalOpen}
       />
     </div>
   );
-};
+}
 
 export default function HomePage() {
   return (

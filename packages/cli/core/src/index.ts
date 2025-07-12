@@ -13,7 +13,7 @@ const __dirname = path.dirname(__filename);
 
 const program = new Command();
 
-program.name('@paykit-sdk/cli').description('PayKit CLI for product setup and development').version('0.1.0');
+program.name('@paykit-sdk/cli').description('PayKit CLI for product setup and development').version('1.1.0-alpha.4');
 
 program
   .command('init')
@@ -93,37 +93,34 @@ program
 
     // Check if dependencies are installed
     if (!existsSync(nodeModulesPath)) {
-      logger.progress('Installing development dependencies (first time setup)');
+      logger.info('Installing development dependencies (first time setup)...');
 
       // Install dependencies
       const installProcess = spawn('npm', ['install', '--production'], {
         cwd: devAppPath,
-        stdio: 'pipe', // Capture output to avoid spam
+        stdio: 'ignore', // Completely silence npm output to avoid interference
       });
 
       // Wait for installation to complete
       await new Promise((resolve, reject) => {
         installProcess.on('close', code => {
           if (code === 0) {
-            logger.clearProgress();
             logger.success('Dependencies installed successfully!');
             resolve(undefined);
           } else {
-            logger.clearProgress();
             logger.error('Failed to install dependencies');
             reject(new Error(`npm install failed with code ${code}`));
           }
         });
 
         installProcess.on('error', error => {
-          logger.clearProgress();
           logger.error('Failed to install dependencies');
           reject(error);
         });
       });
     }
 
-    logger.progress('Serving PayKit development app');
+    logger.info('Starting PayKit development app...');
 
     // Start the Next.js production server
     const nextProcess = spawn('npm', ['start'], {
@@ -131,7 +128,6 @@ program
       stdio: 'inherit',
     });
 
-    logger.clearProgress();
     logger.success('PayKit dev server running on http://localhost:3001');
     logger.tip('Press Ctrl+C to stop the server');
 
@@ -141,11 +137,6 @@ program
       logger.warn('Stopping PayKit dev server...');
       nextProcess.kill();
       process.exit();
-    });
-
-    nextProcess.on('close', code => {
-      logger.info(`PayKit dev server exited with code ${code}`);
-      process.exit(code || 0);
     });
   });
 

@@ -96,12 +96,14 @@ export class LocalProvider implements PayKitProvider {
     return customer;
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams) => {
-    const dataEncoded = safeEncode(JSON.stringify(params));
+  updateCustomer = async (_id: string, params: UpdateCustomerParams) => {
+    const { email, name } = params;
+
+    const dataEncoded = safeEncode(JSON.stringify({ email, name }));
 
     if (!dataEncoded.ok) throw new ValidationError('Invalid data', dataEncoded.error);
 
-    const customer = { ...params, id };
+    const customer = { ...params, id: dataEncoded.value };
 
     updateKey('customer', customer);
 
@@ -152,31 +154,29 @@ export class LocalProvider implements PayKitProvider {
 
       return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: data.id, data: checkout });
     } else if (type == 'customer.created') {
-      const customer = safeEncode(data);
+      const customerId = safeEncode(data);
 
-      if (!customer.ok) throw new ValidationError('Invalid customer data', customer.error);
+      const customerData = data as Pick<Customer, 'name' | 'email'>;
 
-      updateKey('customer', { id: customer.value, name: data.name, email: data.email });
+      if (!customerId.ok) throw new ValidationError('Invalid customer data', customerId.error);
 
-      return toPaykitEvent<Customer>({
-        type: '$customerCreated',
-        created: Date.now(),
-        id: data.id,
-        data: { id: customer.value, name: data.name, email: data.email },
-      });
+      const retUpdate = { id: customerId.value, ...customerData };
+
+      updateKey('customer', retUpdate);
+
+      return toPaykitEvent<Customer>({ type: '$customerCreated', created: Date.now(), id: data.id, data: retUpdate });
     } else if (type == 'customer.updated') {
-      const customer = safeEncode(data);
+      const customerId = safeEncode(data);
 
-      if (!customer.ok) throw new ValidationError('Invalid customer data', customer.error);
+      if (!customerId.ok) throw new ValidationError('Invalid customer data', customerId.error);
 
-      updateKey('customer', { id: customer.value, name: data.name, email: data.email });
+      const customerData = data as Pick<Customer, 'name' | 'email'>;
 
-      return toPaykitEvent<Customer>({
-        type: '$customerUpdated',
-        created: Date.now(),
-        id: data.id,
-        data: { id: customer.value, name: data.name, email: data.email },
-      });
+      const retUpdate = { id: customerId.value, ...customerData };
+
+      updateKey('customer', retUpdate);
+
+      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: Date.now(), id: data.id, data: retUpdate });
     } else if (type == 'customer.deleted') {
       updateKey('customer', {});
 
@@ -188,12 +188,7 @@ export class LocalProvider implements PayKitProvider {
 
       updateKey('subscriptions', [...(getKeyValue('subscriptions') || []), subscription.value]);
 
-      return toPaykitEvent<Subscription>({
-        type: '$subscriptionCreated',
-        created: Date.now(),
-        id: data.id,
-        data: subscription.value,
-      });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: Date.now(), id: data.id, data: subscription.value });
     } else if (type == 'subscription.updated') {
       const subscription = safeDecode<Subscription>(data.id);
 
@@ -201,22 +196,21 @@ export class LocalProvider implements PayKitProvider {
 
       updateKey('subscriptions', [...(getKeyValue('subscriptions') || []), subscription.value]);
 
-      return toPaykitEvent<Subscription>({
-        type: '$subscriptionUpdated',
-        created: Date.now(),
-        id: data.id,
-        data: subscription.value,
-      });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: Date.now(), id: data.id, data: subscription.value });
     } else if (type == 'subscription.deleted') {
       updateKey('subscriptions', getKeyValue('subscriptions')?.filter(sub => sub.id !== data.id) || []);
 
       return toPaykitEvent<null>({ type: '$subscriptionCanceled', created: Date.now(), id: data.id, data: null });
     } else if (type == 'payment.succeeded') {
-      const paymentId = data.id;
+      const paymentId = safeEncode(data);
 
-      updateKey('payments', [...(getKeyValue('payments') || []), paymentId]);
+      console.dir(paymentId, { depth: 50 });
 
-      return toPaykitEvent<{ id: string }>({ type: '$paymentReceived', created: Date.now(), id: paymentId, data: { id: paymentId } });
+      if (!paymentId.ok) throw new ValidationError('Invalid payment data', paymentId.error);
+
+      updateKey('payments', [...(getKeyValue('payments') || []), paymentId.value]);
+
+      return toPaykitEvent<{ id: string }>({ type: '$paymentReceived', created: Date.now(), id: paymentId.value, data: { id: paymentId.value } });
     }
     throw new ValidationError('Unknown webhook type', { provider: 'local' });
   };

@@ -8,7 +8,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "dev": "node dist/index.js dev",
-    "prepublishOnly": "tsup src/index.ts --format cjs,esm --dts"
+    "prepublishOnly": "rm -rf dist && tsup src/index.ts --format cjs,esm --dts"
   },
   "keywords": [
     "cli",

@@ -95,7 +95,7 @@ program
 
     // Check if dependencies are installed
     if (!existsSync(nodeModulesPath)) {
-      logger.info('Installing development dependencies (first time setup)...');
+      logger.progress('Installing development dependencies (first time setup)...');
 
       // Install dependencies
       const installProcess = spawn('npm', ['install', '--production'], {
@@ -122,12 +122,12 @@ program
       });
     }
 
-    logger.info('Starting PayKit development app...');
+    logger.progress('Starting PayKit development app...');
 
     // Start the Next.js production server
     const nextProcess = spawn('npm', ['start'], {
       cwd: devAppPath,
-      stdio: 'inherit',
+      stdio: 'pipe',
     });
 
     logger.success('PayKit dev server running on http://localhost:3001');

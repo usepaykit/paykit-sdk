@@ -26,7 +26,7 @@ export class LocalProvider implements PayKitProvider {
   constructor(private config: LocalConfig) {}
 
   private updateSubscriptionHelper = async (id: string, updates: Partial<Subscription>) => {
-    const subscriptions = getKeyValue('subscriptions');
+    const subscriptions = await getKeyValue('subscriptions');
 
     if (!subscriptions) throw new ValidationError('Subscriptions not found', { provider: 'local' });
 
@@ -37,7 +37,7 @@ export class LocalProvider implements PayKitProvider {
     const updatedSubscriptions = [...subscriptions];
     updatedSubscriptions[subscriptionIndex] = { ...updatedSubscriptions[subscriptionIndex], ...updates };
 
-    updateKey('subscriptions', updatedSubscriptions);
+    await updateKey('subscriptions', updatedSubscriptions);
 
     return updatedSubscriptions[subscriptionIndex];
   };
@@ -91,7 +91,7 @@ export class LocalProvider implements PayKitProvider {
 
     const customer = { ...params, id: dataEncoded.value };
 
-    updateKey('customer', customer);
+    await updateKey('customer', customer);
 
     return customer;
   };
@@ -105,13 +105,13 @@ export class LocalProvider implements PayKitProvider {
 
     const customer = { ...params, id: dataEncoded.value };
 
-    updateKey('customer', customer);
+    await updateKey('customer', customer);
 
     return customer;
   };
 
   retrieveCustomer = async (id: string) => {
-    const customer = getKeyValue('customer');
+    const customer = await getKeyValue('customer');
 
     if (!customer) return null;
 
@@ -127,7 +127,7 @@ export class LocalProvider implements PayKitProvider {
   };
 
   retrieveSubscription = async (id: string) => {
-    const subscriptions = getKeyValue('subscriptions');
+    const subscriptions = await getKeyValue('subscriptions');
 
     if (!subscriptions) throw new ValidationError('Subscriptions not found', { provider: 'local' });
 
@@ -150,7 +150,7 @@ export class LocalProvider implements PayKitProvider {
     if (type === 'checkout.created') {
       const checkout = await this.retrieveCheckout(data.id);
 
-      updateKey('checkouts', [...(getKeyValue('checkouts') || []), checkout]);
+      await updateKey('checkouts', [...((await getKeyValue('checkouts')) || []), checkout]);
 
       return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: data.id, data: checkout });
     } else if (type == 'customer.created') {
@@ -162,7 +162,7 @@ export class LocalProvider implements PayKitProvider {
 
       const retUpdate = { id: customerId.value, ...customerData };
 
-      updateKey('customer', retUpdate);
+      await updateKey('customer', retUpdate);
 
       return toPaykitEvent<Customer>({ type: '$customerCreated', created: Date.now(), id: data.id, data: retUpdate });
     } else if (type == 'customer.updated') {
@@ -174,11 +174,11 @@ export class LocalProvider implements PayKitProvider {
 
       const retUpdate = { id: customerId.value, ...customerData };
 
-      updateKey('customer', retUpdate);
+      await updateKey('customer', retUpdate);
 
       return toPaykitEvent<Customer>({ type: '$customerUpdated', created: Date.now(), id: data.id, data: retUpdate });
     } else if (type == 'customer.deleted') {
-      updateKey('customer', {});
+      await updateKey('customer', {});
 
       return toPaykitEvent<null>({ type: '$customerDeleted', created: Date.now(), id: data.id, data: null });
     } else if (type == 'subscription.created') {
@@ -186,7 +186,7 @@ export class LocalProvider implements PayKitProvider {
 
       if (!subscription.ok) throw new ValidationError('Invalid subscription data', subscription.error);
 
-      updateKey('subscriptions', [...(getKeyValue('subscriptions') || []), subscription.value]);
+      await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription.value]);
 
       return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: Date.now(), id: data.id, data: subscription.value });
     } else if (type == 'subscription.updated') {
@@ -194,11 +194,11 @@ export class LocalProvider implements PayKitProvider {
 
       if (!subscription.ok) throw new ValidationError('Invalid subscription data', subscription.error);
 
-      updateKey('subscriptions', [...(getKeyValue('subscriptions') || []), subscription.value]);
+      await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription.value]);
 
       return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: Date.now(), id: data.id, data: subscription.value });
     } else if (type == 'subscription.deleted') {
-      updateKey('subscriptions', getKeyValue('subscriptions')?.filter(sub => sub.id !== data.id) || []);
+      await updateKey('subscriptions', ((await getKeyValue('subscriptions'))?.filter(sub => sub.id !== data.id)) || []);
 
       return toPaykitEvent<null>({ type: '$subscriptionCanceled', created: Date.now(), id: data.id, data: null });
     } else if (type == 'payment.succeeded') {
@@ -208,7 +208,7 @@ export class LocalProvider implements PayKitProvider {
 
       if (!paymentId.ok) throw new ValidationError('Invalid payment data', paymentId.error);
 
-      updateKey('payments', [...(getKeyValue('payments') || []), paymentId.value]);
+      await updateKey('payments', [...((await getKeyValue('payments')) || []), paymentId.value]);
 
       return toPaykitEvent<{ id: string }>({ type: '$paymentReceived', created: Date.now(), id: paymentId.value, data: { id: paymentId.value } });
     }

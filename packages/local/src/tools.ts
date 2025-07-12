@@ -33,10 +33,10 @@ export interface PaykitConfig {
 /**
  * Lazy load Node.js modules to avoid bundling them for browser
  */
-const getNodeModules = () => {
-  // Dynamic imports to avoid bundling in browser
-  const fs = require('fs');
-  const path = require('path');
+const getNodeModules = async () => {
+  // Use dynamic imports for ESM compatibility
+  const fs = await import('fs');
+  const path = await import('path');
   
   return { fs, path };
 };
@@ -44,8 +44,8 @@ const getNodeModules = () => {
 /**
  *  Helper to get the full config path and ensure directory exists
  */
-const getConfigPath = () => {
-  const { fs, path } = getNodeModules();
+const getConfigPath = async () => {
+  const { fs, path } = await getNodeModules();
   const dirPath = path.resolve(process.cwd(), configDir);
   if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
   return path.join(dirPath, fileName);
@@ -54,10 +54,10 @@ const getConfigPath = () => {
 /**
  * Read the .paykit/config.json file from the current working directory
  */
-export function readPaykitConfig(): PaykitConfig | null {
+export async function readPaykitConfig(): Promise<PaykitConfig | null> {
   try {
-    const { fs } = getNodeModules();
-    const configPath = getConfigPath();
+    const { fs } = await getNodeModules();
+    const configPath = await getConfigPath();
 
     if (!fs.existsSync(configPath)) {
       logger.warn(`${configDir}/${fileName} not found`);
@@ -78,10 +78,10 @@ export function readPaykitConfig(): PaykitConfig | null {
 /**
  * Write the .paykit/config.json file to the current working directory
  */
-export const writePaykitConfig = (config: PaykitConfig): boolean => {
+export const writePaykitConfig = async (config: PaykitConfig): Promise<boolean> => {
   try {
-    const { fs } = getNodeModules();
-    const configPath = getConfigPath();
+    const { fs } = await getNodeModules();
+    const configPath = await getConfigPath();
     const configData = JSON.stringify(config, null, 2);
 
     fs.writeFileSync(configPath, configData, 'utf8');
@@ -96,9 +96,9 @@ export const writePaykitConfig = (config: PaykitConfig): boolean => {
 /**
  * Updates a key in the .paykit/config.json file
  */
-export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitConfig[T]): boolean => {
+export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: PaykitConfig[T]): Promise<boolean> => {
   try {
-    let config = readPaykitConfig();
+    let config = await readPaykitConfig();
 
     if (!config) {
       // Create a default config if it doesn't exist
@@ -113,7 +113,7 @@ export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitCon
 
     config[key] = value;
 
-    const success = writePaykitConfig(config);
+    const success = await writePaykitConfig(config);
 
     if (success) logger.info(`Updated ${key} data for: ${JSON.stringify(value)}`);
 
@@ -127,9 +127,9 @@ export const updateKey = <T extends keyof PaykitConfig>(key: T, value: PaykitCon
 /**
  * Retrieve a key from the .paykit/config.json file
  */
-export const getKeyValue = <T extends keyof PaykitConfig>(key: T): PaykitConfig[T] | null => {
+export const getKeyValue = async <T extends keyof PaykitConfig>(key: T): Promise<PaykitConfig[T] | null> => {
   try {
-    const config = readPaykitConfig();
+    const config = await readPaykitConfig();
 
     if (!config) return null;
 

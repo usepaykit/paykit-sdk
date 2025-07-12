@@ -72,7 +72,9 @@ program
     const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
     const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
-    writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
+    const response = await writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
+
+    if (!response) return;
 
     logger.spacer();
     logger.success('PayKit configuration initialized successfully!');

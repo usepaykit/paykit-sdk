@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/cli",
-  "version": "1.1.0-alpha.5",
+  "version": "1.1.0-alpha.6",
   "description": "PayKit CLI for product setup and development",
   "type": "module",
   "main": "dist/index.js",
@@ -14,7 +14,7 @@
     "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && rm -rf dist/dev-app/.next/cache && npm run create-prod-package",
     "create-prod-package": "node scripts/create-prod-package.js",
     "dev": "npm run build && node dist/index.js",
-    "prepublishOnly": "npm run build"
+    "prepublishOnly": "rm -rf dist && npm run build"
   },
   "files": [
     "dist"

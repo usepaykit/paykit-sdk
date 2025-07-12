@@ -1,0 +1,17 @@
+{
+  "product": {
+    "name": "r",
+    "description": "r",
+    "price": "r",
+    "itemId": "eyJuYW1lIjoiciIsImRlc2NyaXB0aW9uIjoiciIsInByaWNlIjoiciIsImN1c3RvbWVyTmFtZSI6InIiLCJjdXN0b21lckVtYWlsIjoicnJAZ21haWwuY29tIn0="
+  },
+  "customer": {
+    "id": "InJyQGdtYWlsLmNvbSI=",
+    "name": "r",
+    "email": "rr@gmail.com",
+    "metadata": {}
+  },
+  "subscriptions": [],
+  "checkouts": [],
+  "payments": []
+}

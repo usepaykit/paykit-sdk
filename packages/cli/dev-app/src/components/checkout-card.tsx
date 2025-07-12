@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local';
+import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local/browser';
 import { Button, Input } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
@@ -23,6 +23,10 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
 
   const onSubmit = async (data: CheckoutFormSchema) => {
     setIsProcessing(true);
+    
+    // Format the card number for display
+    const formattedCardNumber = formatCardNumber(data.cardNumber);
+    console.log('Formatted card number:', formattedCardNumber);
 
     setTimeout(() => {
       setIsProcessing(false);
@@ -53,7 +57,6 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                       value={customerEmail}
                       disabled
                       className="bg-background text-muted-foreground h-8 text-sm"
-                      children={<div />}
                     />
                     <div className="grid grid-cols-2 gap-2">
                       <Input

@@ -12,7 +12,7 @@
     "build:cli": "tsup core/src/index.ts --format esm --out-dir dist",
     "build:dev-app": "cd dev-app && npm run build",
     "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && npm run create-prod-package",
-    "create-prod-package": "echo '{\"name\": \"@paykit-sdk/cli-dev-app\", \"version\": \"0.1.0\", \"private\": true, \"scripts\": {\"start\": \"next start -p 3001\"}, \"dependencies\": {\"next\": \"^15.3.5\", \"react\": \"^19.1.0\", \"react-dom\": \"^19.1.0\"}}' > dist/dev-app/package.json && echo '{\"type\": \"module\"}' > dist/package.json",
+    "create-prod-package": "node scripts/create-prod-package.js",
     "dev": "npm run build && node dist/index.js",
     "prepublishOnly": "npm run build"
   },

@@ -310,11 +310,11 @@ function Dashboard() {
       </main>
 
       {/* Customer Info Modal */}
-      <CustomerInfoModal 
+      {/* <CustomerInfoModal 
         customerId={selectedCustomerId}
         open={customerModalOpen}
         onOpenChange={setCustomerModalOpen}
-      />
+      /> */}
     </div>
   );
 }

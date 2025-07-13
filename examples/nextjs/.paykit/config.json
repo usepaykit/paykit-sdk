@@ -1,0 +1,517 @@
+{
+  "product": {
+    "name": "",
+    "description": "",
+    "price": "",
+    "itemId": ""
+  },
+  "customer": {},
+  "subscriptions": [],
+  "checkouts": [
+    {
+      "id": "checkout_1752357221886",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357221886",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357223769",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357223769",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357224353",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357224353",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357224618",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357224618",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357224902",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357224902",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357230136",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357230136",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357230570",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357230570",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357230719",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357230719",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357231220",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357231220",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357231554",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357231554",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357231737",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357231737",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357231905",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357231905",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357232303",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357232303",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357232587",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357232587",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357232736",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357232736",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357233003",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357233003",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357233187",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357233187",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357233386",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357233386",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357233637",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357233637",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357234204",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357234204",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357388306",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357388306",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357388890",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357388890",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357389040",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357389040",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357389273",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357389273",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357389423",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357389423",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357389641",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357389641",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357389972",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357389972",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    },
+    {
+      "id": "checkout_1752357393956",
+      "amount": 2999,
+      "currency": "USD",
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "payment_url": "http://localhost:3000/checkout?checkout_id=1752357393956",
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ]
+    }
+  ],
+  "payments": []
+}

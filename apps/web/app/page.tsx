@@ -379,11 +379,9 @@ const Index = () => {
                 </Badge>
               </div>
               <h2 className="text-3xl font-bold md:text-4xl">
-                Production-ready checkout flows
+                Local development checkout flows
                 <br />
-                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                  built for developers
-                </span>
+                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">for rapid testing</span>
               </h2>
               <p className="text-muted-foreground mx-auto max-w-2xl text-xl">See what your customers experience with PayKit&apos;s local provider</p>
             </div>
@@ -400,7 +398,9 @@ const Index = () => {
                         <div className="h-3 w-3 rounded-full bg-yellow-400"></div>
                         <div className="h-3 w-3 rounded-full bg-green-400"></div>
                       </div>
-                      <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">localhost:3001/checkout</div>
+                      <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">
+                        http://localhost:3001/checkout?id=eyiou...
+                      </div>
                     </div>
                   </div>
 

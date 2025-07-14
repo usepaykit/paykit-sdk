@@ -37,7 +37,7 @@ const getNodeModules = async () => {
   // Use dynamic imports for ESM compatibility
   const fs = await import('fs');
   const path = await import('path');
-  
+
   return { fs, path };
 };
 
@@ -107,7 +107,7 @@ export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: Pay
         customer: {},
         subscriptions: [],
         checkouts: [],
-        payments: []
+        payments: [],
       };
     }
 

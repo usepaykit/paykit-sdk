@@ -1,5 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'fs';
+import { NextRequest, NextResponse } from 'next/server';
 import { resolve, join } from 'path';
 
 const configDir = '.paykit';
@@ -24,7 +24,7 @@ const getConfigPath = () => {
 const readPaykitConfig = (): PaykitConfig | null => {
   try {
     const configPath = getConfigPath();
-    
+
     if (!existsSync(configPath)) {
       return null;
     }
@@ -55,9 +55,9 @@ export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
     const key = searchParams.get('key');
-    
+
     let config = readPaykitConfig();
-    
+
     if (!config) {
       // Create default config if it doesn't exist
       config = {
@@ -65,27 +65,30 @@ export async function GET(request: NextRequest) {
         customer: {},
         subscriptions: [],
         checkouts: [],
-        payments: []
+        payments: [],
       };
       writePaykitConfig(config);
     }
-    
+
     if (key) {
-      return NextResponse.json({ 
-        success: true, 
-        data: config[key as keyof PaykitConfig] || null 
+      return NextResponse.json({
+        success: true,
+        data: config[key as keyof PaykitConfig] || null,
       });
     }
-    
-    return NextResponse.json({ 
-      success: true, 
-      data: config 
+
+    return NextResponse.json({
+      success: true,
+      data: config,
     });
   } catch (error) {
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to read config' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to read config',
+      },
+      { status: 500 },
+    );
   }
 }
 
@@ -94,19 +97,19 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const { key, value } = body;
-    
+
     let config = readPaykitConfig();
-    
+
     if (!config) {
       config = {
         product: { name: '', description: '', price: '', itemId: '' },
         customer: {},
         subscriptions: [],
         checkouts: [],
-        payments: []
+        payments: [],
       };
     }
-    
+
     if (key) {
       // Update specific key
       config[key as keyof PaykitConfig] = value;
@@ -114,24 +117,30 @@ export async function POST(request: NextRequest) {
       // Update entire config
       config = { ...config, ...body };
     }
-    
+
     const success = writePaykitConfig(config);
-    
+
     if (success) {
-      return NextResponse.json({ 
-        success: true, 
-        data: config 
+      return NextResponse.json({
+        success: true,
+        data: config,
       });
     } else {
-      return NextResponse.json({ 
-        success: false, 
-        error: 'Failed to write config' 
-      }, { status: 500 });
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to write config',
+        },
+        { status: 500 },
+      );
     }
   } catch (error) {
-    return NextResponse.json({ 
-      success: false, 
-      error: 'Failed to update config' 
-    }, { status: 500 });
+    return NextResponse.json(
+      {
+        success: false,
+        error: 'Failed to update config',
+      },
+      { status: 500 },
+    );
   }
-} 
+}

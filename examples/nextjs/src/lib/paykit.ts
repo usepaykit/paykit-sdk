@@ -1,16 +1,16 @@
 import { PayKit } from '@paykit-sdk/core';
-import type { 
-  PayKitProvider, 
-  CreateCheckoutParams, 
-  CreateCustomerParams, 
-  UpdateSubscriptionParams, 
+import type {
+  PayKitProvider,
+  CreateCheckoutParams,
+  CreateCustomerParams,
+  UpdateSubscriptionParams,
   UpdateCustomerParams,
   Subscription,
   Customer,
   Checkout,
   $ExtWebhookHandlerConfig,
   PaykitProviderOptions,
-  WebhookEventPayload
+  WebhookEventPayload,
 } from '@paykit-sdk/core';
 
 // HTTP-based local provider that uses API routes to read/write .paykit/config.json
@@ -38,11 +38,11 @@ class HttpLocalProvider implements PayKitProvider {
       },
       ...options,
     });
-    
+
     if (!response.ok) {
       throw new Error(`API request failed: ${response.statusText}`);
     }
-    
+
     return response.json();
   }
 
@@ -71,7 +71,7 @@ class HttpLocalProvider implements PayKitProvider {
 
   private updateSubscriptionHelper = async (id: string, updates: Partial<Subscription>) => {
     const subscriptions = await this.getKeyValue('subscriptions');
-    
+
     if (!subscriptions) {
       throw new Error('Subscriptions not found');
     }
@@ -105,7 +105,7 @@ class HttpLocalProvider implements PayKitProvider {
     };
 
     // Store checkout
-    const checkouts = await this.getKeyValue('checkouts') || [];
+    const checkouts = (await this.getKeyValue('checkouts')) || [];
     checkouts.push(checkout);
     await this.updateKey('checkouts', checkouts);
 
@@ -113,9 +113,9 @@ class HttpLocalProvider implements PayKitProvider {
   };
 
   retrieveCheckout = async (id: string) => {
-    const checkouts = await this.getKeyValue('checkouts') || [];
+    const checkouts = (await this.getKeyValue('checkouts')) || [];
     const checkout = checkouts.find(c => c.id === id);
-    
+
     if (!checkout) {
       throw new Error('Checkout not found');
     }
@@ -149,7 +149,7 @@ class HttpLocalProvider implements PayKitProvider {
 
   retrieveCustomer = async (id: string) => {
     const customer = await this.getKeyValue('customer');
-    
+
     if (!customer || !customer.id) {
       // Return demo customer data
       return {
@@ -172,7 +172,7 @@ class HttpLocalProvider implements PayKitProvider {
   };
 
   retrieveSubscription = async (id: string) => {
-    const subscriptions = await this.getKeyValue('subscriptions') || [];
+    const subscriptions = (await this.getKeyValue('subscriptions')) || [];
     const subscription = subscriptions.find(sub => sub.id === id);
 
     if (!subscription) {
@@ -192,13 +192,13 @@ class HttpLocalProvider implements PayKitProvider {
 
   handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
     const { body } = payload;
-    
+
     try {
       const parsedBody = JSON.parse(body);
       const { type, data } = parsedBody as { type: string; data: Record<string, any> };
 
       console.log(`Webhook received: ${type}`, data);
-      
+
       // Return a properly typed webhook event
       return {
         type: '$checkoutCreated',
@@ -216,7 +216,7 @@ class HttpLocalProvider implements PayKitProvider {
 export const provider = new HttpLocalProvider({
   debug: true,
   baseUrl: 'http://localhost:3000',
-  paymentUrl: 'http://localhost:3000/checkout'
+  paymentUrl: 'http://localhost:3000/checkout',
 });
 
-export const paykit = new PayKit(provider); 
+export const paykit = new PayKit(provider);

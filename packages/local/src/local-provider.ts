@@ -198,7 +198,7 @@ export class LocalProvider implements PayKitProvider {
 
       return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: Date.now(), id: data.id, data: subscription.value });
     } else if (type == 'subscription.deleted') {
-      await updateKey('subscriptions', ((await getKeyValue('subscriptions'))?.filter(sub => sub.id !== data.id)) || []);
+      await updateKey('subscriptions', (await getKeyValue('subscriptions'))?.filter(sub => sub.id !== data.id) || []);
 
       return toPaykitEvent<null>({ type: '$subscriptionCanceled', created: Date.now(), id: data.id, data: null });
     } else if (type == 'payment.succeeded') {

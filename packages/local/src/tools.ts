@@ -15,6 +15,11 @@ export interface PaykitConfig {
   customer: Partial<Customer>;
 
   /**
+   * Customers array for multiple customer support
+   */
+  customers: Array<Customer>;
+
+  /**
    * Subscriptions
    */
   subscriptions: Array<Subscription>;
@@ -105,6 +110,7 @@ export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: Pay
       config = {
         product: { name: '', description: '', price: '', itemId: '' },
         customer: {},
+        customers: [],
         subscriptions: [],
         checkouts: [],
         payments: [],

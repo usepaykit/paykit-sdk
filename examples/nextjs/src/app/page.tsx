@@ -63,6 +63,8 @@ const UpgradeCard = () => {
       metadata: { plan: 'pro', billing: 'monthly' },
     });
 
+    console.log({ result });
+
     if (result.data && 'checkout_url' in result.data) {
       window.open(result.data.checkout_url as string, '_blank');
     } else if (result.data) {
@@ -307,7 +309,7 @@ const Dashboard = () => {
         </div>
       </main>
 
-      <CustomerInfoModal customerId={selectedCustomerId} open={customerModalOpen} onOpenChange={setCustomerModalOpen} />
+      {/* <CustomerInfoModal customerId={selectedCustomerId} open={customerModalOpen} onOpenChange={setCustomerModalOpen} /> */}
     </div>
   );
 };

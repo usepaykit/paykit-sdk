@@ -131,7 +131,11 @@ async function handlePost(resource: string, body: any) {
       return server$CreateCustomer(params);
 
     case 'checkout':
-      return server$CreateCheckout({ paymentUrl: 'http://localhost:3001' }, params); // todo: extract from config
+      const paymentUrl = params['paymentUrl'];
+
+      if (!paymentUrl) throw new ValidationError('Payment URL is required', {});
+
+      return server$CreateCheckout({ paymentUrl }, params);
 
     case 'webhook':
       return server$HandleWebhook(body);

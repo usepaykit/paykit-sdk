@@ -3,19 +3,19 @@ import { local$NextPlugin } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function GET(request: NextRequest, response: NextResponse) {
-  return local$NextPlugin(request, response);
+  return local$NextPlugin(request);
 }
 
 export async function POST(request: NextRequest, response: NextResponse) {
-  return local$NextPlugin(request, response);
+  return local$NextPlugin(request);
 }
 
 export async function PUT(request: NextRequest, response: NextResponse) {
-  return local$NextPlugin(request, response);
+  return local$NextPlugin(request);
 }
 
 export async function DELETE(request: NextRequest, response: NextResponse) {
-  return local$NextPlugin(request, response);
+  return local$NextPlugin(request);
 }
 
 /**

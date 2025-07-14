@@ -7,5 +7,3 @@ export const createLocal = (config: LocalConfig) => {
 export const local = () => {
   return createLocal({ debug: true, apiUrl: 'http://localhost:3000/api/paykit', paymentUrl: 'http://localhost:3001' });
 };
-
-export * from './tools';

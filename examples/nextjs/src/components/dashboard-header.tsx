@@ -4,7 +4,7 @@ import { Button, Badge } from '@paykit-sdk/ui';
 import { BarChart3, Settings, HelpCircle, Zap } from 'lucide-react';
 import { ThemeToggle } from './theme-toggle';
 
-export function DashboardHeader() {
+export const DashboardHeader = () => {
   return (
     <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
       <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
@@ -50,4 +50,4 @@ export function DashboardHeader() {
       </div>
     </header>
   );
-}
+};

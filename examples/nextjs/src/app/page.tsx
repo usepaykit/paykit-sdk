@@ -22,19 +22,15 @@ import {
   UserPlus,
 } from 'lucide-react';
 
-function MetricCard({
-  title,
-  value,
-  change,
-  icon: Icon,
-  trend = 'up',
-}: {
+interface MetricCardProps {
   title: string;
   value: string;
   change: string;
   icon: any;
   trend?: 'up' | 'down';
-}) {
+}
+
+const MetricCard = ({ title, value, change, icon: Icon, trend = 'up' }: MetricCardProps) => {
   return (
     <Card.Root className="p-6 transition-shadow hover:shadow-md">
       <div className="flex items-center justify-between">
@@ -54,9 +50,9 @@ function MetricCard({
       </div>
     </Card.Root>
   );
-}
+};
 
-function UpgradeCard() {
+const UpgradeCard = () => {
   const { create } = useCheckout();
 
   const handleUpgrade = async () => {
@@ -131,9 +127,9 @@ function UpgradeCard() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function RevenueChart() {
+const RevenueChart = () => {
   return (
     <Card.Root className="p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -176,9 +172,9 @@ function RevenueChart() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: string) => void }) {
+const RecentCustomers = ({ onViewCustomer }: { onViewCustomer: (customerId: string) => void }) => {
   const customers = [
     { id: 'cus_1234', name: 'John Smith', email: 'john@example.com', status: 'active', joined: '2 min ago' },
     { id: 'cus_1235', name: 'Sarah Wilson', email: 'sarah@example.com', status: 'active', joined: '15 min ago' },
@@ -227,9 +223,9 @@ function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: stri
       </div>
     </Card.Root>
   );
-}
+};
 
-function QuickStats() {
+const QuickStats = () => {
   return (
     <Card.Root className="p-6">
       <h3 className="mb-4 text-lg font-semibold">Quick Insights</h3>
@@ -258,9 +254,9 @@ function QuickStats() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function Dashboard() {
+const Dashboard = () => {
   const [selectedCustomerId, setSelectedCustomerId] = React.useState<string | null>(null);
   const [customerModalOpen, setCustomerModalOpen] = React.useState(false);
 
@@ -296,9 +292,7 @@ function Dashboard() {
           </div>
 
           {/* Upgrade Card */}
-          <div>
-            <UpgradeCard />
-          </div>
+          <UpgradeCard />
         </div>
 
         {/* Secondary Content */}
@@ -309,26 +303,19 @@ function Dashboard() {
           </div>
 
           {/* Quick Stats */}
-          <div>
-            <QuickStats />
-          </div>
+          <QuickStats />
         </div>
       </main>
 
-      {/* Customer Info Modal */}
-      {/* <CustomerInfoModal 
-        customerId={selectedCustomerId}
-        open={customerModalOpen}
-        onOpenChange={setCustomerModalOpen}
-      /> */}
+      <CustomerInfoModal customerId={selectedCustomerId} open={customerModalOpen} onOpenChange={setCustomerModalOpen} />
     </div>
   );
-}
+};
 
-export default function HomePage() {
+export default () => {
   return (
     <PaykitProvider provider={provider}>
       <Dashboard />
     </PaykitProvider>
   );
-}
+};

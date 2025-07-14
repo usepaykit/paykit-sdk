@@ -28,7 +28,7 @@ type RetrieveCustomerData = z.infer<typeof retrieveCustomerSchema>;
 type CreateCustomerData = z.infer<typeof createCustomerSchema>;
 type UpdateCustomerData = z.infer<typeof updateCustomerSchema>;
 
-export function CustomerManager() {
+export const CustomerManager = () => {
   const queryClient = useQueryClient();
   const { retrieve, create, update } = useCustomer();
   const [showCreateForm, setShowCreateForm] = React.useState(false);
@@ -286,4 +286,4 @@ export function CustomerManager() {
       </div>
     </Card.Root>
   );
-}
+};

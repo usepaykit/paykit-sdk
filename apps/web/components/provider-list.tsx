@@ -1,11 +1,10 @@
 'use client';
 
-import { PaymentProvider } from '@paykit-sdk/core';
 import { cn } from '@paykit-sdk/ui';
 
 interface ProviderListProps {
-  selectedProvider: PaymentProvider;
-  onProviderSelect: (provider: PaymentProvider) => void;
+  selectedProvider: string;
+  onProviderSelect: (provider: string) => void;
 }
 
 const providers = [

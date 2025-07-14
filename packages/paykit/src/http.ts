@@ -24,15 +24,15 @@ export class HTTPClient {
   private errorHandler = (err: unknown) => {
     switch (true) {
       case isUnauthorizedError(err):
-        return ERR(new UnauthorizedError('Unauthorized', { provider: 'gumroad' }));
+        return ERR(new UnauthorizedError('Unauthorized', { cause: err }));
       case isConnectionError(err):
-        return ERR(new ConnectionError('Connection error', { provider: 'gumroad' }));
+        return ERR(new ConnectionError('Connection error', { cause: err }));
       case isTimeoutError(err):
-        return ERR(new TimeoutError('Timeout error', { cause: err, provider: 'gumroad' }));
+        return ERR(new TimeoutError('Timeout error', { cause: err }));
       case isAbortError(err):
-        return ERR(new AbortedError('Aborted error', { provider: 'gumroad' }));
+        return ERR(new AbortedError('Aborted error', { cause: err }));
       default:
-        return ERR(new UnknownError('Unknown error', { cause: err, provider: 'gumroad' }));
+        return ERR(new UnknownError('Unknown error', { cause: err }));
     }
   };
 
@@ -42,14 +42,7 @@ export class HTTPClient {
   }
 
   private getRequestOptions(options?: Omit<RequestInit, 'method'>): RequestInit {
-    return {
-      headers: {
-        'Content-Type': 'application/json',
-        ...this.config.headers,
-        ...options?.headers,
-      },
-      ...options,
-    };
+    return { headers: { 'Content-Type': 'application/json', ...this.config.headers, ...options?.headers }, ...options };
   }
 
   async get<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {

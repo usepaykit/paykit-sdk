@@ -1,5 +1,3 @@
-import { PaymentProvider } from '../resources/providers';
-
 /**
  * Base class for all HTTP errors.
  */
@@ -7,9 +5,8 @@ import { PaymentProvider } from '../resources/providers';
 export class HTTPError extends Error {
   override readonly cause: unknown;
   override name = 'HTTPError';
-  public readonly provider: PaymentProvider;
 
-  constructor(message: string, opts: { cause?: unknown; provider: PaymentProvider }) {
+  constructor(message: string, opts: { cause?: unknown }) {
     let msg = message;
     if (opts?.cause) {
       msg += `: ${opts.cause}`;
@@ -19,7 +16,6 @@ export class HTTPError extends Error {
     if (typeof this.cause === 'undefined') {
       this.cause = opts?.cause;
     }
-    this.provider = opts.provider;
   }
 }
 

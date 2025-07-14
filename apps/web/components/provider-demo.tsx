@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { PaymentProvider } from '@paykit-sdk/core';
 import { Badge } from '@paykit-sdk/ui';
 import { Code2, Sparkles } from 'lucide-react';
 import { LineAnimatedCodeViewer } from './line-animated-code-viewer';
@@ -27,7 +26,7 @@ const getCodeLines = (provider: string) => [
 ];
 
 export function ProviderDemo() {
-  const [selectedProvider, setSelectedProvider] = React.useState<PaymentProvider>('stripe');
+  const [selectedProvider, setSelectedProvider] = React.useState<string>('stripe');
 
   return (
     <section className="relative py-4">

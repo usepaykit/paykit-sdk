@@ -1,22 +1,22 @@
 'use client';
 
 import { Button, Badge } from '@paykit-sdk/ui';
-import { ThemeToggle } from './theme-toggle';
 import { BarChart3, Settings, HelpCircle, Zap } from 'lucide-react';
+import { ThemeToggle } from './theme-toggle';
 
-export function DashboardHeader() {
+export const DashboardHeader = () => {
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between max-w-7xl mx-auto px-4">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur">
+      <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4">
         {/* Logo & Brand */}
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-              <Zap className="h-5 w-5 text-primary-foreground" />
+            <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-lg">
+              <Zap className="text-primary-foreground h-5 w-5" />
             </div>
             <div className="flex flex-col">
               <span className="text-lg font-semibold">PayKit</span>
-              <span className="text-xs text-muted-foreground">Analytics</span>
+              <span className="text-muted-foreground text-xs">Analytics</span>
             </div>
           </div>
           <Badge variant="secondary" className="text-xs">
@@ -25,17 +25,17 @@ export function DashboardHeader() {
         </div>
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center gap-6">
+        <nav className="hidden items-center gap-6 md:flex">
           <Button variant="ghost" size="sm" className="text-sm font-medium">
-            <BarChart3 className="h-4 w-4 mr-2" />
+            <BarChart3 className="mr-2 h-4 w-4" />
             Dashboard
           </Button>
           <Button variant="ghost" size="sm" className="text-sm font-medium">
-            <Settings className="h-4 w-4 mr-2" />
+            <Settings className="mr-2 h-4 w-4" />
             Settings
           </Button>
           <Button variant="ghost" size="sm" className="text-sm font-medium">
-            <HelpCircle className="h-4 w-4 mr-2" />
+            <HelpCircle className="mr-2 h-4 w-4" />
             Help
           </Button>
         </nav>
@@ -50,4 +50,4 @@ export function DashboardHeader() {
       </div>
     </header>
   );
-} 
+};

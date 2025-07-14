@@ -22,7 +22,7 @@ interface CustomerInfoModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function CustomerInfoModal({ customerId, open, onOpenChange }: CustomerInfoModalProps) {
+export const CustomerInfoModal = ({ customerId, open, onOpenChange }: CustomerInfoModalProps) => {
   const queryClient = useQueryClient();
   const { retrieve, update } = useCustomer();
   const [isEditing, setIsEditing] = React.useState(false);
@@ -58,10 +58,7 @@ export function CustomerInfoModal({ customerId, open, onOpenChange }: CustomerIn
   // Initialize form when customer data loads
   React.useEffect(() => {
     if (customerQuery.data) {
-      form.reset({
-        name: customerQuery.data.name || '',
-        email: customerQuery.data.email || '',
-      });
+      form.reset({ name: customerQuery.data.name || '', email: customerQuery.data.email || '' });
     }
   }, [customerQuery.data, form.reset()]);
 
@@ -71,9 +68,7 @@ export function CustomerInfoModal({ customerId, open, onOpenChange }: CustomerIn
 
   const handleCancel = () => {
     setIsEditing(false);
-    if (customerQuery.data) {
-      form.reset({ name: customerQuery.data.name || '', email: customerQuery.data.email || '' });
-    }
+    if (customerQuery.data) form.reset({ name: customerQuery.data.name || '', email: customerQuery.data.email || '' });
   };
 
   if (!customerId) return null;
@@ -208,4 +203,4 @@ export function CustomerInfoModal({ customerId, open, onOpenChange }: CustomerIn
       </Dialog.Content>
     </Dialog.Root>
   );
-}
+};

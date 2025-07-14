@@ -1,26 +1,36 @@
 'use client';
 
-import { Card, Button, Badge } from '@paykit-sdk/ui';
-import { PaykitProvider, useCheckout } from '@paykit-sdk/react';
-import { provider } from '@/lib/paykit';
-import { DashboardHeader } from '@/components/dashboard-header';
-import { CustomerInfoModal } from '@/components/customer-info-modal';
 import * as React from 'react';
-import { TrendingUp, Users, CreditCard, DollarSign, Zap, ArrowUpRight, BarChart3, Clock, CheckCircle, Star, Crown, Eye, UserPlus } from 'lucide-react';
+import { CustomerInfoModal } from '@/components/customer-info-modal';
+import { DashboardHeader } from '@/components/dashboard-header';
+import { provider } from '@/lib/paykit';
+import { PaykitProvider, useCheckout } from '@paykit-sdk/react';
+import { Card, Button, Badge } from '@paykit-sdk/ui';
+import {
+  TrendingUp,
+  Users,
+  CreditCard,
+  DollarSign,
+  Zap,
+  ArrowUpRight,
+  BarChart3,
+  Clock,
+  CheckCircle,
+  Star,
+  Crown,
+  Eye,
+  UserPlus,
+} from 'lucide-react';
 
-function MetricCard({ 
-  title, 
-  value, 
-  change, 
-  icon: Icon, 
-  trend = 'up',
-}: { 
-  title: string; 
-  value: string; 
-  change: string; 
-  icon: any; 
+interface MetricCardProps {
+  title: string;
+  value: string;
+  change: string;
+  icon: any;
   trend?: 'up' | 'down';
-}) {
+}
+
+const MetricCard = ({ title, value, change, icon: Icon, trend = 'up' }: MetricCardProps) => {
   return (
     <Card.Root className="p-6 transition-shadow hover:shadow-md">
       <div className="flex items-center justify-between">
@@ -40,9 +50,9 @@ function MetricCard({
       </div>
     </Card.Root>
   );
-}
+};
 
-function UpgradeCard() {
+const UpgradeCard = () => {
   const { create } = useCheckout();
 
   const handleUpgrade = async () => {
@@ -52,7 +62,7 @@ function UpgradeCard() {
       session_type: 'recurring',
       metadata: { plan: 'pro', billing: 'monthly' },
     });
-    
+
     if (result.data && 'checkout_url' in result.data) {
       window.open(result.data.checkout_url as string, '_blank');
     } else if (result.data) {
@@ -76,12 +86,12 @@ function UpgradeCard() {
             <p className="text-2xl font-bold text-purple-600">$29/mo</p>
           </div>
         </div>
-        
+
         <h3 className="mb-2 text-lg font-semibold">Unlock Advanced Analytics</h3>
         <p className="text-muted-foreground mb-4 text-sm">
           Get real-time insights, advanced reporting, and priority support to grow your business faster.
         </p>
-        
+
         <div className="mb-6 grid grid-cols-2 gap-3">
           <div className="flex items-center gap-2 text-sm">
             <CheckCircle className="h-4 w-4 text-green-500" />
@@ -100,7 +110,7 @@ function UpgradeCard() {
             <span>API access</span>
           </div>
         </div>
-        
+
         <Button onClick={handleUpgrade} disabled={create.loading} className="w-full bg-purple-600 hover:bg-purple-700">
           {create.loading ? (
             <div className="flex items-center gap-2">
@@ -117,9 +127,9 @@ function UpgradeCard() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function RevenueChart() {
+const RevenueChart = () => {
   return (
     <Card.Root className="p-6">
       <div className="mb-4 flex items-center justify-between">
@@ -129,7 +139,7 @@ function RevenueChart() {
         </div>
         <BarChart3 className="text-muted-foreground h-5 w-5" />
       </div>
-      
+
       <div className="space-y-4">
         <div className="bg-muted/50 flex items-center justify-between rounded-lg p-3">
           <div className="flex items-center gap-3">
@@ -153,7 +163,7 @@ function RevenueChart() {
           <span className="text-sm font-semibold">$3,120</span>
         </div>
       </div>
-      
+
       <div className="mt-6 border-t pt-4">
         <div className="flex items-center justify-between">
           <span className="text-muted-foreground text-sm">Total Revenue</span>
@@ -162,9 +172,9 @@ function RevenueChart() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: string) => void }) {
+const RecentCustomers = ({ onViewCustomer }: { onViewCustomer: (customerId: string) => void }) => {
   const customers = [
     { id: 'cus_1234', name: 'John Smith', email: 'john@example.com', status: 'active', joined: '2 min ago' },
     { id: 'cus_1235', name: 'Sarah Wilson', email: 'sarah@example.com', status: 'active', joined: '15 min ago' },
@@ -184,9 +194,9 @@ function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: stri
           Add Customer
         </Button>
       </div>
-      
+
       <div className="space-y-3">
-        {customers.map((customer) => (
+        {customers.map(customer => (
           <div key={customer.id} className="hover:bg-muted/50 flex items-center justify-between rounded-lg border p-3 transition-colors">
             <div className="flex items-center gap-3">
               <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100">
@@ -199,20 +209,12 @@ function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: stri
             </div>
             <div className="flex items-center gap-2">
               <div className="text-right">
-                <Badge 
-                  variant={customer.status === 'active' ? 'default' : 'secondary'} 
-                  className="mb-1 text-xs"
-                >
+                <Badge variant={customer.status === 'active' ? 'default' : 'secondary'} className="mb-1 text-xs">
                   {customer.status}
                 </Badge>
                 <p className="text-muted-foreground text-xs">{customer.joined}</p>
               </div>
-              <Button 
-                variant="ghost" 
-                size="sm"
-                onClick={() => onViewCustomer(customer.id)}
-                className="ml-2"
-              >
+              <Button variant="ghost" size="sm" onClick={() => onViewCustomer(customer.id)} className="ml-2">
                 <Eye className="h-4 w-4" />
               </Button>
             </div>
@@ -221,13 +223,13 @@ function RecentCustomers({ onViewCustomer }: { onViewCustomer: (customerId: stri
       </div>
     </Card.Root>
   );
-}
+};
 
-function QuickStats() {
+const QuickStats = () => {
   return (
     <Card.Root className="p-6">
       <h3 className="mb-4 text-lg font-semibold">Quick Insights</h3>
-      
+
       <div className="grid grid-cols-2 gap-4">
         <div className="bg-muted/50 rounded-lg p-4 text-center">
           <Clock className="text-muted-foreground mx-auto mb-2 h-5 w-5" />
@@ -252,9 +254,9 @@ function QuickStats() {
       </div>
     </Card.Root>
   );
-}
+};
 
-function Dashboard() {
+const Dashboard = () => {
   const [selectedCustomerId, setSelectedCustomerId] = React.useState<string | null>(null);
   const [customerModalOpen, setCustomerModalOpen] = React.useState(false);
 
@@ -266,7 +268,7 @@ function Dashboard() {
   return (
     <div className="bg-background min-h-screen">
       <DashboardHeader />
-      
+
       <main className="container mx-auto max-w-7xl px-4 py-8">
         {/* Hero Section */}
         <div className="mb-8">
@@ -288,11 +290,9 @@ function Dashboard() {
           <div className="lg:col-span-2">
             <RevenueChart />
           </div>
-          
+
           {/* Upgrade Card */}
-          <div>
-            <UpgradeCard />
-          </div>
+          <UpgradeCard />
         </div>
 
         {/* Secondary Content */}
@@ -301,28 +301,21 @@ function Dashboard() {
           <div className="lg:col-span-2">
             <RecentCustomers onViewCustomer={handleViewCustomer} />
           </div>
-          
+
           {/* Quick Stats */}
-          <div>
-            <QuickStats />
-          </div>
+          <QuickStats />
         </div>
       </main>
 
-      {/* Customer Info Modal */}
-      <CustomerInfoModal 
-        customerId={selectedCustomerId}
-        open={customerModalOpen}
-        onOpenChange={setCustomerModalOpen}
-      />
+      <CustomerInfoModal customerId={selectedCustomerId} open={customerModalOpen} onOpenChange={setCustomerModalOpen} />
     </div>
   );
-}
+};
 
-export default function HomePage() {
+export default () => {
   return (
     <PaykitProvider provider={provider}>
       <Dashboard />
     </PaykitProvider>
   );
-}
+};

@@ -23,7 +23,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
 
   const onSubmit = async (data: CheckoutFormSchema) => {
     setIsProcessing(true);
-    
+
     // Format the card number for display
     const formattedCardNumber = formatCardNumber(data.cardNumber);
     console.log('Formatted card number:', formattedCardNumber);
@@ -52,12 +52,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 <div className="bg-muted/30 mb-4 rounded-lg border p-4">
                   <div className="mb-2 text-left text-xs font-medium">Customer Information</div>
                   <div className="space-y-2">
-                    <Input
-                      type="email"
-                      value={customerEmail}
-                      disabled
-                      className="bg-background text-muted-foreground h-8 text-sm"
-                    />
+                    <Input type="email" value={customerEmail} disabled className="bg-background text-muted-foreground h-8 text-sm" />
                     <div className="grid grid-cols-2 gap-2">
                       <Input
                         type="text"

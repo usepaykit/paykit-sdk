@@ -40,34 +40,34 @@ export class GumroadProvider implements PayKitProvider {
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   retrieveCustomer = async (id: string): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
   handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
-    throw new UnknownError('Not implemented', { provider: 'gumroad' });
+    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 }

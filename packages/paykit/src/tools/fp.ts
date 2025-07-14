@@ -22,7 +22,7 @@ export const unwrapAsync = async <T>(pr: Promise<Result<T, unknown>>): Promise<T
 export function safeParse<Inp, Out>(rawValue: Inp, fn: (value: Inp) => Out, errorMessage: string): Result<Out, ValidationError> {
   const [result, error] = tryCatchSync(() => fn(rawValue));
 
-  if (error) return ERR(new ValidationError(errorMessage, { cause: error, provider: 'paykit' }));
+  if (error) return ERR(new ValidationError(errorMessage, { cause: error }));
 
   return OK(result);
 }

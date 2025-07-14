@@ -15,6 +15,11 @@ export interface PaykitConfig {
   customer: Partial<Customer>;
 
   /**
+   * Customers array for multiple customer support
+   */
+  customers: Array<Customer>;
+
+  /**
    * Subscriptions
    */
   subscriptions: Array<Subscription>;
@@ -37,7 +42,7 @@ const getNodeModules = async () => {
   // Use dynamic imports for ESM compatibility
   const fs = await import('fs');
   const path = await import('path');
-  
+
   return { fs, path };
 };
 
@@ -105,9 +110,10 @@ export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: Pay
       config = {
         product: { name: '', description: '', price: '', itemId: '' },
         customer: {},
+        customers: [],
         subscriptions: [],
         checkouts: [],
-        payments: []
+        payments: [],
       };
     }
 

@@ -1,5 +1,4 @@
 import { logger, ValidationError } from '@paykit-sdk/core';
-import type { Plugin } from 'vite';
 import {
   server$CreateCheckout,
   server$CreateCustomer,
@@ -11,7 +10,22 @@ import {
   server$UpdateSubscriptionHelper,
 } from '../server';
 
-export interface PaykitApiVitePluginOptions {
+/**
+ * Types for creating a basic Vite plugin, extracted from vite 7.0.4
+ */
+interface ViteDevServer {
+  middlewares: {
+    use(path: string, handler: (req: any, res: any, next?: () => void) => void): void;
+  };
+}
+
+interface Plugin {
+  name: string;
+  configureServer?(server: ViteDevServer): void | (() => void) | Promise<void | (() => void)>;
+  [key: string]: any;
+}
+
+export interface Local$VitePluginOptions {
   /**
    * API path prefix for the plugin routes
    * @default '/api/paykit'
@@ -19,7 +33,7 @@ export interface PaykitApiVitePluginOptions {
   prefix?: string;
 }
 
-export const paykitApiVitePlugin = (options: PaykitApiVitePluginOptions = {}): Plugin => {
+export const local$VitePlugin = (options: Local$VitePluginOptions = {}): Plugin => {
   const { prefix = '/api/paykit' } = options;
 
   return {

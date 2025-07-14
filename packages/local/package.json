@@ -32,14 +32,12 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.0",
-    "vite": ">=4.0.0"
+    "@paykit-sdk/core": ">=1.1.0"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0",
-    "vite": "^5.4.19"
+    "typescript": "^5.0.0"
   },
   "dependencies": {
     "server-only": "^0.0.1"

@@ -14,7 +14,7 @@ export const formatCardNumber = (value: string) =>
 /**
  * If `resource` is present, it will be removed from the params object as it is used to determine the resource type
  * Convert all query parameters to params object
- * Parse values that start with $t prefix as JSON, remove $t prefix
+ * Parse values that start with `$t` prefix as JSON
  * Fallback to string if JSON parsing fails
  */
 export const extractParams = (url: URL) => {

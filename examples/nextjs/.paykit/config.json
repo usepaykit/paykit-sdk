@@ -511,6 +511,109 @@
           "quantity": 1
         }
       ]
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "payment_url": "http://localhost:3001?cid=demo_customer",
+      "products": [
+        {
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": null,
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicGF5bWVudF91cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDE/Y2lkPWRlbW9fY3VzdG9tZXIiLCJwcm9kdWN0cyI6W3sicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJhbW91bnQiOm51bGx9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "payment_url": "http://localhost:3001?cid=demo_customer",
+      "products": [
+        {
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": null,
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicGF5bWVudF91cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDE/Y2lkPWRlbW9fY3VzdG9tZXIiLCJwcm9kdWN0cyI6W3sicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJhbW91bnQiOm51bGx9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "payment_url": "http://localhost:3001?cid=demo_customer",
+      "products": [
+        {
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": null,
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicGF5bWVudF91cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDE/Y2lkPWRlbW9fY3VzdG9tZXIiLCJwcm9kdWN0cyI6W3sicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJhbW91bnQiOm51bGx9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "payment_url": "http://localhost:3001?cid=demo_customer",
+      "products": [
+        {
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": null,
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicGF5bWVudF91cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDE/Y2lkPWRlbW9fY3VzdG9tZXIiLCJwcm9kdWN0cyI6W3sicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJhbW91bnQiOm51bGx9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "payment_url": "http://localhost:3001?cid=demo_customer",
+      "products": [
+        {
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": null,
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicGF5bWVudF91cmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDE/Y2lkPWRlbW9fY3VzdG9tZXIiLCJwcm9kdWN0cyI6W3sicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJhbW91bnQiOm51bGx9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "amount": "NaN",
+      "id": "eyJyZXNvdXJjZSI6ImNoZWNrb3V0IiwiY3VzdG9tZXJfaWQiOiJkZW1vX2N1c3RvbWVyIiwibWV0YWRhdGEiOiIkdHtcInBsYW5cIjpcInByb1wiLFwiYmlsbGluZ1wiOlwibW9udGhseVwifSIsInNlc3Npb25fdHlwZSI6InJlY3VycmluZyIsInByb2R1Y3RzIjoiJHRbe1wiaWRcIjpcInByb19wbGFuXCIsXCJxdWFudGl0eVwiOjF9XSIsImN1cnJlbmN5IjoiVVNEIiwiYW1vdW50IjpudWxsfQ==",
+      "payment_url": "http://localhost:3001/checkout?id=eyJyZXNvdXJjZSI6ImNoZWNrb3V0IiwiY3VzdG9tZXJfaWQiOiJkZW1vX2N1c3RvbWVyIiwibWV0YWRhdGEiOiIkdHtcInBsYW5cIjpcInByb1wiLFwiYmlsbGluZ1wiOlwibW9udGhseVwifSIsInNlc3Npb25fdHlwZSI6InJlY3VycmluZyIsInByb2R1Y3RzIjoiJHRbe1wiaWRcIjpcInByb19wbGFuXCIsXCJxdWFudGl0eVwiOjF9XSIsImN1cnJlbmN5IjoiVVNEIiwiYW1vdW50IjpudWxsfQ=="
     }
   ],
   "payments": []

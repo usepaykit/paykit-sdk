@@ -1,6 +1,6 @@
 import { logger, ValidationError } from '@paykit-sdk/core';
 import {
-  server$CreateCheckout,
+  server$ProcessCreateCheckout,
   server$CreateCustomer,
   server$HandleWebhook,
   server$RetrieveCheckout,
@@ -123,11 +123,7 @@ async function handlePost(resource: string, body: any) {
       return server$CreateCustomer(params);
 
     case 'checkout':
-      const paymentUrl = params['paymentUrl'];
-
-      if (!paymentUrl) throw new ValidationError('Payment URL is required', {});
-
-      return server$CreateCheckout({ paymentUrl }, params);
+      return server$ProcessCreateCheckout(params);
 
     case 'webhook':
       return server$HandleWebhook(body);

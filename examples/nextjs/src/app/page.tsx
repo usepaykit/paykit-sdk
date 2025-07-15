@@ -21,6 +21,7 @@ import {
   Eye,
   UserPlus,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface MetricCardProps {
   title: string;
@@ -54,22 +55,21 @@ const MetricCard = ({ title, value, change, icon: Icon, trend = 'up' }: MetricCa
 
 const UpgradeCard = () => {
   const { create } = useCheckout();
+  const router = useRouter();
 
   const handleUpgrade = async () => {
-    const result = await create.run({
+    const { data, error } = await create.run({
       customer_id: 'demo_customer',
       item_id: 'pro_plan',
       session_type: 'recurring',
       metadata: { plan: 'pro', billing: 'monthly' },
     });
 
-    console.log({ result });
+    if (error) throw new Error(error.message);
 
-    if (result.data && 'checkout_url' in result.data) {
-      window.open(result.data.checkout_url as string, '_blank');
-    } else if (result.data) {
-      console.log('Checkout created:', result.data);
-    }
+    console.log({ data });
+
+    router.push(data.payment_url);
   };
 
   return (

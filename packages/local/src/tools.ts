@@ -121,8 +121,6 @@ export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: Pay
 
     const success = await writePaykitConfig(config);
 
-    if (success) logger.info(`Updated ${key} data for: ${JSON.stringify(value)}`);
-
     return success;
   } catch (error) {
     logger.error(`Failed to update data: ${error}`);

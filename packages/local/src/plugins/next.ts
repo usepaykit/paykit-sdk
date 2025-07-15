@@ -3,7 +3,7 @@ import {
   server$CreateCustomer,
   server$RetrieveCustomer,
   server$UpdateCustomer,
-  server$CreateCheckout,
+  server$ProcessCreateCheckout,
   server$RetrieveCheckout,
   server$RetrieveSubscription,
   server$UpdateSubscriptionHelper,
@@ -63,17 +63,17 @@ async function handleGet(url: URL): Promise<Response> {
     case 'customer':
       if (!id) return Response.json({ error: 'Customer ID is required' }, { status: 400 });
       const customer = await server$RetrieveCustomer(id);
-      return Response.json({ data: customer });
+      return Response.json(customer);
 
     case 'subscription':
       if (!id) return Response.json({ error: 'Subscription ID is required' }, { status: 400 });
       const subscription = await server$RetrieveSubscription(id);
-      return Response.json({ data: subscription });
+      return Response.json(subscription);
 
     case 'checkout':
       if (!id) return Response.json({ error: 'Checkout ID is required' }, { status: 400 });
       const checkout = await server$RetrieveCheckout(id);
-      return Response.json({ data: checkout });
+      return Response.json(checkout);
 
     default:
       return Response.json({ error: 'Unknown resource type' }, { status: 400 });
@@ -92,15 +92,15 @@ async function handlePost(request: RequestLike): Promise<Response> {
   switch (resource) {
     case 'customer':
       const customer = await server$CreateCustomer(params);
-      return Response.json({ data: customer });
+      return Response.json(customer);
 
     case 'checkout':
-      const checkout = await server$CreateCheckout({ paymentUrl: params.paymentUrl || 'http://localhost:3001' }, params);
-      return Response.json({ data: checkout });
+      const checkout = await server$ProcessCreateCheckout(params);
+      return Response.json(checkout);
 
     case 'webhook':
       const webhookResult = await server$HandleWebhook({ body: JSON.stringify(params), headers: request.headers, webhookSecret: 'local-dev-secret' });
-      return Response.json({ data: webhookResult });
+      return Response.json(webhookResult);
 
     default:
       return Response.json({ error: 'Unknown resource type' }, { status: 400 });
@@ -120,11 +120,11 @@ async function handlePut(request: RequestLike): Promise<Response> {
   switch (resource) {
     case 'customer':
       const customer = await server$UpdateCustomer(id, params);
-      return Response.json({ data: customer });
+      return Response.json(customer);
 
     case 'subscription':
       const subscription = await server$UpdateSubscriptionHelper(id, params);
-      return Response.json({ data: subscription });
+      return Response.json(subscription);
 
     default:
       return Response.json({ error: 'Unknown resource type' }, { status: 400 });
@@ -142,7 +142,7 @@ async function handleDelete(url: URL): Promise<Response> {
   switch (resource) {
     case 'subscription':
       const subscription = await server$UpdateSubscriptionHelper(id, { status: 'canceled' });
-      return Response.json({ data: subscription });
+      return Response.json(subscription);
 
     default:
       return Response.json({ error: 'Unknown resource type' }, { status: 400 });

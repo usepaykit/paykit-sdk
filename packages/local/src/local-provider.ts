@@ -12,18 +12,12 @@ import {
   WebhookEventPayload,
   HTTPClient,
   unwrapAsync,
+  safeEncode,
+  ValidationError,
 } from '@paykit-sdk/core';
 
 export interface LocalConfig extends PaykitProviderOptions {
-  /**
-   * API URL for the local development server
-   * The plugin handles server-side operations via HTTP requests
-   */
   apiUrl: string;
-
-  /**
-   * Payment URL for checkout redirects
-   */
   paymentUrl: string;
 }
 
@@ -35,29 +29,39 @@ export class LocalProvider implements PayKitProvider {
   }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const urlParams = new URLSearchParams({
+    const checkoutWithoutId = {
       resource: 'checkout',
       customer_id: params.customer_id,
-      session_type: params.session_type,
-      item_id: params.item_id,
-      paymentUrl: this.config.paymentUrl,
       metadata: `$t${JSON.stringify(params.metadata)}`,
-      ...(params.provider_metadata && { provider_metadata: `$t${JSON.stringify(params.provider_metadata)}` }),
+      session_type: params.session_type,
+      products: `$t${JSON.stringify([{ id: params.item_id, quantity: 1 }])}`,
+      currency: (params.provider_metadata?.['currency'] as string) ?? 'USD',
+      amount: parseInt(params.provider_metadata?.['amount'] as string, 10) ?? 25,
+    };
+
+    const checkoutId = safeEncode(checkoutWithoutId);
+
+    if (!checkoutId.ok) throw new ValidationError('Invalid checkout ID', {});
+
+    const urlParams = new URLSearchParams({
+      ...checkoutWithoutId,
+      id: checkoutId.value,
+      amount: checkoutWithoutId.amount.toString(),
+      payment_url: `${this.config.paymentUrl}/checkout?id=${checkoutId.value}`,
     });
 
     return unwrapAsync(this._client.post<Checkout>(`?${urlParams.toString()}`));
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    const urlParams = new URLSearchParams({ resource: 'checkout', id });
-    return unwrapAsync(this._client.get<Checkout>(`?${urlParams.toString()}`));
+    return unwrapAsync(this._client.get<Checkout>(`?id=${id}&resource=checkout`));
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const urlParams = new URLSearchParams({
       resource: 'customer',
-      ...(params.email && { email: params.email }),
       ...(params.name && { name: params.name }),
+      ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: `$t${JSON.stringify(params.metadata)}` }),
     });
     return unwrapAsync(this._client.post<Customer>(`?${urlParams.toString()}`));
@@ -65,37 +69,34 @@ export class LocalProvider implements PayKitProvider {
 
   updateCustomer = async (id: string, params: UpdateCustomerParams) => {
     const urlParams = new URLSearchParams({
-      resource: 'customer',
       id,
-      ...(params.email && { email: params.email }),
+      resource: 'customer',
       ...(params.name && { name: params.name }),
+      ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: `$t${JSON.stringify(params.metadata)}` }),
     });
     return unwrapAsync(this._client.put<Customer>(`?${urlParams.toString()}`));
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
-    const urlParams = new URLSearchParams({ resource: 'customer', id });
-    return unwrapAsync(this._client.get<Customer>(`?${urlParams.toString()}`));
+    return unwrapAsync(this._client.get<Customer>(`?id=${id}&resource=customer`));
   };
 
   async updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription> {
     const urlParams = new URLSearchParams({
-      resource: 'subscription',
       id,
+      resource: 'subscription',
       metadata: `$t${JSON.stringify(params.metadata)}`,
     });
     return unwrapAsync(this._client.put<Subscription>(`?${urlParams.toString()}`));
   }
 
   async cancelSubscription(id: string): Promise<Subscription> {
-    const urlParams = new URLSearchParams({ resource: 'subscription', id });
-    return unwrapAsync(this._client.delete<Subscription>(`?${urlParams.toString()}`));
+    return unwrapAsync(this._client.delete<Subscription>(`?id=${id}&resource=subscription`));
   }
 
   async retrieveSubscription(id: string): Promise<Subscription> {
-    const urlParams = new URLSearchParams({ resource: 'subscription', id });
-    return unwrapAsync(this._client.get<Subscription>(`?${urlParams.toString()}`));
+    return unwrapAsync(this._client.get<Subscription>(`?id=${id}&resource=subscription`));
   }
 
   async handleWebhook(payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {

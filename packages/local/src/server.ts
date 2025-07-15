@@ -15,25 +15,8 @@ import {
 import 'server-only';
 import { getKeyValue, updateKey } from './tools';
 
-export const server$CreateCheckout = async (config: { paymentUrl: string }, params: CreateCheckoutParams) => {
-  const checkoutWithoutId = {
-    customer_id: params.customer_id,
-    metadata: params.metadata,
-    session_type: params.session_type,
-    payment_url: `${config.paymentUrl}?cid=${params.customer_id}`,
-    products: [{ id: params.item_id, quantity: 1 }],
-    currency: (params.provider_metadata?.['currency'] as string) ?? 'USD',
-    amount: parseInt(params.provider_metadata?.['amount'] as string, 10) ?? 25,
-  };
-
-  const itemId = safeEncode(checkoutWithoutId);
-
-  if (!itemId.ok) throw new ValidationError(itemId.error.message, { cause: 'Invalid checkout parameters' });
-
-  const checkout = { ...checkoutWithoutId, id: itemId.value };
-
+export const server$ProcessCreateCheckout = async (checkout: Checkout) => {
   await updateKey('checkouts', [...((await getKeyValue('checkouts')) || []), checkout]);
-
   return checkout;
 };
 
@@ -55,7 +38,7 @@ export const server$RetrieveCustomer = async (id: string) => {
   return customer || null;
 };
 
-export const server$UpdateCustomer = async (id: string, params: UpdateCustomerParams) => {
+export const server$UpdateCustomer = async (_id: string, params: UpdateCustomerParams) => {
   const { email, name } = params;
 
   const dataEncoded = safeEncode(JSON.stringify({ email, name }));

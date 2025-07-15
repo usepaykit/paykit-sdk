@@ -9,6 +9,7 @@ import {
   server$UpdateSubscriptionHelper,
   server$HandleWebhook,
 } from '../server';
+import { extractParams } from '../utils';
 
 export interface RequestLike {
   method?: string;
@@ -80,8 +81,9 @@ async function handleGet(url: URL): Promise<Response> {
 }
 
 async function handlePost(request: RequestLike): Promise<Response> {
-  const body = await request.json();
-  const { resource, ...params } = body;
+  const url = new URL(request.url);
+  const resource = url.searchParams.get('resource');
+  const params = extractParams(url);
 
   if (!resource) {
     return Response.json({ error: 'Resource type is required' }, { status: 400 });
@@ -106,8 +108,10 @@ async function handlePost(request: RequestLike): Promise<Response> {
 }
 
 async function handlePut(request: RequestLike): Promise<Response> {
-  const body = await request.json();
-  const { resource, id, ...params } = body;
+  const url = new URL(request.url);
+  const resource = url.searchParams.get('resource');
+  const id = url.searchParams.get('id');
+  const params = extractParams(url);
 
   if (!resource || !id) {
     return Response.json({ error: 'Resource type and ID are required' }, { status: 400 });

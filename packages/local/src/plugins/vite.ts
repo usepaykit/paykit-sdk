@@ -9,6 +9,7 @@ import {
   server$UpdateCustomer,
   server$UpdateSubscriptionHelper,
 } from '../server';
+import { extractParams } from '../utils';
 
 /**
  * Types for creating a basic Vite plugin, extracted from vite 7.0.4
@@ -46,18 +47,9 @@ export const local$VitePlugin = (options: Local$VitePluginOptions = {}): Plugin 
           const url = new URL(req.url || '/', `http://localhost`);
           const method = req.method?.toLowerCase();
 
-          // Parse request body for POST/PUT requests
-          let body: any = {};
-          if (method === 'post' || method === 'put') {
-            const chunks: Buffer[] = [];
-            req.on('data', (chunk: any) => chunks.push(chunk));
-            await new Promise(resolve => req.on('end', resolve));
-            const bodyStr = Buffer.concat(chunks).toString();
-            body = bodyStr ? JSON.parse(bodyStr) : {};
-          }
-
           const resource = url.searchParams.get('resource');
           const id = url.searchParams.get('id');
+          const body = extractParams(url);
 
           if (!resource) {
             res.statusCode = 400;

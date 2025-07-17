@@ -58,23 +58,37 @@ export class LocalProvider implements PayKitProvider {
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    const urlParams = new URLSearchParams({
-      resource: 'customer',
+    const customerWithoutId = {
       ...(params.name && { name: params.name }),
       ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: `$t${JSON.stringify(params.metadata)}` }),
-    });
+    };
+
+    const customerId = safeEncode({ name: customerWithoutId.name, email: customerWithoutId.email });
+
+    if (!customerId.ok) throw new ValidationError('Invalid customer data', {});
+
+    const urlParams = new URLSearchParams({ ...customerWithoutId, id: customerId.value, resource: 'customer' });
+
     return unwrapAsync(this._client.post<Customer>(`?${urlParams.toString()}`));
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams) => {
-    const urlParams = new URLSearchParams({
-      id,
-      resource: 'customer',
+    const customer = {
       ...(params.name && { name: params.name }),
       ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: `$t${JSON.stringify(params.metadata)}` }),
-    });
+    };
+
+    /**
+     * Ignores the ID and makes a new one based on the updated values.
+     */
+    const retUpdateId = safeEncode({ name: params.name, email: params.email });
+
+    if (!retUpdateId.ok) throw new ValidationError('Invalid Customer data', {});
+
+    const urlParams = new URLSearchParams({ ...customer, resource: 'customer', id: retUpdateId.value });
+
     return unwrapAsync(this._client.put<Customer>(`?${urlParams.toString()}`));
   };
 

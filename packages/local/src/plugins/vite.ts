@@ -1,12 +1,12 @@
 import { logger, ValidationError } from '@paykit-sdk/core';
 import {
-  server$ProcessCreateCheckout,
+  server$CreateCheckout,
   server$CreateCustomer,
   server$HandleWebhook,
-  server$RetrieveCheckout,
-  server$RetrieveCustomer,
-  server$RetrieveSubscription,
-  server$UpdateCustomer,
+  server$GetCheckout,
+  server$GetCustomer,
+  server$GetSubscription,
+  server$PutCustomer,
   server$UpdateSubscriptionHelper,
 } from '../server';
 import { extractParams } from '../utils';
@@ -100,15 +100,15 @@ async function handleGet(resource: string, id: string | null) {
   switch (resource) {
     case 'customer':
       if (!id) throw new ValidationError('Customer ID is required', {});
-      return server$RetrieveCustomer(id);
+      return server$GetCustomer(id);
 
     case 'subscription':
       if (!id) throw new ValidationError('Subscription ID is required', {});
-      return server$RetrieveSubscription(id);
+      return server$GetSubscription(id);
 
     case 'checkout':
       if (!id) throw new ValidationError('Checkout ID is required', {});
-      return server$RetrieveCheckout(id);
+      return server$GetCheckout(id);
 
     default:
       throw new ValidationError('Unknown resource type', {});
@@ -123,7 +123,7 @@ async function handlePost(resource: string, body: any) {
       return server$CreateCustomer(params);
 
     case 'checkout':
-      return server$ProcessCreateCheckout(params);
+      return server$CreateCheckout(params);
 
     case 'webhook':
       return server$HandleWebhook(body);
@@ -140,7 +140,7 @@ async function handlePut(resource: string, id: string | null, body: any) {
 
   switch (resource) {
     case 'customer':
-      return server$UpdateCustomer(id, params);
+      return server$PutCustomer({ ...params, id });
 
     case 'subscription':
       return server$UpdateSubscriptionHelper(id, params);

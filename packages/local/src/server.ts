@@ -1,26 +1,16 @@
-import {
-  $ExtWebhookHandlerConfig,
-  Checkout,
-  CreateCheckoutParams,
-  CreateCustomerParams,
-  Customer,
-  safeDecode,
-  safeEncode,
-  safeParse,
-  Subscription,
-  toPaykitEvent,
-  UpdateCustomerParams,
-  ValidationError,
-} from '@paykit-sdk/core';
+import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, safeParse, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
 import 'server-only';
 import { getKeyValue, updateKey } from './tools';
 
-export const server$ProcessCreateCheckout = async (checkout: Checkout) => {
+/**
+ * Checkout
+ */
+export const server$CreateCheckout = async (checkout: Checkout) => {
   await updateKey('checkouts', [...((await getKeyValue('checkouts')) || []), checkout]);
   return checkout;
 };
 
-export const server$RetrieveCheckout = async (id: string) => {
+export const server$GetCheckout = async (id: string) => {
   const decode = safeDecode<Checkout>(id);
 
   if (!decode.ok) throw new ValidationError(decode.error.message, { cause: 'Invalid checkout parameters' });
@@ -28,39 +18,48 @@ export const server$RetrieveCheckout = async (id: string) => {
   return decode.value;
 };
 
-export const server$RetrieveCustomer = async (id: string) => {
+/**
+ * Customer
+ */
+export const server$GetCustomer = async (id: string) => {
   const customers = await getKeyValue('customers');
-
-  if (!customers) return null;
-
-  const customer = customers.find(cust => cust.id === id);
-
-  return customer || null;
+  return customers?.find(cust => cust.id === id) ?? null;
 };
 
-export const server$UpdateCustomer = async (_id: string, params: UpdateCustomerParams) => {
-  const { email, name } = params;
-
-  const dataEncoded = safeEncode(JSON.stringify({ email, name }));
-
-  if (!dataEncoded.ok) throw new ValidationError('Invalid data', dataEncoded.error);
-
-  const customer = { ...params, id: dataEncoded.value };
-
-  await updateKey('customer', customer);
-
+export const server$CreateCustomer = async (customer: Customer) => {
+  await updateKey('customers', [...((await getKeyValue('customers')) || []), customer]);
   return customer;
 };
 
-export const server$RetrieveSubscription = async (id: string) => {
+export const server$PutCustomer = async (customer: Customer) => {
+  await updateKey('customer', customer);
+  return customer;
+};
+
+export const server$DeleteCustomer = async (id: string) => {
+  const customers = await getKeyValue('customers');
+  const filteredCustomers = customers?.filter(cust => cust.id !== id) || [];
+  await updateKey('customers', filteredCustomers);
+  return null;
+};
+
+/**
+ * Subscription
+ */
+export const server$GetSubscription = async (id: string) => {
   const subscriptions = await getKeyValue('subscriptions');
 
-  if (!subscriptions) throw new ValidationError('Subscriptions not found', { cause: 'Subscriptions not found' });
+  if (!subscriptions) throw new ValidationError('Subscriptions not found', {});
 
   const subscription = subscriptions.find(sub => sub.id === id);
 
-  if (!subscription) throw new ValidationError('Subscription not found', { cause: 'Subscription not found' });
+  if (!subscription) throw new ValidationError('Subscription not found', {});
 
+  return subscription;
+};
+
+export const server$CreateSubscription = async (subscription: Subscription) => {
+  await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription]);
   return subscription;
 };
 
@@ -81,20 +80,17 @@ export const server$UpdateSubscriptionHelper = async (id: string, params: Partia
   return updatedSubscriptions[subscriptionIndex];
 };
 
-export const server$CreateCustomer = async (params: CreateCustomerParams) => {
-  const { email, name } = params;
-
-  const dataEncoded = safeEncode(JSON.stringify({ email, name }));
-
-  if (!dataEncoded.ok) throw new ValidationError('Invalid data', dataEncoded.error);
-
-  const customer = { ...params, id: dataEncoded.value };
-
-  await updateKey('customers', [...((await getKeyValue('customers')) || []), customer]);
-
-  return customer;
+/**
+ * Payment
+ */
+export const server$CreatePayment = async (paymentId: string) => {
+  await updateKey('payments', [...((await getKeyValue('payments')) || []), paymentId]);
+  return paymentId;
 };
 
+/**
+ * Webhook
+ */
 export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig) => {
   const { body } = payload;
 
@@ -105,61 +101,34 @@ export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig) =>
   const { type, data } = parsedBody.value as { type: string; data: Record<string, any> };
 
   if (type === 'checkout.created') {
-    const checkout = await server$RetrieveCheckout(data.id);
-
-    return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: data.id, data: checkout });
+    const checkout = await server$GetCheckout(data.id);
+    return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: `wk_${data.id}`, data: checkout });
   } else if (type == 'customer.created') {
-    const customerId = safeEncode(data);
-
-    const customerData = data as Pick<Customer, 'name' | 'email'>;
-
-    if (!customerId.ok) throw new ValidationError('Invalid customer data', customerId.error);
-
-    const retUpdate = { id: customerId.value, ...customerData };
-
-    await updateKey('customers', [...((await getKeyValue('customers')) || []), retUpdate]);
-
-    return toPaykitEvent<Customer>({ type: '$customerCreated', created: Date.now(), id: data.id, data: retUpdate });
+    const customer = data as Customer;
+    await server$CreateCustomer(customer);
+    return toPaykitEvent<Customer>({ type: '$customerCreated', created: Date.now(), id: `wk_${data.id}`, data: customer });
   } else if (type == 'customer.updated') {
-    const customerData = data as UpdateCustomerParams;
-
-    const updatedCustomer = await server$UpdateCustomer(data.id, customerData);
-
-    return toPaykitEvent<Customer>({ type: '$customerUpdated', created: Date.now(), id: data.id, data: updatedCustomer });
+    const customer = data as Customer;
+    await server$PutCustomer(customer);
+    return toPaykitEvent<Customer>({ type: '$customerUpdated', created: Date.now(), id: `wk_${data.id}`, data: customer });
   } else if (type == 'customer.deleted') {
-    const customers = await getKeyValue('customers');
-    const filteredCustomers = customers?.filter(cust => cust.id !== data.id) || [];
-    await updateKey('customers', filteredCustomers);
-
+    await server$DeleteCustomer(data.id);
     return toPaykitEvent<null>({ type: '$customerDeleted', created: Date.now(), id: data.id, data: null });
   } else if (type == 'subscription.created') {
-    const subscription = safeDecode<Subscription>(data.id);
-
-    if (!subscription.ok) throw new ValidationError('Invalid subscription data', subscription.error);
-
-    await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription.value]);
-
-    return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: Date.now(), id: data.id, data: subscription.value });
+    const subscription = data as Subscription;
+    await server$CreateSubscription(subscription);
+    return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: Date.now(), id: data.id, data: subscription });
   } else if (type == 'subscription.updated') {
-    const subscription = safeDecode<Subscription>(data.id);
-
-    if (!subscription.ok) throw new ValidationError('Invalid subscription data', subscription.error);
-
-    const updatedSubscription = await server$UpdateSubscriptionHelper(subscription.value.id, { metadata: subscription.value.metadata || {} });
-
-    return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: Date.now(), id: data.id, data: updatedSubscription });
+    const subscription = data as Subscription;
+    await server$UpdateSubscriptionHelper(subscription.id, subscription);
+    return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: Date.now(), id: data.id, data: subscription });
   } else if (type == 'subscription.deleted') {
-    await updateKey('subscriptions', (await getKeyValue('subscriptions'))?.filter(sub => sub.id !== data.id) || []);
-
+    await server$UpdateSubscriptionHelper(data.id, { status: 'canceled' });
     return toPaykitEvent<null>({ type: '$subscriptionCanceled', created: Date.now(), id: data.id, data: null });
   } else if (type == 'payment.succeeded') {
-    const paymentId = safeEncode(data);
-
-    if (!paymentId.ok) throw new ValidationError('Invalid payment data', paymentId.error);
-
-    await updateKey('payments', [...((await getKeyValue('payments')) || []), paymentId.value]);
-
-    return toPaykitEvent<{ id: string }>({ type: '$paymentReceived', created: Date.now(), id: paymentId.value, data: { id: paymentId.value } });
+    const paymentId = data.id;
+    await server$CreatePayment(paymentId);
+    return toPaykitEvent<{ id: string }>({ type: '$paymentReceived', created: Date.now(), id: `wk_${paymentId}`, data: { id: paymentId } });
   }
 
   throw new ValidationError('Unknown webhook type', {});

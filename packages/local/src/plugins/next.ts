@@ -1,11 +1,11 @@
 import { ValidationError, logger } from '@paykit-sdk/core';
 import {
   server$CreateCustomer,
-  server$RetrieveCustomer,
-  server$UpdateCustomer,
-  server$ProcessCreateCheckout,
-  server$RetrieveCheckout,
-  server$RetrieveSubscription,
+  server$GetCustomer,
+  server$PutCustomer,
+  server$CreateCheckout,
+  server$GetCheckout,
+  server$GetSubscription,
   server$UpdateSubscriptionHelper,
   server$HandleWebhook,
 } from '../server';
@@ -62,17 +62,17 @@ async function handleGet(url: URL): Promise<Response> {
   switch (resource) {
     case 'customer':
       if (!id) return Response.json({ error: 'Customer ID is required' }, { status: 400 });
-      const customer = await server$RetrieveCustomer(id);
+      const customer = await server$GetCustomer(id);
       return Response.json(customer);
 
     case 'subscription':
       if (!id) return Response.json({ error: 'Subscription ID is required' }, { status: 400 });
-      const subscription = await server$RetrieveSubscription(id);
+      const subscription = await server$GetSubscription(id);
       return Response.json(subscription);
 
     case 'checkout':
       if (!id) return Response.json({ error: 'Checkout ID is required' }, { status: 400 });
-      const checkout = await server$RetrieveCheckout(id);
+      const checkout = await server$GetCheckout(id);
       return Response.json(checkout);
 
     default:
@@ -95,7 +95,7 @@ async function handlePost(request: RequestLike): Promise<Response> {
       return Response.json(customer);
 
     case 'checkout':
-      const checkout = await server$ProcessCreateCheckout(params);
+      const checkout = await server$CreateCheckout(params);
       return Response.json(checkout);
 
     case 'webhook':
@@ -119,7 +119,7 @@ async function handlePut(request: RequestLike): Promise<Response> {
 
   switch (resource) {
     case 'customer':
-      const customer = await server$UpdateCustomer(id, params);
+      const customer = await server$PutCustomer({ ...params, id });
       return Response.json(customer);
 
     case 'subscription':

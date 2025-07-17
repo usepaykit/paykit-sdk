@@ -81,6 +81,9 @@ program
     logger.tip('Run `paykit dev` to start the development server');
   });
 
+/**
+ * Use package manager to install deps, i.e from package-lock.json (npm), pnpm-lock.yaml (pnpm), yarn.lock (yarn)
+ */
 program
   .command('dev')
   .description('Start the PayKit development server')

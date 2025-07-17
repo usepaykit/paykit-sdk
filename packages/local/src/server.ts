@@ -1,6 +1,16 @@
-import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, safeParse, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
 import 'server-only';
+import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, safeParse, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
 import { getKeyValue, updateKey } from './tools';
+
+/**
+ * Templates
+ */
+export const server$$Template = async () => {
+  await server$CreateCustomer({} as any);
+  await server$CreateSubscription({} as any);
+  await server$CreateCheckout({} as any);
+  await server$CreatePayment({} as any);
+};
 
 /**
  * Checkout

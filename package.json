@@ -28,10 +28,11 @@
       "prettier-plugin-tailwindcss"
     ],
     "importOrder": [
+      "server-only",
       "^react$",
+      "^@paykit-sdk$",
       "^react-dom$",
       "<THIRD_PARTY_MODULES>",
-      "^@/react/(.*)$",
       "^[./]"
     ]
   },

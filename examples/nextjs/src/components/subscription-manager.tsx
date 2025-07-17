@@ -240,9 +240,7 @@ export const SubscriptionManager = () => {
         {/* Error Display */}
         {(retrieveError || updateMutation.error || cancelMutation.error) && (
           <div className="bg-destructive/10 border-destructive/20 rounded-lg border p-4">
-            <p className="text-destructive text-sm">
-              {retrieveError?.message || updateMutation.error?.message || cancelMutation.error?.message}
-            </p>
+            <p className="text-destructive text-sm">{retrieveError?.message || updateMutation.error?.message || cancelMutation.error?.message}</p>
           </div>
         )}
       </div>

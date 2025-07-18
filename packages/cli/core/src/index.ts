@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { safeEncode, ValidationError, logger } from '@paykit-sdk/core';
-import { CheckoutInfo, writePaykitConfig } from '@paykit-sdk/local';
+import { safeEncode, ValidationError, logger, tryCatchSync, tryCatchAsync } from '@paykit-sdk/core';
+import { server$$Template } from '@paykit-sdk/local';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
 import { existsSync } from 'fs';
@@ -23,7 +23,7 @@ program
     logger.info("Welcome to PayKit! Let's set up your product.");
     logger.spacer();
 
-    const answers = (await inquirer.prompt([
+    const answers = await inquirer.prompt([
       {
         type: 'input',
         name: 'name',
@@ -57,11 +57,11 @@ program
           return emailRegex.test(input) ? true : 'Please enter a valid email address';
         },
       },
-    ])) as CheckoutInfo;
+    ]);
 
     logger.progress('Validating product info');
 
-    const itemId = safeEncode<CheckoutInfo>(answers);
+    const itemId = safeEncode(answers);
     const customerId = safeEncode<string>(answers.customerEmail);
 
     logger.clearProgress();
@@ -72,9 +72,12 @@ program
     const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
     const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
-    const response = await writePaykitConfig({ product, customer, subscriptions: [], checkouts: [], payments: [] });
+    const [data, error] = await tryCatchAsync(async () => await server$$Template());
 
-    if (!response) return;
+    if (error) {
+      logger.error('Failed to initialize PayKit configuration');
+      return;
+    }
 
     logger.spacer();
     logger.success('PayKit configuration initialized successfully!');

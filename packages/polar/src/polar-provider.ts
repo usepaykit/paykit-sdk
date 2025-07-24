@@ -73,7 +73,7 @@ export class PolarProvider implements PayKitProvider {
    * Subscription management
    */
   cancelSubscription = async (id: string): Promise<null> => {
-    const [_, error] = await tryCatchAsync(async () => this.polar.subscriptions.revoke({ id }));
+    const [_, error] = await tryCatchAsync(this.polar.subscriptions.revoke({ id }));
     if (error) throw error;
     return null;
   };

@@ -72,7 +72,7 @@ program
     const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
     const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
-    const [data, error] = await tryCatchAsync(async () => await server$$Template());
+    const [_, error] = await tryCatchAsync(server$$Template());
 
     if (error) {
       logger.error('Failed to initialize PayKit configuration');

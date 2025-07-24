@@ -80,7 +80,7 @@ export class StripeProvider implements PayKitProvider {
    * Subscription management
    */
   cancelSubscription = async (id: string): Promise<null> => {
-    const [_, error] = await tryCatchAsync(async () => this.stripe.subscriptions.cancel(id));
+    const [_, error] = await tryCatchAsync(this.stripe.subscriptions.cancel(id));
     if (error) throw error;
     return null;
   };

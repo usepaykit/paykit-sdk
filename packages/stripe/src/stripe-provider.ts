@@ -13,6 +13,7 @@ import {
   headersExtractor,
   $SchemaPaymentReceived,
   $ExtWebhookHandlerConfig,
+  tryCatchAsync,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
@@ -78,9 +79,10 @@ export class StripeProvider implements PayKitProvider {
   /**
    * Subscription management
    */
-  cancelSubscription = async (id: string): Promise<Subscription> => {
-    const subscription = await this.stripe.subscriptions.cancel(id);
-    return toPaykitSubscription(subscription);
+  cancelSubscription = async (id: string): Promise<null> => {
+    const [_, error] = await tryCatchAsync(async () => this.stripe.subscriptions.cancel(id));
+    if (error) throw error;
+    return null;
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {

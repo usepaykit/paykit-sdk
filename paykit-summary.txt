@@ -1,0 +1,19 @@
+Writing payment code kinda sucks. We pretend it's a solved problem. 'Just use Stripe!' they say. But the moment you do, you're trapped. You've just locked yourself into a system, a set of APIs, and a box.
+
+Emmanuel felt this pain himself. A few months ago, he was traveling in Africa, trying to spin up a new SaaS app for a local market. he know the Stripe API like the back of his hand. But guess what? Stripe doesn't operate there. So he looked at a regional provider, Flutterwave. Great tool, but a completely different API, different webhooks, different everything. his muscle memory was useless.
+
+he wasn't about to spend days learning and implementing a whole new system just for one project. Innovation dies in that kind of complexity. And that's the dirty little secret of payments: vendor lock-in is killing developer creativity.
+
+It's not just about geography. It’s API fragility. One breaking change from your provider, and your weekend is gone. It's webhook hell. You write the same listening and processing logic over and over for each provider. You can't even A/B test different processors without building the entire flow twice. It's a mess.
+
+This is why we built Paykit. What Next-Auth did for authentication, Paykit is doing for billing. One unified SDK to rule them all.
+
+You install our core package, and the provider you want to use. You write your logic once against the Paykit API. Create a customer, set up a checkout, manage a subscription. It’s clean, fully-typed, and minimal. Want to switch from Stripe to a provider like Polar? It's literally one line of code.
+
+But we didn't stop there. Remember that problem in Africa? What if you could bypass the limitations of traditional banking entirely? This is where it gets really exciting. We're building a provider for the Stellar blockchain. With the same familiar Paykit API, you unlock the future of payments.
+
+Imagine your users paying in a global currency like XLM, and you instantly receive a stablecoin like USDC. No card failures. No insane 30-50% fees on micro-transactions. Just fast, cheap, global payments
+
+This is how we onboard the next million developers to Web3. Not by forcing them to learn a new paradigm, but by giving them a superpower inside the tools they already love.
+
+Paykit is the bridge. One SDK for today's payments and tomorrow's economy on Stellar. Let's build it.

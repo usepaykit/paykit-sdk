@@ -9,7 +9,7 @@ export interface PayKitProvider {
    * Checkout sessions
    */
   createCheckout(params: CreateCheckoutParams): Promise<Checkout>;
-  retrieveCheckout(id: string): Promise<Checkout>;
+  retrieveCheckout(id: string): Promise<Checkout | null>;
 
   /**
    * Customer management
@@ -22,8 +22,8 @@ export interface PayKitProvider {
    * Subscription management
    */
   updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription>;
-  cancelSubscription(id: string): Promise<Subscription>;
-  retrieveSubscription(id: string): Promise<Subscription>;
+  cancelSubscription(id: string): Promise<null>;
+  retrieveSubscription(id: string): Promise<Subscription | null>;
 
   /**
    * Webhook management

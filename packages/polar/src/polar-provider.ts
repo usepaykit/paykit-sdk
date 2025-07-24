@@ -12,6 +12,7 @@ import {
   headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
+  tryCatchAsync,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
@@ -71,9 +72,10 @@ export class PolarProvider implements PayKitProvider {
   /**
    * Subscription management
    */
-  cancelSubscription = async (id: string): Promise<Subscription> => {
-    const response = await this.polar.subscriptions.revoke({ id });
-    return toPaykitSubscription(response);
+  cancelSubscription = async (id: string): Promise<null> => {
+    const [_, error] = await tryCatchAsync(async () => this.polar.subscriptions.revoke({ id }));
+    if (error) throw error;
+    return null;
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {

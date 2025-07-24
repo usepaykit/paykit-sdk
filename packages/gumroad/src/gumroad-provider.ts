@@ -59,7 +59,7 @@ export class GumroadProvider implements PayKitProvider {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
-  cancelSubscription = async (id: string): Promise<Subscription> => {
+  cancelSubscription = async (id: string): Promise<null> => {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 

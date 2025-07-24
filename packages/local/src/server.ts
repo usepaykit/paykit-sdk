@@ -1,5 +1,5 @@
 import 'server-only';
-import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, safeParse, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
+import { $ExtWebhookHandlerConfig, Checkout, Customer, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
 import { getKeyValue, updateKey } from './tools';
 
 /**
@@ -20,21 +20,9 @@ export const server$CreateCheckout = async (checkout: Checkout) => {
   return checkout;
 };
 
-export const server$GetCheckout = async (id: string) => {
-  const decode = safeDecode<Checkout>(id);
-
-  if (!decode.ok) throw new ValidationError(decode.error.message, { cause: 'Invalid checkout parameters' });
-
-  return decode.value;
-};
-
 /**
  * Customer
  */
-export const server$GetCustomer = async (id: string) => {
-  const customers = await getKeyValue('customers');
-  return customers?.find(cust => cust.id === id) ?? null;
-};
 
 export const server$CreateCustomer = async (customer: Customer) => {
   await updateKey('customers', [...((await getKeyValue('customers')) || []), customer]);
@@ -56,17 +44,6 @@ export const server$DeleteCustomer = async (id: string) => {
 /**
  * Subscription
  */
-export const server$GetSubscription = async (id: string) => {
-  const subscriptions = await getKeyValue('subscriptions');
-
-  if (!subscriptions) throw new ValidationError('Subscriptions not found', {});
-
-  const subscription = subscriptions.find(sub => sub.id === id);
-
-  if (!subscription) throw new ValidationError('Subscription not found', {});
-
-  return subscription;
-};
 
 export const server$CreateSubscription = async (subscription: Subscription) => {
   await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription]);
@@ -104,15 +81,12 @@ export const server$CreatePayment = async (paymentId: string) => {
 export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig) => {
   const { body } = payload;
 
-  const parsedBody = safeParse(body, JSON.parse, 'Invalid webhook body');
+  const parsedBody = body as unknown as Record<string, any>;
 
-  if (!parsedBody.ok) throw new ValidationError('Invalid webhook body', parsedBody.error);
-
-  const { type, data } = parsedBody.value as { type: string; data: Record<string, any> };
+  const { type, data } = parsedBody as { type: string; data: Record<string, any> };
 
   if (type === 'checkout.created') {
-    const checkout = await server$GetCheckout(data.id);
-    return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: `wk_${data.id}`, data: checkout });
+    return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: `wk_${data.id}`, data: data as Checkout });
   } else if (type == 'customer.created') {
     const customer = data as Customer;
     await server$CreateCustomer(customer);

@@ -2,7 +2,6 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { CheckoutInfo, formatCardNumber } from '@paykit-sdk/local/browser';
 import { Button, Input } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
@@ -11,22 +10,26 @@ import { z } from 'zod';
 const Spinner = () => <div className="animate-rounded size-6" />;
 
 const formSchema = z.object({
-  cardNumber: z.string().min(16, { message: 'Card number must be 16 digits' }).transform(formatCardNumber),
+  cardNumber: z.string().min(16, { message: 'Card number must be 16 digits' }),
 });
 
 type CheckoutFormSchema = z.infer<typeof formSchema>;
+
+interface CheckoutInfo {
+  name: string;
+  price: string;
+  description: string;
+  customerName: string;
+  customerEmail: string;
+}
 
 export const CheckoutCard = ({ name, price, description, customerName, customerEmail }: CheckoutInfo) => {
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
 
   const form = RHF.useForm<CheckoutFormSchema>({ resolver: zodResolver(formSchema) });
 
-  const onSubmit = async (data: CheckoutFormSchema) => {
+  const onSubmit = async () => {
     setIsProcessing(true);
-
-    // Format the card number for display
-    const formattedCardNumber = formatCardNumber(data.cardNumber);
-    console.log('Formatted card number:', formattedCardNumber);
 
     setTimeout(() => {
       setIsProcessing(false);

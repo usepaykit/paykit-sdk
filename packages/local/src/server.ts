@@ -1,6 +1,6 @@
 import 'server-only';
-import { $ExtWebhookHandlerConfig, Checkout, Customer, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
-import { getKeyValue, updateKey } from './tools';
+import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
+import { getKeyValue, PaykitConfig, updateKey } from './tools';
 
 /**
  * Templates
@@ -10,6 +10,18 @@ export const server$$Template = async () => {
   await server$CreateSubscription({} as any);
   await server$CreateCheckout({} as any);
   await server$CreatePayment({} as any);
+};
+
+export const server$UpdateProduct = async (productId: string) => {
+  const decoded = safeDecode<PaykitConfig['product']>(productId);
+
+  if (!decoded.ok) return null;
+
+  const product = decoded.value;
+
+  await updateKey('product', product);
+
+  return product;
 };
 
 /**
@@ -86,6 +98,7 @@ export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig) =>
   const { type, data } = parsedBody as { type: string; data: Record<string, any> };
 
   if (type === 'checkout.created') {
+    server$UpdateProduct(data.product_id);
     return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: Date.now(), id: `wk_${data.id}`, data: data as Checkout });
   } else if (type == 'customer.created') {
     const customer = data as Customer;

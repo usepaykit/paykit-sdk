@@ -9,7 +9,7 @@ import {
   ValidationError,
   WebhookEventPayload,
 } from '@paykit-sdk/core';
-import { getKeyValue, PaykitConfig, updateKey } from './tools';
+import { __defaultPaykitConfig, getKeyValue, PaykitConfig, updateKey } from './tools';
 
 /**
  * Product
@@ -56,7 +56,7 @@ export const server$DeleteCustomer = async (id: string) => {
   if (!customer) throw new ValidationError('Customer not found', { cause: 'Customer not found' });
 
   if (customer.id === id) {
-    await updateKey('customer', { id: '', email: '', name: '', metadata: {} });
+    await updateKey('customer', __defaultPaykitConfig().customer);
   }
 
   return null;

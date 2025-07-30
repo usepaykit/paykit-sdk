@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 import { safeEncode, ValidationError, logger, tryCatchAsync } from '@paykit-sdk/core';
+import { CheckoutInfo } from '@paykit-sdk/local/browser';
 import { __defaultPaykitConfig, writePaykitConfig } from '@paykit-sdk/local/cli';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
@@ -23,7 +24,7 @@ program
     logger.info("Welcome to PayKit! Let's set up your product.");
     logger.spacer();
 
-    const answers = await inquirer.prompt([
+    const answers = await inquirer.prompt<CheckoutInfo>([
       {
         type: 'input',
         name: 'name',

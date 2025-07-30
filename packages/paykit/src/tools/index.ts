@@ -3,4 +3,4 @@ export * from './error';
 export * from './http';
 export * from './webhook';
 export * from './try-catch';
-export * from './browser';
+export * from './is-client';

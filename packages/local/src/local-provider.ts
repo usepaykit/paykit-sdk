@@ -19,6 +19,7 @@ import {
   CustomerUpdated,
   SubscriptionUpdated,
   safeDecode,
+  __IS_CLIENT__,
   SubscriptionCanceled,
 } from '@paykit-sdk/core';
 
@@ -197,10 +198,12 @@ export class LocalProvider implements PayKitProvider {
   }
 
   async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
-    const payload = { headers: '', webhookSecret: '', body: '' };
+    if (__IS_CLIENT__) return null as any;
 
-    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
+    console.log('Handling webhook in server environment');
 
-    return unwrapAsync(this._client.post<WebhookEventPayload>(`?${urlParams.toString()}`));
+    const { server$HandleWebhook } = await import('./server');
+
+    return server$HandleWebhook(_options);
   }
 }

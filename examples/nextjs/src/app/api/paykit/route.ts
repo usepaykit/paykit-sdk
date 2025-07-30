@@ -1,5 +1,4 @@
 import { paykit } from '@/lib/paykit';
-import { withLocalProviderNextPlugin } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -7,6 +6,8 @@ export async function POST(request: NextRequest) {
 
   const headers = Object.fromEntries(request.headers.entries());
   const body = await request.text();
+
+  console.log({ url });
 
   const webhook = paykit.webhooks
     .setup({ webhookSecret: '123' })
@@ -19,9 +20,6 @@ export async function POST(request: NextRequest) {
     });
 
   const result = await webhook.handle({ body, headers });
-
-  // Only add this line for local provider
-  await withLocalProviderNextPlugin({ url, webhook });
 
   return NextResponse.json(result);
 }

@@ -171,7 +171,21 @@ export class LocalProvider implements PayKitProvider {
 
     const customerId = customerId$.value?.['customerId'] as string;
 
-    return { ...params, id, status: 'active', current_period_start: new Date(), current_period_end: new Date(), customer_id: customerId };
+    const subscription = safeDecode<Subscription>(id);
+
+    const startAndEndDates = (() => {
+      let startDate = new Date();
+      let endDate = new Date();
+
+      if (subscription.ok) {
+        startDate = subscription.value?.current_period_start ?? new Date();
+        endDate = subscription.value?.current_period_end ?? new Date();
+      }
+
+      return { current_period_start: startDate, current_period_end: endDate } as const;
+    })();
+
+    return { ...params, id, status: 'active', ...startAndEndDates, customer_id: customerId };
   }
 
   async cancelSubscription(id: string): Promise<null> {
@@ -198,6 +212,7 @@ export class LocalProvider implements PayKitProvider {
   }
 
   async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
+    console.log({ __IS_CLIENT__ });
     if (__IS_CLIENT__) return null as any;
 
     console.log('Handling webhook in server environment');

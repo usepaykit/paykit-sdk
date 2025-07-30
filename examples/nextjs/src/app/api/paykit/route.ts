@@ -1,4 +1,5 @@
 import { paykit } from '@/lib/paykit';
+import { server$HandleWebhook } from '@paykit-sdk/local/server';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -19,7 +20,10 @@ export async function POST(request: NextRequest) {
       console.log(e);
     });
 
-  const result = await webhook.handle({ body, headers });
+  // const result = await webhook.handle({ body, headers });
 
-  return NextResponse.json(result);
+  // only for local provider
+  server$HandleWebhook({ url, webhook });
+
+  return NextResponse.json({ success: true });
 }

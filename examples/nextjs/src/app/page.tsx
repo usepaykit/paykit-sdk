@@ -63,6 +63,7 @@ const UpgradeCard = () => {
       item_id: 'pro_plan',
       session_type: 'recurring',
       metadata: { plan: 'pro', billing: 'monthly' },
+      provider_metadata: { currency: 'NGN', amount: 20000 },
     });
 
     if (error) throw new Error(error.message);

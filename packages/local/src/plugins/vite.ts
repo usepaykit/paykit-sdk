@@ -1,6 +1,5 @@
 import { logger, ValidationError, Webhook } from '@paykit-sdk/core';
 import { server$HandleWebhook } from '../server';
-import { extractParams } from '../utils';
 
 /**
  * Types for creating a basic Vite plugin, extracted from vite 7.0.4
@@ -27,7 +26,7 @@ export interface WithLocalProviderVitePluginOptions {
 }
 
 export const withLocalProviderVitePlugin = (options: WithLocalProviderVitePluginOptions): Plugin => {
-  const { prefix = '/api/paykit', webhook: _ } = options;
+  const { prefix = '/api/paykit', webhook } = options;
 
   return {
     name: 'paykit-local-provider-vite',
@@ -45,7 +44,7 @@ export const withLocalProviderVitePlugin = (options: WithLocalProviderVitePlugin
             return;
           }
 
-          await handleWebhook(req, res);
+          await handleWebhook(req, res, webhook);
         } catch (error) {
           logger.error(`[PayKit] Error: ${error instanceof Error ? error.message : 'Unknown error'}`);
 
@@ -62,11 +61,9 @@ export const withLocalProviderVitePlugin = (options: WithLocalProviderVitePlugin
   };
 };
 
-async function handleWebhook(req: any, res: any) {
+async function handleWebhook(req: any, res: any, webhook: Webhook) {
   try {
-    const body = extractParams(new URL(req.url));
-
-    const result = await server$HandleWebhook({ body, headers: {}, webhookSecret: '' });
+    const result = await server$HandleWebhook({ url: req.url, webhook });
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(result));

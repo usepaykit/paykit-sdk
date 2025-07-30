@@ -614,6 +614,24 @@
       "amount": "NaN",
       "id": "eyJyZXNvdXJjZSI6ImNoZWNrb3V0IiwiY3VzdG9tZXJfaWQiOiJkZW1vX2N1c3RvbWVyIiwibWV0YWRhdGEiOiIkdHtcInBsYW5cIjpcInByb1wiLFwiYmlsbGluZ1wiOlwibW9udGhseVwifSIsInNlc3Npb25fdHlwZSI6InJlY3VycmluZyIsInByb2R1Y3RzIjoiJHRbe1wiaWRcIjpcInByb19wbGFuXCIsXCJxdWFudGl0eVwiOjF9XSIsImN1cnJlbmN5IjoiVVNEIiwiYW1vdW50IjpudWxsfQ==",
       "payment_url": "http://localhost:3001/checkout?id=eyJyZXNvdXJjZSI6ImNoZWNrb3V0IiwiY3VzdG9tZXJfaWQiOiJkZW1vX2N1c3RvbWVyIiwibWV0YWRhdGEiOiIkdHtcInBsYW5cIjpcInByb1wiLFwiYmlsbGluZ1wiOlwibW9udGhseVwifSIsInNlc3Npb25fdHlwZSI6InJlY3VycmluZyIsInByb2R1Y3RzIjoiJHRbe1wiaWRcIjpcInByb19wbGFuXCIsXCJxdWFudGl0eVwiOjF9XSIsImN1cnJlbmN5IjoiVVNEIiwiYW1vdW50IjpudWxsfQ=="
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ],
+      "currency": "NGN",
+      "amount": "20000",
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9",
+      "payment_url": "http://localhost:3001/checkout?id=eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9"
     }
   ],
   "payments": []

@@ -22,6 +22,7 @@ import {
   __IS_CLIENT__,
   SubscriptionCanceled,
 } from '@paykit-sdk/core';
+import { PaykitConfig } from './tools';
 
 export interface LocalConfig extends PaykitProviderOptions {
   apiUrl: string;
@@ -36,13 +37,23 @@ export class LocalProvider implements PayKitProvider {
   }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+    const amount = (() => {
+      const product = safeDecode<PaykitConfig['product']>(params.item_id);
+
+      if (product.ok && product.value['price']) return product.value['price'];
+
+      if (params.provider_metadata?.['amount']) return parseInt(params.provider_metadata?.['amount'] as string, 10);
+
+      return 25;
+    })();
+
     const checkoutWithoutIdAndPaymentUrl = {
       customer_id: params.customer_id,
       metadata: params.metadata,
       session_type: params.session_type,
       products: [{ id: params.item_id, quantity: 1 }],
       currency: (params.provider_metadata?.['currency'] as string) ?? 'USD',
-      amount: parseInt(params.provider_metadata?.['amount'] as string, 10) ?? 25,
+      amount,
     } as Omit<Checkout, 'id' | 'payment_url'>;
 
     const checkoutId = safeEncode(checkoutWithoutIdAndPaymentUrl);
@@ -212,13 +223,6 @@ export class LocalProvider implements PayKitProvider {
   }
 
   async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
-    console.log({ __IS_CLIENT__ });
-    if (__IS_CLIENT__) return null as any;
-
-    console.log('Handling webhook in server environment');
-
-    const { server$HandleWebhook } = await import('./server');
-
-    return server$HandleWebhook(_options);
+    throw new Error('handleWebhook must be called through the server export. Use: import { handleWebhook } from "@paykit-sdk/local/server"');
   }
 }

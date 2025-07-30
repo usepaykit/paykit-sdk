@@ -17,7 +17,6 @@ export const formatCardNumber = (value: string) =>
  */
 export const extractParams = (url: URL) => {
   const params = {} as any;
-
   const jsonPrefix = '$json';
 
   for (const [key, value] of url.searchParams.entries()) {
@@ -31,4 +30,24 @@ export const extractParams = (url: URL) => {
   }
 
   return params;
+};
+
+/**
+ * Parse values that start with `$json` prefix as JSON from an object
+ */
+export const parseJsonValues = (obj: Record<string, any>) => {
+  const result = {} as Record<string, any>;
+  const jsonPrefix = '$json';
+
+  for (const [key, value] of Object.entries(obj)) {
+    if (typeof value === 'string' && value.startsWith(jsonPrefix)) {
+      const [data, error] = tryCatchSync(() => JSON.parse(value.slice(jsonPrefix.length)));
+      if (error) result[key] = value;
+      else result[key] = data;
+    } else {
+      result[key] = value;
+    }
+  }
+
+  return result;
 };

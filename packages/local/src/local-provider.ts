@@ -36,7 +36,6 @@ export class LocalProvider implements PayKitProvider {
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const checkoutWithoutIdAndPaymentUrl = {
-      resource: 'checkout',
       customer_id: params.customer_id,
       metadata: params.metadata,
       session_type: params.session_type,
@@ -55,9 +54,9 @@ export class LocalProvider implements PayKitProvider {
         ...checkoutWithoutIdAndPaymentUrl,
         id: checkoutId.value,
         amount: checkoutWithoutIdAndPaymentUrl.amount.toString(),
-        metadata: `$t${JSON.stringify(checkoutWithoutIdAndPaymentUrl.metadata)}`,
+        metadata: `$json${JSON.stringify(checkoutWithoutIdAndPaymentUrl.metadata)}`,
         payment_url: `${this.config.paymentUrl}/checkout?id=${checkoutId.value}`,
-        products: `$t${JSON.stringify(checkoutWithoutIdAndPaymentUrl.products)}`,
+        products: `$json${JSON.stringify(checkoutWithoutIdAndPaymentUrl.products)}`,
       },
     };
 
@@ -96,7 +95,7 @@ export class LocalProvider implements PayKitProvider {
 
     const payload = {
       type: 'customer.created',
-      data: { ...customerWithoutId, id: customerId.value, metadata: `$t${JSON.stringify(customerWithoutId.metadata)}` },
+      data: { ...customerWithoutId, id: customerId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
     };
 
     const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
@@ -127,10 +126,10 @@ export class LocalProvider implements PayKitProvider {
 
     const payload = {
       type: 'customer.updated',
-      data: { ...customerWithoutId, id: retUpdateId.value, metadata: `$t${JSON.stringify(customerWithoutId.metadata)}` },
+      data: { ...customerWithoutId, id: retUpdateId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
     };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
 
     /**
      * Send Webhook
@@ -155,10 +154,10 @@ export class LocalProvider implements PayKitProvider {
   async updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription> {
     const payload = {
       type: 'subscription.updated',
-      data: { id, metadata: `$t${JSON.stringify(params.metadata)}` },
+      data: { id, metadata: `$json${JSON.stringify(params.metadata)}` },
     };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
 
     /**
      * Send Webhook
@@ -177,7 +176,7 @@ export class LocalProvider implements PayKitProvider {
   async cancelSubscription(id: string): Promise<null> {
     const payload = { type: 'subscription.canceled', data: { id } };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
 
     /**
      * Send Webhook
@@ -197,10 +196,10 @@ export class LocalProvider implements PayKitProvider {
     return subscription;
   }
 
-  async handleWebhook(options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
+  async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
     const payload = { headers: '', webhookSecret: '', body: '' };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
 
     return unwrapAsync(this._client.post<WebhookEventPayload>(`?${urlParams.toString()}`));
   }

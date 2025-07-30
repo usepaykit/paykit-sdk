@@ -1,17 +1,19 @@
 import 'server-only';
-import { $ExtWebhookHandlerConfig, Checkout, Customer, safeDecode, Subscription, toPaykitEvent, ValidationError } from '@paykit-sdk/core';
+import {
+  $ExtWebhookHandlerConfig,
+  Checkout,
+  Customer,
+  safeDecode,
+  Subscription,
+  toPaykitEvent,
+  ValidationError,
+  WebhookEventPayload,
+} from '@paykit-sdk/core';
 import { getKeyValue, PaykitConfig, updateKey } from './tools';
 
 /**
- * Templates
+ * Product
  */
-export const server$$Template = async () => {
-  await server$CreateCustomer({} as any);
-  await server$CreateSubscription({} as any);
-  await server$CreateCheckout({} as any);
-  await server$CreatePayment({} as any);
-};
-
 export const server$UpdateProduct = async (productId: string) => {
   const decoded = safeDecode<PaykitConfig['product']>(productId);
 
@@ -37,19 +39,26 @@ export const server$CreateCheckout = async (checkout: Checkout) => {
  */
 
 export const server$CreateCustomer = async (customer: Customer) => {
-  await updateKey('customers', [...((await getKeyValue('customers')) || []), customer]);
+  await updateKey('customer', customer);
+
   return customer;
 };
 
 export const server$PutCustomer = async (customer: Customer) => {
   await updateKey('customer', customer);
+
   return customer;
 };
 
 export const server$DeleteCustomer = async (id: string) => {
-  const customers = await getKeyValue('customers');
-  const filteredCustomers = customers?.filter(cust => cust.id !== id) || [];
-  await updateKey('customers', filteredCustomers);
+  const customer = await getKeyValue('customer');
+
+  if (!customer) throw new ValidationError('Customer not found', { cause: 'Customer not found' });
+
+  if (customer.id === id) {
+    await updateKey('customer', { id: '', email: '', name: '', metadata: {} });
+  }
+
   return null;
 };
 
@@ -59,6 +68,7 @@ export const server$DeleteCustomer = async (id: string) => {
 
 export const server$CreateSubscription = async (subscription: Subscription) => {
   await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription]);
+
   return subscription;
 };
 
@@ -90,8 +100,10 @@ export const server$CreatePayment = async (paymentId: string) => {
 /**
  * Webhook
  */
-export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig) => {
+export const server$HandleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
   const { body } = payload;
+
+  console.dir(body, { depth: 100 });
 
   const parsedBody = body as unknown as Record<string, any>;
 

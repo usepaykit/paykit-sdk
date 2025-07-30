@@ -12,12 +12,7 @@ export interface PaykitConfig {
   /**
    * Customer info
    */
-  customer: Partial<Customer>;
-
-  /**
-   * Customers array for multiple customer support
-   */
-  customers: Array<Customer>;
+  customer: Customer;
 
   /**
    * Subscriptions
@@ -98,6 +93,18 @@ export const writePaykitConfig = async (config: PaykitConfig): Promise<boolean> 
   }
 };
 
+export const __defaultPaykitConfig = (dto: Partial<PaykitConfig> | null = null) => {
+  const defaultConfig: PaykitConfig = {
+    product: { name: '', description: '', price: '', itemId: '' },
+    customer: { id: '', email: '', name: '', metadata: {} },
+    subscriptions: [],
+    checkouts: [],
+    payments: [],
+  };
+
+  return dto ? { ...defaultConfig, ...dto } : defaultConfig;
+};
+
 /**
  * Updates a key in the .paykit/config.json file
  */
@@ -105,17 +112,7 @@ export const updateKey = async <T extends keyof PaykitConfig>(key: T, value: Pay
   try {
     let config = await readPaykitConfig();
 
-    if (!config) {
-      // Create a default config if it doesn't exist
-      config = {
-        product: { name: '', description: '', price: '', itemId: '' },
-        customer: {},
-        customers: [],
-        subscriptions: [],
-        checkouts: [],
-        payments: [],
-      };
-    }
+    if (!config) config = __defaultPaykitConfig();
 
     config[key] = value;
 

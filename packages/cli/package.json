@@ -8,12 +8,12 @@
     "paykit": "dist/index.js"
   },
   "scripts": {
-    "build": "npm run build:cli && npm run build:dev-app && npm run copy-assets",
+    "build": "rm -rf dist && npm run build:cli && npm run app:build && npm run copy-assets",
     "build:cli": "tsup core/src/index.ts --format esm --out-dir dist",
-    "build:dev-app": "cd dev-app && npm run build",
+    "app:build": "cd dev-app && npm run build",
     "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && rm -rf dist/dev-app/.next/cache && npm run create-prod-package",
     "create-prod-package": "node scripts/create-prod-package.js",
-    "dev": "npm run build && node dist/index.js",
+    "cli:dev": "npm run build:cli && node dist/index.js",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "files": [

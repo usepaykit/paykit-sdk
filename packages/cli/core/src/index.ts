@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { safeEncode, ValidationError, logger, tryCatchSync, tryCatchAsync } from '@paykit-sdk/core';
-import { server$$Template } from '@paykit-sdk/local';
+import { safeEncode, ValidationError, logger, tryCatchAsync } from '@paykit-sdk/core';
+import { __defaultPaykitConfig, writePaykitConfig } from '@paykit-sdk/local/cli';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
 import { existsSync } from 'fs';
@@ -62,19 +62,26 @@ program
     logger.progress('Validating product info');
 
     const itemId = safeEncode(answers);
-    const customerId = safeEncode<string>(answers.customerEmail);
+
+    const customerWithoutId = { email: answers.customerEmail, name: answers.customerName, metadata: {} };
+
+    const customerId = safeEncode<string>(JSON.stringify(customerWithoutId));
 
     logger.clearProgress();
 
     if (!customerId.ok) throw new ValidationError('Invalid customer email', customerId.error);
+
     if (!itemId.ok) throw new ValidationError('Invalid product info', itemId.error);
 
     const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
-    const customer = { id: customerId.value, name: answers.customerName, email: answers.customerEmail, metadata: {} };
 
-    const [_, error] = await tryCatchAsync(server$$Template());
+    const customer = { id: customerId.value, ...customerWithoutId };
 
-    if (error) {
+    const config = __defaultPaykitConfig({ product, customer });
+
+    const [result, error] = await tryCatchAsync(writePaykitConfig(config));
+
+    if (error || !result) {
       logger.error('Failed to initialize PayKit configuration');
       return;
     }

@@ -1,5 +1,5 @@
 {
-  "name": "nextjs",
+  "name": "@paykit-sdk/examples/acme-taskboard-nextjs",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,15 +10,13 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.1.1",
-    "@tanstack/react-query": "^5.83.0",
-    "clsx": "^2.1.1",
+    "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "15.3.5",
     "next-themes": "^0.4.6",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
+    "react": "^19",
+    "react-dom": "^19",
     "react-hook-form": "^7.59.0",
-    "tailwind-merge": "^3.3.1",
     "zod": "^3.25.67"
   },
   "devDependencies": {
@@ -28,13 +26,14 @@
     "@paykit-sdk/local": "workspace:*",
     "@paykit-sdk/react": "workspace:*",
     "@paykit-sdk/ui": "workspace:*",
-    "@tailwindcss/postcss": "^4",
-    "@types/node": "^20",
+    "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "15.3.5",
+    "postcss": "^8.5",
     "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4",
     "typescript": "^5"
   }
 }

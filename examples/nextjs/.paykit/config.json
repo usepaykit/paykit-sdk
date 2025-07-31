@@ -1,54 +1,17 @@
 {
   "product": {
-    "name": "",
-    "description": "",
-    "price": "",
-    "itemId": ""
+    "name": "Paykit Cloud Lifetime",
+    "description": "Get lifetime access to paykit cloud",
+    "price": "$149",
+    "itemId": "eyJuYW1lIjoiUGF5a2l0IENsb3VkIExpZmV0aW1lIiwiZGVzY3JpcHRpb24iOiJHZXQgbGlmZXRpbWUgYWNjZXNzIHRvIHBheWtpdCBjbG91ZCIsInByaWNlIjoiJDE0OSIsImN1c3RvbWVyTmFtZSI6IkVtbWFudWVsIG9kaWkiLCJjdXN0b21lckVtYWlsIjoiZW1tYW51ZWxvZGlpODBAZ21haWwuY29tIn0="
   },
   "customer": {
-    "id": "",
-    "email": "",
-    "name": "",
+    "id": "IntcImVtYWlsXCI6XCJlbW1hbnVlbG9kaWk4MEBnbWFpbC5jb21cIixcIm5hbWVcIjpcIkVtbWFudWVsIG9kaWlcIixcIm1ldGFkYXRhXCI6e319Ig==",
+    "email": "emmanuelodii80@gmail.com",
+    "name": "Emmanuel odii",
     "metadata": {}
   },
   "subscriptions": [],
-  "checkouts": [
-    {
-      "customer_id": "demo_customer",
-      "metadata": {
-        "plan": "pro",
-        "billing": "monthly"
-      },
-      "session_type": "recurring",
-      "products": [
-        {
-          "id": "pro_plan",
-          "quantity": 1
-        }
-      ],
-      "currency": "NGN",
-      "amount": "20000",
-      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9",
-      "payment_url": "http://localhost:3001/checkout?id=eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9"
-    },
-    {
-      "customer_id": "demo_customer",
-      "metadata": {
-        "plan": "pro",
-        "billing": "monthly"
-      },
-      "session_type": "recurring",
-      "products": [
-        {
-          "id": "pro_plan",
-          "quantity": 1
-        }
-      ],
-      "currency": "NGN",
-      "amount": "20000",
-      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9",
-      "payment_url": "http://localhost:3001/checkout?id=eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9"
-    }
-  ],
+  "checkouts": [],
   "payments": []
 }

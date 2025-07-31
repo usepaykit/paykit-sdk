@@ -12,7 +12,7 @@
     "@hookform/resolvers": "^5.1.1",
     "@paykit-sdk/core": "1.1.0",
     "@paykit-sdk/local": "1.1.0",
-    "@paykit-sdk/ui": "0.1.1",
+    "@paykit-sdk/ui": "0.1.2",
     "@tailwindcss/postcss": "^4.1.11",
     "lucide-react": "^0.525.0",
     "next": "^15.3.5",

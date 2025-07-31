@@ -1,18 +1,29 @@
 'use client';
 
 import * as React from 'react';
-import { Button } from '@paykit-sdk/ui';
+import { Switch } from '@paykit-sdk/ui';
 import { Moon, Sun } from 'lucide-react';
 import { useTheme } from 'next-themes';
+import { useMounted } from '../hooks/use-mounted';
 
-export function ThemeToggle() {
+export const ThemeToggle = () => {
   const { theme, setTheme } = useTheme();
+  const mounted = useMounted();
+
+  if (!mounted) return null;
+
+  const isDark = theme === 'dark';
+
+  const handleToggle = (checked: boolean) => {
+    setTheme(checked ? 'dark' : 'light');
+  };
 
   return (
-    <Button variant="outline" size="icon" onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')} className="border-2">
-      <Sun className="h-[1.2rem] w-[1.2rem] scale-100 rotate-0 transition-all dark:scale-0 dark:-rotate-90" />
-      <Moon className="absolute h-[1.2rem] w-[1.2rem] scale-0 rotate-90 transition-all dark:scale-100 dark:rotate-0" />
+    <div className="flex items-center space-x-2">
+      <Sun className="h-4 w-4" />
+      <Switch checked={isDark} onCheckedChange={handleToggle} />
+      <Moon className="h-4 w-4" />
       <span className="sr-only">Toggle theme</span>
-    </Button>
+    </div>
   );
-}
+};

@@ -89,7 +89,7 @@ program
 
     logger.spacer();
     logger.success('PayKit configuration initialized successfully!');
-    logger.tip('Run `paykit dev` to start the development server');
+    logger.tip('Run `npx @paykit-sdk/cli dev` to start the development server');
   });
 
 /**

@@ -25,7 +25,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    cancel.run({});
+    cancel.run(subscription.id);
 
     setLoading(false);
   };

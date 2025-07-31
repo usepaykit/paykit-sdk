@@ -72,7 +72,7 @@ export class LocalProvider implements PayKitProvider {
       },
     };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams(JSON.stringify(payload));
 
     /**
      * Send webhook
@@ -141,7 +141,7 @@ export class LocalProvider implements PayKitProvider {
       data: { ...customerWithoutId, id: retUpdateId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
     };
 
-    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams(JSON.stringify(payload));
 
     /**
      * Send Webhook
@@ -169,7 +169,7 @@ export class LocalProvider implements PayKitProvider {
       data: { id, metadata: `$json${JSON.stringify(params.metadata)}` },
     };
 
-    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams(JSON.stringify(payload));
 
     /**
      * Send Webhook
@@ -202,7 +202,7 @@ export class LocalProvider implements PayKitProvider {
   async cancelSubscription(id: string): Promise<null> {
     const payload = { type: 'subscription.canceled', data: { id } };
 
-    const urlParams = new URLSearchParams({ body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams(JSON.stringify(payload));
 
     /**
      * Send Webhook

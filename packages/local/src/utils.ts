@@ -12,27 +12,6 @@ export const formatCardNumber = (value: string) =>
     .replace(/(\d{4})(?=\d)/g, '$1 ');
 
 /**
- * Convert all query parameters to params object
- * Parse values that start with `$json` prefix as JSON
- */
-export const extractParams = (url: URL) => {
-  const params = {} as any;
-  const jsonPrefix = '$json';
-
-  for (const [key, value] of url.searchParams.entries()) {
-    if (value.startsWith(jsonPrefix)) {
-      const [data, error] = tryCatchSync(() => JSON.parse(value.slice(jsonPrefix.length)));
-      if (error) params[key] = value;
-      else params[key] = data;
-    } else {
-      params[key] = value;
-    }
-  }
-
-  return params;
-};
-
-/**
  * Parse values that start with `$json` prefix as JSON from an object
  */
 export const parseJsonValues = (obj: Record<string, any>) => {

@@ -1,7 +1,7 @@
 import 'server-only';
 import { Checkout, Customer, Subscription, toPaykitEvent, ValidationError, Webhook, WebhookEventPayload } from '@paykit-sdk/core';
 import { __defaultPaykitConfig, getKeyValue, updateKey } from './tools';
-import { extractParams, parseJsonValues } from './utils';
+import { parseJsonValues } from './utils';
 
 /**
  * Checkout
@@ -80,15 +80,19 @@ const server$CreatePayment = async (paymentId: string) => {
 export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook }): Promise<WebhookEventPayload> => {
   const { url, webhook: _ } = dto;
 
-  const body = extractParams(new URL(url));
+  const urlParams = new URL(url).searchParams.toString();
 
-  const parsedBody = body as unknown as Record<string, any>;
+  if (!urlParams) throw new ValidationError('Invalid webhook URL', { cause: 'Invalid webhook URL' });
 
-  const { body: bodyString } = parsedBody as { body: string };
+  const decodedData = decodeURIComponent(urlParams);
 
-  const { type, data } = JSON.parse(bodyString) as { type: string; data: Record<string, any> };
+  const webhookData = JSON.parse(decodedData) as { type: string; data: Record<string, any> };
+
+  const { type, data } = webhookData;
 
   const parsedData = parseJsonValues(data);
+
+  console.log({ parsedData });
 
   if (type === 'checkout.created') {
     await server$CreateCheckout(parsedData as Checkout);

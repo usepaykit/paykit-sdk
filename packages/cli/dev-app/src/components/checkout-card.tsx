@@ -2,10 +2,13 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Button, Input } from '@paykit-sdk/ui';
+import { safeEncode, type Checkout } from '@paykit-sdk/core';
+import { Button, Input, Toast } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
 import { z } from 'zod';
+
+const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 const Spinner = () => <div className="animate-rounded size-6" />;
 
@@ -15,26 +18,50 @@ const formSchema = z.object({
 
 type CheckoutFormSchema = z.infer<typeof formSchema>;
 
-interface CheckoutInfo {
-  name: string;
-  price: string;
-  description: string;
-  customerName: string;
-  customerEmail: string;
-}
+export const CheckoutCard = ({ amount, metadata, id, session_type, ...rest }: Checkout) => {
+  const customerName = metadata?.customerName;
+  const customerEmail = metadata?.customerEmail;
+  const webhookUrl = metadata?.webhookUrl;
+  const productName = metadata?.productName;
 
-export const CheckoutCard = ({ name, price, description, customerName, customerEmail }: CheckoutInfo) => {
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
 
   const form = RHF.useForm<CheckoutFormSchema>({ resolver: zodResolver(formSchema) });
 
   const onSubmit = async () => {
-    setIsProcessing(true);
+    try {
+      setIsProcessing(true);
 
-    setTimeout(() => {
+      if (!webhookUrl) throw new Error('API URL is not set in local provider initialization');
+
+      const paymentId = safeEncode({ ...rest, amount, metadata, session_type, completed_at: new Date().toISOString(), source: 'cli-app' });
+
+      if (!paymentId.ok) throw new Error('Failed to generate payment ID');
+
+      const paymentSuccess = await fetch(webhookUrl, {
+        method: 'POST',
+        body: JSON.stringify({ type: 'payment.succeeded', data: { id: paymentId.value } }),
+      });
+
+      if (!paymentSuccess.ok) throw new Error('Failed to process payment');
+
+      if (session_type === 'recurring') {
+        await delay(2000);
+
+        const subscriptionCreated = await fetch(webhookUrl, {
+          method: 'POST',
+          body: JSON.stringify({ type: 'subscription.created', data: { id } }),
+        });
+
+        if (!subscriptionCreated.ok) throw new Error('Failed to create subscription');
+      }
+
+      Toast.success({ title: 'Success', description: 'Payment processed successfully 🎉' });
+    } catch (error) {
+      Toast.error({ title: 'Error', description: error instanceof Error ? error.message : 'An unknown error occurred' });
+    } finally {
       setIsProcessing(false);
-      alert('Payment processed successfully with PayKit Local Provider! 🎉');
-    }, 2000);
+    }
   };
 
   return (
@@ -100,7 +127,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                   ) : (
                     <div className="flex items-center justify-center">
                       <Lock className="mr-2 h-4 w-4" />
-                      <span className="ml-2">Complete Payment - {price}</span>
+                      <span className="ml-2">Complete Payment - {amount}</span>
                     </div>
                   )}
                 </Button>
@@ -115,10 +142,9 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 </div>
                 <div className="space-y-2">
                   <div className="flex items-center justify-between py-2 text-sm">
-                    <span className="font-medium">{name}</span>
-                    <span className="font-medium">{price}</span>
+                    <span className="font-medium">{productName}</span>
+                    <span className="font-medium">{amount}</span>
                   </div>
-                  {description && <div className="text-muted-foreground py-1 text-xs">{description}</div>}
                 </div>
                 <div className="flex items-center justify-between py-2 text-sm">
                   <span>Local provider fee</span>
@@ -127,7 +153,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                 <div className="my-4 border-t"></div>
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>{price}</span>
+                  <span>{amount}</span>
                 </div>
               </div>
               <div className="pt-6">
@@ -140,7 +166,7 @@ export const CheckoutCard = ({ name, price, description, customerName, customerE
                   ) : (
                     <>
                       <CreditCard className="mr-2 h-4 w-4" />
-                      Complete Payment - {price}
+                      Complete Payment - {amount}
                     </>
                   )}
                 </Button>

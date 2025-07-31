@@ -1,9 +1,9 @@
 {
-  "name": "@paykit-sdk/cli/core",
-  "version": "1.1.0-alpha-2",
+  "name": "paykit",
+  "version": "0.0.1",
   "main": "dist/index.js",
   "bin": {
-    "cli": "dist/index.js"
+    "dev": "dist/index.js"
   },
   "scripts": {
     "build": "tsc --project tsconfig.json",

@@ -19,7 +19,6 @@ import {
   CustomerUpdated,
   SubscriptionUpdated,
   safeDecode,
-  __IS_CLIENT__,
   SubscriptionCanceled,
 } from '@paykit-sdk/core';
 import { PaykitConfig } from './tools';
@@ -47,9 +46,22 @@ export class LocalProvider implements PayKitProvider {
       return 25;
     })();
 
+    const customer = safeDecode<Customer>(params.customer_id);
+
+    if (!customer.ok) throw new ValidationError('Invalid customer ID', {});
+
+    const product = safeDecode<PaykitConfig['product']>(params.item_id);
+
+    if (!product.ok) throw new ValidationError('Invalid product ID', {});
+
+    const productName = product.value?.name;
+
+    const customerName = customer.value?.name;
+    const customerEmail = customer.value?.email;
+
     const checkoutWithoutIdAndPaymentUrl = {
       customer_id: params.customer_id,
-      metadata: params.metadata,
+      metadata: { ...params.metadata, customerName, customerEmail, webhookUrl: this.config.apiUrl, productName },
       session_type: params.session_type,
       products: [{ id: params.item_id, quantity: 1 }],
       currency: (params.provider_metadata?.['currency'] as string) ?? 'USD',
@@ -110,7 +122,7 @@ export class LocalProvider implements PayKitProvider {
       data: { ...customerWithoutId, id: customerId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
     };
 
-    const urlParams = new URLSearchParams({ resource: 'webhook', body: JSON.stringify(payload) });
+    const urlParams = new URLSearchParams(JSON.stringify(payload));
 
     /**
      * Send Webhook

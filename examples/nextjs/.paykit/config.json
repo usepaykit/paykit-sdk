@@ -1,0 +1,54 @@
+{
+  "product": {
+    "name": "",
+    "description": "",
+    "price": "",
+    "itemId": ""
+  },
+  "customer": {
+    "id": "",
+    "email": "",
+    "name": "",
+    "metadata": {}
+  },
+  "subscriptions": [],
+  "checkouts": [
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ],
+      "currency": "NGN",
+      "amount": "20000",
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9",
+      "payment_url": "http://localhost:3001/checkout?id=eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9"
+    },
+    {
+      "customer_id": "demo_customer",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "pro_plan",
+          "quantity": 1
+        }
+      ],
+      "currency": "NGN",
+      "amount": "20000",
+      "id": "eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9",
+      "payment_url": "http://localhost:3001/checkout?id=eyJjdXN0b21lcl9pZCI6ImRlbW9fY3VzdG9tZXIiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoicHJvX3BsYW4iLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6Ik5HTiIsImFtb3VudCI6MjAwMDB9"
+    }
+  ],
+  "payments": []
+}

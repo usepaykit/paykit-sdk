@@ -35,7 +35,7 @@ export default function IndexPage() {
           </div>
           <div className="flex items-center justify-center gap-4">
             <Button size="lg" variant="outline" asChild>
-              <Link href="https://paykit-web.vercel.app/docs" target="_blank" rel="noopener noreferrer">
+              <Link href="https://usepaykit.dev/docs" target="_blank" rel="noopener noreferrer">
                 <BookOpen className="mr-2 h-4 w-4" />
                 View Documentation
                 <ExternalLink className="ml-2 h-4 w-4" />
@@ -64,7 +64,7 @@ export default function IndexPage() {
                 </div>
                 <p className="text-muted-foreground text-sm">Learn how to create your first checkout session using PayKit&apos;s React hooks.</p>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="https://paykit.dev/docs/getting-started" target="_blank" rel="noopener noreferrer">
+                  <Link href="https://usepaykit.dev/docs/getting-started" target="_blank" rel="noopener noreferrer">
                     View Tutorial
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -82,7 +82,7 @@ export default function IndexPage() {
                 </div>
                 <p className="text-muted-foreground text-sm">Check out our comprehensive examples for Next.js, React, and Node.js applications.</p>
                 <Button variant="outline" size="sm" asChild>
-                  <Link href="https://paykit-web.vercel.app/docs/examples" target="_blank" rel="noopener noreferrer">
+                  <Link href="https://usepaykit.dev/docs/examples" target="_blank" rel="noopener noreferrer">
                     Browse Examples
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

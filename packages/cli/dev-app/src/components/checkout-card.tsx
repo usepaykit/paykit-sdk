@@ -23,7 +23,7 @@ interface CheckoutCardProps extends Checkout {
   referer?: string | null;
 }
 
-export const CheckoutCard = ({ amount, metadata, id, session_type, provider_metadata, referer, ...rest }: CheckoutCardProps) => {
+export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata, referer, ...rest }: CheckoutCardProps) => {
   const customerName = provider_metadata?.customerName;
   const customerEmail = provider_metadata?.customerEmail;
   const webhookUrl = provider_metadata?.webhookUrl;
@@ -41,7 +41,7 @@ export const CheckoutCard = ({ amount, metadata, id, session_type, provider_meta
 
       if (!webhookUrl) throw new Error('API URL is not set in local provider initialization');
 
-      const makeWebhookUrl = (dto: { type: string; data: Record<string, any> }) => {
+      const makeWebhookUrl = (dto: { type: string; data: Record<string, unknown> }) => {
         const url = new URL(webhookUrl);
         const urlParams = new URLSearchParams(JSON.stringify(dto));
         return `${url.toString()}?${urlParams.toString()}`;
@@ -91,8 +91,6 @@ export const CheckoutCard = ({ amount, metadata, id, session_type, provider_meta
       }
 
       Toast.success({ title: 'Success', description: 'Payment processed successfully 🎉' });
-
-      console.log({ referer });
 
       if (referer) setTimeout(() => (window.location.href = `${referer}?success=true`), 2000);
     } catch (error) {

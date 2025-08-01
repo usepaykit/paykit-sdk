@@ -1,11 +1,10 @@
 'use client';
 
-import type { SubscriptionStatus } from '@/interface';
 import { Card, Badge, Progress } from '@paykit-sdk/ui';
 import { Zap, CheckSquare, TrendingUp } from 'lucide-react';
 
 interface UsageStatsProps {
-  status: SubscriptionStatus;
+  status: { tier: string; usage: number; limit: number; tasksUsed: number; tasksLimit: number };
 }
 
 export function UsageStats({ status }: UsageStatsProps) {

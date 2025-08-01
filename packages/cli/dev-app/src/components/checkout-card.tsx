@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { safeEncode, type Checkout } from '@paykit-sdk/core';
+import { PaykitMetadata, safeEncode, Subscription, type Checkout } from '@paykit-sdk/core';
 import { Button, Input, Toast } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import * as RHF from 'react-hook-form';
@@ -18,11 +18,18 @@ const formSchema = z.object({
 
 type CheckoutFormSchema = z.infer<typeof formSchema>;
 
-export const CheckoutCard = ({ amount, metadata, id, session_type, ...rest }: Checkout) => {
-  const customerName = metadata?.customerName;
-  const customerEmail = metadata?.customerEmail;
-  const webhookUrl = metadata?.webhookUrl;
-  const productName = metadata?.productName;
+interface CheckoutCardProps extends Checkout {
+  provider_metadata: PaykitMetadata;
+  referer?: string | null;
+}
+
+export const CheckoutCard = ({ amount, metadata, id, session_type, provider_metadata, referer, ...rest }: CheckoutCardProps) => {
+  const customerName = provider_metadata?.customerName;
+  const customerEmail = provider_metadata?.customerEmail;
+  const webhookUrl = provider_metadata?.webhookUrl;
+  const productName = provider_metadata?.productName;
+
+  console.log({ provider_metadata });
 
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
 
@@ -34,13 +41,22 @@ export const CheckoutCard = ({ amount, metadata, id, session_type, ...rest }: Ch
 
       if (!webhookUrl) throw new Error('API URL is not set in local provider initialization');
 
+      const makeWebhookUrl = (dto: { type: string; data: Record<string, any> }) => {
+        const url = new URL(webhookUrl);
+        const urlParams = new URLSearchParams(JSON.stringify(dto));
+        return `${url.toString()}?${urlParams.toString()}`;
+      };
+
+      console.log('Webhook URL:', webhookUrl);
+
       const paymentId = safeEncode({ ...rest, amount, metadata, session_type, completed_at: new Date().toISOString(), source: 'cli-app' });
 
       if (!paymentId.ok) throw new Error('Failed to generate payment ID');
 
-      const paymentSuccess = await fetch(webhookUrl, {
+      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$paymentReceived', data: { id: paymentId.value } }), {
         method: 'POST',
-        body: JSON.stringify({ type: 'payment.succeeded', data: { id: paymentId.value } }),
+        mode: 'cors',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
 
       if (!paymentSuccess.ok) throw new Error('Failed to process payment');
@@ -48,15 +64,37 @@ export const CheckoutCard = ({ amount, metadata, id, session_type, ...rest }: Ch
       if (session_type === 'recurring') {
         await delay(2000);
 
-        const subscriptionCreated = await fetch(webhookUrl, {
-          method: 'POST',
-          body: JSON.stringify({ type: 'subscription.created', data: { id } }),
-        });
+        const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+
+        const subscriptionWithoutId = {
+          customer_id: rest.customer_id,
+          status: 'active',
+          current_period_start: new Date(),
+          current_period_end: in30Days,
+          metadata: metadata,
+        } as Omit<Subscription, 'id'>;
+
+        const subscriptionId = safeEncode(subscriptionWithoutId);
+
+        if (!subscriptionId.ok) throw new Error('Failed to generate subscription ID');
+
+        const subscriptionCreated = await fetch(
+          makeWebhookUrl({ type: '$subscriptionCreated', data: { id: subscriptionId.value, ...subscriptionWithoutId } }),
+          {
+            method: 'POST',
+            mode: 'cors',
+            headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          },
+        );
 
         if (!subscriptionCreated.ok) throw new Error('Failed to create subscription');
       }
 
       Toast.success({ title: 'Success', description: 'Payment processed successfully 🎉' });
+
+      console.log({ referer });
+
+      if (referer) setTimeout(() => (window.location.href = `${referer}?success=true`), 2000);
     } catch (error) {
       Toast.error({ title: 'Error', description: error instanceof Error ? error.message : 'An unknown error occurred' });
     } finally {

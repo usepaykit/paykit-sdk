@@ -8,7 +8,7 @@ export type WebhookEventLiteral =
   | '$customerDeleted'
   | '$subscriptionCreated'
   | '$subscriptionUpdated'
-  | '$subscriptionCanceled'
+  | '$subscriptionCancelled'
   | '$checkoutCreated'
   | '$paymentReceived';
 
@@ -40,7 +40,7 @@ export type CustomerDeleted = WebhookEvent<Customer | null>;
 
 export type SubscriptionCreated = WebhookEvent<Subscription>;
 export type SubscriptionUpdated = WebhookEvent<Subscription>;
-export type SubscriptionCanceled = WebhookEvent<Subscription>;
+export type subscriptionCancelled = WebhookEvent<Subscription>;
 
 export type CheckoutCreated = WebhookEvent<Checkout>;
 export type PaymentReceived = WebhookEvent<$SchemaPaymentReceived>;
@@ -51,7 +51,7 @@ export type WebhookEventPayload =
   | CustomerDeleted
   | SubscriptionCreated
   | SubscriptionUpdated
-  | SubscriptionCanceled
+  | subscriptionCancelled
   | PaymentReceived
   | CheckoutCreated;
 

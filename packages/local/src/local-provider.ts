@@ -12,16 +12,8 @@ import {
   WebhookEventPayload,
   HTTPClient,
   unwrapAsync,
-  safeEncode,
-  ValidationError,
-  CheckoutCreated,
-  CustomerCreated,
-  CustomerUpdated,
-  SubscriptionUpdated,
-  safeDecode,
-  SubscriptionCanceled,
 } from '@paykit-sdk/core';
-import { PaykitConfig } from './tools';
+import { nanoid } from 'nanoid';
 
 export interface LocalConfig extends PaykitProviderOptions {
   apiUrl: string;
@@ -36,202 +28,90 @@ export class LocalProvider implements PayKitProvider {
   }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const amount = (() => {
-      const product = safeDecode<PaykitConfig['product']>(params.item_id);
+    const urlParams = new URLSearchParams({
+      resource: 'checkout',
+      type: '$checkoutCreated',
+      body: JSON.stringify({ ...params, webhookUrl: this.config.apiUrl }),
+    });
 
-      if (product.ok && product.value['price']) return product.value['price'];
+    const response = await unwrapAsync(this._client.post<Checkout>(`?${urlParams.toString()}`));
 
-      if (params.provider_metadata?.['amount']) return parseInt(params.provider_metadata?.['amount'] as string, 10);
-
-      return 25;
-    })();
-
-    const customer = safeDecode<Customer>(params.customer_id);
-
-    if (!customer.ok) throw new ValidationError('Invalid customer ID', {});
-
-    const product = safeDecode<PaykitConfig['product']>(params.item_id);
-
-    if (!product.ok) throw new ValidationError('Invalid product ID', {});
-
-    const productName = product.value?.name;
-
-    const customerName = customer.value?.name;
-    const customerEmail = customer.value?.email;
-
-    const checkoutWithoutIdAndPaymentUrl = {
-      customer_id: params.customer_id,
-      metadata: { ...params.metadata, customerName, customerEmail, webhookUrl: this.config.apiUrl, productName },
-      session_type: params.session_type,
-      products: [{ id: params.item_id, quantity: 1 }],
-      currency: (params.provider_metadata?.['currency'] as string) ?? 'USD',
-      amount,
-    } as Omit<Checkout, 'id' | 'payment_url'>;
-
-    const checkoutId = safeEncode(checkoutWithoutIdAndPaymentUrl);
-
-    if (!checkoutId.ok) throw new ValidationError('Invalid checkout ID', {});
-
-    const payload = {
-      type: 'checkout.created',
-      data: {
-        ...checkoutWithoutIdAndPaymentUrl,
-        id: checkoutId.value,
-        amount: checkoutWithoutIdAndPaymentUrl.amount.toString(),
-        metadata: `$json${JSON.stringify(checkoutWithoutIdAndPaymentUrl.metadata)}`,
-        payment_url: `${this.config.paymentUrl}/checkout?id=${checkoutId.value}`,
-        products: `$json${JSON.stringify(checkoutWithoutIdAndPaymentUrl.products)}`,
-      },
-    };
-
-    const urlParams = new URLSearchParams(JSON.stringify(payload));
-
-    /**
-     * Send webhook
-     */
-    await unwrapAsync(this._client.post<CheckoutCreated>(`?${urlParams.toString()}`));
-
-    const checkout = { ...checkoutWithoutIdAndPaymentUrl, id: checkoutId.value, payment_url: payload.data.payment_url };
-
-    return checkout;
+    return response;
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout | null> => {
-    const decoded = safeDecode<Checkout>(id);
+    const urlParams = new URLSearchParams({ resource: 'checkout', type: '$checkoutRetrieved', body: JSON.stringify({ id }) });
 
-    if (!decoded.ok) return null;
+    const response = await unwrapAsync(this._client.get<Checkout>(`?${urlParams.toString()}`));
 
-    const checkout = decoded.value;
-
-    return checkout;
+    return response;
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    const customerWithoutId = {
+    const customer = {
+      id: `cu_${nanoid(30)}`,
       ...(params.name && { name: params.name }),
       ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: params.metadata }),
     };
 
-    const customerId = safeEncode({ name: customerWithoutId.name, email: customerWithoutId.email });
+    const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerCreated', body: JSON.stringify(customer) });
 
-    if (!customerId.ok) throw new ValidationError('Invalid customer data', {});
+    const response = await unwrapAsync(this._client.post<Customer>(`?${urlParams.toString()}`));
 
-    const payload = {
-      type: 'customer.created',
-      data: { ...customerWithoutId, id: customerId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
-    };
-
-    const urlParams = new URLSearchParams(JSON.stringify(payload));
-
-    /**
-     * Send Webhook
-     */
-    await unwrapAsync(this._client.post<CustomerCreated>(`?${urlParams.toString()}`));
-
-    const customer = { ...customerWithoutId, id: customerId.value };
-
-    return customer;
+    return response;
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams) => {
-    const customerWithoutId = {
+    const customer = {
+      id,
       ...(params.name && { name: params.name }),
       ...(params.email && { email: params.email }),
       ...(params.metadata && { metadata: params.metadata }),
     };
 
-    /**
-     * Ignores the ID and makes a new one based on the updated values.
-     */
-    const retUpdateId = safeEncode({ name: params.name, email: params.email });
+    const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerUpdated', body: JSON.stringify(customer) });
 
-    if (!retUpdateId.ok) throw new ValidationError('Invalid Customer data', {});
+    const response = await unwrapAsync(this._client.put<Customer>(`?${urlParams.toString()}`));
 
-    const payload = {
-      type: 'customer.updated',
-      data: { ...customerWithoutId, id: retUpdateId.value, metadata: `$json${JSON.stringify(customerWithoutId.metadata)}` },
-    };
-
-    const urlParams = new URLSearchParams(JSON.stringify(payload));
-
-    /**
-     * Send Webhook
-     */
-    await unwrapAsync(this._client.put<CustomerUpdated>(`?${urlParams.toString()}`));
-
-    const customer = { ...customerWithoutId, id: retUpdateId.value };
-
-    return customer;
+    return response;
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
-    const decoded = safeDecode<Customer>(id);
+    const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerRetrieved', body: JSON.stringify({ id }) });
 
-    if (!decoded.ok) return null;
+    const response = await unwrapAsync(this._client.get<Customer>(`?${urlParams.toString()}`));
 
-    const customer = decoded.value;
-
-    return customer;
+    return response;
   };
 
   async updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription> {
-    const payload = {
-      type: 'subscription.updated',
-      data: { id, metadata: `$json${JSON.stringify(params.metadata)}` },
+    const subscription = {
+      id,
+      metadata: params.metadata,
     };
 
-    const urlParams = new URLSearchParams(JSON.stringify(payload));
+    const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionUpdated', body: JSON.stringify(subscription) });
 
-    /**
-     * Send Webhook
-     */
-    await unwrapAsync(this._client.put<SubscriptionUpdated>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.put<Subscription>(`?${urlParams.toString()}`));
 
-    const customerId$ = safeDecode<Record<string, any>>(id);
-
-    if (!customerId$) throw new Error('Invalid subscription to update');
-
-    const customerId = customerId$.value?.['customerId'] as string;
-
-    const subscription = safeDecode<Subscription>(id);
-
-    const startAndEndDates = (() => {
-      let startDate = new Date();
-      let endDate = new Date();
-
-      if (subscription.ok) {
-        startDate = subscription.value?.current_period_start ?? new Date();
-        endDate = subscription.value?.current_period_end ?? new Date();
-      }
-
-      return { current_period_start: startDate, current_period_end: endDate } as const;
-    })();
-
-    return { ...params, id, status: 'active', ...startAndEndDates, customer_id: customerId };
+    return response;
   }
 
   async cancelSubscription(id: string): Promise<null> {
-    const payload = { type: 'subscription.canceled', data: { id } };
+    const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionCancelled', body: JSON.stringify({ id }) });
 
-    const urlParams = new URLSearchParams(JSON.stringify(payload));
-
-    /**
-     * Send Webhook
-     */
-    await unwrapAsync(this._client.delete<SubscriptionCanceled>(`?${urlParams.toString()}`));
+    await unwrapAsync(this._client.delete<null>(`?${urlParams.toString()}`));
 
     return null;
   }
 
   async retrieveSubscription(id: string): Promise<Subscription | null> {
-    const decoded = safeDecode<Subscription>(id);
+    const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionRetrieved', body: JSON.stringify({ id }) });
 
-    if (!decoded.ok) return null;
+    const response = await unwrapAsync(this._client.get<Subscription>(`?${urlParams.toString()}`));
 
-    const subscription = decoded.value;
-
-    return subscription;
+    return response;
   }
 
   async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {

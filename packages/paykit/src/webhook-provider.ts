@@ -4,7 +4,7 @@ import {
   CustomerCreated,
   CustomerDeleted,
   CustomerUpdated,
-  SubscriptionCanceled,
+  subscriptionCancelled,
   SubscriptionCreated,
   SubscriptionUpdated,
   PaymentReceived,
@@ -17,7 +17,7 @@ export type WebhookEventHandlers = Partial<{
   $customerDeleted: (event: CustomerDeleted) => Promise<void>;
   $subscriptionCreated: (event: SubscriptionCreated) => Promise<void>;
   $subscriptionUpdated: (event: SubscriptionUpdated) => Promise<void>;
-  $subscriptionCanceled: (event: SubscriptionCanceled) => Promise<void>;
+  $subscriptionCancelled: (event: subscriptionCancelled) => Promise<void>;
   $checkoutCreated: (event: CheckoutCreated) => Promise<void>;
   $paymentReceived: (event: PaymentReceived) => Promise<void>;
 }>;

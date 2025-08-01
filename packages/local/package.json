@@ -50,6 +50,7 @@
     "typescript": "^5.0.0"
   },
   "dependencies": {
+    "nanoid": "^5.1.5",
     "server-only": "^0.0.1"
   }
 }

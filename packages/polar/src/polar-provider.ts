@@ -116,7 +116,7 @@ export class PolarProvider implements PayKitProvider {
       return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: subscription });
     } else if (webhookEvent.type === 'subscription.revoked') {
       const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCanceled', created: parseInt(timestamp), id, data: subscription });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: subscription });
     } else if (webhookEvent.type === 'customer.created') {
       const customer = await this.retrieveCustomer(webhookEvent.data.id);
       return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: customer });

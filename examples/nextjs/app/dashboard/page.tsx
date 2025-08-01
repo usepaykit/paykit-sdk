@@ -6,23 +6,40 @@ import { SubscriptionModal } from '@/components/subscription-modal';
 import { TaskCard } from '@/components/task-card';
 import { UpgradePrompt } from '@/components/upgrade-prompt';
 import { UsageStats } from '@/components/usage-stats';
-import type { SubscriptionStatus, Task } from '@/interface';
-import { checkSubscriptionStatus, getTasks, deleteTask } from '@/lib/mock-functions';
+import type { Task } from '@/interface';
+import { getTasks, deleteTask } from '@/lib/mock-functions';
+import { Subscription } from '@paykit-sdk/core';
+import { useSubscription } from '@paykit-sdk/react';
 import { Button, Card, Toast } from '@paykit-sdk/ui';
 import { Plus, TrendingUp, Users, Calendar, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
+const subscriptionId =
+  'eyJjdXN0b21lcl9pZCI6IkludGNJbVZ0WVdsc1hDSTZYQ0psYlcxaGJuVmxiRzlrYVdrNE1FQm5iV0ZwYkM1amIyMWNJaXhjSW01aGJXVmNJanBjSWtWdGJXRnVkV1ZzSUc5a2FXbGNJaXhjSW0xbGRHRmtZWFJoWENJNmUzMTlJZz09Iiwic3RhdHVzIjoiYWN0aXZlIiwiY3VycmVudF9wZXJpb2Rfc3RhcnQiOiIyMDI1LTA4LTAxVDEzOjM3OjE3LjExOVoiLCJjdXJyZW50X3BlcmlvZF9lbmQiOiIyMDI1LTA4LTMxVDEzOjM3OjE3LjExOVoiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifX0=';
+
 export default function Dashboard() {
-  const [subscriptionStatus, setSubscriptionStatus] = React.useState<SubscriptionStatus | null>(null);
+  const { retrieve } = useSubscription();
+  const [subscription, setSubscription] = React.useState<Subscription | null>(null);
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = React.useState(false);
 
   React.useEffect(() => {
+    (async () => {
+      const [subscription, tasks] = await Promise.all([retrieve.run(subscriptionId), getTasks()]);
+
+      if (subscription.data) return setSubscription(subscription.data);
+
+      if (subscription.error) Toast.error({ title: 'Error', description: subscription.error.message });
+
+      if (tasks) return setTasks(tasks);
+    })();
+  }, []);
+
+  React.useEffect(() => {
     const loadData = async () => {
       try {
-        const [status, tasksData] = await Promise.all([checkSubscriptionStatus(), getTasks()]);
-        setSubscriptionStatus(status);
+        const [tasksData] = await Promise.all([getTasks()]);
         setTasks(tasksData);
       } catch (error) {
         Toast.error({ title: 'Failed to load dashboard data' });
@@ -59,6 +76,8 @@ export default function Dashboard() {
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
 
+  const hasActiveSubscription = subscription && subscription.status === 'active' && subscription.metadata?.plan === 'pro';
+
   return (
     <div className="bg-background min-h-screen">
       <Navigation />
@@ -85,8 +104,15 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Usage Stats */}
-          {subscriptionStatus && <UsageStats status={subscriptionStatus} />}
+          <UsageStats
+            status={{
+              limit: hasActiveSubscription ? 50 : 10,
+              usage: hasActiveSubscription ? 0 : 10,
+              tier: hasActiveSubscription ? 'pro' : 'free',
+              tasksLimit: hasActiveSubscription ? -1 : 10,
+              tasksUsed: hasActiveSubscription ? 0 : 10,
+            }}
+          />
 
           {/* Quick Stats */}
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -166,9 +192,7 @@ export default function Dashboard() {
 
             {/* Upgrade Prompt */}
             <div className="space-y-6">
-              {subscriptionStatus && subscriptionStatus.tier === 'free' && (
-                <UpgradePrompt feature="AI generations" currentPlan={subscriptionStatus.tier} />
-              )}
+              {!hasActiveSubscription && <UpgradePrompt feature="AI generations" currentPlan={subscription?.metadata?.['tier']!} />}
 
               <Card.Root>
                 <Card.Header>

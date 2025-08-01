@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { type Subscription } from '@paykit-sdk/core';
+import { delay, type Subscription, truncate } from '@paykit-sdk/core';
 import { useSubscription } from '@paykit-sdk/react';
 import { Dialog, Button, Card, Badge, Toast } from '@paykit-sdk/ui';
 import { format } from 'date-fns';
@@ -12,7 +12,8 @@ interface SubscriptionModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const subscriptionId = 'sub_1234567890';
+const subscriptionId =
+  'eyJjdXN0b21lcl9pZCI6IkludGNJbVZ0WVdsc1hDSTZYQ0psYlcxaGJuVmxiRzlrYVdrNE1FQm5iV0ZwYkM1amIyMWNJaXhjSW01aGJXVmNJanBjSWtWdGJXRnVkV1ZzSUc5a2FXbGNJaXhjSW0xbGRHRmtZWFJoWENJNmUzMTlJZz09Iiwic3RhdHVzIjoiYWN0aXZlIiwiY3VycmVudF9wZXJpb2Rfc3RhcnQiOiIyMDI1LTA4LTAxVDEyOjI0OjMyLjUxN1oiLCJjdXJyZW50X3BlcmlvZF9lbmQiOiIyMDI1LTA4LTMxVDEyOjI0OjMyLjUxN1oiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifX0=';
 
 export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps) {
   const { cancel, retrieve } = useSubscription();
@@ -28,11 +29,11 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
     })();
   }, []);
 
-  const handleManageSubscription = async () => {
+  const handleCancelSubscription = async () => {
     try {
       setLoading(true);
 
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      await delay(1000);
 
       if (subscription) {
         const { error } = await cancel.run(subscription.id);
@@ -92,7 +93,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
                       <User className="h-4 w-4" />
                       Customer ID
                     </div>
-                    <p className="font-mono text-sm">{subscription.customer_id}</p>
+                    <p className="font-mono text-sm">{truncate(subscription.customer_id, 10, '...')}</p>
                   </div>
                   <div className="space-y-2">
                     <div className="text-muted-foreground flex items-center gap-2 text-sm">
@@ -132,7 +133,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
             </Card.Root>
 
             <div className="flex gap-3">
-              <Button onClick={handleManageSubscription} disabled={loading} className="flex-1">
+              <Button onClick={handleCancelSubscription} disabled={loading} className="flex-1">
                 {loading ? 'Loading...' : 'Cancel Subscription'}
               </Button>
               <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">

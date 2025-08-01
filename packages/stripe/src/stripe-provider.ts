@@ -128,7 +128,7 @@ export class StripeProvider implements PayKitProvider {
       return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: subscription });
     } else if (event.type === 'customer.subscription.deleted') {
       const subscription = await this.retrieveSubscription(event.data.object.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCanceled', created: event.created, id: event.id, data: subscription });
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: event.created, id: event.id, data: subscription });
     } else if (event.type === 'customer.subscription.paused') {
       const subscription = await this.retrieveSubscription(event.data.object.id);
       return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: subscription });

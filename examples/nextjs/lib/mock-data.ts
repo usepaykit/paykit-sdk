@@ -1,4 +1,4 @@
-import type { Task, User, Subscription, PricingPlan } from '../interface';
+import type { Task, User } from '../interface';
 
 // Mock user data
 export const mockUser: User = {
@@ -6,7 +6,6 @@ export const mockUser: User = {
   name: 'John Doe',
   email: 'john@example.com',
   avatar: '/placeholder.svg?height=40&width=40',
-  subscription: 'free',
 };
 
 // Mock tasks
@@ -40,21 +39,7 @@ export const mockTasks: Task[] = [
   },
 ];
 
-// Mock subscription data
-export const mockSubscription: Subscription = {
-  id: 'sub_1234567890',
-  customer_id: 'cus_1234567890',
-  status: 'active',
-  current_period_start: new Date('2024-01-01'),
-  current_period_end: new Date('2024-02-01'),
-  metadata: {
-    plan: 'free',
-    features: 'basic',
-  },
-};
-
-// Pricing plans
-export const pricingPlans: PricingPlan[] = [
+export const pricingPlans = [
   {
     name: 'Free',
     tier: 'free',
@@ -73,14 +58,5 @@ export const pricingPlans: PricingPlan[] = [
     aiGenerations: 50,
     tasks: 'unlimited',
     popular: true,
-  },
-  {
-    name: 'Enterprise',
-    tier: 'enterprise',
-    price: 49,
-    interval: 'month',
-    features: ['Unlimited AI generations', 'Unlimited tasks', 'Team collaboration', 'Custom templates', 'Dedicated support', 'Advanced analytics'],
-    aiGenerations: -1, // -1 represents unlimited
-    tasks: 'unlimited',
   },
 ];

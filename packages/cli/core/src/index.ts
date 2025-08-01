@@ -1,11 +1,12 @@
 #!/usr/bin/env node
-import { safeEncode, ValidationError, logger, tryCatchAsync } from '@paykit-sdk/core';
+import { logger, tryCatchAsync } from '@paykit-sdk/core';
 import { CheckoutInfo } from '@paykit-sdk/local/browser';
 import { __defaultPaykitConfig, writePaykitConfig } from '@paykit-sdk/local/cli';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
 import { existsSync } from 'fs';
 import inquirer from 'inquirer';
+import { nanoid } from 'nanoid';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -62,21 +63,11 @@ program
 
     logger.progress('Validating product info');
 
-    const itemId = safeEncode(answers);
-
-    const customerWithoutId = { email: answers.customerEmail, name: answers.customerName, metadata: {} };
-
-    const customerId = safeEncode<string>(JSON.stringify(customerWithoutId));
-
     logger.clearProgress();
 
-    if (!customerId.ok) throw new ValidationError('Invalid customer email', customerId.error);
+    const product = { itemId: `it_${nanoid(30)}`, name: answers.name, description: answers.description, price: answers.price };
 
-    if (!itemId.ok) throw new ValidationError('Invalid product info', itemId.error);
-
-    const product = { name: answers.name, description: answers.description, price: answers.price, itemId: itemId.value };
-
-    const customer = { id: customerId.value, ...customerWithoutId };
+    const customer = { id: `cus_${nanoid(30)}`, email: answers.customerEmail, name: answers.customerName, metadata: {} };
 
     const config = __defaultPaykitConfig({ product, customer });
 
@@ -144,8 +135,51 @@ program
       stdio: 'pipe',
     });
 
-    logger.success('PayKit dev server running on http://localhost:3001');
-    logger.tip('Press Ctrl+C to stop the server');
+    // Wait for the server to be ready
+    let serverReady = false;
+    let outputBuffer = '';
+
+    nextProcess.stdout?.on('data', data => {
+      const output = data.toString();
+      outputBuffer += output;
+
+      // Check if server is ready (Next.js typically shows "Ready" when server starts)
+      if (output.includes('Ready') || output.includes('Local:') || output.includes('localhost:3001')) {
+        if (!serverReady) {
+          serverReady = true;
+          logger.clearProgress();
+          logger.success('PayKit dev server running on http://localhost:3001');
+          logger.tip('Press Ctrl+C to stop the server');
+        }
+      }
+    });
+
+    nextProcess.stderr?.on('data', data => {
+      const error = data.toString();
+      console.error('Next.js error:', error);
+    });
+
+    // Handle process exit
+    nextProcess.on('close', code => {
+      if (code !== 0) {
+        logger.error(`Next.js process exited with code ${code}`);
+      }
+    });
+
+    // Handle process errors
+    nextProcess.on('error', error => {
+      logger.error(`Failed to start Next.js server: ${error.message}`);
+    });
+
+    // Set a timeout to show success message even if we don't detect the ready signal
+    setTimeout(() => {
+      if (!serverReady) {
+        serverReady = true;
+        logger.clearProgress();
+        logger.success('PayKit dev server running on http://localhost:3001');
+        logger.tip('Press Ctrl+C to stop the server');
+      }
+    }, 10000); // 10 second timeout
 
     // Handle process termination
     process.on('SIGINT', () => {

@@ -10,6 +10,10 @@ interface UpgradePromptProps {
   currentPlan: string;
 }
 
+const customerId = 'IntcImVtYWlsXCI6XCJlbW1hbnVlbG9kaWk4MEBnbWFpbC5jb21cIixcIm5hbWVcIjpcIkVtbWFudWVsIG9kaWlcIixcIm1ldGFkYXRhXCI6e319Ig==';
+const itemId =
+  'eyJuYW1lIjoiUGF5a2l0IENsb3VkIExpZmV0aW1lIiwiZGVzY3JpcHRpb24iOiJHZXQgbGlmZXRpbWUgYWNjZXNzIHRvIHBheWtpdCBjbG91ZCIsInByaWNlIjoiJDE0OSIsImN1c3RvbWVyTmFtZSI6IkVtbWFudWVsIG9kaWkiLCJjdXN0b21lckVtYWlsIjoiZW1tYW51ZWxvZGlpODBAZ21haWwuY29tIn0=';
+
 export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
   const { create } = useCheckout();
 
@@ -17,16 +21,14 @@ export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
 
   const handleUpgrade = async () => {
     const { data, error } = await create.run({
-      customer_id: 'demo_customer',
-      item_id: 'pro_plan',
+      customer_id: customerId,
+      item_id: itemId,
       session_type: 'recurring',
       metadata: { plan: 'pro', billing: 'monthly' },
-      provider_metadata: { currency: 'NGN', amount: 20000 },
+      provider_metadata: { currency: 'USD', amount: 149 },
     });
 
     if (error) throw new Error(error.message);
-
-    console.log({ data });
 
     router.push(data.payment_url);
   };

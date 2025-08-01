@@ -10,9 +10,8 @@ interface UpgradePromptProps {
   currentPlan: string;
 }
 
-const customerId = 'IntcImVtYWlsXCI6XCJlbW1hbnVlbG9kaWk4MEBnbWFpbC5jb21cIixcIm5hbWVcIjpcIkVtbWFudWVsIG9kaWlcIixcIm1ldGFkYXRhXCI6e319Ig==';
-const itemId =
-  'eyJuYW1lIjoiUGF5a2l0IENsb3VkIExpZmV0aW1lIiwiZGVzY3JpcHRpb24iOiJHZXQgbGlmZXRpbWUgYWNjZXNzIHRvIHBheWtpdCBjbG91ZCIsInByaWNlIjoiJDE0OSIsImN1c3RvbWVyTmFtZSI6IkVtbWFudWVsIG9kaWkiLCJjdXN0b21lckVtYWlsIjoiZW1tYW51ZWxvZGlpODBAZ21haWwuY29tIn0=';
+const customerId = 'cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0';
+const itemId = 'it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq';
 
 export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
   const { create } = useCheckout();

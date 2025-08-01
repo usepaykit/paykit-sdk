@@ -10,11 +10,9 @@ import { Badge, Button, Card, Input, Label, Separator, Toast, Avatar } from '@pa
 import { User, CreditCard, Bell, Shield, Trash2, Crown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
-const subscriptionId =
-  'eyJjdXN0b21lcl9pZCI6IkludGNJbVZ0WVdsc1hDSTZYQ0psYlcxaGJuVmxiRzlrYVdrNE1FQm5iV0ZwYkM1amIyMWNJaXhjSW01aGJXVmNJanBjSWtWdGJXRnVkV1ZzSUc5a2FXbGNJaXhjSW0xbGRHRmtZWFJoWENJNmUzMTlJZz09Iiwic3RhdHVzIjoiYWN0aXZlIiwiY3VycmVudF9wZXJpb2Rfc3RhcnQiOiIyMDI1LTA4LTAxVDEzOjM3OjE3LjExOVoiLCJjdXJyZW50X3BlcmlvZF9lbmQiOiIyMDI1LTA4LTMxVDEzOjM3OjE3LjExOVoiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifX0=';
-const customerId = 'IntcImVtYWlsXCI6XCJlbW1hbnVlbG9kaWk4MEBnbWFpbC5jb21cIixcIm5hbWVcIjpcIkVtbWFudWVsIG9kaWlcIixcIm1ldGFkYXRhXCI6e319Ig==';
-const itemId =
-  'eyJuYW1lIjoiUGF5a2l0IENsb3VkIExpZmV0aW1lIiwiZGVzY3JpcHRpb24iOiJHZXQgbGlmZXRpbWUgYWNjZXNzIHRvIHBheWtpdCBjbG91ZCIsInByaWNlIjoiJDE0OSIsImN1c3RvbWVyTmFtZSI6IkVtbWFudWVsIG9kaWkiLCJjdXN0b21lckVtYWlsIjoiZW1tYW51ZWxvZGlpODBAZ21haWwuY29tIn0=';
+const subscriptionId = 'sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu';
+const customerId = 'cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0';
+const itemId = 'it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq';
 
 export default function SettingsPage() {
   const router = useRouter();

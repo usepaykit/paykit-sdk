@@ -16,7 +16,7 @@ interface Plugin {
   [key: string]: any;
 }
 
-export interface WithLocalProviderVitePluginOptions {
+export interface WithViteWebhookOptions {
   /**
    * API path prefix for the plugin routes
    * @default '/api/paykit'
@@ -25,7 +25,7 @@ export interface WithLocalProviderVitePluginOptions {
   webhook: Webhook;
 }
 
-export const withLocalProviderVitePlugin = (options: WithLocalProviderVitePluginOptions): Plugin => {
+export const withViteWebhook = (options: WithViteWebhookOptions): Plugin => {
   const { prefix = '/api/paykit', webhook } = options;
 
   return {
@@ -63,7 +63,7 @@ export const withLocalProviderVitePlugin = (options: WithLocalProviderVitePlugin
 
 async function handleWebhook(req: any, res: any, webhook: Webhook) {
   try {
-    const result = await server$HandleWebhook({ url: req.url, webhook });
+    const result = await server$HandleWebhook(req.url, webhook);
 
     res.setHeader('Content-Type', 'application/json');
     res.end(JSON.stringify(result));

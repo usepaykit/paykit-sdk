@@ -25,11 +25,6 @@
       "import": "./dist/cli.mjs",
       "require": "./dist/cli.js",
       "types": "./dist/cli.d.ts"
-    },
-    "./server": {
-      "import": "./dist/server.mjs",
-      "require": "./dist/server.js",
-      "types": "./dist/server.d.ts"
     }
   },
   "files": [

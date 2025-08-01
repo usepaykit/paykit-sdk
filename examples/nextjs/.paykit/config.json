@@ -1,0 +1,51 @@
+{
+  "product": {
+    "itemId": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq",
+    "name": "Acme Taskboard Pro",
+    "description": "Unlimited access to Acme Taskboard",
+    "price": "$25"
+  },
+  "customer": {
+    "id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
+    "email": "emmanuelodii80@gmail.com",
+    "name": "Emmanuel Odii",
+    "metadata": {}
+  },
+  "subscriptions": [
+    {
+      "id": "sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu",
+      "customer_id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
+      "status": "active",
+      "current_period_start": "2025-08-01T22:51:23.651Z",
+      "current_period_end": "2025-08-31T22:51:23.651Z",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly",
+        "source": "cli-app"
+      }
+    }
+  ],
+  "checkouts": [
+    {
+      "amount": "$25",
+      "customer_id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
+      "metadata": {
+        "plan": "pro",
+        "billing": "monthly"
+      },
+      "session_type": "recurring",
+      "products": [
+        {
+          "id": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq",
+          "quantity": 1
+        }
+      ],
+      "currency": "USD",
+      "id": "eyJhbW91bnQiOiIkMjUiLCJjdXN0b21lcl9pZCI6ImN1c19oUzNrTEZxMFUzZTFsMUg4aGF4VjctTHFsbklzbjAiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoiaXRfWXNvam5yUURlRlR1b0tkVmd0QXFuYlJvbGstM25xIiwicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJwcm92aWRlcl9tZXRhZGF0YSI6eyJjdXN0b21lck5hbWUiOiJFbW1hbnVlbCBPZGlpIiwiY3VzdG9tZXJFbWFpbCI6ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSIsIndlYmhvb2tVcmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAvYXBpL3BheWtpdCIsInByb2R1Y3ROYW1lIjoiQWNtZSBUYXNrYm9hcmQgUHJvIn19",
+      "payment_url": "http://localhost:3001/checkout?id=eyJhbW91bnQiOiIkMjUiLCJjdXN0b21lcl9pZCI6ImN1c19oUzNrTEZxMFUzZTFsMUg4aGF4VjctTHFsbklzbjAiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifSwic2Vzc2lvbl90eXBlIjoicmVjdXJyaW5nIiwicHJvZHVjdHMiOlt7ImlkIjoiaXRfWXNvam5yUURlRlR1b0tkVmd0QXFuYlJvbGstM25xIiwicXVhbnRpdHkiOjF9XSwiY3VycmVuY3kiOiJVU0QiLCJwcm92aWRlcl9tZXRhZGF0YSI6eyJjdXN0b21lck5hbWUiOiJFbW1hbnVlbCBPZGlpIiwiY3VzdG9tZXJFbWFpbCI6ImVtbWFudWVsb2RpaTgwQGdtYWlsLmNvbSIsIndlYmhvb2tVcmwiOiJodHRwOi8vbG9jYWxob3N0OjMwMDAvYXBpL3BheWtpdCIsInByb2R1Y3ROYW1lIjoiQWNtZSBUYXNrYm9hcmQgUHJvIn19"
+    }
+  ],
+  "payments": [
+    "eyJjdXN0b21lcl9pZCI6ImN1c19oUzNrTEZxMFUzZTFsMUg4aGF4VjctTHFsbklzbjAiLCJwcm9kdWN0cyI6W3siaWQiOiJpdF9Zc29qbnJRRGVGVHVvS2RWZ3RBcW5iUm9say0zbnEiLCJxdWFudGl0eSI6MX1dLCJjdXJyZW5jeSI6IlVTRCIsImFtb3VudCI6IiQyNSIsIm1ldGFkYXRhIjp7InBsYW4iOiJwcm8iLCJiaWxsaW5nIjoibW9udGhseSJ9LCJzZXNzaW9uX3R5cGUiOiJyZWN1cnJpbmciLCJjb21wbGV0ZWRfYXQiOiIyMDI1LTA4LTAxVDIyOjUxOjIxLjU4NloiLCJzb3VyY2UiOiJjbGktYXBwIn0="
+  ]
+}

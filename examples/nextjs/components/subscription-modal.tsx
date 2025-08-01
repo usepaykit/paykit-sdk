@@ -12,11 +12,10 @@ interface SubscriptionModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const subscriptionId =
-  'eyJjdXN0b21lcl9pZCI6IkludGNJbVZ0WVdsc1hDSTZYQ0psYlcxaGJuVmxiRzlrYVdrNE1FQm5iV0ZwYkM1amIyMWNJaXhjSW01aGJXVmNJanBjSWtWdGJXRnVkV1ZzSUc5a2FXbGNJaXhjSW0xbGRHRmtZWFJoWENJNmUzMTlJZz09Iiwic3RhdHVzIjoiYWN0aXZlIiwiY3VycmVudF9wZXJpb2Rfc3RhcnQiOiIyMDI1LTA4LTAxVDEyOjI0OjMyLjUxN1oiLCJjdXJyZW50X3BlcmlvZF9lbmQiOiIyMDI1LTA4LTMxVDEyOjI0OjMyLjUxN1oiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifX0=';
+const subscriptionId = 'sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu';
 
 export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps) {
-  const { cancel, retrieve } = useSubscription();
+  const { cancel, retrieve, update } = useSubscription();
 
   const [subscription, setSubscription] = React.useState<Subscription | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -29,13 +28,15 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
     })();
   }, []);
 
-  const handleCancelSubscription = async () => {
+  const hasActiveSubscription = subscription?.status === 'active';
+
+  const handleManageSubscription = async () => {
     try {
       setLoading(true);
 
       await delay(1000);
 
-      if (subscription) {
+      if (hasActiveSubscription) {
         const { error } = await cancel.run(subscription.id);
 
         if (error) {
@@ -44,6 +45,11 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
         }
 
         Toast.success({ title: 'Success', description: 'Subscription canceled successfully' });
+      } else {
+        if (!subscription) return;
+
+        await update.run(subscription.id, { metadata: { status: 'active' } });
+        Toast.success({ title: 'Success', description: 'Subscription resumed successfully' });
       }
     } catch (error) {
       Toast.error({ title: 'Error', description: error instanceof Error ? error.message : 'An unknown error occurred' });
@@ -133,8 +139,8 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
             </Card.Root>
 
             <div className="flex gap-3">
-              <Button onClick={handleCancelSubscription} disabled={loading} className="flex-1">
-                {loading ? 'Loading...' : 'Cancel Subscription'}
+              <Button onClick={handleManageSubscription} disabled={loading} className="flex-1">
+                {loading ? 'Loading...' : hasActiveSubscription ? 'Cancel Subscription' : 'Resume Subscription'}
               </Button>
               <Button variant="outline" onClick={() => onOpenChange(false)} className="flex-1">
                 Close

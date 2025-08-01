@@ -14,8 +14,7 @@ import { Button, Card, Toast } from '@paykit-sdk/ui';
 import { Plus, TrendingUp, Users, Calendar, CreditCard } from 'lucide-react';
 import Link from 'next/link';
 
-const subscriptionId =
-  'eyJjdXN0b21lcl9pZCI6IkludGNJbVZ0WVdsc1hDSTZYQ0psYlcxaGJuVmxiRzlrYVdrNE1FQm5iV0ZwYkM1amIyMWNJaXhjSW01aGJXVmNJanBjSWtWdGJXRnVkV1ZzSUc5a2FXbGNJaXhjSW0xbGRHRmtZWFJoWENJNmUzMTlJZz09Iiwic3RhdHVzIjoiYWN0aXZlIiwiY3VycmVudF9wZXJpb2Rfc3RhcnQiOiIyMDI1LTA4LTAxVDEzOjM3OjE3LjExOVoiLCJjdXJyZW50X3BlcmlvZF9lbmQiOiIyMDI1LTA4LTMxVDEzOjM3OjE3LjExOVoiLCJtZXRhZGF0YSI6eyJwbGFuIjoicHJvIiwiYmlsbGluZyI6Im1vbnRobHkifX0=';
+const subscriptionId = 'sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu';
 
 export default function Dashboard() {
   const { retrieve } = useSubscription();

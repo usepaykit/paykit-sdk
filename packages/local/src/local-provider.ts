@@ -12,6 +12,7 @@ import {
   WebhookEventPayload,
   HTTPClient,
   unwrapAsync,
+  WebhookEvent,
 } from '@paykit-sdk/core';
 import { nanoid } from 'nanoid';
 
@@ -31,20 +32,20 @@ export class LocalProvider implements PayKitProvider {
     const urlParams = new URLSearchParams({
       resource: 'checkout',
       type: '$checkoutCreated',
-      body: JSON.stringify({ ...params, webhookUrl: this.config.apiUrl }),
+      body: JSON.stringify({ ...params, paymentUrl: this.config.paymentUrl, webhookUrl: this.config.apiUrl }),
     });
 
-    const response = await unwrapAsync(this._client.post<Checkout>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Checkout>>(`?${urlParams.toString()}`));
 
-    return response;
+    return response.data;
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout | null> => {
     const urlParams = new URLSearchParams({ resource: 'checkout', type: '$checkoutRetrieved', body: JSON.stringify({ id }) });
 
-    const response = await unwrapAsync(this._client.get<Checkout>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Checkout>>(`?${urlParams.toString()}`));
 
-    return response;
+    return response.data;
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
@@ -57,12 +58,12 @@ export class LocalProvider implements PayKitProvider {
 
     const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerCreated', body: JSON.stringify(customer) });
 
-    const response = await unwrapAsync(this._client.post<Customer>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Customer>>(`?${urlParams.toString()}`));
 
-    return response;
+    return response.data;
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams) => {
+  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const customer = {
       id,
       ...(params.name && { name: params.name }),
@@ -72,49 +73,48 @@ export class LocalProvider implements PayKitProvider {
 
     const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerUpdated', body: JSON.stringify(customer) });
 
-    const response = await unwrapAsync(this._client.put<Customer>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Customer>>(`?${urlParams.toString()}`));
 
-    return response;
+    return response.data;
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
     const urlParams = new URLSearchParams({ resource: 'customer', type: '$customerRetrieved', body: JSON.stringify({ id }) });
 
-    const response = await unwrapAsync(this._client.get<Customer>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Customer>>(`?${urlParams.toString()}`));
 
-    return response;
+    return response.data;
   };
 
-  async updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription> {
-    const subscription = {
-      id,
-      metadata: params.metadata,
-    };
+  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+    const subscription = { id, ...params };
 
     const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionUpdated', body: JSON.stringify(subscription) });
 
-    const response = await unwrapAsync(this._client.put<Subscription>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Subscription>>(`?${urlParams.toString()}`));
 
-    return response;
-  }
+    return response.data;
+  };
 
-  async cancelSubscription(id: string): Promise<null> {
+  cancelSubscription = async (id: string): Promise<null> => {
     const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionCancelled', body: JSON.stringify({ id }) });
 
-    await unwrapAsync(this._client.delete<null>(`?${urlParams.toString()}`));
+    await unwrapAsync(this._client.post<null>(`?${urlParams.toString()}`));
 
     return null;
-  }
+  };
 
-  async retrieveSubscription(id: string): Promise<Subscription | null> {
+  retrieveSubscription = async (id: string): Promise<Subscription | null> => {
     const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionRetrieved', body: JSON.stringify({ id }) });
 
-    const response = await unwrapAsync(this._client.get<Subscription>(`?${urlParams.toString()}`));
+    const response = await unwrapAsync(this._client.post<WebhookEvent<Subscription>>(`?${urlParams.toString()}`));
 
-    return response;
-  }
+    console.log({ response });
 
-  async handleWebhook(_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
+    return response.data;
+  };
+
+  handleWebhook = async (_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
     throw new Error('handleWebhook must be called through the server export. Use: import { handleWebhook } from "@paykit-sdk/local/server"');
-  }
+  };
 }

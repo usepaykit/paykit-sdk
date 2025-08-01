@@ -8,13 +8,15 @@ import {
   Subscription,
   ValidationError,
   Webhook,
+  WebhookEvent,
   WebhookEventLiteral,
+  WebhookEventPayload,
 } from '@paykit-sdk/core';
 import { nanoid } from 'nanoid';
 import { __defaultPaykitConfig, getKeyValue, updateKey } from './tools';
 import { parseJsonValues } from './utils';
 
-type CheckoutWithProviderMetadata = Omit<Checkout, 'id' | 'payment_url'> & { provider_metadata: PaykitMetadata };
+type CheckoutWithProviderMetadata = Checkout & { provider_metadata: PaykitMetadata };
 
 /**
  * Product
@@ -121,29 +123,36 @@ const server$CreatePayment = async (paymentId: string) => {
   return paymentId;
 };
 
+const makeWebhookEvent = <T extends LooseAutoComplete<WebhookEventLiteral>, Resource>(type: T, data: Resource) => {
+  return { id: `evt_${nanoid(30)}`, type, created: Date.now(), data } as WebhookEvent<Resource>;
+};
+
 /**
  * Webhook
  */
-export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook }) => {
-  const { url, webhook: _ } = dto;
-
+export const server$HandleWebhook = async (url: string, webhook: Webhook): Promise<WebhookEventPayload> => {
   const urlParams = new URL(url).searchParams.toString();
 
-  console.log({ urlParams });
+  const urlSearchParams = new URLSearchParams(urlParams);
 
-  if (!urlParams) throw new ValidationError('Invalid webhook URL', { cause: 'Invalid webhook URL' });
+  const resource = urlSearchParams.get('resource');
 
-  const decodedData = decodeURIComponent(urlParams);
+  const type = urlSearchParams.get('type') as LooseAutoComplete<WebhookEventLiteral>;
 
-  console.log({ decodedData });
+  const bodyParam = urlSearchParams.get('body');
 
-  const webhookData = JSON.parse(decodedData) as { type: LooseAutoComplete<WebhookEventLiteral>; data: Record<string, any> };
+  if (!bodyParam) throw new ValidationError('Missing body parameter', {});
 
-  const { type, data } = webhookData;
+  const data = JSON.parse(bodyParam) as Record<string, any>;
 
   const parsedData = parseJsonValues(data);
 
-  const resource: string = '';
+  console.log({ parsedData });
+
+  if (!resource) throw new ValidationError('Missing resource parameter', {});
+
+  let result: any;
+  let webhookEvent: WebhookEventPayload | null = null;
 
   if (resource == 'checkout') {
     switch (type) {
@@ -173,8 +182,7 @@ export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook 
           productName: product.name,
         };
 
-        const checkoutWithoutPayment = {
-          id: `ch_${nanoid(30)}`,
+        const checkoutWithoutPaymentAndId = {
           amount: await amount,
           customer_id: parsedData.customer_id,
           metadata: parsedData.metadata,
@@ -182,26 +190,30 @@ export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook 
           products: [{ id: parsedData.item_id, quantity: 1 }],
           currency: (parsedData.provider_metadata?.['currency'] as string) ?? 'USD',
           provider_metadata: providerMetadata,
-        } as CheckoutWithProviderMetadata;
+        } as Omit<Checkout, 'id' | 'payment_url'>;
 
-        const flowId = safeEncode(checkoutWithoutPayment);
+        const flowId = safeEncode(checkoutWithoutPaymentAndId);
 
         if (!flowId.ok) throw new ValidationError('Failed to create checkout', {});
 
         const checkout = {
-          ...checkoutWithoutPayment,
+          ...checkoutWithoutPaymentAndId,
           id: flowId.value,
-          payment_url: `${parsedData.webhookUrl}/checkout?id=${flowId.value}`,
+          payment_url: `${parsedData.paymentUrl}/checkout?id=${flowId.value}`,
         } as CheckoutWithProviderMetadata;
 
         const { provider_metadata, ...checkoutData } = checkout;
 
         await server$CreateCheckout(checkoutData as Checkout);
 
-        return checkout;
+        result = checkoutData;
+        webhookEvent = makeWebhookEvent<'$checkoutCreated', Checkout>('$checkoutCreated', checkoutData);
+        break;
 
       case '$checkoutRetrieved':
-        return await server$RetrieveCheckout(parsedData.id);
+        result = await server$RetrieveCheckout(parsedData.id);
+        webhookEvent = makeWebhookEvent<'$checkoutRetrieved', Checkout>('$checkoutRetrieved', result);
+        break;
 
       default:
         throw new ValidationError('Unknown webhook type', {});
@@ -210,21 +222,26 @@ export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook 
     switch (type) {
       case '$customerCreated':
         await server$CreateCustomer(parsedData as Customer);
-        return parsedData as Customer;
+        result = parsedData as Customer;
+        webhookEvent = makeWebhookEvent<'$customerCreated', Customer>('$customerCreated', result);
+        break;
 
       case '$customerRetrieved':
-        return await server$RetrieveCustomer(parsedData.id);
+        result = await server$RetrieveCustomer(parsedData.id);
+        webhookEvent = makeWebhookEvent<'$customerRetrieved', Customer>('$customerRetrieved', result);
+        break;
 
       case '$customerUpdated':
         await server$PutCustomer(parsedData as Customer);
-        return parsedData as Customer;
+        result = parsedData as Customer;
+        webhookEvent = makeWebhookEvent<'$customerUpdated', Customer>('$customerUpdated', result);
+        break;
 
       case '$customerDeleted':
         await server$DeleteCustomer(parsedData.id);
-        return null;
-
-      case '$customerRetrieved':
-        return parsedData as Customer;
+        result = null;
+        webhookEvent = makeWebhookEvent<'$customerDeleted', Customer | null>('$customerDeleted', result);
+        break;
 
       default:
         throw new ValidationError('Unknown webhook type', {});
@@ -233,18 +250,27 @@ export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook 
     switch (type) {
       case '$subscriptionCreated':
         await server$CreateSubscription(parsedData as Subscription);
-        return parsedData as Subscription;
+        result = parsedData as Subscription;
+        webhookEvent = makeWebhookEvent<'$subscriptionCreated', Subscription>('$subscriptionCreated', result);
+        break;
 
       case '$subscriptionUpdated':
-        await server$UpdateSubscriptionHelper(parsedData.id, record => ({ ...record, metadata: { ...record.metadata, ...parsedData } }));
-        return parsedData as Subscription;
+        await server$UpdateSubscriptionHelper(parsedData.id, record => ({ ...record, metadata: { ...record.metadata, ...parsedData.metadata } }));
+        result = parsedData as Subscription;
+        webhookEvent = makeWebhookEvent<'$subscriptionUpdated', Subscription>('$subscriptionUpdated', result);
+        break;
 
       case '$subscriptionCancelled':
         await server$UpdateSubscriptionHelper(parsedData.id, record => ({ ...record, status: 'canceled' }));
-        return null;
+        result = null;
+        webhookEvent = makeWebhookEvent<'$subscriptionCancelled', Subscription>('$subscriptionCancelled', result);
+        break;
 
       case '$subscriptionRetrieved':
-        return await server$RetrieveSubscription(parsedData.id);
+        result = await server$RetrieveSubscription(parsedData.id);
+        console.log({ result });
+        webhookEvent = makeWebhookEvent<'$subscriptionRetrieved', Subscription>('$subscriptionRetrieved', result);
+        break;
 
       default:
         throw new ValidationError('Unknown webhook type', {});
@@ -253,14 +279,28 @@ export const server$HandleWebhook = async (dto: { url: string; webhook: Webhook 
     switch (type) {
       case '$paymentReceived':
         await server$CreatePayment(parsedData.id);
-        return parsedData as { id: string };
+        result = parsedData as { id: string };
+        webhookEvent = makeWebhookEvent<'$paymentReceived', { id: string }>('$paymentReceived', result);
+        break;
 
       default:
         throw new ValidationError('Unknown webhook type', {});
     }
+  } else {
+    console.log('Unknown webhook type error message', { type, data });
+    throw new ValidationError('Unknown webhook type', {});
   }
 
-  console.log('Unknown webhook type error message', { type, data });
+  try {
+    const webhookWithHandlers = webhook as unknown as { handlers: Map<string, ((event: any) => Promise<void>)[]> };
+    const handlers = webhookWithHandlers.handlers?.get(type as string);
 
-  throw new ValidationError('Unknown webhook type', {});
+    if (handlers && handlers.length > 0) {
+      await Promise.all(handlers.map((handler: (event: any) => Promise<void>) => handler(result)));
+    }
+  } catch (error) {
+    throw new ValidationError('Error calling webhook handlers', {});
+  }
+
+  return webhookEvent as WebhookEventPayload;
 };

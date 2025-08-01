@@ -5,6 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { PaykitMetadata, safeEncode, Subscription, type Checkout } from '@paykit-sdk/core';
 import { Button, Input, Toast } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
+import { nanoid } from 'nanoid';
 import * as RHF from 'react-hook-form';
 import { z } from 'zod';
 
@@ -29,8 +30,6 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
   const webhookUrl = provider_metadata?.webhookUrl;
   const productName = provider_metadata?.productName;
 
-  console.log({ provider_metadata });
-
   const [isProcessing, setIsProcessing] = React.useState<boolean>(false);
 
   const form = RHF.useForm<CheckoutFormSchema>({ resolver: zodResolver(formSchema) });
@@ -41,10 +40,9 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
 
       if (!webhookUrl) throw new Error('API URL is not set in local provider initialization');
 
-      const makeWebhookUrl = (dto: { type: string; data: Record<string, unknown> }) => {
-        const url = new URL(webhookUrl);
-        const urlParams = new URLSearchParams(JSON.stringify(dto));
-        return `${url.toString()}?${urlParams.toString()}`;
+      const makeWebhookUrl = (dto: { type: string; body: Record<string, unknown>; resource: string }) => {
+        const urlParams = new URLSearchParams({ resource: dto.resource, type: dto.type, body: JSON.stringify(dto.body), webhookUrl: webhookUrl });
+        return `/api/webhook?${urlParams.toString()}`;
       };
 
       console.log('Webhook URL:', webhookUrl);
@@ -53,9 +51,8 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
 
       if (!paymentId.ok) throw new Error('Failed to generate payment ID');
 
-      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$paymentReceived', data: { id: paymentId.value } }), {
+      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$paymentReceived', body: { id: paymentId.value }, resource: 'payment' }), {
         method: 'POST',
-        mode: 'cors',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
 
@@ -74,15 +71,10 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
           metadata: metadata,
         } as Omit<Subscription, 'id'>;
 
-        const subscriptionId = safeEncode(subscriptionWithoutId);
-
-        if (!subscriptionId.ok) throw new Error('Failed to generate subscription ID');
-
         const subscriptionCreated = await fetch(
-          makeWebhookUrl({ type: '$subscriptionCreated', data: { id: subscriptionId.value, ...subscriptionWithoutId } }),
+          makeWebhookUrl({ type: '$subscriptionCreated', body: { id: `sub_${nanoid(30)}`, ...subscriptionWithoutId }, resource: 'subscription' }),
           {
             method: 'POST',
-            mode: 'cors',
             headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
           },
         );

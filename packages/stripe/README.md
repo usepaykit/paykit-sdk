@@ -42,6 +42,116 @@ paykit.webhooks
   });
 ```
 
+## Webhook Implementation
+
+### Next.js API Route
+
+```typescript
+import { paykit } from '@/lib/paykit';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  console.log('Stripe webhook received');
+
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
+    .on('$checkoutCreated', async event => {
+      console.log('Checkout created:', event.data);
+      // Handle checkout creation
+    })
+    .on('$customerCreated', async event => {
+      console.log('Customer created:', event.data);
+      // Handle customer creation
+    })
+    .on('$customerUpdated', async event => {
+      console.log('Customer updated:', event.data);
+      // Handle customer updates
+    })
+    .on('$subscriptionCreated', async event => {
+      console.log('Subscription created:', event.data);
+      // Handle subscription creation
+    })
+    .on('$subscriptionUpdated', async event => {
+      console.log('Subscription updated:', event.data);
+      // Handle subscription updates
+    })
+    .on('$subscriptionCancelled', async event => {
+      console.log('Subscription cancelled:', event.data);
+      // Handle subscription cancellation
+    })
+    .on('$invoicePaid', async event => {
+      console.log('Payment received:', event.data);
+      // Handle successful payment
+    });
+
+  const headers = Object.fromEntries(request.headers.entries());
+  const body = await request.text();
+  await webhook.handle({ body, headers });
+
+  return NextResponse.json({ success: true });
+}
+```
+
+### Express.js Route
+
+```typescript
+import { paykit } from '@/lib/paykit';
+import express from 'express';
+
+const app = express();
+app.use(express.raw({ type: 'application/json' }));
+
+app.post('/api/webhooks/stripe', async (req, res) => {
+  console.log('Stripe webhook received');
+
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
+    .on('$checkoutCreated', async event => {
+      console.log('Checkout created:', event.data);
+    })
+    .on('$customerCreated', async event => {
+      console.log('Customer created:', event.data);
+    })
+    .on('$invoicePaid', async event => {
+      console.log('Payment received:', event.data);
+    });
+
+  const headers = req.headers;
+  const body = req.body;
+  await webhook.handle({ body, headers });
+
+  res.json({ success: true });
+});
+```
+
+### Vite.js
+
+```typescript
+import { paykit } from '@/lib/paykit';
+
+export default defineEventHandler(async event => {
+  console.log('Stripe webhook received');
+
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
+    .on('$checkoutCreated', async event => {
+      console.log('Checkout created:', event.data);
+    })
+    .on('$customerCreated', async event => {
+      console.log('Customer created:', event.data);
+    })
+    .on('$invoicePaid', async event => {
+      console.log('Payment received:', event.data);
+    });
+
+  const headers = getHeaders(event);
+  const body = await readBody(event);
+  await webhook.handle({ body, headers });
+
+  return { success: true };
+});
+```
+
 ## Subscription Management
 
 ```typescript

@@ -32,8 +32,9 @@ function App() {
 ```tsx
 import * as React from 'react';
 import { useCustomer, useSubscription, useCheckout } from '@paykit-sdk/react';
+import { CustomerView } from './customer-view';
 
-function CustomerDashboard() {
+const CustomerDashboard = ({ customerId }: { customerId: string }) => {
   const { retrieve, create, update } = useCustomer();
 
   React.useEffect(() => {
@@ -45,7 +46,7 @@ function CustomerDashboard() {
   if (retrieve.error) return <Error error={retrieve.error} />;
 
   return <CustomerView customer={retrieve.data} />;
-}
+};
 ```
 
 ## Available Hooks
@@ -60,8 +61,8 @@ Works with any PayKit provider including Stripe, Polar, Gumroad, and more.
 
 ## Documentation
 
-- [React Documentation](https://paykit.dev/docs/react)
-- [PayKit Documentation](https://paykit.dev)
+- [React Documentation](https://usepaykit.dev/docs/react)
+- [PayKit Documentation](https://usepaykit.dev)
 - [Production Examples](https://usepaykit.dev/docs/examples)
 
 ## TypeScript Support

@@ -1,6 +1,6 @@
 # @paykit-sdk/react
 
-React hooks and components for PayKit SDK - Universal payment processing with Stripe, Polar, and more.
+PayKit React is a toolkit designed to simplify payment processing in React applications. It provides hooks and components that work seamlessly with any PayKit provider (Stripe, Polar, Gumroad, etc.) to handle customers, subscriptions, and checkouts.
 
 ## Installation
 
@@ -16,9 +16,6 @@ npm install @paykit-sdk/react
 import { PaykitProvider } from '@paykit-sdk/react';
 import { stripe } from '@paykit-sdk/stripe';
 
-// or import { local } from '@paykit-sdk/local';
-// or import { polar } from '@paykit-sdk/polar';
-
 const provider = stripe();
 
 function App() {
@@ -33,6 +30,7 @@ function App() {
 ### 2. Use Hooks
 
 ```tsx
+import * as React from 'react';
 import { useCustomer, useSubscription, useCheckout } from '@paykit-sdk/react';
 
 function CustomerDashboard() {
@@ -43,76 +41,32 @@ function CustomerDashboard() {
   }, [customerId]);
 
   if (retrieve.loading) return <Spinner />;
+
   if (retrieve.error) return <Error error={retrieve.error} />;
 
   return <CustomerView customer={retrieve.data} />;
 }
 ```
 
-## Hooks API
+## Available Hooks
 
-### `useCustomer(options)`
-
-```tsx
-const { customer, create, update } = useCustomer({ customerId: 'cus_123' });
-```
-
-**Returns:**
-
-- `customer` - Customer data
-- `isLoading` - Loading state
-- `error` - Error state
-- `create` - Create customer mutation
-- `update` - Update customer mutation
-
-### `useSubscription(subscriptionId)`
-
-```tsx
-const { subscription, update, cancel } = useSubscription('sub_123');
-```
-
-**Returns:**
-
-- `subscription` - Subscription data
-- `isLoading` - Loading state
-- `error` - Error state
-- `update` - Update subscription mutation
-- `cancel` - Cancel subscription mutation
-
-### `useCheckout(checkoutId?)`
-
-```tsx
-const { checkout, create } = useCheckout();
-```
-
-**Returns:**
-
-- `checkout` - Checkout data (if ID provided)
-- `isLoading` - Loading state
-- `error` - Error state
-- `create` - Create checkout mutation
+- `useCustomer()` - Manage customer data
+- `useSubscription()` - Handle subscriptions
+- `useCheckout()` - Process checkouts
 
 ## Providers
 
-Works with any PayKit provider:
+Works with any PayKit provider including Stripe, Polar, Gumroad, and more.
 
-```tsx
-// Stripe
-import { stripe } from '@paykit-sdk/stripe';
-const provider = stripe();
+## Documentation
 
-// Local (for development)
-import { local } from '@paykit-sdk/local';
-const provider = local();
-
-// Polar
-import { polar } from '@paykit-sdk/polar';
-const provider = polar();
-```
+- [React Documentation](https://paykit.dev/docs/react)
+- [PayKit Documentation](https://paykit.dev)
+- [Production Examples](https://usepaykit.dev/docs/examples)
 
 ## TypeScript Support
 
-Full TypeScript support included with proper type definitions.
+Full TypeScript support included.
 
 ## License
 

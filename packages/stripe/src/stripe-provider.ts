@@ -144,6 +144,6 @@ export class StripeProvider implements PayKitProvider {
       });
     }
 
-    throw new Error(`Unknown event type: ${event.type}`);
+    throw new Error(`Unhandled event type: ${event.type}`);
   };
 }

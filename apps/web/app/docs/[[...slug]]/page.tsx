@@ -1,5 +1,6 @@
 import { Mdx } from '@/components/mdx-components';
 import { DocsPager } from '@/components/pager';
+import { PayKitCloudCard } from '@/components/paykit-cloud-card';
 import { DashboardTableOfContents } from '@/components/toc';
 import { getTableOfContents } from '@/lib/toc';
 import { badgeVariants, cn } from '@paykit-sdk/ui';
@@ -125,9 +126,12 @@ export default async function DocPage({ params }: DocPageProps) {
       {doc.toc && (
         <div className="bg-muted/30 hidden w-80 shrink-0 border-l xl:block">
           <div className="sticky top-20 p-6">
-            <div className="space-y-4">
-              <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">On this page</h4>
-              <DashboardTableOfContents toc={toc} />
+            <div className="space-y-6">
+              <div className="space-y-4">
+                <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">On this page</h4>
+                <DashboardTableOfContents toc={toc} />
+              </div>
+              <PayKitCloudCard />
             </div>
           </div>
         </div>

@@ -18,4 +18,5 @@ export * from './primitives/progress';
 export * from './primitives/textarea';
 export * from './primitives/switch';
 export * from './primitives/select';
+export * from './primitives/sheet';
 export { cn } from './lib/utils';

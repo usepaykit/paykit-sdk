@@ -45,21 +45,6 @@ importers:
       '@next/mdx':
         specifier: ^15.3.4
         version: 15.4.5(@mdx-js/loader@3.1.0(acorn@8.15.0))(@mdx-js/react@3.1.0(@types/react@19.1.9)(react@19.1.1))
-      '@paykit-sdk/core':
-        specifier: 1.1.0
-        version: 1.1.0
-      '@paykit-sdk/local':
-        specifier: 1.1.0-alpha.2
-        version: 1.1.0-alpha.2(@paykit-sdk/core@1.1.0)
-      '@paykit-sdk/polar':
-        specifier: 1.1.0
-        version: 1.1.0(@paykit-sdk/core@1.1.0)(zod@3.25.76)
-      '@paykit-sdk/stripe':
-        specifier: 1.1.0
-        version: 1.1.0(@paykit-sdk/core@1.1.0)(@types/node@20.19.9)
-      '@paykit-sdk/ui':
-        specifier: 0.1.1
-        version: 0.1.1(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@radix-ui/react-accordion':
         specifier: ^1.2.11
         version: 1.2.11(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -130,6 +115,21 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@paykit-sdk/core':
+        specifier: workspace:*
+        version: link:../../packages/paykit
+      '@paykit-sdk/local':
+        specifier: workspace:*
+        version: link:../../packages/local
+      '@paykit-sdk/polar':
+        specifier: workspace:*
+        version: link:../../packages/polar
+      '@paykit-sdk/stripe':
+        specifier: workspace:*
+        version: link:../../packages/stripe
+      '@paykit-sdk/ui':
+        specifier: workspace:*
+        version: link:../../packages/ui
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.11
@@ -2205,30 +2205,6 @@ packages:
   '@parcel/watcher@2.5.1':
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
-
-  '@paykit-sdk/core@1.1.0':
-    resolution: {integrity: sha512-BhWuG8c+Uyki56uJj9oY3Ck/oMiSxxWTrxqmn9lnRVCvLl7tLOzmB0SbCNSaUNu3dChIDrYCW/Xy5segWGer9w==}
-
-  '@paykit-sdk/local@1.1.0-alpha.2':
-    resolution: {integrity: sha512-u3ndVlTN1JNOhLt3z1KXnzNn4ciW64vPfrhTaEaAxXhV51bWdjpe02rDUeBFMK1TruZPSHkoc+KgU7pZkUKcxQ==}
-    peerDependencies:
-      '@paykit-sdk/core': '>=1.1.0'
-
-  '@paykit-sdk/polar@1.1.0':
-    resolution: {integrity: sha512-tANIvrkVT7GefwHo9EXIhPZBwXd7lnTi7LsmW3HBmfqfR+eU+Gluq+LPa6LVrZWLKLAGASyYcqYMm/n7pf/c+g==}
-    peerDependencies:
-      '@paykit-sdk/core': ^1.1.0
-
-  '@paykit-sdk/stripe@1.1.0':
-    resolution: {integrity: sha512-aZqjGR6sDQgNE7rZMHNjhmE95r91V2Kwxkn8ZHW43mvjLL/UOg5+yuNgTj3E3ecz/1E/x/+dC4PZnfL9ytmrmg==}
-    peerDependencies:
-      '@paykit-sdk/core': ^1.1.0
-
-  '@paykit-sdk/ui@0.1.1':
-    resolution: {integrity: sha512-ei0y75IGvF/dZWsNqhts5D70G/hP+ZY2oZx54KGP2qd3OpChwRbu+Qsdw2so6NmfXbzi2MeokQqah/6z/GH8rA==}
-    peerDependencies:
-      react: ^19.1.0
-      react-dom: ^19.1.0
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -8467,51 +8443,6 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paykit-sdk/core@1.1.0':
-    dependencies:
-      chalk: 5.4.1
-
-  '@paykit-sdk/local@1.1.0-alpha.2(@paykit-sdk/core@1.1.0)':
-    dependencies:
-      '@paykit-sdk/core': 1.1.0
-      nanoid: 5.1.5
-      server-only: 0.0.1
-
-  '@paykit-sdk/polar@1.1.0(@paykit-sdk/core@1.1.0)(zod@3.25.76)':
-    dependencies:
-      '@paykit-sdk/core': 1.1.0
-      '@polar-sh/sdk': 0.33.2(zod@3.25.76)
-    transitivePeerDependencies:
-      - '@modelcontextprotocol/sdk'
-      - zod
-
-  '@paykit-sdk/stripe@1.1.0(@paykit-sdk/core@1.1.0)(@types/node@20.19.9)':
-    dependencies:
-      '@paykit-sdk/core': 1.1.0
-      stripe: 18.4.0(@types/node@20.19.9)
-    transitivePeerDependencies:
-      - '@types/node'
-
-  '@paykit-sdk/ui@0.1.1(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
-    dependencies:
-      '@radix-ui/react-accordion': 1.2.11(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@radix-ui/react-avatar': 1.1.10(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@radix-ui/react-scroll-area': 1.2.9(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@radix-ui/react-separator': 1.1.7(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      '@radix-ui/react-slot': 1.2.3(@types/react@19.1.9)(react@19.1.1)
-      '@radix-ui/react-tabs': 1.1.12(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      class-variance-authority: 0.7.1
-      clsx: 2.1.1
-      lucide-react: 0.525.0(react@19.1.1)
-      react: 19.1.1
-      react-dom: 19.1.1(react@19.1.1)
-      sonner: 1.7.4(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
-      tailwind-merge: 3.3.1
-      tw-animate-css: 1.3.6
-    transitivePeerDependencies:
-      - '@types/react'
-      - '@types/react-dom'
-
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
@@ -12998,12 +12929,6 @@ snapshots:
   strip-bom@3.0.0: {}
 
   strip-json-comments@3.1.1: {}
-
-  stripe@18.4.0(@types/node@20.19.9):
-    dependencies:
-      qs: 6.14.0
-    optionalDependencies:
-      '@types/node': 20.19.9
 
   stripe@18.4.0(@types/node@22.17.0):
     dependencies:

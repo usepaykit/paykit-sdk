@@ -36,13 +36,16 @@ export class StripeProvider implements PayKitProvider {
    */
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { customer_id, item_id, metadata, session_type, provider_metadata } = params;
+
     const checkout = await this.stripe.checkout.sessions.create({
       customer: customer_id,
-      metadata,
-      line_items: [{ price: item_id }],
       mode: session_type === 'one_time' ? 'payment' : 'subscription',
+      ...(session_type == 'one_time' && { metadata }),
+      ...(session_type == 'recurring' && { subscription_data: { metadata } }),
+      line_items: [{ price: item_id }],
       ...provider_metadata,
     });
+
     return toPaykitCheckout(checkout);
   };
 

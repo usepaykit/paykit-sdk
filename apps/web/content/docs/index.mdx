@@ -8,55 +8,15 @@ toc: true
 
 # Welcome to PayKit
 
-PayKit is a modern, lightweight payment processing library designed specifically for React and Next.js applications. It provides a unified interface for integrating multiple payment providers like Stripe, Polar, and Gumroad.
+PayKit was built to solve a fundamental problem: switching payment providers shouldn't require rewriting your entire payment flow. Whether you're moving to a new region, need better tax rates, or want to optimize for specific payment methods, changing providers often means rebuilding subscriptions, webhooks, and checkout flows from scratch.
+
+PayKit provides a unified interface that abstracts away provider-specific implementations, allowing you to switch between Stripe, Polar, Gumroad, and other providers without touching your business logic.
 
 ## Why PayKit?
 
-- **Unified API**: Single interface for multiple payment providers
-- **React Native**: Built with React and TypeScript from the ground up
-- **Lightweight**: Minimal bundle size with tree-shaking support
-- **Type Safe**: Full TypeScript support with excellent developer experience
-- **Flexible**: Easy to customize and extend for your specific needs
+Payment providers excel at different things. Stripe dominates in North America, Polar specializes in creator subscriptions, and Gumroad leads in digital product sales. But switching between them means rewriting your payment infrastructure each time.
 
-## Key Features
-
-- 🔄 **Multiple Providers**: Support for Stripe, Polar, Gumroad, and more
-- 🎯 **Type Safe**: Full TypeScript support with excellent IntelliSense
-- ⚡ **Performance**: Optimized for React with minimal re-renders
-- 🛡️ **Security**: Built-in security best practices and validation
-- 📱 **Responsive**: Works seamlessly across all devices and screen sizes
-- 🎨 **Customizable**: Easy to style and customize to match your brand
-
-## Quick Start
-
-Get started with PayKit in just a few minutes:
-
-```bash
-npm install @paykit-sdk/react
-```
-
-```tsx
-import { PayKitProvider, usePayKit } from '@paykit-sdk/react';
-
-function App() {
-  return (
-    <PayKitProvider>
-      <PaymentForm />
-    </PayKitProvider>
-  );
-}
-```
-
-Ready to get started? Check out our [Installation Guide](/docs/installation) or jump straight to the [Quick Start](/docs/getting-started) tutorial.
-
-## Features
-
-- **Unified API**: One interface for multiple payment providers
-- **TypeScript Support**: Full type safety and IntelliSense
-- **Framework Agnostic**: Works with React, Next.js, Vue, and more
-- **Webhook Support**: Built-in webhook handling and verification
-- **Error Handling**: Comprehensive error handling and recovery
-- **Testing**: Easy testing with local provider
+PayKit standardizes the interface across providers. Your subscription logic, webhook handlers, and checkout flows work unchanged regardless of which provider you choose. When you need to switch for regional compliance, better rates, or new features, you simply change the provider configuration.
 
 ## Quick Start
 
@@ -71,26 +31,22 @@ import { stripe } from '@paykit-sdk/stripe';
 const provider = stripe();
 const paykit = new PayKit(provider);
 
-const payment = await paykit.checkout.create({
-  customerId: 'cus_123',
-  amount: 1000, // $10.00
-  currency: 'usd',
-  description: 'Test payment',
+const checkout = await paykit.checkouts.create({
+  customer_id: 'cus_123',
+  item_id: 'price_123',
+  session_type: 'one_time',
+  metadata: { plan: 'pro' },
 });
 ```
 
-## Payment Providers
+## Supported Providers
 
-PayKit supports multiple payment providers:
+- Stripe - Credit cards, digital wallets, global reach
+- Polar - Creator subscriptions and memberships
+- Gumroad - Digital product sales and licensing
 
-- **Stripe** - Credit cards, digital wallets, and more
-- **Polar** - Subscription and membership payments
-- **Gumroad** - Digital product sales
-
-## Getting Started
-
-Choose your path to get started with PayKit:
+## Next Steps
 
 - [Installation](/docs/installation) - Set up PayKit in your project
 - [Quick Start](/docs/getting-started) - Create your first payment
-- [Payment Providers](/docs/providers/stripe) - Learn about specific providers
+- [Providers](/docs/providers/stripe) - Learn about specific providers

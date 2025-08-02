@@ -17,7 +17,7 @@ export default function AboutPage() {
           <div className="flex items-center space-x-2 md:hidden">
             <ThemeToggle />
             <Button asChild variant="ghost" size="sm">
-              <Link href="/docs">
+              <Link href="/docs/introduction">
                 <BookOpen className="size-4" />
               </Link>
             </Button>

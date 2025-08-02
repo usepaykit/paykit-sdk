@@ -37,10 +37,7 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
     }
   }, [content, currentContent, isChangingLine]);
 
-  // Empty lines should just be spacing
-  if (currentContent === '') {
-    return <div className="h-4" />;
-  }
+  if (currentContent === '') return <div className="h-4" />;
 
   return (
     <div
@@ -51,7 +48,9 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
       )}
     >
       <div className="[&_*]:!bg-transparent">
-        <CodeBlock language="typescript">{currentContent}</CodeBlock>
+        <CodeBlock language="typescript" customStyle={{ padding: 0, background: 'none', fontSize: '14px', border: 'none' }}>
+          {currentContent}
+        </CodeBlock>
       </div>
     </div>
   );

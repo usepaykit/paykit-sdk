@@ -26,50 +26,32 @@ export const docsConfig = {
     {
       title: 'Getting Started',
       items: [
-        { title: 'Introduction', href: '/docs', items: [] },
-        { title: 'Installation', href: '/docs/installation', items: [] },
-        { title: 'Quick Start', href: '/docs/getting-started', items: [] },
+        { title: 'Introduction', href: '/docs/core/introduction', items: [] },
+        {
+          title: 'Installation',
+          href: '/docs/core/installation-root',
+          items: [
+            { title: 'React', href: '/docs/core/vitejs-installation', items: [] },
+            { title: 'Next.js', href: '/docs/core/nextjs-installation', items: [] },
+          ],
+        },
+        { title: 'Quick Start', href: '/docs/core/getting-started', items: [] },
       ],
     },
     {
       title: 'Payment Providers',
       items: [
+        { title: 'Local', href: '/docs/providers/local', items: [] },
         { title: 'Stripe', href: '/docs/providers/stripe', items: [] },
         { title: 'Polar', href: '/docs/providers/polar', items: [] },
-        { title: 'Gumroad', href: '/docs/providers/gumroad', items: [] },
       ],
     },
     {
       title: 'Core Concepts',
       items: [
-        { title: 'Payment Flow', href: '/docs/concepts/payment-flow', items: [] },
+        { title: 'API Reference', href: '/docs/concepts/api-reference', items: [] },
         { title: 'Error Handling', href: '/docs/concepts/error-handling', items: [] },
-        { title: 'Testing', href: '/docs/concepts/testing', items: [] },
-      ],
-    },
-    {
-      title: 'API Reference',
-      items: [
-        { title: 'Core API', href: '/docs/api-reference', items: [] },
-        { title: 'Types', href: '/docs/api-reference/types', items: [] },
-        { title: 'Utilities', href: '/docs/api-reference/utilities', items: [] },
-      ],
-    },
-    {
-      title: 'Guides',
-      items: [
-        { title: 'React Integration', href: '/docs/guides/react', items: [] },
-        { title: 'Next.js Setup', href: '/docs/guides/nextjs', items: [] },
-        { title: 'Webhook Setup', href: '/docs/guides/webhooks', items: [] },
-        { title: 'Production Deployment', href: '/docs/guides/deployment', items: [] },
-      ],
-    },
-    {
-      title: 'Examples',
-      items: [
-        { title: 'Basic Payment', href: '/docs/examples/basic-payment', items: [] },
-        { title: 'Subscription', href: '/docs/examples/subscription', items: [] },
-        { title: 'One-time Purchase', href: '/docs/examples/one-time', items: [] },
+        { title: 'Client Side Integration', href: '/docs/concepts/client-side-usage', items: [] },
       ],
     },
   ],

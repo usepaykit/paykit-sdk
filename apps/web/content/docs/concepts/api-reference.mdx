@@ -1,0 +1,110 @@
+---
+title: 'API Reference'
+description: 'Complete API reference for PayKit SDK.'
+date: '2025-08-02'
+published: true
+toc: true
+---
+
+PayKit provides a unified API that works across all payment providers. This reference covers the core resource types.
+
+## Types
+
+<br />
+
+```typescript
+type PaykitMetadata = {
+  [key: string]: string;
+};
+```
+
+## Customer
+
+<br />
+
+```typescript
+interface Customer {
+  id: string;
+  email?: string;
+  name?: string;
+  metadata?: PaykitMetadata;
+}
+
+interface CreateCustomerParams {
+  email: string;
+  name?: string;
+  metadata?: PaykitMetadata;
+}
+
+interface UpdateCustomerParams {
+  email?: string;
+  name?: string;
+  metadata?: PaykitMetadata;
+}
+```
+
+## Checkout
+
+<br />
+
+```typescript
+type CheckoutSessionType = 'one_time' | 'recurring';
+
+interface CreateCheckoutParams {
+  customer_id: string;
+  item_id: string;
+  session_type: CheckoutSessionType;
+  metadata: PaykitMetadata;
+  provider_metadata?: Record<string, unknown>;
+}
+
+interface RetrieveCheckoutParams {
+  customer_id: string;
+}
+
+interface Checkout {
+  id: string;
+  customer_id: string;
+  payment_url: string;
+  metadata: PaykitMetadata | null;
+  session_type: CheckoutSessionType;
+  products: Array<{ id: string; quantity: number }>;
+  currency: string;
+  amount: number;
+}
+```
+
+## Subscription
+
+<br />
+
+```typescript
+type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'expired';
+
+interface Subscription {
+  id: string;
+  customer_id: string;
+  status: SubscriptionStatus;
+  current_period_start: Date;
+  current_period_end: Date;
+  metadata: PaykitMetadata;
+}
+
+interface UpdateSubscriptionParams {
+  metadata: PaykitMetadata;
+}
+```
+
+## Invoice
+
+<br />
+
+```typescript
+interface Invoice {
+  id: string;
+  amount: number;
+  currency: string;
+  metadata: PaykitMetadata;
+  customer_id: string;
+}
+```

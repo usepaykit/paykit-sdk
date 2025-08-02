@@ -1,0 +1,72 @@
+---
+title: 'Introduction'
+description: 'PayKit is a unified payment processing library that abstracts away provider-specific implementations, allowing you to switch between payment providers without rewriting your code.'
+date: '2024-01-01'
+published: true
+toc: true
+---
+
+This is not just another payment library. It is how you build payment infrastructure that doesn't lock you in.
+
+You know how payment processing typically works: you choose a provider like Stripe, integrate their SDK, build your checkout flows, webhooks, and subscription logic around their specific API. This works well until you need to switch providers for better rates, regional compliance, or new features.
+
+Often, you end up rewriting your entire payment flow, rebuilding webhooks from scratch, and migrating customer data between different provider formats. The switching cost is so high that most teams stay locked into their first choice, even when it's no longer the best option.
+
+This is what PayKit aims to solve. It is built around the following principles:
+
+- Provider Agnostic: Switch between payment providers without changing your business logic.
+- Unified Interface: Every provider uses the same API, making your code predictable and maintainable.
+- Zero Lock-in: Your payment infrastructure is independent of any single provider.
+- Simple Migration: Move between providers with minimal code changes and no data loss.
+- Future Proof: Add new providers without rebuilding your payment flows.
+
+## Provider Agnostic
+
+PayKit abstracts away provider-specific implementations, so your code works the same regardless of which provider you choose. This means you can switch between Stripe, Polar, Gumroad, or any other provider without changing your business logic.
+
+In a typical payment integration, switching from Stripe to Polar requires rewriting checkout flows, webhook handlers, and subscription management. With PayKit, you simply change the provider configuration.
+
+## Unified Interface
+
+Every provider in PayKit shares the same interface. Your subscription logic, webhook handlers, and checkout flows work unchanged regardless of which provider you choose.
+
+If a new provider becomes available, we add it to the ecosystem with the same interface. You get access to new features without learning different APIs or rewriting your code.
+
+A unified interface means it's predictable for both your team and future developers. You're not learning different APIs for every payment provider.
+
+## Zero Lock-in
+
+Payment providers excel at different things. Stripe dominates in North America, Polar specializes in creator subscriptions, and Gumroad leads in digital product sales. But switching between them usually means rebuilding your payment infrastructure each time.
+
+PayKit standardizes the interface across providers. When you need to switch for regional compliance, better rates, or new features, you simply change the provider configuration.
+
+Your business logic stays the same. Your customer data remains intact. Your webhook handlers continue working. Only the underlying provider changes.
+
+## Simple Migration
+
+Moving between payment providers is typically a complex, error-prone process that requires careful planning and extensive testing. PayKit simplifies this by maintaining consistent data structures and API patterns.
+
+- Data Consistency: Customer and subscription data follows the same format across providers.
+- Webhook Compatibility: Your webhook handlers work with any provider without modification.
+- Gradual Migration: Switch providers incrementally without disrupting your service.
+- Rollback Safety: Easy to revert to your previous provider if needed.
+
+## Future Proof
+
+The payment landscape is constantly evolving. New providers emerge, regulations change, and business requirements shift. PayKit ensures your payment infrastructure can adapt without major rewrites.
+
+When you need to add support for a new region, integrate with a new payment method, or take advantage of better rates, you can do so without rebuilding your entire payment system.
+
+Your payment infrastructure becomes a flexible foundation that grows with your business, not a constraint that limits your options.
+
+## Supported Providers
+
+- Stripe - Credit cards, digital wallets, global reach
+- Polar - Creator subscriptions and memberships
+- Gumroad - Digital product sales and licensing
+
+## Next Steps
+
+- [Installation](/docs/installation) - Set up PayKit in your project
+- [Quick Start](/docs/getting-started) - Create your first payment
+- [Providers](/docs/providers/stripe) - Learn about specific providers

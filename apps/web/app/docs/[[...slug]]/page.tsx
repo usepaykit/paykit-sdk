@@ -124,7 +124,7 @@ export default async function DocPage({ params }: DocPageProps) {
       </div>
 
       {doc.toc && (
-        <div className="bg-muted/30 hidden w-80 shrink-0 border-l xl:block">
+        <div className="bg-muted/30 w-80 shrink-0 border-l">
           <div className="sticky top-20 p-6">
             <div className="space-y-6">
               <div className="space-y-4">

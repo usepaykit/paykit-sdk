@@ -1,0 +1,69 @@
+---
+title: 'Next.js'
+description: 'Install and configure PayKit for Next.js.'
+date: '2025-08-02'
+published: true
+toc: true
+---
+
+## Installation
+
+Install the PayKit CLI globally:
+
+<br />
+
+```bash
+# terminal
+npm install -g @paykit-sdk/cli
+```
+
+## Setup
+
+Initialize PayKit in your project:
+
+<br />
+
+```bash
+# terminal
+npx @paykit-sdk/cli init
+```
+
+This creates a `.paykit/config.json` file in your project root.
+
+## Development
+
+Start the development server:
+
+<br />
+
+```bash
+# terminal
+npx @paykit-sdk/cli dev
+```
+
+The checkout interface will be available at `http://localhost:3001`.
+
+## Configuration
+
+```json
+# .paykit/config.json
+{
+  "product": {
+    "itemId": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq",
+    "name": "Paykit Pro",
+    "description": "Unlimited access to Paykit",
+    "price": "$25"
+  },
+  "customer": {
+    "id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
+    "email": "emmanuelodii80@gmail.com",
+    "name": "Emmanuel Odii",
+    "metadata": {}
+  },
+  "subscriptions": [],
+  "checkouts": [],
+  "payments": []
+}
+```
+
+Edit this file to customize your payment logic and test different scenarios.

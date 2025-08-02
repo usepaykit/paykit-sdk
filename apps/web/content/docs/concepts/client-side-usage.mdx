@@ -1,0 +1,240 @@
+---
+title: 'Client-Side Usage'
+description: 'Learn how to use PayKit in React applications.'
+date: '2025-08-02'
+published: true
+toc: true
+---
+
+PayKit provides React hooks for seamless client-side integration. These hooks handle the `[data, error]` pattern automatically and provide loading states.
+
+## Basic Setup
+
+Wrap your app with the PayKit provider:
+
+<br />
+
+```typescript
+// app/providers.tsx
+import { PayKitProvider } from '@paykit-sdk/react';
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  return (
+    <PayKitProvider>
+      {children}
+    </PayKitProvider>
+  );
+}
+```
+
+## Customer Management
+
+Use the `useCustomer` hook to manage customers:
+
+<br />
+
+```typescript
+// components/customer-form.tsx
+import { useCustomer } from '@paykit-sdk/react';
+
+export function CustomerForm() {
+  const { create } = useCustomer();
+
+  const handleSubmit = async (formData: FormData) => {
+    const [customer, error] = await create.run({
+      email: formData.get('email') as string,
+      name: formData.get('name') as string,
+    });
+
+    if (error) {
+      console.error('Failed to create customer:', error.message);
+      return;
+    }
+
+    console.log('Customer created:', customer.id);
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <input name="email" type="email" placeholder="Email" required />
+      <input name="name" type="text" placeholder="Name" />
+      <button type="submit" disabled={create.loading}>
+        {create.loading ? 'Creating...' : 'Create Customer'}
+      </button>
+    </form>
+  );
+}
+```
+
+## Checkout Creation
+
+Use the `useCheckout` hook for payment flows:
+
+<br />
+
+```typescript
+// components/checkout-button.tsx
+import { useCheckout } from '@paykit-sdk/react';
+
+export function CheckoutButton() {
+  const { create } = useCheckout();
+
+  const handleCheckout = async () => {
+    const [checkout, error] = await create.run({
+      customer_id: 'cus_123',
+      item_id: 'price_123',
+      session_type: 'one_time',
+      metadata: { plan: 'pro' },
+    });
+
+    if (error) {
+      console.error('Failed to create checkout:', error.message);
+      return;
+    }
+
+    // Redirect to payment page
+    window.location.href = checkout.payment_url;
+  };
+
+  return (
+    <div>
+      <button onClick={handleCheckout} disabled={create.loading}>
+        {create.loading ? 'Creating checkout...' : 'Pay Now'}
+      </button>
+    </div>
+  );
+}
+```
+
+## Subscription Management
+
+Use the `useSubscription` hook for recurring billing:
+
+<br />
+
+```typescript
+// components/subscription-form.tsx
+import { useSubscription } from '@paykit-sdk/react';
+
+export function SubscriptionForm() {
+  const { create, cancel } = useSubscription();
+
+  const handleSubscribe = async () => {
+    const [subscription, error] = await create.run({
+      customer_id: 'cus_123',
+      item_id: 'price_123',
+      metadata: { plan: 'pro' },
+    });
+
+    if (error) {
+      console.error('Failed to create subscription:', error.message);
+      return;
+    }
+
+    console.log('Subscription created:', subscription.id);
+  };
+
+  const handleCancel = async (subscriptionId: string) => {
+    const [subscription, error] = await cancel.run(subscriptionId);
+
+    if (error) {
+      console.error('Failed to cancel subscription:', error.message);
+      return;
+    }
+
+    console.log('Subscription cancelled:', subscription.status);
+  };
+
+  return (
+    <div>
+      <button onClick={handleSubscribe} disabled={create.loading}>
+        {create.loading ? 'Creating subscription...' : 'Subscribe'}
+      </button>
+      <button onClick={() => handleCancel('sub_123')} disabled={cancel.loading}>
+        {cancel.loading ? 'Cancelling...' : 'Cancel Subscription'}
+      </button>
+    </div>
+  );
+}
+```
+
+## Complete Payment Flow
+
+Here's a complete example combining customer creation and checkout:
+
+<br />
+
+```typescript
+// components/payment-flow.tsx
+import { useCustomer, useCheckout } from '@paykit-sdk/react';
+import { useState } from 'react';
+
+export function PaymentFlow() {
+  const { create: createCustomer } = useCustomer();
+  const { create: createCheckout } = useCheckout();
+  const [customerId, setCustomerId] = useState<string | null>(null);
+
+  const handlePayment = async (formData: FormData) => {
+    // Step 1: Create customer
+    const [customer, customerError] = await createCustomer.run({
+      email: formData.get('email') as string,
+      name: formData.get('name') as string,
+    });
+
+    if (customerError) {
+      console.error('Failed to create customer:', customerError.message);
+      return;
+    }
+
+    setCustomerId(customer.id);
+
+    // Step 2: Create checkout
+    const [checkout, checkoutError] = await createCheckout.run({
+      customer_id: customer.id,
+      item_id: 'price_123',
+      session_type: 'one_time',
+      metadata: { plan: 'pro' },
+    });
+
+    if (checkoutError) {
+      console.error('Failed to create checkout:', checkoutError.message);
+      return;
+    }
+
+    // Step 3: Redirect to payment
+    window.location.href = checkout.payment_url;
+  };
+
+  return (
+    <form onSubmit={handlePayment}>
+      <input name="email" type="email" placeholder="Email" required />
+      <input name="name" type="text" placeholder="Name" />
+      <button type="submit" disabled={createCustomer.loading || createCheckout.loading}>
+        {createCustomer.loading || createCheckout.loading ? 'Processing...' : 'Start Payment'}
+      </button>
+    </form>
+  );
+}
+```
+
+## Hook Methods
+
+All PayKit hooks provide consistent methods with `.run` and `.loading`:
+
+<br />
+
+```typescript
+const {
+  create, // Function to create resource
+  update, // Function to update resource
+  delete, // Function to delete resource
+} = useResource();
+
+// Each method has:
+create.run(params)    // Execute the action
+create.loading        // Boolean loading state
+update.run(params)    // Execute the action
+update.loading        // Boolean loading state
+delete.run(id)        // Execute the action
+delete.loading        // Boolean loading state
+```

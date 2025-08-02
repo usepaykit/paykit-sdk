@@ -25,7 +25,7 @@ const Index = () => {
           <div className="flex items-center space-x-2 md:hidden">
             <ThemeToggle />
             <Button asChild variant="ghost" size="sm">
-              <Link href="/docs">
+              <Link href="/docs/introduction">
                 <BookOpen className="size-4" />
               </Link>
             </Button>
@@ -463,7 +463,7 @@ const Index = () => {
 
             <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Button asChild variant="outline" size="lg">
-                <Link href="/docs">
+                <Link href="/docs/introduction">
                   <BookOpen className="mr-2 h-5 w-5" />
                   Read Documentation
                 </Link>
@@ -488,7 +488,7 @@ const Index = () => {
               </p>
               <div className="flex items-center space-x-4">
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="/docs">
+                  <Link href="/docs/introduction">
                     <BookOpen className="size-4" />
                   </Link>
                 </Button>

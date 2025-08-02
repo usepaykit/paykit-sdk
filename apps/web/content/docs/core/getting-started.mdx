@@ -1,0 +1,136 @@
+---
+title: 'Quick Start'
+description: 'Get started with PayKit in minutes.'
+date: '2025-08-02'
+published: true
+toc: true
+---
+
+## Overview
+
+This guide will help you create your first payment with PayKit. We'll build a simple checkout flow that works with any provider.
+
+## Prerequisites
+
+- Node.js 18.0 or later
+- A payment provider (Local, Stripe, Polar, etc)
+
+## Installation
+
+Install the PayKit SDK:
+
+<br />
+
+```bash
+# terminal
+npm install @paykit-sdk/core @paykit-sdk/stripe
+```
+
+## Basic Setup
+
+Create a new file for your payment logic:
+
+<br />
+
+```typescript
+// lib/paykit.ts
+import { PayKit } from '@paykit-sdk/core';
+import { stripe } from '@paykit-sdk/stripe';
+
+const provider = stripe();
+const paykit = new PayKit(provider);
+
+export { paykit };
+```
+
+## Create Your First Checkout
+
+Add this to your component or API route:
+
+<br />
+
+```typescript
+// app/checkout/page.tsx
+import { paykit } from '@/lib/paykit';
+
+export default async function CheckoutPage() {
+  const checkout = await paykit.checkout.create({
+    customer_id: 'cus_123',
+    item_id: 'price_123',
+    session_type: 'one_time',
+    metadata: { plan: 'pro' },
+    provider_metadata: {
+      ui_mode: 'hosted',
+      success_url: 'https://localhost:3000/success'
+    }
+  })
+
+  return (
+    <div>
+      <h1>Complete Your Purchase</h1>
+      <a href={checkout.payment_url}>Pay Now </a>
+    </div>
+  );
+}
+```
+
+## Handle Webhooks
+
+Create a webhook endpoint to process payment events:
+
+<br />
+
+```typescript
+// app/api/webhook/route.ts
+import { paykit } from '@/lib/paykit';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  console.log('POST request received');
+
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
+    .on('$checkoutCreated', async e => {
+      console.log('checkout created');
+      console.log(e);
+    })
+    .on('$customerCreated', async customer => {
+      console.log({ customer });
+    })
+    .on('$invoicePaid', async invoice => {
+      console.log('Just made a sale!');
+      console.log({ invoice });
+    });
+
+  const headers = Object.fromEntries(request.headers.entries());
+  const body = await request.text();
+  await webhook.handle({ body, headers });
+
+  return NextResponse.json({ success: true });
+}
+```
+
+## Environment Variables
+
+Create a `.env` file:
+
+<br />
+
+```bash
+# .env
+STRIPE_API_KEY=sk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+## Test Your Integration
+
+1. Start your development server
+2. Navigate to your checkout page
+3. Complete a test payment
+4. Check your webhook logs
+
+## Next Steps
+
+- [Installation](/docs/installation) - Set up PayKit in your project
+- [Providers](/docs/providers/stripe) - Learn about specific providers
+- [API Reference](/docs/api-reference) - Explore the full API

@@ -3,9 +3,10 @@
 import * as React from 'react';
 import { CodeBlock } from '@/components/code-block';
 import { cn } from '@/lib/utils';
-import { Accordion, Button, Tabs } from '@paykit-sdk/ui';
+import { Accordion, Button, Tabs, Card } from '@paykit-sdk/ui';
 import { Alert } from '@paykit-sdk/ui';
 import { useMDXComponent } from 'next-contentlayer/hooks';
+import Link from 'next/link';
 
 type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['components'];
 
@@ -97,26 +98,48 @@ const components = {
   TabsList: Tabs.List,
   TabsTrigger: Tabs.Trigger,
   TabsContent: Tabs.Content,
+  LinkedCard: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
+    <Link href={href} className={cn('hover:text-foreground block transition-colors', className)}>
+      <Card.Root className="group relative overflow-hidden transition-all hover:shadow-md">
+        <Card.Content className="flex flex-col items-center justify-center p-6 text-center">{children}</Card.Content>
+      </Card.Root>
+    </Link>
+  ),
   code: ({ className = '', children, ...props }) => {
     const isBlock = className && className.startsWith('language-');
 
     if (isBlock) {
       const language = className.replace('language-', '') || 'typescript';
 
+      // Extract filename from the first line comment and remove it from display
+      let filename = null;
+      let codeString = extractCodeString(children);
+
+      const firstLine = codeString.split('\n')[0];
+      const commentMatch = firstLine.match(/^\/\/\s*(.+)$/) || firstLine.match(/^#\s*(.+)$/);
+
+      if (commentMatch) {
+        filename = commentMatch[1].trim();
+        // Remove the first line (the comment) from the displayed code
+        codeString = codeString.split('\n').slice(1).join('\n');
+      }
+
       return (
         <CodeBlock
-          className="bg-muted border-border selection:bg-primary/20 w-full overflow-x-auto rounded-lg border px-6 py-2"
-          language={language}
+          className="mt-12 mb-6 w-full overflow-x-auto"
           customStyle={{ fontSize: '13px' }}
+          language={language}
+          filename={filename}
+          showCopyButton={true}
           {...props}
         >
-          {extractCodeString(children)}
+          {codeString}
         </CodeBlock>
       );
     }
 
     return (
-      <code className={className} {...props}>
+      <code className={cn('bg-muted text-muted-foreground relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm', className)} {...props}>
         {children}
       </code>
     );

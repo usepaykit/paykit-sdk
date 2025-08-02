@@ -35,7 +35,7 @@ export default function IndexPage() {
           </div>
           <div className="flex items-center justify-center gap-4">
             <Button size="lg" variant="outline" asChild>
-              <Link href="https://usepaykit.dev/docs" target="_blank" rel="noopener noreferrer">
+              <Link href="https://usepaykit.dev/docs/introduction" target="_blank" rel="noopener noreferrer">
                 <BookOpen className="mr-2 h-4 w-4" />
                 View Documentation
                 <ExternalLink className="ml-2 h-4 w-4" />

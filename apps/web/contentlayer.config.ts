@@ -32,7 +32,5 @@ export const Doc = defineDocumentType(() => ({
 export default makeSource({
   contentDirPath: join(process.cwd(), 'content'),
   documentTypes: [Doc],
-  mdx: {
-    rehypePlugins: [],
-  },
+  mdx: { rehypePlugins: [] },
 });

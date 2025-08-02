@@ -1,4 +1,5 @@
 import { paykit } from '@/lib/paykit';
+import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -10,17 +11,15 @@ export async function POST(request: NextRequest) {
       console.log('checkout created');
       console.log(e);
     })
-    .on('$customerCreated', async e => {
-      console.log({ e });
+    .on('$customerCreated', async customer => {
+      console.log({ customer });
     })
-    .on('$invoicePaid', async e => {
+    .on('$invoicePaid', async invoice => {
       console.log('Just made a sale!');
-      console.log(e);
+      console.log({ invoice });
     });
 
-  const headers = Object.fromEntries(request.headers.entries());
-  const body = await request.text();
-  await webhook.handle({ body, headers });
+  const response = await withNextJsWebhook(request.nextUrl.toString(), webhook);
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json(response);
 }

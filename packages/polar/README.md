@@ -9,7 +9,7 @@ import { PayKit } from '@paykit-sdk/core';
 import { polar, createPolar } from '@paykit-sdk/polar';
 
 // Method 1: Using environment variables
-const provider = polar(); // Uses POLAR_ACCESS_TOKEN from env
+const provider = polar(); // Ensure POLAR_ACCESS_TOKEN environment variable is set
 
 // Method 2: Direct configuration
 const provider = createPolar({
@@ -35,7 +35,7 @@ paykit.webhooks
   .on('$checkoutCreated', async event => {
     console.log('Checkout created:', event.data);
   })
-  .on('$paymentReceived', async event => {
+  .on('$invoicePaid', async event => {
     console.log('Payment received:', event.data);
   });
 ```

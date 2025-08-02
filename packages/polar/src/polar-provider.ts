@@ -12,10 +12,11 @@ import {
   headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
+  Invoice,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
-import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
+import { toPaykitCheckout, toPaykitCustomer, toPaykitInvoice, toPaykitSubscription } from '../lib/mapper';
 
 export interface PolarConfig extends PaykitProviderOptions<SDKOptions> {}
 
@@ -116,36 +117,29 @@ export class PolarProvider implements PayKitProvider {
 
     console.log({ headers, webhookHeaders, webhookSecret, body });
 
-    const webhookEvent = validateEvent(body, webhookHeaders, webhookSecret);
+    const { data, type } = validateEvent(body, webhookHeaders, webhookSecret);
 
     const id = webhookHeaders['webhook-id'];
     const timestamp = webhookHeaders['webhook-timestamp'];
 
-    if (webhookEvent.type === 'subscription.updated') {
-      const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: subscription });
-    } else if (webhookEvent.type === 'subscription.created') {
-      const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: subscription });
-    } else if (webhookEvent.type === 'subscription.revoked') {
-      const subscription = await this.retrieveSubscription(webhookEvent.data.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: subscription });
-    } else if (webhookEvent.type === 'customer.created') {
-      const customer = await this.retrieveCustomer(webhookEvent.data.id);
-      return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: customer });
-    } else if (webhookEvent.type === 'customer.updated') {
-      const customer = await this.retrieveCustomer(webhookEvent.data.id);
-      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: customer });
-    } else if (webhookEvent.type === 'customer.deleted') {
+    if (type === 'subscription.updated') {
+      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+    } else if (type === 'subscription.created') {
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+    } else if (type === 'subscription.revoked') {
+      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+    } else if (type === 'customer.created') {
+      return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+    } else if (type === 'customer.updated') {
+      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+    } else if (type === 'customer.deleted') {
       return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
-    } else if (webhookEvent.type === 'checkout.created') {
-      const checkout = await this.retrieveCheckout(webhookEvent.data.id);
-      return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: checkout });
-    } else if (webhookEvent.type === 'order.created') {
-      const checkout = await this.retrieveCheckout(webhookEvent.data.id);
-      return toPaykitEvent<Checkout>({ type: '$paymentReceived', created: parseInt(timestamp), id, data: checkout });
+    } else if (type === 'checkout.created') {
+      return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: toPaykitCheckout(data) });
+    } else if (type === 'order.created') {
+      return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: parseInt(timestamp), id, data: toPaykitInvoice(data) });
     }
 
-    throw new Error(`Unhandled event type: ${webhookEvent.type}`);
+    throw new Error(`Unhandled event type: ${type}`);
   };
 }

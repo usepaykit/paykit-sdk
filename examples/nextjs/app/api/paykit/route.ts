@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
     .on('$customerCreated', async e => {
       console.log({ e });
     })
-    .on('$paymentReceived', async e => {
+    .on('$invoicePaid', async e => {
       console.log('Just made a sale!');
       console.log(e);
     });

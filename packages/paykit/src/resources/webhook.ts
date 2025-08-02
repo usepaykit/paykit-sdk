@@ -1,5 +1,6 @@
-import { Checkout, $SchemaPaymentReceived } from './checkout';
+import { Checkout } from './checkout';
 import { Customer } from './customer';
+import { Invoice } from './invoice';
 import { Subscription } from './subscription';
 
 export type WebhookEventLiteral =
@@ -10,7 +11,7 @@ export type WebhookEventLiteral =
   | '$subscriptionUpdated'
   | '$subscriptionCancelled'
   | '$checkoutCreated'
-  | '$paymentReceived';
+  | '$invoicePaid';
 
 export interface WebhookEvent<T extends any> {
   /**
@@ -43,7 +44,7 @@ export type SubscriptionUpdated = WebhookEvent<Subscription>;
 export type subscriptionCancelled = WebhookEvent<Subscription>;
 
 export type CheckoutCreated = WebhookEvent<Checkout>;
-export type PaymentReceived = WebhookEvent<$SchemaPaymentReceived>;
+export type InvoicePaid = WebhookEvent<Invoice>;
 
 export type WebhookEventPayload =
   | CustomerCreated
@@ -52,7 +53,7 @@ export type WebhookEventPayload =
   | SubscriptionCreated
   | SubscriptionUpdated
   | subscriptionCancelled
-  | PaymentReceived
+  | InvoicePaid
   | CheckoutCreated;
 
 export const toPaykitEvent = <Resource>(event: WebhookEvent<Resource>) => event;

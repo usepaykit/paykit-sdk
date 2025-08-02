@@ -277,10 +277,10 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
     }
   } else if (resource == 'payment') {
     switch (type) {
-      case '$paymentReceived':
+      case '$invoicePaid':
         await server$CreatePayment(parsedData.id);
         result = parsedData as { id: string };
-        webhookEvent = makeWebhookEvent<'$paymentReceived', { id: string }>('$paymentReceived', result);
+        webhookEvent = makeWebhookEvent<'$invoicePaid', { id: string }>('$invoicePaid', result);
         break;
 
       default:

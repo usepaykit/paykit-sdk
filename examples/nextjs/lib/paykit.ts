@@ -1,6 +1,6 @@
 import { PayKit } from '@paykit-sdk/core';
-import { polar } from '@paykit-sdk/polar';
+import { stripe } from '@paykit-sdk/stripe';
 
-export const provider = polar();
+export const provider = stripe();
 
 export const paykit = new PayKit(provider);

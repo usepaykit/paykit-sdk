@@ -11,12 +11,12 @@ import {
   WebhookEventPayload,
   PaykitProviderOptions,
   headersExtractor,
-  $SchemaPaymentReceived,
+  Invoice,
   $ExtWebhookHandlerConfig,
-  tryCatchAsync,
+  stringifyObjectValues,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
-import { toPaykitCheckout, toPaykitCustomer, toPaykitSubscription } from '../lib/mapper';
+import { toPaykitCheckout, toPaykitCustomer, toPaykitInvoice, toPaykitSubscription } from '../lib/mapper';
 
 export interface StripeConfig extends PaykitProviderOptions<Stripe.StripeConfig> {
   apiKey: string;
@@ -27,8 +27,6 @@ export class StripeProvider implements PayKitProvider {
 
   constructor(config: StripeConfig) {
     const { debug, apiKey, ...rest } = config;
-
-    // todo: use debug mode internally
 
     this.stripe = new Stripe(apiKey, rest);
   }
@@ -50,6 +48,7 @@ export class StripeProvider implements PayKitProvider {
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     const checkout = await this.stripe.checkout.sessions.retrieve(id);
+
     return toPaykitCheckout(checkout);
   };
 
@@ -58,21 +57,27 @@ export class StripeProvider implements PayKitProvider {
    */
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const customer = await this.stripe.customers.create(params);
+
     return toPaykitCustomer(customer);
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const customer = await this.stripe.customers.update(id, params);
+
     return toPaykitCustomer(customer);
   };
 
-  deleteCustomer = async (id: string): Promise<void> => {
+  deleteCustomer = async (id: string): Promise<null> => {
     await this.stripe.customers.del(id);
+
+    return null;
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
     const customer = await this.stripe.customers.retrieve(id);
+
     if ('deleted' in customer) return null;
+
     return toPaykitCustomer(customer);
   };
 
@@ -80,18 +85,20 @@ export class StripeProvider implements PayKitProvider {
    * Subscription management
    */
   cancelSubscription = async (id: string): Promise<null> => {
-    const [_, error] = await tryCatchAsync(this.stripe.subscriptions.cancel(id));
-    if (error) throw error;
+    await this.stripe.subscriptions.cancel(id);
+
     return null;
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
     const subscription = await this.stripe.subscriptions.update(id, { metadata: params.metadata });
+
     return toPaykitSubscription(subscription);
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
     const subscription = await this.stripe.subscriptions.retrieve(id);
+
     return toPaykitSubscription(subscription);
   };
 
@@ -107,41 +114,71 @@ export class StripeProvider implements PayKitProvider {
     const event = this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
     if (event.type === 'checkout.session.completed') {
-      const checkout = await this.retrieveCheckout(event.data.object.id);
-      const response = toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: event.created, id: event.id, data: checkout });
-      return response;
-    } else if (event.type === 'customer.created') {
-      const customer = await this.createCustomer({ email: event.data.object.email!, name: event.data.object.name ?? undefined });
-      return toPaykitEvent<Customer>({ type: '$customerCreated', created: event.created, id: event.id, data: customer });
-    } else if (event.type === 'customer.updated') {
-      const { email, name } = event.data.object;
-      const customer = await this.updateCustomer(event.data.object.id, { email: email!, name: name ?? undefined });
-      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: event.created, id: event.id, data: customer });
-    } else if (event.type === 'customer.deleted') {
-      await this.deleteCustomer(event.data.object.id);
-      return toPaykitEvent<null>({ type: '$customerDeleted', created: event.created, id: event.id, data: null });
-    } else if (event.type === 'customer.subscription.created') {
-      const subscription = await this.retrieveSubscription(event.data.object.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: event.created, id: event.id, data: subscription });
-    } else if (event.type === 'customer.subscription.updated') {
-      const subscription = await this.retrieveSubscription(event.data.object.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: subscription });
-    } else if (event.type === 'customer.subscription.deleted') {
-      const subscription = await this.retrieveSubscription(event.data.object.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: event.created, id: event.id, data: subscription });
-    } else if (event.type === 'customer.subscription.paused') {
-      const subscription = await this.retrieveSubscription(event.data.object.id);
-      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: subscription });
-    } else if (event.type == 'invoice.payment_succeeded') {
-      const checkoutId = event.data.object.metadata?.checkoutId;
-      if (!checkoutId) throw new Error('Checkout ID not found in invoice metadata');
-      const checkout = await this.retrieveCheckout(checkoutId);
-      return toPaykitEvent<$SchemaPaymentReceived>({
-        type: '$paymentReceived',
+      const data = event.data.object;
+
+      return toPaykitEvent<Invoice>({
+        type: '$invoicePaid',
         created: event.created,
         id: event.id,
-        data: { ...checkout, checkoutId },
+        data: {
+          id: data.id,
+          amount: data.amount_total ?? 0,
+          currency: data.currency ?? '',
+          metadata: stringifyObjectValues(data.metadata ?? {}),
+          customer_id: data.customer?.toString() ?? '',
+        },
       });
+    } else if (event.type === 'customer.created') {
+      const customer = event.data.object;
+
+      return toPaykitEvent<Customer>({
+        type: '$customerCreated',
+        created: event.created,
+        id: event.id,
+        data: toPaykitCustomer(customer),
+      });
+    } else if (event.type === 'customer.updated') {
+      const customer = event.data.object;
+
+      return toPaykitEvent<Customer>({
+        type: '$customerUpdated',
+        created: event.created,
+        id: event.id,
+        data: toPaykitCustomer(customer),
+      });
+    } else if (event.type === 'customer.deleted') {
+      return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: event.created, id: event.id, data: null });
+    } else if (event.type === 'customer.subscription.created') {
+      const subscription = event.data.object;
+
+      return toPaykitEvent<Subscription>({
+        type: '$subscriptionCreated',
+        created: event.created,
+        id: event.id,
+        data: toPaykitSubscription(subscription),
+      });
+    } else if (event.type === 'customer.subscription.updated') {
+      const subscription = event.data.object;
+
+      return toPaykitEvent<Subscription>({
+        type: '$subscriptionUpdated',
+        created: event.created,
+        id: event.id,
+        data: toPaykitSubscription(subscription),
+      });
+    } else if (event.type === 'customer.subscription.deleted') {
+      const subscription = event.data.object;
+
+      return toPaykitEvent<Subscription>({
+        type: '$subscriptionCancelled',
+        created: event.created,
+        id: event.id,
+        data: toPaykitSubscription(subscription),
+      });
+    } else if (event.type == 'invoice.paid') {
+      const invoice = event.data.object;
+
+      return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: event.created, id: event.id, data: toPaykitInvoice(invoice) });
     }
 
     throw new Error(`Unhandled event type: ${event.type}`);

@@ -51,7 +51,7 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
 
       if (!paymentId.ok) throw new Error('Failed to generate payment ID');
 
-      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$paymentReceived', body: { id: paymentId.value }, resource: 'payment' }), {
+      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$invoicePaid', body: { id: paymentId.value }, resource: 'payment' }), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });

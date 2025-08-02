@@ -12,7 +12,6 @@ import {
   headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
-  tryCatchAsync,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
@@ -36,16 +35,15 @@ export class PolarProvider implements PayKitProvider {
    */
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { metadata, item_id, provider_metadata } = params;
-    const response = await this.polar.checkouts.create({
-      metadata,
-      products: [item_id],
-      ...provider_metadata,
-    });
+
+    const response = await this.polar.checkouts.create({ metadata, products: [item_id], ...provider_metadata });
+
     return toPaykitCheckout(response);
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     const response = await this.polar.checkouts.get({ id });
+
     return toPaykitCheckout(response);
   };
 
@@ -54,18 +52,26 @@ export class PolarProvider implements PayKitProvider {
    */
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const { email, name, metadata } = params;
+
     const response = await this.polar.customers.create({ email, name, ...(metadata && { metadata }) });
+
     return toPaykitCustomer(response);
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const { email, name, metadata } = params;
-    const response = await this.polar.customers.update({ id, customerUpdate: { email, name, ...(metadata && { metadata }) } });
+
+    const response = await this.polar.customers.update({
+      id,
+      customerUpdate: { ...(email && { email }), ...(name && { name }), ...(metadata && { metadata }) },
+    });
+
     return toPaykitCustomer(response);
   };
 
   retrieveCustomer = async (id: string): Promise<Customer> => {
     const response = await this.polar.customers.get({ id });
+
     return toPaykitCustomer(response);
   };
 
@@ -73,20 +79,25 @@ export class PolarProvider implements PayKitProvider {
    * Subscription management
    */
   cancelSubscription = async (id: string): Promise<null> => {
-    const [_, error] = await tryCatchAsync(this.polar.subscriptions.revoke({ id }));
-    if (error) throw error;
+    await this.polar.subscriptions.revoke({ id });
+
     return null;
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
     const response = await this.polar.subscriptions.get({ id });
+
     return toPaykitSubscription(response);
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
-    // currently we don't support updating a subscription for polar
-    const subscription = await this.retrieveSubscription(id);
-    return subscription;
+    /**
+     * Polar handles validation of the subscriptionUpdate object
+     * For supported operations, see: https://docs.polar.sh/
+     */
+    const response = await this.polar.subscriptions.update({ id, subscriptionUpdate: { ...params.metadata } });
+
+    return toPaykitSubscription(response);
   };
 
   /**
@@ -102,6 +113,8 @@ export class PolarProvider implements PayKitProvider {
       },
       {} as Record<string, string>,
     );
+
+    console.log({ headers, webhookHeaders, webhookSecret, body });
 
     const webhookEvent = validateEvent(body, webhookHeaders, webhookSecret);
 
@@ -133,6 +146,6 @@ export class PolarProvider implements PayKitProvider {
       return toPaykitEvent<Checkout>({ type: '$paymentReceived', created: parseInt(timestamp), id, data: checkout });
     }
 
-    throw new Error(`Unknown event type: ${webhookEvent.type}`);
+    throw new Error(`Unhandled event type: ${webhookEvent.type}`);
   };
 }

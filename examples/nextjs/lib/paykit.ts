@@ -1,6 +1,6 @@
 import { PayKit } from '@paykit-sdk/core';
-import { local } from '@paykit-sdk/local';
+import { polar } from '@paykit-sdk/polar';
 
-export const provider = local();
+export const provider = polar();
 
 export const paykit = new PayKit(provider);

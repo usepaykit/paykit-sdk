@@ -23,7 +23,7 @@
     "@eslint/eslintrc": "^3",
     "@paykit-sdk/cli": "workspace:*",
     "@paykit-sdk/core": "workspace:*",
-    "@paykit-sdk/local": "workspace:*",
+    "@paykit-sdk/polar": "workspace:*",
     "@paykit-sdk/react": "workspace:*",
     "@paykit-sdk/ui": "workspace:*",
     "@types/node": "^22",

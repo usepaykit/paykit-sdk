@@ -1,12 +1,11 @@
 import { paykit } from '@/lib/paykit';
-import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   console.log('POST request received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: '123' })
+    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
     .on('$checkoutCreated', async e => {
       console.log('checkout created');
       console.log(e);
@@ -19,14 +18,9 @@ export async function POST(request: NextRequest) {
       console.log(e);
     });
 
-  /**
-   *  const headers = Object.fromEntries(request.headers.entries());
-   *  const body = await request.text();
-   *  const result = await webhook.handle({ body, headers });
-   */
+  const headers = Object.fromEntries(request.headers.entries());
+  const body = await request.text();
+  await webhook.handle({ body, headers });
 
-  // only for local provider
-  const response = await withNextJsWebhook(request.nextUrl.toString(), webhook);
-
-  return NextResponse.json(response);
+  return NextResponse.json({ success: true });
 }

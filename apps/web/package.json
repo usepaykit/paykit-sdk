@@ -24,7 +24,7 @@
     "class-variance-authority": "^0.7.1",
     "@paykit-sdk/core": "1.1.0",
     "@paykit-sdk/local": "1.1.0-alpha.2",
-    "@paykit-sdk/polar": "1.1.0",
+    "@paykit-sdk/polar": "1.1.1",
     "@paykit-sdk/stripe": "1.1.0",
     "@paykit-sdk/ui": "0.1.1",
     "clsx": "^2.1.1",

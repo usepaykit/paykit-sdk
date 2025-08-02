@@ -38,7 +38,7 @@ export interface UpdateCustomerParams {
   /**
    * The email of the customer.
    */
-  email: string;
+  email?: string;
   /**
    * The name of the customer.
    */

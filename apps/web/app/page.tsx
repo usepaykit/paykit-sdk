@@ -6,22 +6,7 @@ import GumroadLogo from '@/public/providers/gumroad.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Card, Button, Badge } from '@paykit-sdk/ui';
-import {
-  BookOpen,
-  ArrowRight,
-  Zap,
-  Sparkles,
-  Code2,
-  Rocket,
-  Shield,
-  Clock,
-  Users,
-  Check,
-  Terminal,
-  Settings,
-  Layers,
-  CreditCard,
-} from 'lucide-react';
+import { BookOpen, ArrowRight, Zap, Sparkles, Code2, Rocket, Shield, Clock, Users, Check, Terminal, Settings, Layers } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -32,10 +17,10 @@ const Index = () => {
     <div className="font-inter bg-background min-h-screen">
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <div className="flex items-center space-x-3">
+          <Link href="/" className="flex items-center space-x-3">
             <Sparkles className="text-foreground size-4" />
             <span className="text-xl font-bold tracking-tight">PayKit</span>
-          </div>
+          </Link>
 
           <div className="flex items-center space-x-2 md:hidden">
             <ThemeToggle />
@@ -370,23 +355,14 @@ const Index = () => {
       <section className="relative py-16">
         <div className="mx-auto max-w-7xl px-6">
           <div className="mb-16 text-center">
-            <div className="mb-8 space-y-2">
-              <div className="bg-muted/50 mb-4 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
-                <CreditCard className="h-4 w-4 text-green-500" />
-                <span className="text-muted-foreground">Complete Checkout Experience</span>
-                <Badge variant="outline" className="ml-2">
-                  Demo
-                </Badge>
-              </div>
-              <h2 className="text-3xl font-bold md:text-4xl">
-                Local development checkout flows
-                <br />
-                <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">for rapid testing</span>
-              </h2>
-              <p className="text-muted-foreground mx-auto max-w-2xl text-xl">See what your customers experience with PayKit&apos;s local provider</p>
+            <div className="text-center">
+              <h2 className="text-foreground mb-6 text-4xl font-bold md:text-5xl">Your payment backend lives in a file</h2>
+              <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
+                Configure your payment logic in a single file and test locally with PayKit's development provider
+              </p>
             </div>
 
-            <div className="bg-muted/20 relative rounded-2xl border p-1">
+            <div className="bg-muted/20 relative mt-7 rounded-2xl border p-1">
               <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-green-500/20 via-emerald-500/20 to-teal-500/20"></div>
               <div className="bg-background relative space-y-6 rounded-xl p-8 md:p-12">
                 {/* Browser Chrome */}

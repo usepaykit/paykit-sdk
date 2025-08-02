@@ -60,13 +60,15 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
 export function LineAnimatedCodeViewer({ className = '', lines = [] }: LineAnimatedCodeViewerProps) {
   return (
     <div className={cn('bg-card border-border overflow-hidden rounded-lg border', className)}>
-      <div className="p-6">
-        {lines.map((line, index) => {
-          // Only lines 1 and 3 (import and provider init) should be marked as changing
-          const isChangingLine = index === 1 || index === 3;
+      <div className="overflow-x-auto">
+        <div className="min-w-max p-6">
+          {lines.map((line, index) => {
+            // Only lines 1 and 3 (import and provider init) should be marked as changing
+            const isChangingLine = index === 1 || index === 3;
 
-          return <AnimatedLine key={index} content={line} isChangingLine={isChangingLine} />;
-        })}
+            return <AnimatedLine key={index} content={line} isChangingLine={isChangingLine} />;
+          })}
+        </div>
       </div>
     </div>
   );

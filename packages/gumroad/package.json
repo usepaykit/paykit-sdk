@@ -22,7 +22,7 @@
     "@paykit-sdk/core": "workspace:*"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": "^1.1.1"
+    "@paykit-sdk/core": "^1.1.1-alpha.1"
   },
   "devDependencies": {
     "tsup": "^8.0.0",

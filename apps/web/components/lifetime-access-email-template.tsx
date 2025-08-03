@@ -24,15 +24,15 @@ export const LifetimeAccessEmail = () => {
               </Text>
 
               <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed">
-                If you ever need anything or have ideas&rsquo; feel free to reply — we’re listening! 🙏
+                If you ever need anything or have ideas, feel free to reply — we’re listening! 🙏
               </Text>
             </Section>
 
             {/* Footer */}
             <Section tw="border-t border-[oklch(0.9037 0 0)] pt-6">
-              <Text tw="text-[oklch(0.2046 0 0)] text-base mb-2">Cheers&rsquo;</Text>
+              <Text tw="text-[oklch(0.2046 0 0)] text-base mb-2">Cheers, </Text>
               <Text tw="text-[oklch(0.2046 0 0)] text-base font-semibold">Odii</Text>
-              <Text tw="text-[oklch(0.2435 0 0)] text-sm">Maker&rsquo; PayKit</Text>
+              <Text tw="text-[oklch(0.2435 0 0)] text-sm">Maker of PayKit</Text>
             </Section>
           </Section>
         </Container>

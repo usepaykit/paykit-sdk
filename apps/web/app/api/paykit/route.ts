@@ -11,23 +11,16 @@ export const POST = async (request: NextRequest) => {
         console.log({ customer });
       })
       .on('$invoicePaid', async invoice => {
-        console.log('invoice processing');
-        console.log({ invoice });
+        const email = JSON.parse(invoice.data.metadata['$customFieldData'])['account-email'] as string;
 
-        const email = JSON.parse(invoice.data.metadata['customFieldData'])['account-email'] as string;
-
-        console.log({ email });
-
-        const { data, error } = await resend.emails.send({
-          from: 'PayKit <acme@resend.dev>',
+        const { error } = await resend.emails.send({
+          from: 'PayKit <odii@usepaykit.dev>',
           to: email,
           subject: 'PayKit Lifetime Access',
           react: LifetimeAccessEmail(),
         });
 
         if (error) throw error;
-
-        console.log({ data });
       });
 
     const headers = Object.fromEntries(request.headers.entries());

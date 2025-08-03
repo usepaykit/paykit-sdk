@@ -178,7 +178,7 @@ export class StripeProvider implements PayKitProvider {
         id: event.id,
         data: toPaykitSubscription(subscription),
       });
-    } else if (event.type == 'invoice.paid') {
+    } else if (event.type == 'invoice.paid' && event.data.object.status == 'paid') {
       const invoice = event.data.object;
 
       return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: event.created, id: event.id, data: toPaykitInvoice(invoice) });

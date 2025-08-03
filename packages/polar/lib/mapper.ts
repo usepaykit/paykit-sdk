@@ -44,7 +44,7 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
-    metadata: stringifyObjectValues({ ...(subscription.metadata ?? {}), customFieldData: subscription.customFieldData }),
+    metadata: stringifyObjectValues({ ...(subscription.metadata ?? {}), $customFieldData: subscription.customFieldData }),
   };
 };
 
@@ -53,7 +53,7 @@ export const toPaykitInvoice = (invoice: Order): PaykitInvoice => {
     id: invoice.id,
     amount: invoice.totalAmount,
     currency: invoice.currency,
-    metadata: stringifyObjectValues(invoice.metadata ?? {}),
+    metadata: stringifyObjectValues({ ...(invoice.metadata ?? {}), $customFieldData: invoice.customFieldData }),
     customer_id: invoice.customerId,
   };
 };

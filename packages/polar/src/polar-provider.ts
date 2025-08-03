@@ -134,7 +134,7 @@ export class PolarProvider implements PayKitProvider {
       return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
     } else if (type === 'checkout.created') {
       return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: toPaykitCheckout(data) });
-    } else if (type === 'order.created') {
+    } else if (type === 'order.paid' && data.status == 'paid') {
       return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: parseInt(timestamp), id, data: toPaykitInvoice(data) });
     }
 

@@ -108,3 +108,21 @@ interface Invoice {
   customer_id: string;
 }
 ```
+
+## Webhook Events
+
+PayKit supports the following webhook events across all providers:
+
+<br />
+
+```typescript
+type WebhookEventLiteral =
+  | '$customerCreated'
+  | '$customerUpdated'
+  | '$customerDeleted'
+  | '$subscriptionCreated'
+  | '$subscriptionUpdated'
+  | '$subscriptionCancelled'
+  | '$checkoutCreated'
+  | '$invoicePaid';
+```

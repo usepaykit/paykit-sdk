@@ -81,6 +81,18 @@ export async function POST(request: Request) {
 
 ## Webhook Setup
 
+### Enable Events
+
+In your Stripe dashboard, enable the following webhook events:
+
+- `checkout.session.completed`
+- `customer.created`
+- `customer.updated`
+- `customer.deleted`
+- `customer.subscription.updated`
+- `customer.subscription.deleted`
+- `invoice.paid`
+
 ### Next.js API Route
 
 <br />

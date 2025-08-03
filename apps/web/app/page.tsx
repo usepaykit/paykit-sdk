@@ -1,6 +1,7 @@
 import React from 'react';
 import { CopyButton } from '@/components/copy-button';
 import { FinalCTA } from '@/components/final-cta';
+import { Paykit as PaykitIcon } from '@/components/icons';
 import { LifetimeAccess } from '@/components/lifetime-access';
 import { LocalCheckoutSession } from '@/components/local-checkout-session';
 import { ProviderDemo } from '@/components/provider-demo';
@@ -10,7 +11,7 @@ import GumroadLogo from '@/public/providers/gumroad.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
-import { BookOpen, Zap, Sparkles } from 'lucide-react';
+import { BookOpen, Zap } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -22,7 +23,7 @@ const Index = () => {
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center space-x-3">
-            <Sparkles className="text-foreground size-4" />
+            <PaykitIcon className="text-foreground size-4" />
             <span className="text-xl font-bold tracking-tight">PayKit</span>
           </Link>
 
@@ -89,7 +90,7 @@ const Index = () => {
             </div>
 
             {/* PayKit core */}
-            <Sparkles className="text-foreground size-12" />
+            <PaykitIcon className="text-foreground size-12" />
           </div>
         </div>
       </main>
@@ -111,7 +112,7 @@ const Index = () => {
             {/* Company Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
-                <Sparkles className="h-5 w-5 text-blue-500" />
+                <PaykitIcon className="size-5 text-blue-500" />
                 <span className="text-lg font-bold">PayKit</span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">

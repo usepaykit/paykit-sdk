@@ -2,7 +2,8 @@
 
 import * as React from 'react';
 import { Badge } from '@paykit-sdk/ui';
-import { Code2, Sparkles } from 'lucide-react';
+import { Code2 } from 'lucide-react';
+import { Paykit as PaykitIcon } from './icons';
 import { LineAnimatedCodeViewer } from './line-animated-code-viewer';
 import { ProviderList } from './provider-list';
 
@@ -67,7 +68,7 @@ export function ProviderDemo() {
                 <div className="border-border/50 border-r lg:col-span-1">
                   <div className="p-6">
                     <div className="mb-4 flex items-center space-x-2">
-                      <Sparkles className="h-4 w-4 text-blue-500" />
+                      <PaykitIcon className="size-4 text-blue-500" />
                       <span className="text-muted-foreground text-sm font-medium">Providers</span>
                     </div>
                     <ProviderList selectedProvider={selectedProvider} onProviderSelect={setSelectedProvider} />

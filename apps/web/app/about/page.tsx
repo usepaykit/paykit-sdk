@@ -1,6 +1,7 @@
+import { Paykit as PaykitIcon } from '@/components/icons';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Button } from '@paykit-sdk/ui';
-import { ArrowLeft, BookOpen, Sparkles } from 'lucide-react';
+import { ArrowLeft, BookOpen } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -10,7 +11,7 @@ export default function AboutPage() {
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center space-x-3">
-            <Sparkles className="text-foreground size-4" />
+            <PaykitIcon className="text-foreground size-4" />
             <span className="text-xl font-bold tracking-tight">PayKit</span>
           </Link>
 

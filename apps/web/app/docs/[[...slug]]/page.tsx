@@ -1,13 +1,13 @@
+import { DocsAd } from '@/components/docs-ad';
 import { Mdx } from '@/components/mdx-components';
 import { DocsPager } from '@/components/pager';
-import { PayKitCloudCard } from '@/components/paykit-cloud-card';
 import { DashboardTableOfContents } from '@/components/toc';
 import { getTableOfContents } from '@/lib/toc';
 import { badgeVariants, cn } from '@paykit-sdk/ui';
 import { allDocs } from 'contentlayer/generated';
 import { ChevronRight, ExternalLink } from 'lucide-react';
 import Link from 'next/link';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Balancer from 'react-wrap-balancer';
 
 export const dynamic = 'force-dynamic';
@@ -18,6 +18,8 @@ interface DocPageProps {
 
 async function getDocFromParams({ params }: DocPageProps) {
   const { slug } = await params;
+
+  if (!slug) redirect('/docs/introduction');
 
   const doc = allDocs.find(doc => doc.slugAsParams === (slug?.join('/') || ''));
 
@@ -131,7 +133,7 @@ export default async function DocPage({ params }: DocPageProps) {
                 <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">On this page</h4>
                 <DashboardTableOfContents toc={toc} />
               </div>
-              <PayKitCloudCard />
+              <DocsAd />
             </div>
           </div>
         </div>

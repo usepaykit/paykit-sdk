@@ -162,7 +162,7 @@ export const CodeBlock = ({ showCopyButton = false, children, filename, ...props
   }
 
   return (
-    <div className="group bg-muted relative flex flex-col items-center justify-between rounded-xl">
+    <div className="group bg-muted relative flex flex-col items-center justify-between gap-1 rounded-xl">
       <div className="flex w-full items-center justify-between px-2 py-1">
         {filename ? (
           <div className="flex items-center space-x-2">

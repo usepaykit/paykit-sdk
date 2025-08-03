@@ -44,8 +44,12 @@ export default function AboutPage() {
 
           <div className="text-muted-foreground space-y-4 leading-relaxed">
             <p>
-              I'm Emmanuel Odii, a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I've built several applications including
-              tarotmaster.ai and classynotes.app.
+              I'm
+              <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 hover:underline">
+                Emmanuel Odii
+              </Link>
+              , a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I've built several applications including tarotmaster.ai
+              and classynotes.app.
             </p>
             <p>
               Each time I built these applications, I found myself diving deep into payment provider documentation to implement the abstractions I

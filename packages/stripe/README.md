@@ -174,7 +174,6 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 ## Support
 
 - [Stripe Documentation](https://stripe.com/docs)
-- [PayKit Issues](https://github.com/devodii/paykit/issues)
 
 ## License
 

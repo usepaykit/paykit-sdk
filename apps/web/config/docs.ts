@@ -26,21 +26,22 @@ export const docsConfig = {
     {
       title: 'Getting Started',
       items: [
-        { title: 'Introduction', href: '/docs/core/introduction', items: [] },
+        { title: 'Introduction', href: '/docs/introduction', items: [] },
         {
           title: 'Installation',
-          href: '/docs/core/installation-root',
+          href: '/docs/installation-root',
           items: [
-            { title: 'React', href: '/docs/core/vitejs-installation', items: [] },
-            { title: 'Next.js', href: '/docs/core/nextjs-installation', items: [] },
+            { title: 'React', href: '/docs/vitejs-installation', items: [] },
+            { title: 'Next.js', href: '/docs/nextjs-installation', items: [] },
           ],
         },
-        { title: 'Quick Start', href: '/docs/core/getting-started', items: [] },
+        { title: 'Quick Start', href: '/docs/getting-started', items: [] },
       ],
     },
     {
       title: 'Payment Providers',
       items: [
+        { title: 'Overview', href: '/docs/providers/overview', items: [] },
         { title: 'Local', href: '/docs/providers/local', items: [] },
         { title: 'Stripe', href: '/docs/providers/stripe', items: [] },
         { title: 'Polar', href: '/docs/providers/polar', items: [] },

@@ -180,7 +180,6 @@ POLAR_WEBHOOK_SECRET=your-webhook-secret
 ## Support
 
 - [Polar Documentation](https://docs.polar.sh/)
-- [PayKit Issues](https://github.com/devodii/paykit/issues)
 
 ## License
 

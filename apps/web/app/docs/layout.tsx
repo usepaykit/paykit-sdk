@@ -1,6 +1,7 @@
 import { DocsNav } from '@/components/docs-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { docsConfig } from '@/config/docs';
+import Link from 'next/link';
 
 interface DocsLayoutProps {
   children: React.ReactNode;
@@ -13,7 +14,9 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
       <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-sm">
         <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div className="flex items-center space-x-2">
-            <h1 className="text-xl font-bold">PayKit Docs</h1>
+            <h1 className="text-xl font-bold">
+              <Link href="/">PayKit Docs</Link>
+            </h1>
           </div>
           <ThemeToggle />
         </div>

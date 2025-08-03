@@ -1,5 +1,4 @@
 import '@/app/globals.css';
-import { AppProvider } from '@/components/app-provider';
 import { ThemeProvider } from '@/components/theme-provider';
 import { cn, Toaster } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
@@ -21,11 +20,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(ptSans.variable, 'font-pt-sans antialiased')}>
-        <AppProvider>
-          <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-            {children}
-          </ThemeProvider>
-        </AppProvider>
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+          {children}
+        </ThemeProvider>
         <Toaster />
       </body>
     </html>

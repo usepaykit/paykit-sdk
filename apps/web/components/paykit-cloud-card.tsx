@@ -1,6 +1,8 @@
+'use client';
+
 import { useCheckout } from '@paykit-sdk/react';
 import { Button, Card, Toast } from '@paykit-sdk/ui';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 export function PayKitCloudCard() {
   const { create } = useCheckout();
@@ -9,7 +11,7 @@ export function PayKitCloudCard() {
   const handleCheckout = async () => {
     if (create.loading) return;
 
-    const { data, error } = await create.run({
+    const [checkout, error] = await create.run({
       customer_id: 'cus_123',
       item_id: 'price_123',
       session_type: 'one_time',
@@ -24,7 +26,7 @@ export function PayKitCloudCard() {
       return;
     }
 
-    router.push(data.payment_url);
+    router.push(checkout.payment_url);
   };
 
   return (

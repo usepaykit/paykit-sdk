@@ -1,48 +1,26 @@
 # PayKit CLI Dev App
 
-This is a development application for testing PayKit functionality.
+A development checkout page for testing PayKit payments locally.
 
-## Redirect After Checkout
+## Features
 
-After a successful payment, users are automatically redirected back to where they came from using the browser's referrer header. This provides a seamless user experience without requiring any additional configuration.
+- Checkout Interface: Complete payment form with customer info and product details
+- Automatic Redirect: After successful payment, users are redirected back to their original location
+- Webhook Testing: Simulates real payment events for testing your webhook handlers
+- Local Provider: Uses PayKit's local provider for seamless development
 
-### How It Works
+## How It Works
 
-1. **Automatic Referrer Detection**: When a user visits the checkout page, the application automatically reads the `referer` header from the browser
-2. **Seamless Redirect**: After successful payment completion, users are automatically redirected back to their original location
-3. **Fallback Behavior**: If no referrer is available, users stay on the checkout page and see the success message
+1. Referrer Detection: When users visit the checkout page, the app reads the `referer` header from their browser
+2. Payment Processing: Users complete payment using the checkout form
+3. Webhook Events: The app sends webhook events to the referrer's API route to simulate real payment processing
+4. Automatic Redirect: After successful payment, users are automatically redirected back to where they came from
 
-### Example Implementation
+## Usage
 
-```typescript
-import { useCheckout } from '@paykit-sdk/react';
+The dev app is automatically started when you run `npx @paykit-sdk/cli dev` and is accessible at `http://localhost:3001`.
 
-function PaymentButton() {
-  const { create } = useCheckout();
-  const router = useRouter();
+## Redirect Behavior
 
-  const handlePayment = async () => {
-    const { data, error } = await create.run({
-      customer_id: customerId,
-      item_id: itemId,
-      session_type: 'one_time',
-      metadata: { source: 'payment-button' },
-      provider_metadata: {
-        currency: 'USD',
-        amount: 2500
-      },
-    });
-
-    if (error) throw new Error(error.message);
-
-    // User will be automatically redirected back after payment
-    router.push(data.payment_url);
-  };
-
-  return (
-    <button onClick={handlePayment}>
-      Pay $25.00
-    </button>
-  );
-}
-```
+- If a referrer is detected, users are redirected back after payment
+- If no referrer is available, users stay on the checkout page and see a success message

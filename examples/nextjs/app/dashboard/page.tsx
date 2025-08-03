@@ -27,9 +27,9 @@ export default function Dashboard() {
     (async () => {
       const [subscription, tasks] = await Promise.all([retrieve.run(subscriptionId), getTasks()]);
 
-      if (subscription.data) return setSubscription(subscription.data);
-
-      if (subscription.error) Toast.error({ title: 'Error', description: subscription.error.message });
+      const [data, error] = subscription;
+      if (data) return setSubscription(data);
+      if (error) Toast.error({ title: 'Error', description: error.message });
 
       if (tasks) return setTasks(tasks);
     })();

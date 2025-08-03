@@ -65,8 +65,20 @@ const getLanguageIcon = (language: string) => {
     case 'shell':
     case 'sh':
       return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="h-4 w-4" fill="currentColor">
-          <path d="M2 3h20a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm18 17V5H4v15h16zM8 7h8v2H8V7zm0 4h8v2H8v-2zm0 4h5v2H8v-2z" />
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          className="h-4 w-4"
+        >
+          <polyline points="4 17 10 11 4 5"></polyline>
+          <line x1="12" x2="20" y1="19" y2="19"></line>
         </svg>
       );
     default:

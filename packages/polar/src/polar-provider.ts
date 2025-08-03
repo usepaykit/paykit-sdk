@@ -115,8 +115,6 @@ export class PolarProvider implements PayKitProvider {
       {} as Record<string, string>,
     );
 
-    console.log({ headers, webhookHeaders, webhookSecret, body });
-
     const { data, type } = validateEvent(body, webhookHeaders, webhookSecret);
 
     const id = webhookHeaders['webhook-id'];

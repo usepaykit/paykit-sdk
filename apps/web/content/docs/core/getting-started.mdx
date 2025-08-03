@@ -1,6 +1,6 @@
 ---
 title: 'Quick Start'
-description: 'Get started with PayKit in minutes.'
+description: 'Get started with PayKit in minutes using the local provider.'
 date: '2025-08-02'
 published: true
 toc: true
@@ -8,36 +8,77 @@ toc: true
 
 ## Overview
 
-This guide will help you create your first payment with PayKit. We'll build a simple checkout flow that works with any provider.
+This guide will help you create your first payment with PayKit using the local provider. We'll build a simple checkout flow that works seamlessly with any provider.
 
 ## Prerequisites
 
 - Node.js 18.0 or later
-- A payment provider (Local, Stripe, Polar, etc)
+- PayKit CLI installed (see [Installation](/docs/config/installation-root) guide)
 
 ## Installation
 
-Install the PayKit SDK:
+Install the required packages:
 
 <br />
 
 ```bash
 # terminal
-npm install @paykit-sdk/core @paykit-sdk/stripe
+npm install @paykit-sdk/core @paykit-sdk/local
 ```
 
-## Basic Setup
+## Create Your API Route
 
-Create a new file for your payment logic:
+Set up a webhook endpoint to handle payment events:
+
+<br />
+
+```typescript
+// app/api/paykit/route.ts
+import { paykit } from '@/lib/paykit';
+import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
+import { NextRequest, NextResponse } from 'next/server';
+
+export async function POST(request: NextRequest) {
+  console.log('POST request received');
+
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: '123' })
+    .on('$checkoutCreated', async event => {
+      console.log('Checkout created:', event.data);
+      // Handle checkout creation
+    })
+    .on('$customerCreated', async event => {
+      console.log('Customer created:', event.data);
+      // Handle customer creation
+    })
+    .on('$invoicePaid', async event => {
+      console.log('Payment received:', event.data);
+      // Handle successful payment
+    });
+
+  // Local provider webhook handler
+  const response = await withNextJsWebhook(request.nextUrl.toString(), webhook);
+
+  return NextResponse.json(response);
+}
+```
+
+## Configure PayKit
+
+Create your PayKit instance with the local provider:
 
 <br />
 
 ```typescript
 // lib/paykit.ts
 import { PayKit } from '@paykit-sdk/core';
-import { stripe } from '@paykit-sdk/stripe';
+import { createLocal } from '@paykit-sdk/local';
 
-const provider = stripe();
+const provider = createLocal({
+  apiUrl: 'http://localhost:3000/api/paykit',
+  paymentUrl: 'http://localhost:3001',
+});
+
 const paykit = new PayKit(provider);
 
 export { paykit };
@@ -74,52 +115,57 @@ export default async function CheckoutPage() {
 }
 ```
 
-## Handle Webhooks
+## Check Subscription Status
 
-Create a webhook endpoint to process payment events:
+Create a page to display subscription information:
 
 <br />
 
 ```typescript
-// app/api/webhook/route.ts
+// app/subscription/page.tsx
 import { paykit } from '@/lib/paykit';
-import { NextRequest, NextResponse } from 'next/server';
+import { format } from 'date-fns';
 
-export async function POST(request: NextRequest) {
-  console.log('POST request received');
+export default async function SubscriptionPage() {
+  const subscriptionId = 'sub_1234567890';
 
-  const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async e => {
-      console.log('checkout created');
-      console.log(e);
-    })
-    .on('$customerCreated', async customer => {
-      console.log({ customer });
-    })
-    .on('$invoicePaid', async invoice => {
-      console.log('Just made a sale!');
-      console.log({ invoice });
-    });
+  const [subscription, error] = await paykit.subscription.retrieve(subscriptionId);
 
-  const headers = Object.fromEntries(request.headers.entries());
-  const body = await request.text();
-  await webhook.handle({ body, headers });
+  if (error) {
+    return (
+      <div>
+        <h1>Subscription Error</h1>
+        <p>Error: {error.message}</p>
+      </div>
+    );
+  }
 
-  return NextResponse.json({ success: true });
+  if (!subscription) {
+    return (
+      <div>
+        <h1>Subscription Not Found</h1>
+        <p>No subscription found with ID: {subscriptionId}</p>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <h1>Subscription Details</h1>
+      <div>
+        <h2>Status: {subscription.status}</h2>
+        <p>Customer ID: {subscription.customer_id}</p>
+        <p>Current Period: {format(subscription.current_period_start, 'MMM dd, yyyy')} - {format(subscription.current_period_end, 'MMM dd, yyyy')}</p>
+        {Object.entries(subscription.metadata).map(([key, value]) => (
+          <div key={key} className="flex justify-between text-sm">
+            <span className="capitalize">{key.replace('_', ' ')}:</span>
+            <span className="font-medium">{String(value)}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
-```
-
-## Environment Variables
-
-Create a `.env` file:
-
-<br />
-
-```bash
-# .env
-STRIPE_API_KEY=sk_test_...
-STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
 ## Test Your Integration
@@ -128,9 +174,10 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 2. Navigate to your checkout page
 3. Complete a test payment
 4. Check your webhook logs
+5. Visit the subscription page to see the status
 
 ## Next Steps
 
 - [Installation](/docs/installation) - Set up PayKit in your project
-- [Providers](/docs/providers/stripe) - Learn about specific providers
+- [Providers](/docs/providers/local) - Learn about the local provider
 - [API Reference](/docs/api-reference) - Explore the full API

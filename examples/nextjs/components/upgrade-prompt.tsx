@@ -19,7 +19,7 @@ export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
   const router = useRouter();
 
   const handleUpgrade = async () => {
-    const { data, error } = await create.run({
+    const [data, error] = await create.run({
       customer_id: customerId,
       item_id: itemId,
       session_type: 'recurring',

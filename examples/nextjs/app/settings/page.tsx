@@ -28,8 +28,8 @@ export default function SettingsPage() {
 
   React.useEffect(() => {
     (async () => {
-      const { data, error } = await retrieve.run(subscriptionId);
-      if (data) return setSubscription(data);
+      const [subscription, error] = await retrieve.run(subscriptionId);
+      if (subscription) return setSubscription(subscription);
       Toast.error({ title: 'Error', description: error?.message });
     })();
   }, []);
@@ -51,7 +51,7 @@ export default function SettingsPage() {
       await new Promise(resolve => setTimeout(resolve, 1000));
 
       if (subscription) {
-        const { error } = await cancel.run(subscription.id);
+        const [, error] = await cancel.run(subscription.id);
 
         if (error) {
           Toast.error({ title: 'Error', description: error.message });
@@ -68,7 +68,7 @@ export default function SettingsPage() {
   };
 
   const handleUpgrade = async () => {
-    const { data, error } = await create.run({
+    const [checkout, error] = await create.run({
       customer_id: customerId,
       item_id: itemId,
       session_type: 'recurring',
@@ -78,7 +78,7 @@ export default function SettingsPage() {
 
     if (error) throw new Error(error.message);
 
-    router.push(data.payment_url);
+    router.push(checkout.payment_url);
   };
 
   return (

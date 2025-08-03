@@ -22,8 +22,8 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
 
   React.useEffect(() => {
     (async () => {
-      const { data, error } = await retrieve.run(subscriptionId);
-      if (data) return setSubscription(data);
+      const [subscription, error] = await retrieve.run(subscriptionId);
+      if (subscription) return setSubscription(subscription);
       Toast.error({ title: 'Error', description: error?.message });
     })();
   }, []);
@@ -37,7 +37,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
       await delay(1000);
 
       if (hasActiveSubscription) {
-        const { error } = await cancel.run(subscription.id);
+        const [, error] = await cancel.run(subscription.id);
 
         if (error) {
           Toast.error({ title: 'Error', description: error.message });

@@ -1,4 +1,3 @@
-import { checkoutUrl } from '@/lib/checkout';
 import { Button } from '@paykit-sdk/ui';
 import { Card } from '@paykit-sdk/ui';
 import { Check, Package } from 'lucide-react';
@@ -70,7 +69,7 @@ export const LifetimeAccess = () => {
                           <div className="text-muted-foreground text-sm">Never break your MRR streak</div>
                         </div>
                         <Button className="mt-6 w-full" size="lg" asChild>
-                          <Link href={checkoutUrl} target="_blank">
+                          <Link href={process.env.NEXT_PUBLIC_CHECKOUT_URL!} target="_blank">
                             <CreditCard className="mr-2 h-4 w-4" />
                             Get Lifetime Access
                           </Link>

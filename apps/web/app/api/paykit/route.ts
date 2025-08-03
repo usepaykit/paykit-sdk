@@ -11,12 +11,15 @@ export const POST = async (request: NextRequest) => {
         console.log({ customer });
       })
       .on('$invoicePaid', async invoice => {
+        console.log('invoice processing');
+        console.log({ invoice });
+
         const email = JSON.parse(invoice.data.metadata['customFieldData'])['account-email'] as string;
 
         console.log({ email });
 
         const { data, error } = await resend.emails.send({
-          from: 'PayKit <odii@usepaykit.dev>',
+          from: 'PayKit <acme@resend.dev>',
           to: email,
           subject: 'PayKit Lifetime Access',
           react: LifetimeAccessEmail(),

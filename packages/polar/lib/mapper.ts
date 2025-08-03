@@ -44,6 +44,7 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
+    metadata: stringifyObjectValues({ ...(subscription.metadata ?? {}), customFieldData: subscription.customFieldData }),
   };
 };
 

@@ -39,7 +39,7 @@ export const LifetimeAccess = () => {
                           'Invite team members with permissions',
                           'Auto-organize customers and sales',
                         ].map(feature => (
-                          <div className="flex items-center space-x-3">
+                          <div key={feature} className="flex items-center space-x-3">
                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
                               <Check className="h-4 w-4 text-green-600 dark:text-green-400" />
                             </div>

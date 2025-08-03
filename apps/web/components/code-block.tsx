@@ -90,7 +90,7 @@ const getLanguageIcon = (language: string) => {
   }
 };
 
-function CodeBlockContent({ language = '', children, customStyle, filename, ...props }: CodeBlockProps) {
+function CodeBlockContent({ language = '', children, customStyle, ...props }: CodeBlockProps) {
   const { resolvedTheme } = useTheme();
 
   const customStyleObj = {

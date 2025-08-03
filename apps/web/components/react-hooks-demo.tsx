@@ -31,7 +31,7 @@ export const ReactHooksDemo = () => {
               <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">seamless integration</span>
             </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              Use familiar React patterns with PayKit's hooks. Type-safe, async-first, and provider-agnostic.
+              Use familiar React patterns with PayKit’s hooks. Type-safe, async-first, and provider-agnostic.
             </p>
           </div>
 

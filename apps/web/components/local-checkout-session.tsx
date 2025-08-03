@@ -6,7 +6,7 @@ export const LocalCheckoutSession = () => {
           <div className="text-center">
             <h2 className="text-foreground mb-6 text-4xl font-bold md:text-5xl">Your payment backend lives in a file</h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              Configure your payment logic in a single file and test locally with PayKit's development provider
+              Configure your payment logic in a single file and test locally with PayKit’s development provider
             </p>
           </div>
 

@@ -10,7 +10,7 @@ import GumroadLogo from '@/public/providers/gumroad.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
-import { BookOpen, ArrowRight, Zap, Sparkles } from 'lucide-react';
+import { BookOpen, Zap, Sparkles } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 

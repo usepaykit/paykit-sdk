@@ -44,12 +44,12 @@ export default function AboutPage() {
 
           <div className="text-muted-foreground space-y-4 leading-relaxed">
             <p>
-              I'm
+              I’m
               <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 hover:underline">
                 Emmanuel Odii
               </Link>
-              , a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I've built several applications including tarotmaster.ai
-              and classynotes.app.
+              &rsquo; a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I’ve built several applications including
+              tarotmaster.ai and classynotes.app.
             </p>
             <p>
               Each time I built these applications, I found myself diving deep into payment provider documentation to implement the abstractions I
@@ -59,7 +59,7 @@ export default function AboutPage() {
             <p>This repetitive process of studying docs, implementing payment logic, and managing provider-specific code led me to build PayKit</p>
 
             <p>
-              PayKit is the solution I wish I had when building my first applications. It's designed to help developers focus on their core product
+              PayKit is the solution I wish I had when building my first applications. It’s designed to help developers focus on their core product
               rather than payment infrastructure.
             </p>
           </div>

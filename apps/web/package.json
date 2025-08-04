@@ -17,7 +17,7 @@
     "@paykit-sdk/core": "1.1.4",
     "@paykit-sdk/local": "1.1.4",
     "@paykit-sdk/polar": "1.1.6",
-    "@paykit-sdk/react": "1.1.4",
+    "@paykit-sdk/react": "1.1.5",
     "@paykit-sdk/stripe": "1.1.4",
     "@paykit-sdk/ui": "0.1.4",
     "@radix-ui/react-accordion": "^1.2.11",

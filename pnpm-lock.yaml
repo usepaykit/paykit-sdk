@@ -55,8 +55,8 @@ importers:
         specifier: 1.1.6
         version: 1.1.6(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(zod@3.25.76)
       '@paykit-sdk/react':
-        specifier: 1.1.4
-        version: 1.1.4(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 1.1.5
+        version: 1.1.5(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@paykit-sdk/stripe':
         specifier: 1.1.4
         version: 1.1.4(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(@types/node@20.19.9)
@@ -2289,10 +2289,10 @@ packages:
     peerDependencies:
       '@paykit-sdk/core': ^1.1.3
 
-  '@paykit-sdk/react@1.1.4':
-    resolution: {integrity: sha512-aq4oLhxNi6e1ruNQnkg3JnYyGxS6GKUYDK7e/h3uhrV4MgdLLxODPRoytEVndQqx4rlx8szOu5w+fUDW1TI6Cg==}
+  '@paykit-sdk/react@1.1.5':
+    resolution: {integrity: sha512-p+PFL5zZf2dZ60BWct70qgQQ7lYIb8ThmWDd/FP1LHXkysfF6x79RzV0phfbQFX2riEibA3roGDDmuDlT61ryQ==}
     peerDependencies:
-      '@paykit-sdk/core': '>=1.1.2'
+      '@paykit-sdk/core': '>=1.1.3'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
@@ -8984,7 +8984,7 @@ snapshots:
       - '@modelcontextprotocol/sdk'
       - zod
 
-  '@paykit-sdk/react@1.1.4(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@paykit-sdk/react@1.1.5(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
       '@paykit-sdk/core': 1.1.4(@types/node@20.19.9)
       react: 19.1.1

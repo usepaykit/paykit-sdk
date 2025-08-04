@@ -2,7 +2,7 @@ import * as React from 'react';
 import { PayKitProvider as PaykitProvider$1 } from '@paykit-sdk/core';
 import { parseElementContext } from './util';
 
-const PaykitContext = React.createContext({} as { provider: PaykitProvider$1 });
+const PaykitContext = React.createContext<{ provider: PaykitProvider$1 } | undefined>(undefined);
 
 interface PaykitProviderProps {
   children: React.ReactNode;

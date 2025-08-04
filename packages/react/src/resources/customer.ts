@@ -2,15 +2,15 @@ import { usePaykitContext } from '../core';
 import { useAsyncFn } from '../hooks/use-async-fn';
 
 export const useCustomer = () => {
-  const { provider } = usePaykitContext();
+  const ctx = usePaykitContext();
 
-  if (!provider) {
+  if (!ctx) {
     throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
   }
 
-  const retrieve = useAsyncFn(provider.retrieveCustomer);
-  const create = useAsyncFn(provider.createCustomer);
-  const update = useAsyncFn(provider.updateCustomer);
+  const retrieve = useAsyncFn(ctx.provider.retrieveCustomer);
+  const create = useAsyncFn(ctx.provider.createCustomer);
+  const update = useAsyncFn(ctx.provider.updateCustomer);
 
   return { retrieve, create, update };
 };

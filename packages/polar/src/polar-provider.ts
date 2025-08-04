@@ -15,6 +15,9 @@ import {
   Invoice,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
+import { Customer as PolarCustomer } from '@polar-sh/sdk/models/components/customer.js';
+import { Order as PolarOrder } from '@polar-sh/sdk/models/components/order.js';
+import { Subscription as PolarSubscription } from '@polar-sh/sdk/models/components/subscription.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
 import { toPaykitCheckout, toPaykitCustomer, toPaykitInvoice, toPaykitSubscription } from '../lib/mapper';
 
@@ -120,24 +123,91 @@ export class PolarProvider implements PayKitProvider {
     const id = webhookHeaders['webhook-id'];
     const timestamp = webhookHeaders['webhook-timestamp'];
 
-    if (type === 'subscription.updated') {
-      return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
-    } else if (type === 'subscription.created') {
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
-    } else if (type === 'subscription.revoked') {
-      return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
-    } else if (type === 'customer.created') {
-      return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
-    } else if (type === 'customer.updated') {
-      return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
-    } else if (type === 'customer.deleted') {
-      return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
-    } else if (type === 'checkout.created') {
-      return toPaykitEvent<Checkout>({ type: '$checkoutCreated', created: parseInt(timestamp), id, data: toPaykitCheckout(data) });
-    } else if (type === 'order.paid' && data.status == 'paid') {
-      return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: parseInt(timestamp), id, data: toPaykitInvoice(data) });
-    }
+    type PolarEventLiteral = Exclude<typeof type, undefined>;
 
-    throw new Error(`Unhandled event type: ${type}`);
+    const webhookHandlers: Partial<Record<PolarEventLiteral, (data: any) => WebhookEventPayload | null>> = {
+      /**
+       * Invoice
+       */
+      'order.paid': (data: PolarOrder) => {
+        const { status, metadata } = data;
+
+        if (status !== 'paid') return null;
+
+        // Handle consumeble purchase
+        return toPaykitEvent<Invoice>({
+          type: '$invoicePaid',
+          created: parseInt(timestamp),
+          id,
+          data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'payment' } }),
+        });
+      },
+
+      'order.created': (data: PolarOrder) => {
+        const { billingReason, metadata, status } = data;
+
+        // Handle Subscription
+
+        if (billingReason == 'subscription_create') {
+          return toPaykitEvent<Invoice>({
+            type: '$invoicePaid',
+            created: parseInt(timestamp),
+            id,
+            data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'subscription' } }),
+          });
+        }
+
+        if (billingReason == 'subscription_cycle') {
+          return toPaykitEvent<Invoice>({
+            type: '$invoicePaid',
+            created: parseInt(timestamp),
+            id,
+            data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'subscription' } }),
+          });
+        }
+
+        return null;
+      },
+
+      /**
+       * Customer
+       */
+      'customer.created': (data: PolarCustomer) => {
+        return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+      },
+
+      'customer.updated': (data: PolarCustomer) => {
+        return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+      },
+
+      'customer.deleted': () => {
+        return toPaykitEvent<null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
+      },
+
+      /**
+       * Subscription
+       */
+      'subscription.updated': (data: PolarSubscription) => {
+        return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+      },
+
+      'subscription.created': (data: PolarSubscription) => {
+        return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+      },
+
+      'subscription.revoked': (data: PolarSubscription) => {
+        return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+      },
+    };
+
+    const handler = webhookHandlers[type as PolarEventLiteral];
+
+    if (!handler) throw new Error(`Unhandled event type: ${type}`);
+
+    const result = handler(data);
+
+    if (!result) throw new Error(`Unhandled event type: ${type}`);
+
+    return result;
   };
 }

@@ -113,6 +113,6 @@ export class LocalProvider implements PayKitProvider {
   };
 
   handleWebhook = async (_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
-    throw new Error('handleWebhook must be called through the server export. Use: import { handleWebhook } from "@paykit-sdk/local/server"');
+    throw new Error('handleWebhook must be called through the server export. Use: import { withLocalProvider } from "@paykit-sdk/local/plugins"');
   };
 }

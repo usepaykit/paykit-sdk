@@ -5,5 +5,10 @@ export const createLocal = (config: LocalConfig) => {
 };
 
 export const local = () => {
-  return createLocal({ debug: true, apiUrl: 'http://localhost:3000/api/paykit', paymentUrl: 'http://localhost:3001' });
+  const webhookUrl = process.env.PAYKIT_WEBHOOK_URL;
+  const paymentUrl = process.env.PAYKIT_PAYMENT_URL;
+
+  if (!webhookUrl || !paymentUrl) throw new Error('PAYKIT_WEBHOOK_URL and PAYKIT_PAYMENT_URL must be set');
+
+  return createLocal({ debug: true, webhookUrl, paymentUrl });
 };

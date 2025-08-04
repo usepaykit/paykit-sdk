@@ -49,8 +49,8 @@ importers:
         specifier: 1.1.4
         version: 1.1.4(@types/node@20.19.9)
       '@paykit-sdk/local':
-        specifier: 1.1.3
-        version: 1.1.3(@paykit-sdk/core@1.1.4(@types/node@20.19.9))
+        specifier: 1.1.4
+        version: 1.1.4(@paykit-sdk/core@1.1.4(@types/node@20.19.9))
       '@paykit-sdk/polar':
         specifier: 1.1.6
         version: 1.1.6(@paykit-sdk/core@1.1.4(@types/node@20.19.9))(zod@3.25.76)
@@ -2264,8 +2264,8 @@ packages:
   '@paykit-sdk/core@1.1.4':
     resolution: {integrity: sha512-Al3PXaLuZTgULMGYocvX9Th6gTjgUouVZ6uua92KmmX03KgOV//2moS0E3bKlW52ELb7DzZOsbnGhCM4Te4G1A==}
 
-  '@paykit-sdk/local@1.1.3':
-    resolution: {integrity: sha512-SL9WIeUxa22Iv3ANdgiv6k6HWwmxiqJevTOiCYCNlEmZKukemCzPv2ezJPwHp8KJgKqvElw0AmCbqChk6dCyXA==}
+  '@paykit-sdk/local@1.1.4':
+    resolution: {integrity: sha512-KwbTJfJ6CWnhZaeQsSX4b35w1e6GBVKvGkoQagyhbEQlcgZiy2LjgJL3RhEaAcnWIQbixhABSujezVI5dalfXg==}
     peerDependencies:
       '@paykit-sdk/core': '>=1.1.4'
 
@@ -8955,7 +8955,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@paykit-sdk/local@1.1.3(@paykit-sdk/core@1.1.4(@types/node@20.19.9))':
+  '@paykit-sdk/local@1.1.4(@paykit-sdk/core@1.1.4(@types/node@20.19.9))':
     dependencies:
       '@paykit-sdk/core': 1.1.4(@types/node@20.19.9)
       nanoid: 5.1.5

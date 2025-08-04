@@ -38,7 +38,7 @@ import { PayKit } from '@paykit-sdk/core';
 import { createLocal } from '@paykit-sdk/local';
 
 const provider = createLocal({
-  apiUrl: 'http://localhost:3000/api/paykit',
+  webhookUrl: 'http://localhost:3000/api/paykit',
   paymentUrl: 'http://localhost:3001',
 });
 

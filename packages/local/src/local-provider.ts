@@ -17,7 +17,7 @@ import {
 import { nanoid } from 'nanoid';
 
 export interface LocalConfig extends PaykitProviderOptions {
-  apiUrl: string;
+  webhookUrl: string;
   paymentUrl: string;
 }
 
@@ -25,14 +25,14 @@ export class LocalProvider implements PayKitProvider {
   private _client: HTTPClient;
 
   constructor(private config: LocalConfig) {
-    this._client = new HTTPClient({ baseUrl: config.apiUrl, headers: {} });
+    this._client = new HTTPClient({ baseUrl: config.webhookUrl, headers: {} });
   }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const urlParams = new URLSearchParams({
       resource: 'checkout',
       type: '$checkoutCreated',
-      body: JSON.stringify({ ...params, paymentUrl: this.config.paymentUrl, webhookUrl: this.config.apiUrl }),
+      body: JSON.stringify({ ...params, paymentUrl: this.config.paymentUrl, webhookUrl: this.config.webhookUrl }),
     });
 
     const response = await unwrapAsync(this._client.post<WebhookEvent<Checkout>>(`?${urlParams.toString()}`));
@@ -108,8 +108,6 @@ export class LocalProvider implements PayKitProvider {
     const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionRetrieved', body: JSON.stringify({ id }) });
 
     const response = await unwrapAsync(this._client.post<WebhookEvent<Subscription>>(`?${urlParams.toString()}`));
-
-    console.log({ response });
 
     return response.data;
   };

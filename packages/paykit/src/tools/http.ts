@@ -61,5 +61,5 @@ export function isUnauthorizedError(err: unknown): boolean {
     return false;
   }
 
-  return err instanceof Error && err.message.toLowerCase().includes('unauthorized');
+  return err instanceof Error && ['unauthorized', '401'].includes(err.message.toLowerCase());
 }

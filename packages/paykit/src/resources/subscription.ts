@@ -1,4 +1,5 @@
-import { PaykitMetadata } from '../types';
+import { z } from 'zod';
+import { metadataSchema, PaykitMetadata } from './metadata';
 
 export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'expired';
 
@@ -33,9 +34,14 @@ export interface Subscription {
   metadata: PaykitMetadata;
 }
 
-export type UpdateSubscriptionParams = {
-  /**
-   * The metadata of the subscription.
-   */
-  metadata: PaykitMetadata;
-};
+export const updateSubscriptionSchema = z.object({
+  metadata: metadataSchema.optional(),
+});
+
+export type UpdateSubscriptionParams = z.infer<typeof updateSubscriptionSchema>;
+
+export const retrieveSubscriptionSchema = z.object({
+  id: z.string(),
+});
+
+export type RetrieveSubscriptionParams = z.infer<typeof retrieveSubscriptionSchema>;

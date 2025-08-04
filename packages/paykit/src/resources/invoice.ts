@@ -1,4 +1,4 @@
-import { PaykitMetadata } from '../types';
+import { PaykitMetadata } from './metadata';
 
 export type Invoice = {
   /**

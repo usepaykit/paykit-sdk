@@ -116,74 +116,88 @@ export class StripeProvider implements PayKitProvider {
 
     const event = this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
 
-    if (event.type === 'checkout.session.completed') {
-      const data = event.data.object;
+    type StripeEventLiteral = typeof event.type;
 
-      return toPaykitEvent<Invoice>({
-        type: '$invoicePaid',
-        created: event.created,
-        id: event.id,
-        data: {
-          id: data.id,
-          amount: data.amount_total ?? 0,
-          currency: data.currency ?? '',
-          metadata: stringifyObjectValues(data.metadata ?? {}),
-          customer_id: data.customer?.toString() ?? '',
-        },
-      });
-    } else if (event.type === 'customer.created') {
-      const customer = event.data.object;
+    const webhookHandlers: Partial<Record<StripeEventLiteral, (event: Stripe.Event) => WebhookEventPayload | null>> = {
+      /**
+       * Invoice
+       */
+      'checkout.session.completed': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Checkout.Session;
 
-      return toPaykitEvent<Customer>({
-        type: '$customerCreated',
-        created: event.created,
-        id: event.id,
-        data: toPaykitCustomer(customer),
-      });
-    } else if (event.type === 'customer.updated') {
-      const customer = event.data.object;
+        if (data.mode !== 'payment') return null;
 
-      return toPaykitEvent<Customer>({
-        type: '$customerUpdated',
-        created: event.created,
-        id: event.id,
-        data: toPaykitCustomer(customer),
-      });
-    } else if (event.type === 'customer.deleted') {
-      return toPaykitEvent<Customer | null>({ type: '$customerDeleted', created: event.created, id: event.id, data: null });
-    } else if (event.type === 'customer.subscription.created') {
-      const subscription = event.data.object;
+        // Handle consumeble purchase
+        return toPaykitEvent<Invoice>({
+          type: '$invoicePaid',
+          created: event.created,
+          id: event.id,
+          data: {
+            id: data.id,
+            amount: data.amount_total ?? 0,
+            currency: data.currency ?? '',
+            metadata: stringifyObjectValues({ ...(data.metadata ?? {}), $mode: data.mode }),
+            customer_id: data.customer?.toString() ?? '',
+          },
+        });
+      },
 
-      return toPaykitEvent<Subscription>({
-        type: '$subscriptionCreated',
-        created: event.created,
-        id: event.id,
-        data: toPaykitSubscription(subscription),
-      });
-    } else if (event.type === 'customer.subscription.updated') {
-      const subscription = event.data.object;
+      'invoice.paid': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Invoice;
 
-      return toPaykitEvent<Subscription>({
-        type: '$subscriptionUpdated',
-        created: event.created,
-        id: event.id,
-        data: toPaykitSubscription(subscription),
-      });
-    } else if (event.type === 'customer.subscription.deleted') {
-      const subscription = event.data.object;
+        if (data.status !== 'paid') return null;
 
-      return toPaykitEvent<Subscription>({
-        type: '$subscriptionCancelled',
-        created: event.created,
-        id: event.id,
-        data: toPaykitSubscription(subscription),
-      });
-    } else if (event.type == 'invoice.paid' && event.data.object.status == 'paid') {
-      const invoice = event.data.object;
+        // Handle subscription purchase
+        return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: event.created, id: event.id, data: toPaykitInvoice(data) });
+      },
 
-      return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: event.created, id: event.id, data: toPaykitInvoice(invoice) });
-    }
+      /**
+       * Customer
+       */
+      'customer.created': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Customer;
 
-    throw new Error(`Unhandled event type: ${event.type}`);
+        return toPaykitEvent<Customer>({ type: '$customerCreated', created: event.created, id: event.id, data: toPaykitCustomer(data) });
+      },
+
+      'customer.updated': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Customer;
+
+        return toPaykitEvent<Customer>({ type: '$customerUpdated', created: event.created, id: event.id, data: toPaykitCustomer(data) });
+      },
+
+      'customer.deleted': (event: Stripe.Event) => {
+        return toPaykitEvent<null>({ type: '$customerDeleted', created: event.created, id: event.id, data: null });
+      },
+
+      /**
+       * Subscription
+       */
+      'customer.subscription.created': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Subscription;
+
+        return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: event.created, id: event.id, data: toPaykitSubscription(data) });
+      },
+
+      'customer.subscription.updated': (event: Stripe.Event) => {
+        const data = event.data.object as Stripe.Subscription;
+
+        return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: toPaykitSubscription(data) });
+      },
+
+      'customer.subscription.deleted': (event: Stripe.Event) => {
+        return toPaykitEvent<null>({ type: '$subscriptionCancelled', created: event.created, id: event.id, data: null });
+      },
+    };
+
+    const handler = webhookHandlers[event.type];
+
+    if (!handler) throw new Error(`Unhandled event type: ${event.type}`);
+
+    const result = handler(event);
+
+    if (!result) throw new Error(`Unhandled event type: ${event.type}`);
+
+    return result;
   };
 }

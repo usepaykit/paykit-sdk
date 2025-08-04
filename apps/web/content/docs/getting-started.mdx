@@ -101,8 +101,8 @@ export default async function CheckoutPage() {
     session_type: 'one_time',
     metadata: { plan: 'pro' },
     provider_metadata: {
-      ui_mode: 'hosted',
-      success_url: 'https://localhost:3000/success'
+      amount: 45 // Override the amount speficied in config.json
+      currency: 'GBP' // Override the currency
     }
   })
 

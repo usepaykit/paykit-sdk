@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PaykitMetadata, safeEncode, Subscription, type Checkout } from '@paykit-sdk/core';
+import { PaykitMetadata, Subscription, type Checkout } from '@paykit-sdk/core';
 import { Button, Input, Toast } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import { nanoid } from 'nanoid';

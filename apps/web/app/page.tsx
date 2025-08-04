@@ -181,7 +181,7 @@ const Index = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="mailto:emmanuelodii80@gmail.com" className="hover:text-foreground transition-colors">
+                  <Link href="mailto:odii@usepaykit.dev" className="hover:text-foreground transition-colors">
                     Contact
                   </Link>
                 </li>

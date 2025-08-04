@@ -73,7 +73,7 @@ export default function AboutPage() {
             <p>Open to investment opportunities and partnerships.</p>
           </div>
           <Button asChild>
-            <Link href="mailto:emmanuelodii80@gmail.com?subject=Investment Opportunity - PayKit">Get in Touch</Link>
+            <Link href="mailto:odii@usepaykit.dev?subject=Investment Opportunity - PayKit">Get in Touch</Link>
           </Button>
         </div>
 

@@ -15,6 +15,7 @@ const handlePayment = async () => {
   });
 
   if (error) return;
+  
   window.location.href = checkout.payment_url;
 }
 `;

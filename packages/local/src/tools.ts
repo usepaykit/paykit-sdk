@@ -1,4 +1,4 @@
-import { Checkout, Customer, logger, Subscription } from '@paykit-sdk/core';
+import { Checkout, Customer, Invoice, logger, Subscription } from '@paykit-sdk/core';
 
 const configDir = '.paykit';
 const fileName = 'config.json';
@@ -25,9 +25,9 @@ export interface PaykitConfig {
   checkouts: Array<Checkout>;
 
   /**
-   * Payments
+   * Invoices
    */
-  payments: Array<string>;
+  invoices: Array<Invoice>;
 }
 
 /**
@@ -99,7 +99,7 @@ export const __defaultPaykitConfig = (dto: Partial<PaykitConfig> | null = null) 
     customer: { id: '', email: '', name: '', metadata: {} },
     subscriptions: [],
     checkouts: [],
-    payments: [],
+    invoices: [],
   };
 
   return dto ? { ...defaultConfig, ...dto } : defaultConfig;

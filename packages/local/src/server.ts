@@ -2,6 +2,7 @@ import 'server-only';
 import {
   Checkout,
   Customer,
+  Invoice,
   LooseAutoComplete,
   PaykitMetadata,
   safeEncode,
@@ -16,130 +17,240 @@ import { nanoid } from 'nanoid';
 import { __defaultPaykitConfig, getKeyValue, updateKey } from './tools';
 import { parseJsonValues } from './utils';
 
+type WebhookResource = 'checkout' | 'customer' | 'subscription' | 'invoice';
+
 type CheckoutWithProviderMetadata = Checkout & { provider_metadata: PaykitMetadata };
 
 /**
- * Product
+ * Utils
  */
+const createWebhookEvent = <T extends LooseAutoComplete<WebhookEventLiteral>, Resource>(type: T, data: Resource): WebhookEvent<Resource> => ({
+  id: `evt_${nanoid(30)}`,
+  type: type as WebhookEventLiteral,
+  created: Date.now(),
+  data,
+});
 
-const server$RetrieveProduct = async (id: string) => {
-  const product = await getKeyValue('product');
-
-  return product?.itemId == id ? product : null;
+const productHandlers = {
+  retrieve: async (id: string) => {
+    const product = await getKeyValue('product');
+    return product?.itemId === id ? product : null;
+  },
 };
 
-/**
- * Checkout
- */
-const server$CreateCheckout = async (checkout: Checkout) => {
-  await updateKey('checkouts', [...((await getKeyValue('checkouts')) || []), checkout]);
+const customerHandlers = {
+  create: async (customer: Customer) => {
+    await updateKey('customer', customer);
+    return customer;
+  },
 
-  return checkout;
+  retrieve: async (id: string) => {
+    const customer = await getKeyValue('customer');
+    return customer?.id === id ? customer : null;
+  },
+
+  update: async (customer: Customer) => {
+    await updateKey('customer', customer);
+    return customer;
+  },
+
+  delete: async (id: string) => {
+    const customer = await getKeyValue('customer');
+
+    if (!customer) throw new ValidationError('Customer not found', {});
+
+    if (customer.id === id) await updateKey('customer', __defaultPaykitConfig().customer);
+
+    return null;
+  },
 };
 
-const server$RetrieveCheckout = async (id: string) => {
-  const checkouts = await getKeyValue('checkouts');
+const checkoutHandlers = {
+  create: async (checkout: Checkout) => {
+    await updateKey('checkouts', [...((await getKeyValue('checkouts')) || []), checkout]);
+    return checkout;
+  },
 
-  return checkouts?.find(checkout => checkout.id === id) ?? null;
+  retrieve: async (id: string) => {
+    const checkouts = (await getKeyValue('checkouts')) || [];
+    return checkouts.find(checkout => checkout.id === id) ?? null;
+  },
+
+  createWithMetadata: async (data: Record<string, any>) => {
+    const product = await productHandlers.retrieve(data.item_id);
+
+    if (!product) throw new ValidationError('Product not found', {});
+
+    const customer = await customerHandlers.retrieve(data.customer_id);
+
+    if (!customer) throw new ValidationError('Customer not found', {});
+
+    const amount = await (async () => {
+      if (product?.price) return product?.price;
+
+      // Overriding the amount from the product
+      if (data.provider_metadata?.amount) {
+        return parseInt(data.provider_metadata.amount as string, 10);
+      }
+      return 25;
+    })();
+
+    const providerMetadata: PaykitMetadata = {
+      customerName: customer.name ?? '',
+      customerEmail: customer.email ?? '',
+      webhookUrl: data.webhookUrl,
+      productName: product.name,
+    };
+
+    const checkoutData = {
+      amount,
+      customer_id: data.customer_id,
+      metadata: data.metadata,
+      session_type: data.session_type,
+      products: [{ id: data.item_id, quantity: 1 }],
+      currency: data.provider_metadata?.currency ?? 'USD',
+      provider_metadata: providerMetadata,
+    } as Omit<CheckoutWithProviderMetadata, 'id' | 'payment_url'>;
+
+    const flowId = safeEncode(checkoutData);
+
+    if (!flowId.ok) throw new ValidationError('Failed to create checkout', {});
+
+    const checkout = {
+      ...checkoutData,
+      id: flowId.value,
+      payment_url: `${data.paymentUrl}/checkout?id=${flowId.value}`,
+    } as CheckoutWithProviderMetadata;
+
+    const { provider_metadata, ...checkoutWithoutProviderMetadata } = checkout;
+    await checkoutHandlers.create(checkoutWithoutProviderMetadata);
+
+    return checkoutWithoutProviderMetadata;
+  },
 };
 
-/**
- * Customer
- */
+const subscriptionHandlers = {
+  create: async (subscription: Subscription) => {
+    await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription]);
+    return subscription;
+  },
 
-const server$CreateCustomer = async (customer: Customer) => {
-  await updateKey('customer', customer);
+  retrieve: async (id: string) => {
+    const subscriptions = (await getKeyValue('subscriptions')) || [];
+    return subscriptions.find(sub => sub.id === id) ?? null;
+  },
 
-  return customer;
+  update: async (id: string, updateFn: (record: Subscription) => Subscription) => {
+    const subscriptions = await getKeyValue('subscriptions');
+
+    if (!subscriptions) throw new ValidationError('Subscriptions not found', {});
+
+    const index = subscriptions.findIndex(sub => sub.id === id);
+
+    if (index === -1) throw new ValidationError('Subscription not found', {});
+
+    const updatedSubscriptions = [...subscriptions];
+
+    updatedSubscriptions[index] = updateFn(updatedSubscriptions[index]!);
+
+    await updateKey('subscriptions', updatedSubscriptions);
+
+    return updatedSubscriptions[index]!;
+  },
+
+  updateMetadata: async (id: string, metadata: Record<string, any>) => {
+    return subscriptionHandlers.update(id, record => ({ ...record, metadata: { ...record.metadata, ...metadata } }));
+  },
+
+  cancel: async (id: string) => {
+    return subscriptionHandlers.update(id, record => ({ ...record, status: 'canceled' }));
+  },
 };
 
-const server$RetrieveCustomer = async (id: string) => {
-  const customer = await getKeyValue('customer');
-
-  return customer?.id == id ? customer : null;
+const invoiceHandlers = {
+  create: async (invoice: Invoice) => {
+    await updateKey('invoices', [...((await getKeyValue('invoices')) || []), invoice]);
+    return invoice;
+  },
 };
 
-const server$PutCustomer = async (customer: Customer) => {
-  await updateKey('customer', customer);
+const webhookEventHandlers = {
+  /**
+   * Checkout
+   */
+  $checkoutCreated: async (data: Record<string, any>) => {
+    const result = await checkoutHandlers.createWithMetadata(data);
+    return { result, event: createWebhookEvent('$checkoutCreated', result) };
+  },
+  $checkoutRetrieved: async (data: Record<string, any>) => {
+    const result = await checkoutHandlers.retrieve(data.id);
+    return { result, event: createWebhookEvent('$checkoutRetrieved', result) };
+  },
 
-  return customer;
-};
+  /**
+   * Customer
+   */
+  $customerCreated: async (data: Record<string, any>) => {
+    const result = await customerHandlers.create(data as Customer);
+    return { result, event: createWebhookEvent('$customerCreated', result) };
+  },
+  $customerRetrieved: async (data: Record<string, any>) => {
+    const result = await customerHandlers.retrieve(data.id);
+    return { result, event: createWebhookEvent('$customerRetrieved', result) };
+  },
+  $customerUpdated: async (data: Record<string, any>) => {
+    const result = await customerHandlers.update(data as Customer);
+    return { result, event: createWebhookEvent('$customerUpdated', result) };
+  },
+  $customerDeleted: async (data: Record<string, any>) => {
+    const result = await customerHandlers.delete(data.id);
+    return { result, event: createWebhookEvent('$customerDeleted', result) };
+  },
 
-const server$DeleteCustomer = async (id: string) => {
-  const customer = await getKeyValue('customer');
+  /**
+   * Subscription
+   */
+  $subscriptionCreated: async (data: Record<string, any>) => {
+    const result = await subscriptionHandlers.create(data as Subscription);
+    return { result, event: createWebhookEvent('$subscriptionCreated', result) };
+  },
+  $subscriptionUpdated: async (data: Record<string, any>) => {
+    const result = await subscriptionHandlers.updateMetadata(data.id, data.metadata);
+    return { result, event: createWebhookEvent('$subscriptionUpdated', result) };
+  },
+  $subscriptionCancelled: async (data: Record<string, any>) => {
+    const result = await subscriptionHandlers.cancel(data.id);
+    return { result, event: createWebhookEvent('$subscriptionCancelled', result) };
+  },
+  $subscriptionRetrieved: async (data: Record<string, any>) => {
+    const result = await subscriptionHandlers.retrieve(data.id);
+    return { result, event: createWebhookEvent('$subscriptionRetrieved', result) };
+  },
 
-  if (!customer) throw new ValidationError('Customer not found', { cause: 'Customer not found' });
-
-  if (customer.id === id) {
-    await updateKey('customer', __defaultPaykitConfig().customer);
-  }
-
-  return null;
-};
-
-/**
- * Subscription
- */
-
-const server$CreateSubscription = async (subscription: Subscription) => {
-  await updateKey('subscriptions', [...((await getKeyValue('subscriptions')) || []), subscription]);
-
-  return subscription;
-};
-
-const server$RetrieveSubscription = async (id: string) => {
-  const subscriptions = await getKeyValue('subscriptions');
-
-  return subscriptions?.find(sub => sub.id === id) ?? null;
-};
-
-const server$UpdateSubscriptionHelper = async (id: string, updateData: (record: Subscription) => Subscription) => {
-  const subscriptions = await getKeyValue('subscriptions');
-
-  if (!subscriptions) throw new ValidationError('Subscriptions not found', { cause: 'Subscriptions not found' });
-
-  const subscriptionIndex = subscriptions.findIndex(sub => sub.id === id) ?? -1;
-
-  if (subscriptionIndex === -1) throw new ValidationError('Subscription not found', { cause: 'Subscription not found' });
-
-  const updatedSubscriptions = [...subscriptions];
-  const currentSubscription = updatedSubscriptions[subscriptionIndex];
-
-  const updatedSubscription = updateData(currentSubscription);
-
-  updatedSubscriptions[subscriptionIndex] = updatedSubscription;
-
-  await updateKey('subscriptions', updatedSubscriptions);
-
-  return updatedSubscriptions[subscriptionIndex];
-};
-
-/**
- * Payment
- */
-const server$CreatePayment = async (paymentId: string) => {
-  await updateKey('payments', [...((await getKeyValue('payments')) || []), paymentId]);
-
-  return paymentId;
-};
-
-const makeWebhookEvent = <T extends LooseAutoComplete<WebhookEventLiteral>, Resource>(type: T, data: Resource) => {
-  return { id: `evt_${nanoid(30)}`, type, created: Date.now(), data } as WebhookEvent<Resource>;
+  /**
+   * Invoice
+   */
+  $invoicePaid: async (data: Record<string, any>) => {
+    const result = await invoiceHandlers.create(data as Invoice);
+    return { result, event: createWebhookEvent('$invoicePaid', result) };
+  },
 };
 
 /**
  * Webhook
  */
 export const server$HandleWebhook = async (url: string, webhook: Webhook): Promise<WebhookEventPayload> => {
-  const urlParams = new URL(url).searchParams.toString();
+  const urlParams = new URLSearchParams(new URL(url).searchParams.toString());
 
-  const urlSearchParams = new URLSearchParams(urlParams);
+  const resource = urlParams.get('resource') as WebhookResource;
 
-  const resource = urlSearchParams.get('resource');
+  if (!resource) throw new ValidationError('Missing resource parameter', {});
 
-  const type = urlSearchParams.get('type') as LooseAutoComplete<WebhookEventLiteral>;
+  const type = urlParams.get('type') as LooseAutoComplete<WebhookEventLiteral>;
 
-  const bodyParam = urlSearchParams.get('body');
+  if (!type) throw new ValidationError('Missing type parameter', {});
+
+  const bodyParam = urlParams.get('body');
 
   if (!bodyParam) throw new ValidationError('Missing body parameter', {});
 
@@ -147,160 +258,20 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
 
   const parsedData = parseJsonValues(data);
 
-  console.log({ parsedData });
+  const typeHandler = webhookEventHandlers[type as keyof typeof webhookEventHandlers];
 
-  if (!resource) throw new ValidationError('Missing resource parameter', {});
-
-  let result: any;
-  let webhookEvent: WebhookEventPayload | null = null;
-
-  if (resource == 'checkout') {
-    switch (type) {
-      case '$checkoutCreated':
-        const amount = (async () => {
-          const product = await server$RetrieveProduct(parsedData.item_id);
-
-          if (product && product['price']) return product['price'];
-
-          if (parsedData.provider_metadata?.['amount']) return parseInt(parsedData.provider_metadata?.['amount'] as string, 10);
-
-          return 25;
-        })();
-
-        const product = await server$RetrieveProduct(parsedData.item_id);
-
-        if (!product) throw new ValidationError('Product not found', {});
-
-        const customer = await server$RetrieveCustomer(parsedData.customer_id);
-
-        if (!customer) throw new ValidationError('Customer not found', {});
-
-        const providerMetadata = {
-          customerName: customer.name,
-          customerEmail: customer.email,
-          webhookUrl: parsedData.webhookUrl,
-          productName: product.name,
-        };
-
-        const checkoutWithoutPaymentAndId = {
-          amount: await amount,
-          customer_id: parsedData.customer_id,
-          metadata: parsedData.metadata,
-          session_type: parsedData.session_type,
-          products: [{ id: parsedData.item_id, quantity: 1 }],
-          currency: (parsedData.provider_metadata?.['currency'] as string) ?? 'USD',
-          provider_metadata: providerMetadata,
-        } as Omit<Checkout, 'id' | 'payment_url'>;
-
-        const flowId = safeEncode(checkoutWithoutPaymentAndId);
-
-        if (!flowId.ok) throw new ValidationError('Failed to create checkout', {});
-
-        const checkout = {
-          ...checkoutWithoutPaymentAndId,
-          id: flowId.value,
-          payment_url: `${parsedData.paymentUrl}/checkout?id=${flowId.value}`,
-        } as CheckoutWithProviderMetadata;
-
-        const { provider_metadata, ...checkoutData } = checkout;
-
-        await server$CreateCheckout(checkoutData as Checkout);
-
-        result = checkoutData;
-        webhookEvent = makeWebhookEvent<'$checkoutCreated', Checkout>('$checkoutCreated', checkoutData);
-        break;
-
-      case '$checkoutRetrieved':
-        result = await server$RetrieveCheckout(parsedData.id);
-        webhookEvent = makeWebhookEvent<'$checkoutRetrieved', Checkout>('$checkoutRetrieved', result);
-        break;
-
-      default:
-        throw new ValidationError('Unknown webhook type', {});
-    }
-  } else if (resource == 'customer') {
-    switch (type) {
-      case '$customerCreated':
-        await server$CreateCustomer(parsedData as Customer);
-        result = parsedData as Customer;
-        webhookEvent = makeWebhookEvent<'$customerCreated', Customer>('$customerCreated', result);
-        break;
-
-      case '$customerRetrieved':
-        result = await server$RetrieveCustomer(parsedData.id);
-        webhookEvent = makeWebhookEvent<'$customerRetrieved', Customer>('$customerRetrieved', result);
-        break;
-
-      case '$customerUpdated':
-        await server$PutCustomer(parsedData as Customer);
-        result = parsedData as Customer;
-        webhookEvent = makeWebhookEvent<'$customerUpdated', Customer>('$customerUpdated', result);
-        break;
-
-      case '$customerDeleted':
-        await server$DeleteCustomer(parsedData.id);
-        result = null;
-        webhookEvent = makeWebhookEvent<'$customerDeleted', Customer | null>('$customerDeleted', result);
-        break;
-
-      default:
-        throw new ValidationError('Unknown webhook type', {});
-    }
-  } else if (resource == 'subscription') {
-    switch (type) {
-      case '$subscriptionCreated':
-        await server$CreateSubscription(parsedData as Subscription);
-        result = parsedData as Subscription;
-        webhookEvent = makeWebhookEvent<'$subscriptionCreated', Subscription>('$subscriptionCreated', result);
-        break;
-
-      case '$subscriptionUpdated':
-        await server$UpdateSubscriptionHelper(parsedData.id, record => ({ ...record, metadata: { ...record.metadata, ...parsedData.metadata } }));
-        result = parsedData as Subscription;
-        webhookEvent = makeWebhookEvent<'$subscriptionUpdated', Subscription>('$subscriptionUpdated', result);
-        break;
-
-      case '$subscriptionCancelled':
-        await server$UpdateSubscriptionHelper(parsedData.id, record => ({ ...record, status: 'canceled' }));
-        result = null;
-        webhookEvent = makeWebhookEvent<'$subscriptionCancelled', Subscription>('$subscriptionCancelled', result);
-        break;
-
-      case '$subscriptionRetrieved':
-        result = await server$RetrieveSubscription(parsedData.id);
-        console.log({ result });
-        webhookEvent = makeWebhookEvent<'$subscriptionRetrieved', Subscription>('$subscriptionRetrieved', result);
-        break;
-
-      default:
-        throw new ValidationError('Unknown webhook type', {});
-    }
-  } else if (resource == 'payment') {
-    switch (type) {
-      case '$invoicePaid':
-        await server$CreatePayment(parsedData.id);
-        result = parsedData as { id: string };
-        webhookEvent = makeWebhookEvent<'$invoicePaid', { id: string }>('$invoicePaid', result);
-        break;
-
-      default:
-        throw new ValidationError('Unknown webhook type', {});
-    }
-  } else {
-    console.log('Unknown webhook type error message', { type, data });
-    throw new ValidationError('Unknown webhook type', {});
-  }
+  const { result, event } = await typeHandler(parsedData);
 
   try {
-    const webhookWithHandlers = webhook as unknown as { handlers: Map<string, ((event: any) => Promise<void>)[]> };
+    const webhookWithHandlers = webhook as unknown as { handlers: Map<string, ((event: WebhookEventLiteral) => Promise<void>)[]> };
     const handlers = webhookWithHandlers.handlers?.get(type as string);
 
     if (handlers && handlers.length > 0) {
       await Promise.all(handlers.map((handler: (event: any) => Promise<void>) => handler(result)));
     }
   } catch (error) {
-    throw new ValidationError('Error calling webhook handlers', {});
+    throw new ValidationError('Failed to call webhook handlers', { cause: error });
   }
 
-  return webhookEvent as WebhookEventPayload;
+  return event as WebhookEventPayload;
 };

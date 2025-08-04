@@ -1,45 +1,114 @@
 # @paykit-sdk/local
 
-Local development provider for PayKit helps you test offline without no dependencies.
+Local provider for PayKit development and testing.
 
-## Overview
+## Quick Start
 
-The local provider creates a complete payment simulation environment on your machine. Your backend logic lives in a single configurable file, and the development server provides a hosted checkout experience at `http://localhost:3001`.
+Install the Local provider:
 
-## Quick Setup
+<br />
 
-1. **Initialize the project:**
+```bash
+npm install @paykit-sdk/local
+```
 
-   ```bash
-   npx @paykit-sdk/cli init
-   ```
+## Setup
 
-   This generates a `.paykit/config.json` file where you'll define your payment logic.
+### Method 1: Environment Variables
 
-2. **Start the development server:**
+```typescript
+// lib/paykit.ts
+import { PayKit } from '@paykit-sdk/core';
+import { local } from '@paykit-sdk/local';
 
-   ```bash
-   npx @paykit-sdk/cli dev
-   ```
+const provider = local(); // Ensure PAYKIT_API_URL, PAYKIT_PAYMENT_URL environment variables are set
 
-   The checkout interface will be available at `http://localhost:3001`.
+const paykit = new PayKit(provider);
+
+export { paykit };
+```
+
+### Method 2: Direct Configuration
+
+<br />
+
+```typescript
+// lib/paykit.ts
+import { PayKit } from '@paykit-sdk/core';
+import { createLocal } from '@paykit-sdk/local';
+
+const provider = createLocal({
+  apiUrl: 'http://localhost:3000/api/paykit',
+  paymentUrl: 'http://localhost:3001',
+});
+
+const paykit = new PayKit(provider);
+
+export { paykit };
+```
+
+```typescript
+import { paykit } from '@/lib/paykit';
+
+// Create checkout
+const checkout = await paykit.checkouts.create({
+  customer_id: 'cus_123',
+  item_id: 'it_456',
+  session_type: 'one_time',
+  metadata: { plan: 'pro' },
+});
+
+// Handle webhooks
+paykit.webhooks
+  .setup({ webhookSecret: 'local' })
+  .on('$checkoutCreated', async event => {
+    console.log('Checkout created:', event.data);
+  })
+  .on('$invoicePaid', async event => {
+    console.log('Payment received:', event.data);
+  });
+```
 
 ## Configuration
 
-Edit `.paykit/config.json` to define your payment flows:
+The local provider uses a `.paykit/config.json` file to store data. Here's the minimal boilerplate configuration:
 
 ```json
 {
   "product": {
     "itemId": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq",
-    "name": "Paykit Pro Licensce",
+    "name": "Paykit Pro License",
     "description": "Go unlimited!",
     "price": "$25"
   },
   "customer": {
     "id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
-    "email": "em@paykit.com",
+    "email": "john@doe.com",
     "name": "Emmanuel Odii",
+    "metadata": {}
+  },
+  "checkouts": [],
+  "subscriptions": [],
+  "invoices": []
+}
+```
+
+## Example: After Checkout Completion
+
+After a checkout is completed, your config will look like this:
+
+```json
+{
+  "product": {
+    "itemId": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq",
+    "name": "Paykit Pro License",
+    "description": "Go unlimited!",
+    "price": "$25"
+  },
+  "customer": {
+    "id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
+    "email": "john@doe.com",
+    "name": "John Doe",
     "metadata": {}
   },
   "subscriptions": [
@@ -54,7 +123,7 @@ Edit `.paykit/config.json` to define your payment flows:
   ],
   "checkouts": [
     {
-      "amount": "$25",
+      "amount": 25,
       "customer_id": "cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0",
       "metadata": { "plan": "pro", "billing": "monthly" },
       "session_type": "recurring",
@@ -64,47 +133,62 @@ Edit `.paykit/config.json` to define your payment flows:
       "payment_url": "http://localhost:3001/checkout?id=eyJhbW91bnQiOiIkMjUi19..."
     }
   ],
-  "payments": ["eyJjdXN0b21lcl9pZCI6ImN1c19oUzNrTEZ.."]
+  "invoices": [
+    {
+      "id": "inv_uwheiuy8yhchuwehiugcuwewew2",
+      "amount": 25,
+      "currency": "USD",
+      "metadata": {},
+      "customer_id": "cus_hS3kLFq0U3e1l1H8haxV7"
+    }
+  ]
 }
 ```
 
-## API Route Setup
+## Webhook Implementation
 
-### Next.js
+### Next.js API Route
 
 ```typescript
 import { paykit } from '@/lib/paykit';
-import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
+import { withLocalWebhook } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.PAYKIT_WEBHOOK_SECRET! })
+    .setup({ webhookSecret: 'local' })
     .on('$checkoutCreated', async event => {
       console.log('Checkout created:', event.data);
     })
     .on('$customerCreated', async event => {
       console.log('Customer created:', event.data);
     })
+    .on('$subscriptionCreated', async event => {
+      console.log('Subscription created:', event.data);
+    })
     .on('$invoicePaid', async event => {
       console.log('Payment received:', event.data);
     });
 
-  const result = await withNextJsWebhook(request.url.toString(), webhook);
+  const result = await withLocalWebhook(request.url.toString(), webhook);
 
   return NextResponse.json(result);
 }
 ```
 
-### Vite.js
+### Express.js Route
 
 ```typescript
 import { paykit } from '@/lib/paykit';
-import { withViteWebhook } from '@paykit-sdk/local/plugins';
+import { withLocalWebhook } from '@paykit-sdk/local/plugins';
+import express from 'express';
 
-export default defineEventHandler(async event => {
+const app = express();
+app.use(express.raw({ type: 'application/json' }));
+
+app.post('/api/paykit', async (req, res) => {
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: import.meta.url.PAYKIT_WEBHOOK_SECRET! })
+    .setup({ webhookSecret: 'local' })
     .on('$checkoutCreated', async event => {
       console.log('Checkout created:', event.data);
     })
@@ -112,45 +196,46 @@ export default defineEventHandler(async event => {
       console.log('Payment received:', event.data);
     });
 
-  const result = await withViteWebhook(event, webhook);
+  const result = await withLocalWebhook(req.url, webhook);
 
   return result;
 });
 ```
 
-## Provider Setup
+### Vite.js
 
 ```typescript
-import { PayKit } from '@paykit-sdk/core';
-import { createLocal } from '@paykit-sdk/local';
+import { paykit } from '@/lib/paykit';
+import { withLocalWebhook } from '@paykit-sdk/local/plugins';
 
-const provider = createLocal({
-  apiUrl: 'http://localhost:3000/api/paykit',
-  paymentUrl: 'http://localhost:3001',
-});
+export default defineEventHandler(async event => {
+  const url = event.url;
 
-const paykit = new PayKit(provider);
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret: 'local' })
+    .on('$checkoutCreated', async event => {
+      console.log('Checkout created:', event.data);
+    })
+    .on('$invoicePaid', async event => {
+      console.log('Payment received:', event.data);
+    });
 
-// Create checkout
-const checkout = await paykit.checkouts.create({
-  customer_id: 'test-customer',
-  item_id: 'pro-plan',
-  session_type: 'one_time',
-  metadata: { plan: 'pro' },
+  const result = await withLocalWebhook(url, webhook);
+
+  return result;
 });
 ```
 
-## Development Workflow
+## Environment Variables
 
-1. Run `npx @paykit-sdk/cli init` to create your config
-2. Edit `.paykit/config.json` with your products, customers, and subscriptions
-3. Start the dev server with `npx @paykit-sdk/cli dev`
-4. Implement your API route using the plugin helpers
-5. Test payment flows through the hosted checkout interface
+```bash
+PAYKIT_API_URL=http://localhost:3000/api/paykit
+PAYKIT_PAYMENT_URL=http://localhost:3001
+```
 
 ## Support
 
-- [PayKit Documentation](https://usepaykit.dev)
+- [PayKit Local Provider Documentation](https://usepaykit.dev/docs/providers/local)
 
 ## License
 

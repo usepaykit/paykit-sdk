@@ -103,7 +103,7 @@ Edit `.paykit/config.json` to define your payment flows:
   },
   "subscriptions": [],
   "checkouts": [],
-  "payments": []
+  "invoices": []
 }
 ```
 
@@ -142,7 +142,7 @@ The Local provider uses plugins to handle webhooks differently from other provid
 ```typescript
 // api/paykit/route.ts
 import { paykit } from '@/lib/paykit';
-import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
+import { withLocalWebhook } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -164,7 +164,7 @@ export async function POST(request: NextRequest) {
     });
 
   // remove this when you're switching to a production ready provider like stripe
-  const response = await withNextJsWebhook(request.nextUrl.toString(), webhook);
+  const response = await withLocalWebhook(request.nextUrl.toString(), webhook);
 
   return NextResponse.json(response);
 }

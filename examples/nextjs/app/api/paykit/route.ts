@@ -1,5 +1,5 @@
 import { paykit } from '@/lib/paykit';
-import { withNextJsWebhook } from '@paykit-sdk/local/plugins';
+import { withLocalWebhook } from '@paykit-sdk/local/plugins';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
       console.log({ invoice });
     });
 
-  const response = await withNextJsWebhook(request.nextUrl.toString(), webhook);
+  const response = await withLocalWebhook(request.nextUrl.toString(), webhook);
 
   return NextResponse.json(response);
 }

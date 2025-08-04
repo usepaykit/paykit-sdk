@@ -24,7 +24,7 @@ interface CheckoutCardProps extends Checkout {
   referer?: string | null;
 }
 
-export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata, referer, ...rest }: CheckoutCardProps) => {
+export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata, referer, customer_id, currency }: CheckoutCardProps) => {
   const customerName = provider_metadata?.customerName;
   const customerEmail = provider_metadata?.customerEmail;
   const webhookUrl = provider_metadata?.webhookUrl;
@@ -45,13 +45,9 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
         return `/api/webhook?${urlParams.toString()}`;
       };
 
-      console.log('Webhook URL:', webhookUrl);
+      const invoice = { id: `inv_${nanoid(30)}`, amount, customer_id, currency, metadata: {} };
 
-      const paymentId = safeEncode({ ...rest, amount, metadata, session_type, completed_at: new Date().toISOString(), source: 'cli-app' });
-
-      if (!paymentId.ok) throw new Error('Failed to generate payment ID');
-
-      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$invoicePaid', body: { id: paymentId.value }, resource: 'payment' }), {
+      const paymentSuccess = await fetch(makeWebhookUrl({ type: '$invoicePaid', body: invoice, resource: 'invoice' }), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       });
@@ -64,7 +60,7 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
         const in30Days = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
 
         const subscriptionWithoutId = {
-          customer_id: rest.customer_id,
+          customer_id,
           status: 'active',
           current_period_start: new Date(),
           current_period_end: in30Days,

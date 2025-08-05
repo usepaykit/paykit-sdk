@@ -26,6 +26,7 @@
     "@paykit-sdk/polar": "workspace:*",
     "@paykit-sdk/react": "workspace:*",
     "@paykit-sdk/ui": "workspace:*",
+    "@paykit-sdk/local": "workspace:*",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

@@ -12,7 +12,7 @@ interface SubscriptionModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const subscriptionId = 'sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu';
+const subscriptionId = 'sub_TSuoZu8b0I_ad5PO30nv5ukQkKyk7h';
 
 export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps) {
   const { cancel, retrieve, update } = useSubscription();
@@ -37,7 +37,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
       await delay(1000);
 
       if (hasActiveSubscription) {
-        const [, error] = await cancel.run(subscription.id);
+        const [d, error] = await cancel.run(subscription.id);
 
         if (error) {
           Toast.error({ title: 'Error', description: error.message });

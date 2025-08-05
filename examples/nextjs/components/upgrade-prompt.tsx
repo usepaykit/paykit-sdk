@@ -10,8 +10,8 @@ interface UpgradePromptProps {
   currentPlan: string;
 }
 
-const customerId = '945dcda1-5c77-42e4-aa4b-2ab945851032';
-const itemId = '66738d4f-6d66-47c7-8acb-0f30a1bb15da';
+const customerId = 'cus_hS3kLFq0U3e1l1H8haxV7-LqlnIsn0';
+const itemId = 'it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq';
 
 export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
   const { create } = useCheckout();

@@ -1,6 +1,9 @@
 import { PayKit } from '@paykit-sdk/core';
-import { stripe } from '@paykit-sdk/stripe';
+import { createLocal } from '@paykit-sdk/local';
 
-export const provider = stripe();
+export const provider = createLocal({
+  webhookUrl: 'http://localhost:3000/api/paykit',
+  paymentUrl: 'http://localhost:3001',
+});
 
 export const paykit = new PayKit(provider);

@@ -206,6 +206,9 @@ importers:
       '@paykit-sdk/core':
         specifier: workspace:*
         version: link:../../packages/paykit
+      '@paykit-sdk/local':
+        specifier: workspace:*
+        version: link:../../packages/local
       '@paykit-sdk/polar':
         specifier: workspace:*
         version: link:../../packages/polar

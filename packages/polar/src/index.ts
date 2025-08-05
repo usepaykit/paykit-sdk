@@ -1,3 +1,4 @@
+import { validateEnvVars } from '@paykit-sdk/core';
 import { PolarProvider, PolarConfig } from './polar-provider';
 
 export const createPolar = (config: PolarConfig) => {
@@ -5,10 +6,9 @@ export const createPolar = (config: PolarConfig) => {
 };
 
 export const polar = () => {
-  const accessToken = process.env.POLAR_ACCESS_TOKEN;
+  const envVars = validateEnvVars(['POLAR_ACCESS_TOKEN'], process.env);
+
   const isDev = process.env.NODE_ENV === 'development';
 
-  if (!accessToken) throw new Error('POLAR_ACCESS_TOKEN is not set');
-
-  return createPolar({ debug: true, accessToken, server: isDev ? 'sandbox' : 'production' });
+  return createPolar({ debug: true, accessToken: envVars.POLAR_ACCESS_TOKEN, server: isDev ? 'sandbox' : 'production' });
 };

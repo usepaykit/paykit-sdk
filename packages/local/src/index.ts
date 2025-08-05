@@ -1,3 +1,4 @@
+import { validateEnvVars } from '@paykit-sdk/core';
 import { LocalProvider, LocalConfig } from './local-provider';
 
 export const createLocal = (config: LocalConfig) => {
@@ -5,10 +6,7 @@ export const createLocal = (config: LocalConfig) => {
 };
 
 export const local = () => {
-  const webhookUrl = process.env.PAYKIT_WEBHOOK_URL;
-  const paymentUrl = process.env.PAYKIT_PAYMENT_URL;
+  const envVars = validateEnvVars(['PAYKIT_WEBHOOK_URL', 'PAYKIT_PAYMENT_URL'], process.env);
 
-  if (!webhookUrl || !paymentUrl) throw new Error('PAYKIT_WEBHOOK_URL and PAYKIT_PAYMENT_URL must be set');
-
-  return createLocal({ debug: true, webhookUrl, paymentUrl });
+  return createLocal({ debug: true, webhookUrl: envVars.PAYKIT_WEBHOOK_URL, paymentUrl: envVars.PAYKIT_PAYMENT_URL });
 };

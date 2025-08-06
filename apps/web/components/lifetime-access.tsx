@@ -10,13 +10,9 @@ export const LifetimeAccess = () => {
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-16 text-center">
           <div className="space-y-4">
-            <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
-              Get lifetime access to
-              <br />
-              <span className="bg-gradient-to-r from-green-600 via-emerald-600 to-teal-600 bg-clip-text text-transparent">PayKit Cloud</span>
-            </h2>
+            <h2 className="text-4xl font-bold tracking-tight md:text-5xl">PayKit Cloud</h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              Deploy your payment infrastructure with confidence. Platform integrations with Supabase, Vercel, and more.
+              Get lifetime access to PayKit services with dashboard, analytics, and collaboration tools, Launching in v2.
             </p>
           </div>
 

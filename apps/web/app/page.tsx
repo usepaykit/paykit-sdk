@@ -11,7 +11,7 @@ import GumroadLogo from '@/public/providers/gumroad.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
-import { BookOpen, Zap } from 'lucide-react';
+import { BookOpen, Zap, Github } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -27,13 +27,21 @@ const Index = () => {
             <span className="text-xl font-bold tracking-tight">PayKit</span>
           </Link>
 
-          <div className="flex items-center space-x-2 md:hidden">
-            <ThemeToggle />
+          {/* Desktop Navigation */}
+          <div className="flex items-center space-x-1 md:flex">
             <Button asChild variant="ghost" size="sm">
               <Link href="/docs/introduction">
-                <BookOpen className="size-4" />
+                <BookOpen className="mr-2 size-4" />
+                Docs
               </Link>
             </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link href="https://github.com/usepaykit" target="_blank" rel="noopener noreferrer">
+                <Github className="mr-2 size-4" />
+                GitHub
+              </Link>
+            </Button>
+            <ThemeToggle />
           </div>
         </nav>
       </header>
@@ -43,7 +51,7 @@ const Index = () => {
         <div className="mb-16 space-y-6 text-center">
           <div className="bg-muted/50 inline-flex items-center space-x-2 rounded-full border px-4 py-2 text-sm">
             <Zap className="h-4 w-4 text-yellow-500" />
-            <span className="text-muted-foreground">Payment Toolkit</span>
+            <span className="text-muted-foreground">Open Source Payment Toolkit</span>
             <Badge variant="secondary" className="ml-2">
               TypeScript
             </Badge>
@@ -153,10 +161,16 @@ const Index = () => {
               <p className="text-muted-foreground text-sm leading-relaxed">
                 The payment toolkit for TypeScript developers. Build locally, deploy anywhere.
               </p>
-              <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-1">
                 <Button asChild variant="ghost" size="sm">
                   <Link href="/docs/introduction">
                     <BookOpen className="size-4" />
+                  </Link>
+                </Button>
+
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="https://github.com/usepaykit" target="_blank" rel="noopener noreferrer">
+                    <Github className="size-4" />
                   </Link>
                 </Button>
               </div>

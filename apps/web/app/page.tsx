@@ -103,12 +103,47 @@ const Index = () => {
 
       <LifetimeAccess />
 
+      {/* About Maker */}
+      <section className="py-24">
+        <div className="mx-auto max-w-7xl px-6">
+          <div className="mx-auto flex max-w-2xl flex-col items-center space-y-8">
+            <h2 className="text-foreground text-center text-2xl font-semibold">About the Maker</h2>
+
+            <div className="border-primary/20 relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4">
+              <Image src="/odii.png" alt="Emmanuel Odii" fill className="object-cover" priority />
+            </div>
+
+            <div className="text-muted-foreground space-y-4 text-center leading-relaxed">
+              <p>
+                I’m
+                <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 hover:underline">
+                  Emmanuel Odii,
+                </Link>
+                a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I’ve built several applications including tarotmaster.ai
+                and classynotes.app.
+              </p>
+              <p>
+                Each time I built these applications, I found myself diving deep into payment provider documentation to implement the abstractions I
+                needed. Whether it was Stripe, Polar, or other payment systems, I was constantly rewriting payment flows and webhook handlers.
+              </p>
+
+              <p>This repetitive process of studying docs, implementing payment logic, and managing provider-specific code led me to build PayKit</p>
+
+              <p>
+                PayKit is the solution I wish I had when building my first applications. It’s designed to help developers focus on their core product
+                rather than payment infrastructure.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <FinalCTA />
 
       {/* Footer */}
       <footer className="bg-muted/30 border-t">
         <div className="mx-auto max-w-7xl px-6 py-12">
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             {/* Company Info */}
             <div className="space-y-4">
               <div className="flex items-center space-x-2">
@@ -166,23 +201,6 @@ const Index = () => {
                 <li>
                   <Link href="docs/examples" className="hover:text-foreground transition-colors">
                     Examples
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Company */}
-            <div className="space-y-4">
-              <h3 className="font-semibold">Company</h3>
-              <ul className="text-muted-foreground space-y-2 text-sm">
-                <li>
-                  <Link href="/about" className="hover:text-foreground transition-colors">
-                    About
-                  </Link>
-                </li>
-                <li>
-                  <Link href="mailto:odii@usepaykit.dev" className="hover:text-foreground transition-colors">
-                    Contact
                   </Link>
                 </li>
               </ul>

@@ -1,0 +1,18 @@
+{
+  "name": "custom-provider",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@paykit-sdk/core": "^1.1.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.2.0",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  }
+}

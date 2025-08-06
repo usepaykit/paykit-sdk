@@ -1,9 +1,9 @@
-export const validateEnvVars = <K extends string>(requiredKeys: readonly K[], env: Record<string, string | undefined>): Record<K, string> => {
+export const validateEnvVars = <K extends string>(requiredKeys: readonly K[], source: Record<string, string | undefined>): Record<K, string> => {
   const missingKeys: K[] = [];
   const result: Partial<Record<K, string>> = {};
 
   for (const key of requiredKeys) {
-    const value = env[key];
+    const value = source[key];
     if (!value) {
       missingKeys.push(key);
     } else {

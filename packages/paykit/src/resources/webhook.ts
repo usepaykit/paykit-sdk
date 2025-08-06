@@ -37,7 +37,7 @@ export interface WebhookEvent<T extends any> {
 
 export type CustomerCreated = WebhookEvent<Customer>;
 export type CustomerUpdated = WebhookEvent<Customer | null>;
-export type CustomerDeleted = WebhookEvent<Customer | null>;
+export type CustomerDeleted = WebhookEvent<null>;
 
 export type SubscriptionCreated = WebhookEvent<Subscription>;
 export type SubscriptionUpdated = WebhookEvent<Subscription>;

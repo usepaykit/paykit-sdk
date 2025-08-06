@@ -6,7 +6,7 @@ export async function POST(request: NextRequest) {
   console.log('POST request received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
+    .setup({ webhookSecret: '' })
     .on('$checkoutCreated', async e => {
       console.log('checkout created');
       console.log(e);

@@ -27,10 +27,10 @@ export const LifetimeAccess = () => {
                       <h3 className="text-2xl font-bold">What’s included</h3>
                       <div className="space-y-3">
                         {[
-                          'See total income across all platforms',
+                          'See total income across all providers',
                           'Manage all customers in one place',
                           'Monitor payment events in real time',
-                          'Create billing portals',
+                          "Add billing portals to providers that don't offer them",
                           'Invite team members with permissions',
                           'Auto-organize customers and sales',
                         ].map(feature => (

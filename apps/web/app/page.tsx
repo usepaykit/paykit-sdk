@@ -181,7 +181,7 @@ const Index = () => {
               <h3 className="font-semibold">Product</h3>
               <ul className="text-muted-foreground space-y-2 text-sm">
                 <li>
-                  <Link href="/docs/features" className="hover:text-foreground transition-colors">
+                  <Link href="#" className="hover:text-foreground transition-colors">
                     Features
                   </Link>
                 </li>
@@ -208,13 +208,13 @@ const Index = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs" className="hover:text-foreground transition-colors">
+                  <Link href="/docs/api-reference" className="hover:text-foreground transition-colors">
                     API Reference
                   </Link>
                 </li>
                 <li>
-                  <Link href="docs/examples" className="hover:text-foreground transition-colors">
-                    Examples
+                  <Link href="/docs/framework-examples" className="hover:text-foreground transition-colors">
+                    Framework Examples
                   </Link>
                 </li>
               </ul>

@@ -9,6 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@paykit-sdk/cli": "1.1.8",
+    "@paykit-sdk/core": "1.1.6",
+    "@paykit-sdk/react": "1.1.7",
+    "@paykit-sdk/ui": "0.1.4",
+    "@paykit-sdk/local": "1.1.7",
     "@hookform/resolvers": "^5.1.1",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.525.0",
@@ -21,12 +26,6 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
-    "@paykit-sdk/cli": "workspace:*",
-    "@paykit-sdk/core": "workspace:*",
-    "@paykit-sdk/polar": "workspace:*",
-    "@paykit-sdk/react": "workspace:*",
-    "@paykit-sdk/ui": "workspace:*",
-    "@paykit-sdk/local": "workspace:*",
     "@types/node": "^22",
     "@types/react": "^19",
     "@types/react-dom": "^19",

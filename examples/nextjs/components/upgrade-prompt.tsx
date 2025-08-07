@@ -1,7 +1,7 @@
 'use client';
 
 import { useCheckout } from '@paykit-sdk/react';
-import { Button, Badge, Card } from '@paykit-sdk/ui';
+import { Button, Badge, Card, Toast } from '@paykit-sdk/ui';
 import { Crown, Zap, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
@@ -18,7 +18,17 @@ export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
 
   const router = useRouter();
 
+  const __IS_DEV__ = process.env.NEXT_PUBLIC_NODE_ENV === 'development';
+
   const handleUpgrade = async () => {
+    if (!__IS_DEV__) {
+      Toast.error({
+        title: 'Must be running on localhost to test checkout',
+        description: 'Please run the app on localhost as it uses the local provider',
+      });
+      return;
+    }
+
     const [data, error] = await create.run({
       customer_id: customerId,
       item_id: itemId,

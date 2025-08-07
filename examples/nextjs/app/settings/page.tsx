@@ -24,7 +24,9 @@ export default function SettingsPage() {
   const [showSubscriptionModal, setShowSubscriptionModal] = React.useState(false);
   const [subscription, setSubscription] = React.useState<Subscription | null>(null);
 
-  const currentPlan = pricingPlans.find(plan => plan.tier === 'pro');
+  const currentPlan = pricingPlans.find(plan => plan.tier === (subscription?.status === 'active' ? 'pro' : 'free'));
+
+  const __IS_DEV__ = process.env.NEXT_PUBLIC_NODE_ENV === 'development';
 
   React.useEffect(() => {
     (async () => {
@@ -68,6 +70,14 @@ export default function SettingsPage() {
   };
 
   const handleUpgrade = async () => {
+    if (!__IS_DEV__) {
+      Toast.error({
+        title: 'Must be running on localhost to test checkout',
+        description: 'Please run the app on localhost as it uses the local provider',
+      });
+      return;
+    }
+
     const [checkout, error] = await create.run({
       customer_id: customerId,
       item_id: itemId,

@@ -17,6 +17,7 @@ export const DocsAd = () => {
           <p className="text-muted-foreground text-sm">
             Never break your MRR streak when switching providers. Platform integrations with Supabase, Vercel, and more.
           </p>
+          <div className="text-xs font-medium text-green-600 dark:text-green-400">🎁 First 100 persons - 95 left</div>
           <Button className="w-full" size="sm">
             Get Lifetime Access - $99
           </Button>

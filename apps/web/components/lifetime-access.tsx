@@ -63,6 +63,7 @@ export const LifetimeAccess = () => {
                         <div className="space-y-2">
                           <div className="text-muted-foreground text-sm">Launching in v2</div>
                           <div className="text-muted-foreground text-sm">Never break your MRR streak</div>
+                          <div className="text-sm font-medium text-green-600 dark:text-green-400">🎁 First 100 persons - 95 left</div>
                         </div>
                         <Button className="mt-6 w-full" size="lg" asChild>
                           <Link href={process.env.NEXT_PUBLIC_CHECKOUT_URL!} target="_blank">

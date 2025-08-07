@@ -2,7 +2,7 @@
 
 import { mockUser } from '@/lib/mock-data';
 import { Button, Avatar, DropdownMenu, cn } from '@paykit-sdk/ui';
-import { Settings, LogOut, User, CreditCard } from 'lucide-react';
+import { Settings, LogOut, User, CreditCard, GithubIcon } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { ToggleTheme } from './toggle-theme';
@@ -44,6 +44,12 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center space-x-4">
+            <Button variant="outline" size="sm" asChild>
+              <Link href="https://github.com/usepaykit/paykit-sdk/tree/main/examples/nextjs" target="_blank" rel="noopener noreferrer">
+                <GithubIcon className="mr-2 h-4 w-4" />
+                View on GitHub
+              </Link>
+            </Button>
             <ToggleTheme />
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>

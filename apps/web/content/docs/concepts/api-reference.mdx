@@ -113,16 +113,11 @@ interface Invoice {
 
 PayKit supports the following webhook events across all providers:
 
-<br />
-
-```typescript
-type WebhookEventLiteral =
-  | '$customerCreated'
-  | '$customerUpdated'
-  | '$customerDeleted'
-  | '$subscriptionCreated'
-  | '$subscriptionUpdated'
-  | '$subscriptionCancelled'
-  | '$checkoutCreated'
-  | '$invoicePaid';
-```
+- `$customerCreated` - Triggered when a customer is created
+- `$customerUpdated` - Triggered when a customer is updated
+- `$customerDeleted` - Triggered when a customer is deleted
+- `$subscriptionCreated` - Triggered when a subscription is created
+- `$subscriptionUpdated` - Triggered when a subscription is updated
+- `$subscriptionCancelled` - Triggered when a subscription is cancelled
+- `$checkoutCreated` - Triggered when a checkout is created
+- `$invoicePaid` - Triggered when an invoice is paid

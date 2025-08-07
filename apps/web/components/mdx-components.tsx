@@ -98,8 +98,13 @@ const components = {
   TabsList: Tabs.List,
   TabsTrigger: Tabs.Trigger,
   TabsContent: Tabs.Content,
-  LinkedCard: ({ href, children, className }: { href: string; children: React.ReactNode; className?: string }) => (
-    <Link href={href} className={cn('hover:text-foreground block transition-colors', className)}>
+  LinkedCard: ({ href, children, className, target }: { href: string; children: React.ReactNode; className?: string; target?: string }) => (
+    <Link
+      {...(target ? { rel: 'noreferrer' } : {})}
+      href={href}
+      className={cn('hover:text-foreground block transition-colors', className)}
+      target={target}
+    >
       <Card.Root className="group relative overflow-hidden transition-all hover:shadow-md">
         <Card.Content className="flex flex-col items-center justify-center p-6 text-center">{children}</Card.Content>
       </Card.Root>

@@ -68,7 +68,7 @@ export default async function DocPage({ params }: DocPageProps) {
   const toc = getTableOfContents(doc.body.raw);
 
   return (
-    <div className="flex w-full">
+    <div className="flex w-full min-h-screen">
       <div className="flex-1 px-6 py-8 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
           <div className="text-muted-foreground mb-6 flex items-center space-x-1 text-sm">

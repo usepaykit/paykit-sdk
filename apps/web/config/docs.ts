@@ -53,6 +53,7 @@ export const docsConfig = {
         { title: 'API Reference', href: '/docs/concepts/api-reference', items: [] },
         { title: 'Error Handling', href: '/docs/concepts/error-handling', items: [] },
         { title: 'Client Side Integration', href: '/docs/concepts/client-side-usage', items: [] },
+        { title: 'Framework Examples', href: '/docs/framework-examples', items: [] },
       ],
     },
   ],

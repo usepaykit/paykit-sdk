@@ -11,7 +11,11 @@ const handlePayment = async () => {
     customer_id: 'cus_123',
     item_id: 'price_123',
     session_type: 'one_time',
-    metadata: { plan: 'pro' }
+    metadata: { plan: 'pro' },
+    provider_metadata: {
+      success_url: 'https://example.com/success',
+      cancel_url: 'https://example.com/cancel'
+    }
   });
 
   if (error) return;

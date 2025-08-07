@@ -24,7 +24,7 @@ export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
       item_id: itemId,
       session_type: 'recurring',
       metadata: { plan: 'pro', billing: 'monthly' },
-      provider_metadata: { successUrl: `http://localhost:3000/payment-success` },
+      provider_metadata: { amount: 200, currency: 'GBP' },
     });
 
     if (error) throw new Error(error.message);

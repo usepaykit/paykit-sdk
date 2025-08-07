@@ -8,7 +8,7 @@ import {
   Subscription,
   UpdateSubscriptionParams,
   unwrapAsync,
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   WebhookEventPayload,
   UnknownError,
   PaykitProviderOptions,
@@ -67,7 +67,7 @@ export class GumroadProvider implements PayKitProvider {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
-  handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 }

@@ -12,7 +12,7 @@ import {
   PaykitProviderOptions,
   headersExtractor,
   Invoice,
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   stringifyObjectValues,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
@@ -108,7 +108,7 @@ export class StripeProvider implements PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook = async (params: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (params: HandleWebhookParams): Promise<WebhookEventPayload> => {
     const { body, headers, webhookSecret } = params;
 
     const stripeHeaders = headersExtractor(headers, ['x-stripe-signature']);

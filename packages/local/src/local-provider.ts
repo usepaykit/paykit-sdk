@@ -4,7 +4,7 @@ import {
   CreateCustomerParams,
   UpdateSubscriptionParams,
   Subscription,
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   UpdateCustomerParams,
   PaykitProviderOptions,
   Checkout,
@@ -112,7 +112,7 @@ export class LocalProvider implements PayKitProvider {
     return response.data;
   };
 
-  handleWebhook = async (_options: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (_options: HandleWebhookParams): Promise<WebhookEventPayload> => {
     throw new Error('handleWebhook must be called through the server export. Use: import { withLocalProvider } from "@paykit-sdk/local/plugins"');
   };
 }

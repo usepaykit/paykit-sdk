@@ -6,7 +6,7 @@ import {
   CreateCustomerParams,
   UpdateCustomerParams,
   UpdateSubscriptionParams,
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   WebhookEventPayload,
   Customer,
   CreateCheckoutParams,
@@ -53,7 +53,7 @@ export class CryptoProvider implements PayKitProvider {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 
-  handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
     throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
   };
 }

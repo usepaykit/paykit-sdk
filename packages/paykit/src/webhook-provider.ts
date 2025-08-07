@@ -34,7 +34,7 @@ export type WebhookHandlerConfig = {
   headers: Record<string, string | string[]>;
 };
 
-export type $ExtWebhookHandlerConfig = WebhookHandlerConfig & Pick<WebhookSetupConfig, 'webhookSecret'>;
+export interface HandleWebhookParams extends WebhookHandlerConfig, Pick<WebhookSetupConfig, 'webhookSecret'> {}
 
 export class Webhook {
   private handlers: Map<WebhookEventType, ((event: WebhookEventPayload) => Promise<void>)[]> = new Map();

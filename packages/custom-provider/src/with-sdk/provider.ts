@@ -1,5 +1,5 @@
 import {
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   Checkout,
   CreateCheckoutParams,
   CreateCustomerParams,
@@ -49,7 +49,7 @@ export class WithProviderSDK implements PayKitProvider {
     throw new Error('Method not implemented.');
   }
 
-  handleWebhook(payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> {
+  handleWebhook(payload: HandleWebhookParams): Promise<WebhookEventPayload> {
     throw new Error('Method not implemented.');
   }
 }

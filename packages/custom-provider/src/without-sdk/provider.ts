@@ -13,7 +13,7 @@ import {
   updateCustomerSchema,
   updateSubscriptionSchema,
   WebhookEventPayload,
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
 } from '@paykit-sdk/core';
 import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -132,7 +132,7 @@ export class WithoutProviderSDK implements PayKitProvider {
     return null;
   };
 
-  handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
     throw new Error('Method not implemented.');
   };
 }

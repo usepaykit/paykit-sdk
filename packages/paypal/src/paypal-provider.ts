@@ -1,5 +1,5 @@
 import {
-  $ExtWebhookHandlerConfig,
+  HandleWebhookParams,
   Checkout,
   CreateCheckoutParams,
   createCheckoutSchema,
@@ -129,7 +129,7 @@ export class PayPalProvider implements PayKitProvider {
     return response.value as Subscription;
   };
 
-  handleWebhook = async (payload: $ExtWebhookHandlerConfig): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
     const { body, headers } = payload;
 
     const data = {

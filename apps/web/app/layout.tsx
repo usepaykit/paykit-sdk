@@ -1,5 +1,5 @@
 import '@/app/globals.css';
-import { ThemeProvider } from '@/components/theme-provider';
+import { AppProviders } from '@/providers';
 import { cn, Toaster } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
@@ -23,10 +23,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(ptSans.variable, 'font-pt-sans antialiased')}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          {children}
-        </ThemeProvider>
-        <Toaster />
+        <AppProviders>{children}</AppProviders>
       </body>
     </html>
   );

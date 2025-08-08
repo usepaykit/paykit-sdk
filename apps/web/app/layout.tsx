@@ -1,6 +1,6 @@
 import '@/app/globals.css';
 import { AppProviders } from '@/providers';
-import { cn, Toaster } from '@paykit-sdk/ui';
+import { cn } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
 

@@ -1,5 +1,5 @@
 import { Card, Button, Badge, cn } from '@paykit-sdk/ui';
-import { Zap, BookOpen, ExternalLink, ArrowRight } from 'lucide-react';
+import { BookOpen, ExternalLink, ArrowRight } from 'lucide-react';
 import Link from 'next/link';
 import { ThemeToggle } from '../components/theme-toggle';
 

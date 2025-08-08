@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { PaykitMetadata, Subscription, type Checkout } from '@paykit-sdk/core';
+import { Invoice, PaykitMetadata, Subscription, type Checkout } from '@paykit-sdk/core';
 import { Button, Input, Toast } from '@paykit-sdk/ui';
 import { Lock, CreditCard } from 'lucide-react';
 import { nanoid } from 'nanoid';
@@ -45,7 +45,7 @@ export const CheckoutCard = ({ amount, metadata, session_type, provider_metadata
         return `/api/webhook?${urlParams.toString()}`;
       };
 
-      const invoice = { id: `inv_${nanoid(30)}`, amount, customer_id, currency, metadata: {} };
+      const invoice: Invoice = { id: `inv_${nanoid(30)}`, billing_mode: session_type, amount, customer_id, currency, metadata: {} };
 
       const paymentSuccess = await fetch(makeWebhookUrl({ type: '$invoicePaid', body: invoice, resource: 'invoice' }), {
         method: 'POST',

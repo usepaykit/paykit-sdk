@@ -4,28 +4,43 @@ The Payment Toolkit for TypeScript developers.
 
 PayKit is a unified SDK that simplifies payment processing across different providers with a consistent API.
 
-## Installation
+## Quick Start
+
+Choose your preferred way to get started:
+
+### 1. Using the CLI (Recommended)
 
 ```bash
-npm install @paykit-sdk/core
+npx @paykit-sdk/cli@latest init
 ```
 
-## Supported Providers
+### 2. Manual Installation
 
-- Stripe
-- Polar
-- More providers coming soon...
+```bash
+npm install @paykit-sdk/core @paykit-sdk/stripe
+```
+
+Then follow the [Core Package documentation](packages/paykit/README.md) for setup.
+
+## Packages
+
+| Package                                           | Description                |
+| ------------------------------------------------- | -------------------------- |
+| [`@paykit-sdk/core`](packages/paykit)             | Main PayKit SDK            |
+| [`@paykit-sdk/react`](packages/react)             | React hooks and components |
+| [`@paykit-sdk/cli`](packages/cli)                 | CLI for project setup      |
+| **Providers**                                     |                            |
+| [`@paykit-sdk/stripe`](packages/stripe)           | Stripe integration         |
+| [`@paykit-sdk/polar`](packages/polar)             | Polar integration          |
+| [`@paykit-sdk/local`](packages/local)             | Local development provider |
+| **Tools**                                         |                            |
+| [`@paykit-sdk/ui`](packages/ui)                   | UI components              |
+| [Custom Provider Guide](packages/custom-provider) | Build your own provider    |
 
 ## Documentation
 
-Each package has its own documentation with detailed API references and examples:
-
-- [Core Package](packages/paykit/README.md) - Main PayKit SDK
-- [React Package](packages/react/README.md) - React hooks and components
-- [Stripe Provider](packages/stripe/README.md) - Stripe integration
-- [Polar Provider](packages/polar/README.md)- Polar integration
-- [Local Provider](packages/local/README.md) - Local development provider
+Visit [paykit.dev](https://usepaykit.dev) for complete documentation, examples, and guides.
 
 ---
 
-Maintained by [Emmanuel Odii](https://x.com/devodii_)
+Maintained by [Emmanuel Odii](https://github.com/devodii)

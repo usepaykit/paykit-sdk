@@ -23,11 +23,6 @@ const providers = [
     name: 'Polar',
     description: 'Creator monetization',
   },
-  {
-    key: 'gumroad' as const,
-    name: 'Gumroad',
-    description: 'Digital product sales',
-  },
 ];
 
 export function ProviderList({ selectedProvider, onProviderSelect }: ProviderListProps) {

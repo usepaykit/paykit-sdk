@@ -20,8 +20,18 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
   const [subscription, setSubscription] = React.useState<Subscription | null>(null);
   const [loading, setLoading] = React.useState(false);
 
+  const __IS_DEV__ = process.env.NEXT_PUBLIC_NODE_ENV === 'development';
+
   React.useEffect(() => {
     (async () => {
+      if (!__IS_DEV__) {
+        Toast.error({
+          title: 'Must be running on localhost to retrieve subscription',
+          description: 'Please run the app on localhost as it uses the local provider',
+          options: { position: 'bottom-right' },
+        });
+        return;
+      }
       const [subscription, error] = await retrieve.run(subscriptionId);
       if (subscription) return setSubscription(subscription);
       Toast.error({ title: 'Error', description: error?.message });

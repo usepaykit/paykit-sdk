@@ -173,8 +173,8 @@ importers:
         specifier: ^5.1.1
         version: 5.2.1(react-hook-form@7.61.1(react@19.1.1))
       '@paykit-sdk/cli':
-        specifier: 1.1.9
-        version: 1.1.9
+        specifier: 1.1.91
+        version: 1.1.91
       '@paykit-sdk/core':
         specifier: 1.1.7
         version: 1.1.7(@types/node@22.17.0)
@@ -2292,8 +2292,8 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@paykit-sdk/cli@1.1.9':
-    resolution: {integrity: sha512-CHD2IPTG8Nix21dmSYq8HAvtWi6DcjGd4q+B8GCEM8Q9SF7skaQfbpFAlDwHVqGr3EltQkL2m31Flck2zywDQg==}
+  '@paykit-sdk/cli@1.1.91':
+    resolution: {integrity: sha512-mwb8yLTdY0SSysEbUadH+m9Gr0F5mf95iRspyTHqK8smoZPCJbhIwsWXsdywIUHTAnovUuq/agerXSXvB//TdQ==}
     hasBin: true
 
   '@paykit-sdk/core@1.1.7':
@@ -9102,7 +9102,7 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paykit-sdk/cli@1.1.9':
+  '@paykit-sdk/cli@1.1.91':
     dependencies:
       commander: 12.1.0
       inquirer: 10.2.2

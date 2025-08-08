@@ -30,6 +30,15 @@ export default function SettingsPage() {
 
   React.useEffect(() => {
     (async () => {
+      if (!__IS_DEV__) {
+        Toast.error({
+          title: 'Must be running on localhost to retrieve subscription',
+          description: 'Please run the app on localhost as it uses the local provider',
+          options: { position: 'bottom-right' },
+        });
+        return;
+      }
+
       const [subscription, error] = await retrieve.run(subscriptionId);
       if (subscription) return setSubscription(subscription);
       Toast.error({ title: 'Error', description: error?.message });
@@ -74,6 +83,7 @@ export default function SettingsPage() {
       Toast.error({
         title: 'Must be running on localhost to test checkout',
         description: 'Please run the app on localhost as it uses the local provider',
+        options: { position: 'bottom-right' },
       });
       return;
     }

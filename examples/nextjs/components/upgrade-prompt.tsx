@@ -25,6 +25,7 @@ export function UpgradePrompt({ feature, currentPlan }: UpgradePromptProps) {
       Toast.error({
         title: 'Must be running on localhost to test checkout',
         description: 'Please run the app on localhost as it uses the local provider',
+        options: { position: 'bottom-right' },
       });
       return;
     }

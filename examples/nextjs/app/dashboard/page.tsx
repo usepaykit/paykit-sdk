@@ -23,8 +23,19 @@ export default function Dashboard() {
   const [loading, setLoading] = React.useState(true);
   const [showSubscriptionModal, setShowSubscriptionModal] = React.useState(false);
 
+  const __IS_DEV__ = process.env.NEXT_PUBLIC_NODE_ENV === 'development';
+
   React.useEffect(() => {
     (async () => {
+      if (!__IS_DEV__) {
+        Toast.error({
+          title: 'Must be running on localhost to retrieve subscription',
+          description: 'Please run the app on localhost as it uses the local provider',
+          options: { position: 'bottom-right' },
+        });
+        return;
+      }
+
       const [subscription, tasks] = await Promise.all([retrieve.run(subscriptionId), getTasks()]);
 
       const [data, error] = subscription;

@@ -9,7 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@paykit-sdk/cli": "1.1.9",
+    "@paykit-sdk/cli": "1.1.91",
     "@paykit-sdk/core": "1.1.7",
     "@paykit-sdk/react": "1.1.8",
     "@paykit-sdk/ui": "0.1.4",

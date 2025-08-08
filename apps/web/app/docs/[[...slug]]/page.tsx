@@ -1,5 +1,6 @@
 import { DocsAd } from '@/components/docs-ad';
 import { Mdx } from '@/components/mdx-components';
+import { MobileToc } from '@/components/mobile-toc';
 import { DocsPager } from '@/components/pager';
 import { DashboardTableOfContents } from '@/components/toc';
 import { getTableOfContents } from '@/lib/toc';
@@ -68,10 +69,25 @@ export default async function DocPage({ params }: DocPageProps) {
   const toc = getTableOfContents(doc.body.raw);
 
   return (
-    <div className="flex w-full min-h-screen">
+    <div className="flex min-h-screen w-full">
       <div className="flex-1 px-6 py-8 lg:px-8 lg:py-12">
         <div className="mx-auto max-w-3xl">
-          <div className="text-muted-foreground mb-6 flex items-center space-x-1 text-sm">
+          {/* Mobile TOC Header */}
+          {doc.toc && (
+            <div className="mb-6 flex items-center justify-between md:hidden!">
+              <div className="text-muted-foreground flex items-center space-x-1 text-sm">
+                <Link href="/docs" className="hover:text-foreground transition-colors">
+                  Docs
+                </Link>
+                <ChevronRight className="h-3.5 w-3.5" />
+                <span className="text-foreground font-medium">{doc.title}</span>
+              </div>
+              <MobileToc toc={toc} />
+            </div>
+          )}
+
+          {/* Desktop Breadcrumb */}
+          <div className="text-muted-foreground mb-6 hidden items-center space-x-1 text-sm md:flex">
             <Link href="/docs" className="hover:text-foreground transition-colors">
               Docs
             </Link>
@@ -126,7 +142,7 @@ export default async function DocPage({ params }: DocPageProps) {
       </div>
 
       {doc.toc && (
-        <div className="bg-muted/30 w-80 shrink-0 border-l">
+        <div className="bg-muted/30 hidden w-80 shrink-0 border-l md:block!">
           <div className="sticky top-20 p-6">
             <div className="space-y-6">
               <div className="space-y-4">

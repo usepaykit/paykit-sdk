@@ -22,6 +22,8 @@ const paykit = new PayKit(provider);
 export { provider, paykit };
 ```
 
+### 2. Setup Provider
+
 ```tsx
 import { provider } from '@lib/paykit';
 import { PaykitProvider } from '@paykit-sdk/react';
@@ -35,7 +37,7 @@ function App() {
 }
 ```
 
-### 2. Use Hooks
+### 3. Use Hooks
 
 ```tsx
 import * as React from 'react';

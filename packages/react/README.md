@@ -10,13 +10,21 @@ npm install @paykit-sdk/react
 
 ## Quick Start
 
-### 1. Setup Provider
+### 1. Setup PayKit
 
 ```tsx
-import { PaykitProvider } from '@paykit-sdk/react';
-import { stripe } from '@paykit-sdk/stripe';
+import { PayKit } from '@paykit-sdk/core';
+import { local } from '@paykit-sdk/local';
 
-const provider = stripe();
+const provider = local();
+const paykit = new PayKit(provider);
+
+export { provider, paykit };
+```
+
+```tsx
+import { provider } from '@lib/paykit';
+import { PaykitProvider } from '@paykit-sdk/react';
 
 function App() {
   return (
@@ -63,7 +71,7 @@ Works with any PayKit provider including Stripe, Polar, Gumroad, and more.
 
 - [React Documentation](https://usepaykit.dev/docs/react)
 - [PayKit Documentation](https://usepaykit.dev)
-- [Production Examples](https://usepaykit.dev/docs/examples)
+- [Framework Examples](https://usepaykit.dev/docs/framework-examples)
 
 ## TypeScript Support
 

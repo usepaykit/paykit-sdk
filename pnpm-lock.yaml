@@ -46,20 +46,20 @@ importers:
         specifier: ^15.3.4
         version: 15.4.5(@mdx-js/loader@3.1.0(acorn@8.15.0))(@mdx-js/react@3.1.0(@types/react@19.1.9)(react@19.1.1))
       '@paykit-sdk/core':
-        specifier: 1.1.6
-        version: 1.1.6(@types/node@20.19.9)
+        specifier: 1.1.7
+        version: 1.1.7(@types/node@20.19.9)
       '@paykit-sdk/local':
-        specifier: 1.1.7
-        version: 1.1.7(@paykit-sdk/core@1.1.6(@types/node@20.19.9))
-      '@paykit-sdk/polar':
         specifier: 1.1.8
-        version: 1.1.8(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(zod@3.25.76)
+        version: 1.1.8(@paykit-sdk/core@1.1.7(@types/node@20.19.9))
+      '@paykit-sdk/polar':
+        specifier: 1.1.9
+        version: 1.1.9(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(zod@3.25.76)
       '@paykit-sdk/react':
-        specifier: 1.1.7
-        version: 1.1.7(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 1.1.8
+        version: 1.1.8(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@paykit-sdk/stripe':
-        specifier: 1.1.5
-        version: 1.1.5(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(@types/node@20.19.9)
+        specifier: 1.1.6
+        version: 1.1.6(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(@types/node@20.19.9)
       '@paykit-sdk/ui':
         specifier: 0.1.4
         version: 0.1.4(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -173,17 +173,17 @@ importers:
         specifier: ^5.1.1
         version: 5.2.1(react-hook-form@7.61.1(react@19.1.1))
       '@paykit-sdk/cli':
-        specifier: 1.1.8
-        version: 1.1.8
+        specifier: 1.1.9
+        version: 1.1.9
       '@paykit-sdk/core':
-        specifier: 1.1.6
-        version: 1.1.6(@types/node@22.17.0)
+        specifier: 1.1.7
+        version: 1.1.7(@types/node@22.17.0)
       '@paykit-sdk/local':
-        specifier: 1.1.7
-        version: 1.1.7(@paykit-sdk/core@1.1.6(@types/node@22.17.0))
+        specifier: 1.1.8
+        version: 1.1.8(@paykit-sdk/core@1.1.7(@types/node@22.17.0))
       '@paykit-sdk/react':
-        specifier: 1.1.7
-        version: 1.1.7(@paykit-sdk/core@1.1.6(@types/node@22.17.0))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
+        specifier: 1.1.8
+        version: 1.1.8(@paykit-sdk/core@1.1.7(@types/node@22.17.0))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
       '@paykit-sdk/ui':
         specifier: 0.1.4
         version: 0.1.4(@types/react-dom@19.1.7(@types/react@19.1.9))(@types/react@19.1.9)(react-dom@19.1.1(react@19.1.1))(react@19.1.1)
@@ -338,8 +338,8 @@ importers:
   packages/custom-provider:
     dependencies:
       '@paykit-sdk/core':
-        specifier: ^1.1.6
-        version: 1.1.6(@types/node@24.2.0)
+        specifier: ^1.1.7
+        version: 1.1.7(@types/node@24.2.0)
     devDependencies:
       '@types/node':
         specifier: ^24.2.0
@@ -2292,34 +2292,34 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@paykit-sdk/cli@1.1.8':
-    resolution: {integrity: sha512-IxgwPJ0WG+hDIybohbHHu9ABRV6HiAhkSp8JaODq/FMpP+5cCxr/Eb7N/FUn+bxRSBv4MEdaaCW2XtMAIqSe8Q==}
+  '@paykit-sdk/cli@1.1.9':
+    resolution: {integrity: sha512-CHD2IPTG8Nix21dmSYq8HAvtWi6DcjGd4q+B8GCEM8Q9SF7skaQfbpFAlDwHVqGr3EltQkL2m31Flck2zywDQg==}
     hasBin: true
 
-  '@paykit-sdk/core@1.1.6':
-    resolution: {integrity: sha512-445+ixB6XItVU5/eseAOtwktXRPM659lEdw7i9NoLaIAAFV38DlLmzyyzhoqyTS2zP/nFBUxQ3WqThzaSRvKcw==}
+  '@paykit-sdk/core@1.1.7':
+    resolution: {integrity: sha512-WwHkupOJXNKV7/wht8AEjOi0qFQ2pyVo7YXWw7/eRc4cJi/s6ISOM+ZIiWP2EE5qWjSUYLImMfhgtVDJX8gYvw==}
 
-  '@paykit-sdk/local@1.1.7':
-    resolution: {integrity: sha512-GFr3NdPgdq4r+O6ouRZq7JmKwjvACnCqOiIRzjltDJUuzvkKR9UgcgUcbcGsnc4Q91ZELHY5CUORI+eJpR/Liw==}
+  '@paykit-sdk/local@1.1.8':
+    resolution: {integrity: sha512-Vzy/950IP0JSWGfqpmBwpDi9N0wPyJJ92Rc6T35xkeYNs3T+dlXZGYeIYJdS6HzA3tRlUesAzYtwJEzd4pTyaQ==}
     peerDependencies:
-      '@paykit-sdk/core': '>=1.1.6'
+      '@paykit-sdk/core': '>=1.1.7'
 
-  '@paykit-sdk/polar@1.1.8':
-    resolution: {integrity: sha512-LDQJHi75QW8d0TPCClN6ZKyTgjbN8uAtezA0dGCGzKrTbzzyodAqFdLc93Ruzym0tY/eg8ryUYLBcWDT7smx4Q==}
+  '@paykit-sdk/polar@1.1.9':
+    resolution: {integrity: sha512-sfkqdY4NzezMxmzYuJAVkiUSyrIVzUtSPJmHu7usOHbeZuHfq5vHvnQIZASD5AgkJTKWsgtsbDz6eiqAUWRZ4g==}
     peerDependencies:
-      '@paykit-sdk/core': ^1.1.6
+      '@paykit-sdk/core': ^1.1.7
 
-  '@paykit-sdk/react@1.1.7':
-    resolution: {integrity: sha512-jMFsR2n7wyuUo+rfRrQjgULp6I5HeQlM6N+JOCFkH4tVg3Hbq5R8wTsC03zugi3oRUctR7ZUJjKeBv2T5L+ekQ==}
+  '@paykit-sdk/react@1.1.8':
+    resolution: {integrity: sha512-aRTcfX/6HaVmH6ixz5AEgVjJJG2Wub8R7LZhW2ZuFLSFoQQ+hHaWd9tugFJrF0cL+HT55D7+kxb/WU7ig5R2Aw==}
     peerDependencies:
-      '@paykit-sdk/core': '>=1.1.6'
+      '@paykit-sdk/core': '>=1.1.7'
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@paykit-sdk/stripe@1.1.5':
-    resolution: {integrity: sha512-VPgsLwsgNJzHteb0cxiAkNGvKFQjaHTvtsgC/hzOl6I0DnvlnmY5QtCXUXw+3ViRm6PHJTA7fY1Q6KfqJkgpeA==}
+  '@paykit-sdk/stripe@1.1.6':
+    resolution: {integrity: sha512-F22++jGD7TLTBlhZaoONnufwaDKEpNpKeaCkyIuqBHqBcZF7ee2NG+lb0qeQ00CZC2vKrEMezeNHuUqJIDfHAw==}
     peerDependencies:
-      '@paykit-sdk/core': ^1.1.6
+      '@paykit-sdk/core': ^1.1.7
 
   '@paykit-sdk/ui@0.1.4':
     resolution: {integrity: sha512-0+xNDcBK7fpx2zgZRd1eqhC9qKcK4z/2LyPESwKSn7/Ych8/l/t4+W+Mk9+DKHxE6Mo0Oro3zvs8vMzWJ4KQBw==}
@@ -9102,14 +9102,14 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paykit-sdk/cli@1.1.8':
+  '@paykit-sdk/cli@1.1.9':
     dependencies:
       commander: 12.1.0
       inquirer: 10.2.2
       nanoid: 5.1.5
       tw-animate-css: 1.3.6
 
-  '@paykit-sdk/core@1.1.6(@types/node@20.19.9)':
+  '@paykit-sdk/core@1.1.7(@types/node@20.19.9)':
     dependencies:
       chalk: 5.4.1
       commander: 14.0.0
@@ -9118,7 +9118,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@paykit-sdk/core@1.1.6(@types/node@22.17.0)':
+  '@paykit-sdk/core@1.1.7(@types/node@22.17.0)':
     dependencies:
       chalk: 5.4.1
       commander: 14.0.0
@@ -9127,7 +9127,7 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@paykit-sdk/core@1.1.6(@types/node@24.2.0)':
+  '@paykit-sdk/core@1.1.7(@types/node@24.2.0)':
     dependencies:
       chalk: 5.4.1
       commander: 14.0.0
@@ -9136,41 +9136,41 @@ snapshots:
     transitivePeerDependencies:
       - '@types/node'
 
-  '@paykit-sdk/local@1.1.7(@paykit-sdk/core@1.1.6(@types/node@20.19.9))':
+  '@paykit-sdk/local@1.1.8(@paykit-sdk/core@1.1.7(@types/node@20.19.9))':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@20.19.9)
+      '@paykit-sdk/core': 1.1.7(@types/node@20.19.9)
       nanoid: 5.1.5
       server-only: 0.0.1
 
-  '@paykit-sdk/local@1.1.7(@paykit-sdk/core@1.1.6(@types/node@22.17.0))':
+  '@paykit-sdk/local@1.1.8(@paykit-sdk/core@1.1.7(@types/node@22.17.0))':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@22.17.0)
+      '@paykit-sdk/core': 1.1.7(@types/node@22.17.0)
       nanoid: 5.1.5
       server-only: 0.0.1
 
-  '@paykit-sdk/polar@1.1.8(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(zod@3.25.76)':
+  '@paykit-sdk/polar@1.1.9(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(zod@3.25.76)':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@20.19.9)
+      '@paykit-sdk/core': 1.1.7(@types/node@20.19.9)
       '@polar-sh/sdk': 0.33.2(zod@3.25.76)
     transitivePeerDependencies:
       - '@modelcontextprotocol/sdk'
       - zod
 
-  '@paykit-sdk/react@1.1.7(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@paykit-sdk/react@1.1.8(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@20.19.9)
+      '@paykit-sdk/core': 1.1.7(@types/node@20.19.9)
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
 
-  '@paykit-sdk/react@1.1.7(@paykit-sdk/core@1.1.6(@types/node@22.17.0))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
+  '@paykit-sdk/react@1.1.8(@paykit-sdk/core@1.1.7(@types/node@22.17.0))(react-dom@19.1.1(react@19.1.1))(react@19.1.1)':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@22.17.0)
+      '@paykit-sdk/core': 1.1.7(@types/node@22.17.0)
       react: 19.1.1
       react-dom: 19.1.1(react@19.1.1)
 
-  '@paykit-sdk/stripe@1.1.5(@paykit-sdk/core@1.1.6(@types/node@20.19.9))(@types/node@20.19.9)':
+  '@paykit-sdk/stripe@1.1.6(@paykit-sdk/core@1.1.7(@types/node@20.19.9))(@types/node@20.19.9)':
     dependencies:
-      '@paykit-sdk/core': 1.1.6(@types/node@20.19.9)
+      '@paykit-sdk/core': 1.1.7(@types/node@20.19.9)
       stripe: 18.4.0(@types/node@20.19.9)
     transitivePeerDependencies:
       - '@types/node'

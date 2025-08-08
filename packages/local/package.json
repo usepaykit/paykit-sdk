@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/local",
-  "version": "1.1.7",
+  "version": "1.1.8",
   "description": "PayKit Local Provider for development and testing",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
@@ -37,7 +37,7 @@
     "typecheck": "tsc --noEmit"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.6"
+    "@paykit-sdk/core": ">=1.1.7"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

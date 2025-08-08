@@ -1,4 +1,4 @@
-import { Checkout, Customer, Invoice, stringifyObjectValues, Subscription, SubscriptionStatus } from '@paykit-sdk/core';
+import { BillingMode, Checkout, Customer, Invoice, stringifyObjectValues, Subscription, SubscriptionStatus } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 
 /**
@@ -51,12 +51,13 @@ export const toPaykitSubscription = (subscription: Stripe.Subscription): Subscri
   };
 };
 
-export const toPaykitInvoice = (invoice: Stripe.Invoice): Invoice => {
+export const toPaykitInvoice = (invoice: Stripe.Invoice & { billingMode: BillingMode }): Invoice => {
   return {
     id: invoice.id!,
     amount: invoice.amount_paid,
     currency: invoice.currency,
     metadata: stringifyObjectValues(invoice.metadata ?? {}),
     customer_id: invoice.customer?.toString() ?? '',
+    billing_mode: invoice.billingMode,
   };
 };

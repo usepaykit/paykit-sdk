@@ -1,3 +1,4 @@
+import { BillingMode } from './checkout';
 import { PaykitMetadata } from './metadata';
 
 export type Invoice = {
@@ -5,6 +6,11 @@ export type Invoice = {
    * The ID of the invoice.
    */
   id: string;
+
+  /**
+   * The billing mode of the invoice.
+   */
+  billing_mode: BillingMode;
 
   /**
    * The amount of the invoice.

@@ -6,6 +6,7 @@ import {
   PaykitMetadata,
   SubscriptionStatus,
   stringifyObjectValues,
+  BillingMode,
 } from '@paykit-sdk/core';
 import { Checkout } from '@polar-sh/sdk/models/components/checkout';
 import { Customer } from '@polar-sh/sdk/models/components/customer';
@@ -48,12 +49,13 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
   };
 };
 
-export const toPaykitInvoice = (invoice: Order): PaykitInvoice => {
+export const toPaykitInvoice = (invoice: Order & { billingMode: BillingMode }): PaykitInvoice => {
   return {
     id: invoice.id,
     amount: invoice.totalAmount,
     currency: invoice.currency,
     metadata: stringifyObjectValues({ ...(invoice.metadata ?? {}), $customFieldData: invoice.customFieldData }),
     customer_id: invoice.customerId,
+    billing_mode: invoice.billingMode,
   };
 };

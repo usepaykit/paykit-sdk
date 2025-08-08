@@ -138,6 +138,7 @@ export class StripeProvider implements PayKitProvider {
             currency: data.currency ?? '',
             metadata: stringifyObjectValues({ ...(data.metadata ?? {}), $mode: data.mode }),
             customer_id: data.customer?.toString() ?? '',
+            billing_mode: 'one_time',
           },
         });
       },
@@ -145,10 +146,17 @@ export class StripeProvider implements PayKitProvider {
       'invoice.paid': (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Invoice;
 
-        if (data.status !== 'paid') return null;
+        if (data.status !== 'paid' && !['subscription_create', 'subscription_cycle'].includes(data.billing_reason as Stripe.Invoice.BillingReason)) {
+          return null;
+        }
 
         // Handle subscription purchase
-        return toPaykitEvent<Invoice>({ type: '$invoicePaid', created: event.created, id: event.id, data: toPaykitInvoice(data) });
+        return toPaykitEvent<Invoice>({
+          type: '$invoicePaid',
+          created: event.created,
+          id: event.id,
+          data: toPaykitInvoice({ ...data, billingMode: 'recurring' }),
+        });
       },
 
       /**

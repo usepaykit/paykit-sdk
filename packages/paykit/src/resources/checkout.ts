@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { metadataSchema, PaykitMetadata } from './metadata';
 
-export const checkoutSessionTypeSchema = z.enum(['one_time', 'recurring']);
+export const billingModeSchema = z.enum(['one_time', 'recurring']);
 
-export type CheckoutSessionType = z.infer<typeof checkoutSessionTypeSchema>;
+export type BillingMode = z.infer<typeof billingModeSchema>;
 
 export const createCheckoutSchema = z.object({
   /**
@@ -19,7 +19,7 @@ export const createCheckoutSchema = z.object({
   /**
    * The mode of the checkout.
    */
-  session_type: checkoutSessionTypeSchema,
+  session_type: billingModeSchema,
 
   /**
    * The item ID of the checkout.
@@ -64,7 +64,7 @@ export type Checkout = {
   /**
    * The mode of the checkout.
    */
-  session_type: CheckoutSessionType;
+  session_type: BillingMode;
 
   /**
    * The products of the checkout.

@@ -4,7 +4,7 @@ import { CheckoutInfo } from '@paykit-sdk/local/browser';
 import { __defaultPaykitConfig, writePaykitConfig } from '@paykit-sdk/local/cli';
 import { spawn } from 'child_process';
 import { Command } from 'commander';
-import { existsSync } from 'fs';
+import { existsSync, unlinkSync } from 'fs';
 import inquirer from 'inquirer';
 import { nanoid } from 'nanoid';
 import path from 'path';
@@ -83,9 +83,6 @@ program
     logger.tip('Run `npx @paykit-sdk/cli dev` to start the development server');
   });
 
-/**
- * Use package manager to install deps, i.e from package-lock.json (npm), pnpm-lock.yaml (pnpm), yarn.lock (yarn)
- */
 program
   .command('dev')
   .description('Start the PayKit development server')
@@ -102,8 +99,22 @@ program
     if (!existsSync(nodeModulesPath)) {
       logger.progress('Installing development dependencies (first time setup)...');
 
-      // Install dependencies
-      const installProcess = spawn('npm', ['install', '--production'], {
+      // Clean up any existing lockfiles to avoid conflicts
+      const lockfiles = [path.join(devAppPath, 'package-lock.json'), path.join(devAppPath, 'yarn.lock'), path.join(devAppPath, 'pnpm-lock.yaml')];
+
+      for (const lockfile of lockfiles) {
+        if (existsSync(lockfile)) {
+          try {
+            unlinkSync(lockfile);
+            logger.info(`Removed existing lockfile: ${path.basename(lockfile)}`);
+          } catch (error) {
+            // Ignore errors if file doesn't exist or can't be deleted
+          }
+        }
+      }
+
+      // Install dependencies with --no-package-lock to avoid creating a new lockfile
+      const installProcess = spawn('npm', ['install', '--production', '--no-package-lock'], {
         cwd: devAppPath,
         stdio: 'ignore', // Completely silence npm output to avoid interference
       });

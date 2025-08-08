@@ -48,12 +48,12 @@ interface UpdateCustomerParams {
 <br />
 
 ```typescript
-type CheckoutSessionType = 'one_time' | 'recurring';
+type BillingMode = 'one_time' | 'recurring';
 
 interface CreateCheckoutParams {
   customer_id: string;
   item_id: string;
-  session_type: CheckoutSessionType;
+  session_type: BillingMode;
   metadata: PaykitMetadata;
   provider_metadata?: Record<string, unknown>;
 }
@@ -67,7 +67,7 @@ interface Checkout {
   customer_id: string;
   payment_url: string;
   metadata: PaykitMetadata | null;
-  session_type: CheckoutSessionType;
+  session_type: BillingMode;
   products: Array<{ id: string; quantity: number }>;
   currency: string;
   amount: number;
@@ -106,6 +106,7 @@ interface Invoice {
   currency: string;
   metadata: PaykitMetadata;
   customer_id: string;
+  billing_mode: BillingMode;
 }
 ```
 

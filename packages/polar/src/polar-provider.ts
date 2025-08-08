@@ -139,7 +139,7 @@ export class PolarProvider implements PayKitProvider {
           type: '$invoicePaid',
           created: parseInt(timestamp),
           id,
-          data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'payment' } }),
+          data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}) }, billingMode: 'one_time' }),
         });
       },
 
@@ -147,22 +147,12 @@ export class PolarProvider implements PayKitProvider {
         const { billingReason, metadata, status } = data;
 
         // Handle Subscription
-
-        if (billingReason == 'subscription_create') {
+        if (['subscription_create', 'subscription_cycle'].includes(billingReason)) {
           return toPaykitEvent<Invoice>({
             type: '$invoicePaid',
             created: parseInt(timestamp),
             id,
-            data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'subscription' } }),
-          });
-        }
-
-        if (billingReason == 'subscription_cycle') {
-          return toPaykitEvent<Invoice>({
-            type: '$invoicePaid',
-            created: parseInt(timestamp),
-            id,
-            data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}), $mode: 'subscription' } }),
+            data: toPaykitInvoice({ ...data, metadata: { ...(metadata ?? {}) }, billingMode: 'recurring' }),
           });
         }
 

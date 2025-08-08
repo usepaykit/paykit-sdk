@@ -86,7 +86,7 @@ export default function Dashboard() {
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const inProgressTasks = tasks.filter(task => task.status === 'in-progress').length;
 
-  const hasActiveSubscription = subscription && subscription.status === 'active' && subscription.metadata?.plan === 'pro';
+  const hasActiveSubscription = subscription && subscription.status === 'active' && subscription.metadata?.['plan'] === 'pro';
 
   return (
     <div className="bg-background min-h-screen">
@@ -202,7 +202,7 @@ export default function Dashboard() {
 
             {/* Upgrade Prompt */}
             <div className="space-y-6">
-              {!hasActiveSubscription && <UpgradePrompt feature="AI generations" currentPlan={subscription?.metadata?.['tier']!} />}
+              {!hasActiveSubscription && <UpgradePrompt feature="AI generations" currentPlan={subscription?.metadata?.['plan']!} />}
 
               <Card.Root>
                 <Card.Header>

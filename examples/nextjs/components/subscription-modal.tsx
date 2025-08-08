@@ -12,7 +12,7 @@ interface SubscriptionModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const subscriptionId = 'sub_TSuoZu8b0I_ad5PO30nv5ukQkKyk7h';
+const subscriptionId = 'sub_WEqpOMtKCIJlR4a-elBZEHnSfFq0yu';
 
 export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps) {
   const { cancel, retrieve, update } = useSubscription();

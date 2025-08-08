@@ -15,7 +15,9 @@ export default function DocsLayout({ children }: DocsLayoutProps) {
       <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-sm">
         <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4">
           <div className="flex items-center space-x-2">
-            <MobileDocsNav config={docsConfig} />
+            <div className="block md:hidden!">
+              <MobileDocsNav config={docsConfig} />
+            </div>
             <h1 className="text-xl font-bold">
               <Link href="/">PayKit Docs</Link>
             </h1>

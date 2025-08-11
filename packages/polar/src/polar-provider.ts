@@ -110,12 +110,14 @@ export class PolarProvider implements PayKitProvider {
   handleWebhook = async (params: HandleWebhookParams): Promise<WebhookEventPayload> => {
     const { body, headers, webhookSecret } = params;
 
-    const webhookHeaders = headersExtractor(headers, ['webhook-id', 'webhook-timestamp', 'webhook-signature']).reduce(
+    const requiredHeaders = ['webhook-id', 'webhook-timestamp', 'webhook-signature'] as const;
+
+    const webhookHeaders = headersExtractor(headers, requiredHeaders).reduce(
       (acc, kv) => {
-        acc[kv.key] = Array.isArray(kv.value) ? kv.value.join(',') : kv.value;
+        (acc as any)[kv.key] = Array.isArray(kv.value) ? kv.value.join(',') : kv.value;
         return acc;
       },
-      {} as Record<string, string>,
+      {} as Record<(typeof requiredHeaders)[number], string>,
     );
 
     const { data, type } = validateEvent(body, webhookHeaders, webhookSecret);

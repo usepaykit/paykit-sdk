@@ -59,7 +59,7 @@ export class Webhook {
 
     const { webhookSecret, provider } = this.config;
     const event = await provider.handleWebhook({ ...dto, webhookSecret });
-    const handlers = this.handlers.get(event.type as WebhookEventType);
+    const handlers = this.handlers.get(event.type);
 
     if (handlers && handlers.length > 0) {
       await Promise.all(handlers.map(handler => handler(event)));

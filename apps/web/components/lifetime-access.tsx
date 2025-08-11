@@ -27,9 +27,9 @@ export const LifetimeAccess = () => {
                       <h3 className="text-2xl font-bold">What’s included</h3>
                       <div className="space-y-3">
                         {[
+                          'Invoice builder',
                           'See total income across all providers',
                           'Manage all customers in one place',
-                          'Monitor payment events in real time',
                           "Add billing portals to providers that don't offer them",
                           'Invite team members with permissions',
                           'Auto-organize customers and sales',

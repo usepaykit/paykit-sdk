@@ -111,41 +111,6 @@ const Index = () => {
 
       <LifetimeAccess />
 
-      {/* About Maker */}
-      <section className="py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="mx-auto flex max-w-2xl flex-col items-center space-y-8">
-            <h2 className="text-foreground text-center text-2xl font-semibold">About the Maker</h2>
-
-            <div className="border-primary/20 relative mb-8 h-48 w-48 overflow-hidden rounded-full border-4">
-              <Image src="/odii.png" alt="Emmanuel Odii" fill className="object-cover" priority />
-            </div>
-
-            <div className="text-muted-foreground space-y-4 text-center leading-relaxed">
-              <p>
-                I’m
-                <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 hover:underline">
-                  Emmanuel Odii,
-                </Link>
-                a 19yo dev from Nigeria who started my coding journey in 2022. Since then, I’ve built several applications including tarotmaster.ai
-                and classynotes.app.
-              </p>
-              <p>
-                Each time I built these applications, I found myself diving deep into payment provider documentation to implement the abstractions I
-                needed. Whether it was Stripe, Polar, or other payment systems, I was constantly rewriting payment flows and webhook handlers.
-              </p>
-
-              <p>This repetitive process of studying docs, implementing payment logic, and managing provider-specific code led me to build PayKit</p>
-
-              <p>
-                PayKit is the solution I wish I had when building my first applications. It’s designed to help developers focus on their core product
-                rather than payment infrastructure.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <FinalCTA />
 
       {/* Footer */}
@@ -224,13 +189,23 @@ const Index = () => {
           <Separator className="my-8" />
 
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
+            <div className="flex items-center space-x-3">
+              <div className="relative h-8 w-8 overflow-hidden rounded-full">
+                <Image src="/odii.png" alt="Emmanuel Odii" fill className="object-cover" />
+              </div>
+              <p className="text-muted-foreground text-sm">
+                Hey Curious 👋 I’m
+                <Link href="https://odii.vercel.app" target="_blank" className="text-foreground ml-1 font-medium hover:underline">
+                  Emmanuel
+                </Link>
+                , the creator of PayKit. You can follow my work on
+                <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 font-medium hover:underline">
+                  Twitter.
+                </Link>
+              </p>
+            </div>
+
             <p className="text-muted-foreground text-sm">© 2024 PayKit. All rights reserved.</p>
-            <p className="text-muted-foreground text-sm">
-              Built with ❤️ by
-              <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 underline">
-                Odii
-              </Link>
-            </p>
           </div>
         </div>
       </footer>

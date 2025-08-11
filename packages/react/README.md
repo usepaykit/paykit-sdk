@@ -71,8 +71,8 @@ Works with any PayKit provider including Stripe, Polar, Gumroad, and more.
 
 ## Documentation
 
-- [React Documentation](https://usepaykit.dev/docs/react)
-- [PayKit Documentation](https://usepaykit.dev)
+- [React Documentation](https://www.usepaykit.dev/docs/concepts/client-side-usage)
+- [PayKit Documentation](https://usepaykit.dev/docs)
 - [Framework Examples](https://usepaykit.dev/docs/framework-examples)
 
 ## TypeScript Support

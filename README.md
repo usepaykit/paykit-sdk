@@ -39,7 +39,7 @@ Then follow the [Core Package documentation](packages/paykit/README.md) for setu
 
 ## Documentation
 
-Visit [paykit.dev](https://usepaykit.dev) for complete documentation, examples, and guides.
+Visit [Paykit](https://usepaykit.dev) for complete documentation, examples, and guides.
 
 ---
 

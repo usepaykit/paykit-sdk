@@ -19,10 +19,11 @@ const paykit = new PayKit(createStripe({ apiKey: process.env.STRIPE_API_KEY }));
 
 // Create a checkout session
 const checkout = await paykit.checkouts.create({
-  amount: 2999, // $29.99
-  currency: 'usd',
-  successUrl: 'https://yoursite.com/success',
-  cancelUrl: 'https://yoursite.com/cancel',
+  customer_id: 'cus_1234',
+  metadata: { plan: 'pro' },
+  session_type: 'recurring',
+  item_id: 'pri_12345',
+  provider_metadata: {},
 });
 ```
 

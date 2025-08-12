@@ -10,7 +10,7 @@ import {
   ValidationError,
   Webhook,
   WebhookEvent,
-  WebhookEventLiteral,
+  WebhookEventType,
   WebhookEventPayload,
 } from '@paykit-sdk/core';
 import { nanoid } from 'nanoid';
@@ -24,9 +24,9 @@ type CheckoutWithProviderMetadata = Checkout & { provider_metadata: PaykitMetada
 /**
  * Utils
  */
-const createWebhookEvent = <T extends LooseAutoComplete<WebhookEventLiteral>, Resource>(type: T, data: Resource): WebhookEvent<Resource> => ({
+const createWebhookEvent = <T extends LooseAutoComplete<WebhookEventType>, Resource>(type: T, data: Resource): WebhookEvent<Resource> => ({
   id: `evt_${nanoid(30)}`,
-  type: type as WebhookEventLiteral,
+  type: type as WebhookEventType,
   created: Date.now(),
   data,
 });
@@ -246,7 +246,7 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
 
   if (!resource) throw new ValidationError('Missing resource parameter', {});
 
-  const type = urlParams.get('type') as LooseAutoComplete<WebhookEventLiteral>;
+  const type = urlParams.get('type') as LooseAutoComplete<WebhookEventType>;
 
   if (!type) throw new ValidationError('Missing type parameter', {});
 
@@ -263,7 +263,7 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
   const { result, event } = await typeHandler(parsedData);
 
   try {
-    const webhookWithHandlers = webhook as unknown as { handlers: Map<string, ((event: WebhookEventLiteral) => Promise<void>)[]> };
+    const webhookWithHandlers = webhook as unknown as { handlers: Map<string, ((event: WebhookEventType) => Promise<void>)[]> };
     const handlers = webhookWithHandlers.handlers?.get(type as string);
 
     if (handlers && handlers.length > 0) {

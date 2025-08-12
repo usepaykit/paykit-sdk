@@ -1,5 +1,20 @@
 import { z } from 'zod';
 import { metadataSchema, PaykitMetadata } from './metadata';
+import { subscriptionBillingIntervalSchema } from './subscription';
+
+export const checkoutSubscriptionSchema = z.object({
+  /**
+   * The billing interval.
+   */
+  billing_interval: subscriptionBillingIntervalSchema,
+
+  /**
+   * The billing interval count.
+   */
+  billing_interval_count: z.number(),
+});
+
+type CheckoutSubscription = z.infer<typeof checkoutSubscriptionSchema>;
 
 export const billingModeSchema = z.enum(['one_time', 'recurring']);
 
@@ -25,6 +40,11 @@ export const createCheckoutSchema = z.object({
    * The item ID of the checkout.
    */
   item_id: z.string(),
+
+  /**
+   * The subscription specification of the checkout.
+   */
+  subscription: checkoutSubscriptionSchema.optional(),
 
   /**
    * Extra information to be sent to the provider e.g tax, trial days, etc.
@@ -80,4 +100,14 @@ export type Checkout = {
    * Total amount in the smallest currency unit (e.g., cents).
    */
   amount: number;
+
+  /**
+   * The date the checkout expires.
+   */
+  expires_at: string;
+
+  /**
+   * The subscription specification of the checkout.
+   */
+  subscription?: CheckoutSubscription;
 };

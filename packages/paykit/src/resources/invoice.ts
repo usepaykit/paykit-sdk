@@ -1,5 +1,10 @@
+import { z } from 'zod';
 import { BillingMode } from './checkout';
 import { PaykitMetadata } from './metadata';
+
+export const invoiceStatusSchema = z.enum(['draft', 'paid', 'refunded']);
+
+export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 
 export type Invoice = {
   /**
@@ -13,22 +18,67 @@ export type Invoice = {
   billing_mode: BillingMode;
 
   /**
-   * The amount of the invoice.
+   * The amount due in smallest currency unit.
    */
-  amount: number;
+  amount_due: number;
 
   /**
-   * The currency of the invoice.
+   * The amount paid in smallest currency unit.
+   */
+  amount_paid: number;
+
+  /**
+   * The tax amount in smallest currency unit.
+   */
+  tax_amount?: number;
+
+  /**
+   * The discount amount in smallest currency unit.
+   */
+  discount_amount?: number;
+
+  /**
+   * The status of the invoice.
+   */
+  status: InvoiceStatus;
+
+  /**
+   * ISO 4217 currency code (e.g. USD, EUR, GBP, etc.)
    */
   currency: string;
+
+  /**
+   * The date the invoice was paid.
+   */
+  paid_at?: string;
+
+  /**
+   * The line items of the invoice.
+   */
+  line_items: Array<{ id: string; quantity: number }>;
+
+  /**
+   * The customer reference.
+   */
+  customer_id: string;
+
+  /**
+   * Linked subscription (if recurring).
+   */
+  subscription_id?: string;
+
+  /**
+   * The current cycle number in subscription.
+   */
+  current_cycle: number;
+
+  /**
+   * The total cycles completed.
+   */
+  total_cycles: number;
 
   /**
    * The metadata of the invoice.
    */
   metadata: PaykitMetadata;
-
-  /**
-   * The customer ID of the invoice.
-   */
-  customer_id: string;
 };

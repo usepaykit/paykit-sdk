@@ -1,13 +1,30 @@
 import { z } from 'zod';
 import { metadataSchema, PaykitMetadata } from './metadata';
 
-export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'expired';
+export const subscriptionBillingIntervalSchema = z.enum(['month', 'year']);
+
+export type SubscriptionBillingInterval = z.infer<typeof subscriptionBillingIntervalSchema>;
+
+export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled', 'expired']);
+
+export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
 
 export interface Subscription {
   /**
    * The ID of the subscription.
    */
   id: string;
+
+  /**
+   * The amount in smallest currency unit.
+   */
+  amount: number;
+
+  /**
+   * The currency of the subscription.
+   */
+  currency: string;
+
   /**
    * The ID of the customer.
    */
@@ -27,6 +44,26 @@ export interface Subscription {
    * The current period end of the subscription.
    */
   current_period_end: Date;
+
+  /**
+   * The ID of the item.
+   */
+  item_id: string;
+
+  /**
+   * The billing interval of the subscription.
+   */
+  billing_interval: SubscriptionBillingInterval;
+
+  /**
+   * The billing interval count of the subscription.
+   */
+  billing_interval_count: number;
+
+  /**
+   * The checkout ID of the subscription.
+   */
+  checkout_id: string | null;
 
   /**
    * The metadata of the subscription.

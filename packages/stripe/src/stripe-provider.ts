@@ -14,9 +14,17 @@ import {
   Invoice,
   HandleWebhookParams,
   stringifyObjectValues,
+  PAYKIT_INTERNAL_PREFIX,
+  ParamsOrFactory,
+  withoutPaykitMetadata,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
-import { toPaykitCheckout, toPaykitCustomer, toPaykitInvoice, toPaykitSubscription } from '../lib/mapper';
+import {
+  paykitCheckout$InboundSchema,
+  paykitCustomer$InboundSchema,
+  paykitInvoice$InboundSchema,
+  paykitSubscription$InboundSchema,
+} from '../lib/mapper';
 
 export interface StripeConfig extends PaykitProviderOptions<Stripe.StripeConfig> {
   apiKey: string;
@@ -35,24 +43,22 @@ export class StripeProvider implements PayKitProvider {
    * Checkout management
    */
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const { customer_id, item_id, metadata, session_type, provider_metadata } = params;
-
     const checkout = await this.stripe.checkout.sessions.create({
-      customer: customer_id,
-      mode: session_type === 'one_time' ? 'payment' : 'subscription',
-      ...(session_type == 'one_time' && { metadata }),
-      ...(session_type == 'recurring' && { subscription_data: { metadata } }),
-      line_items: [{ price: item_id }],
-      ...provider_metadata,
+      customer: params.customer_id,
+      mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
+      ...(params.session_type == 'one_time' && { metadata: stringifyObjectValues(params.metadata ?? {}) }),
+      ...(params.session_type == 'recurring' && { subscription_data: { metadata: stringifyObjectValues(params.metadata ?? {}) } }),
+      line_items: [{ price: params.item_id, quantity: params.quantity }],
+      ...params.provider_metadata,
     });
 
-    return toPaykitCheckout(checkout);
+    return paykitCheckout$InboundSchema(checkout);
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     const checkout = await this.stripe.checkout.sessions.retrieve(id);
 
-    return toPaykitCheckout(checkout);
+    return paykitCheckout$InboundSchema(checkout);
   };
 
   /**
@@ -61,13 +67,18 @@ export class StripeProvider implements PayKitProvider {
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const customer = await this.stripe.customers.create(params);
 
-    return toPaykitCustomer(customer);
+    return paykitCustomer$InboundSchema(customer);
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (id: string, params: ParamsOrFactory<UpdateCustomerParams>): Promise<Customer> => {
+    if (typeof params === 'function') {
+      const customer = await this.retrieveCustomer(id);
+      params = await params(customer?.metadata ?? {});
+    }
+
     const customer = await this.stripe.customers.update(id, params);
 
-    return toPaykitCustomer(customer);
+    return paykitCustomer$InboundSchema(customer);
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
@@ -81,7 +92,7 @@ export class StripeProvider implements PayKitProvider {
 
     if ('deleted' in customer) return null;
 
-    return toPaykitCustomer(customer);
+    return paykitCustomer$InboundSchema(customer);
   };
 
   /**
@@ -93,16 +104,21 @@ export class StripeProvider implements PayKitProvider {
     return null;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
-    const subscription = await this.stripe.subscriptions.update(id, { metadata: params.metadata });
+  updateSubscription = async (id: string, params: ParamsOrFactory<UpdateSubscriptionParams>): Promise<Subscription> => {
+    if (typeof params === 'function') {
+      const sub = await this.retrieveSubscription(id);
+      params = await params(sub.metadata);
+    }
 
-    return toPaykitSubscription(subscription);
+    const subscription = await this.stripe.subscriptions.update(id, { metadata: stringifyObjectValues(params.metadata ?? {}) });
+
+    return paykitSubscription$InboundSchema(subscription);
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
     const subscription = await this.stripe.subscriptions.retrieve(id);
 
-    return toPaykitSubscription(subscription);
+    return paykitSubscription$InboundSchema(subscription);
   };
 
   /**
@@ -118,32 +134,50 @@ export class StripeProvider implements PayKitProvider {
 
     type StripeEventLiteral = typeof event.type;
 
-    const webhookHandlers: Partial<Record<StripeEventLiteral, (event: Stripe.Event) => WebhookEventPayload | null>> = {
+    const webhookHandlers: Partial<Record<StripeEventLiteral, (event: Stripe.Event) => Promise<WebhookEventPayload | null>>> = {
       /**
        * Invoice
        */
-      'checkout.session.completed': (event: Stripe.Event) => {
+      'checkout.session.completed': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Checkout.Session;
 
         if (data.mode !== 'payment') return null;
 
+        const sub = data.subscription?.toString();
+
+        if (sub) {
+          await this.updateSubscription(sub, async ({ metadata }) => {
+            if (metadata?.[PAYKIT_INTERNAL_PREFIX]) {
+              const parsed = JSON.parse(metadata[PAYKIT_INTERNAL_PREFIX]);
+              return { metadata: { ...metadata, __$pk: JSON.stringify({ ...parsed, ref: { ...parsed.ref, checkout_id: data.id } }) } };
+            }
+            throw new Error('Untrusted source');
+          });
+        }
+
         // Handle consumeble purchase
         return toPaykitEvent<Invoice>({
-          type: '$invoicePaid',
+          type: '$invoiceStatusChanged',
           created: event.created,
           id: event.id,
           data: {
             id: data.id,
-            amount: data.amount_total ?? 0,
+            status: 'paid',
+            paid_at: new Date(event.created * 1000).toISOString(),
+            amount_paid: data.amount_total ?? 0,
             currency: data.currency ?? '',
-            metadata: stringifyObjectValues({ ...(data.metadata ?? {}), $mode: data.mode }),
+            metadata: withoutPaykitMetadata(stringifyObjectValues({ ...(data.metadata ?? {}) })),
             customer_id: data.customer?.toString() ?? '',
             billing_mode: 'one_time',
+            line_items: [],
+            subscription_id: null,
+            current_cycle: 0,
+            total_cycles: 0,
           },
         });
       },
 
-      'invoice.paid': (event: Stripe.Event) => {
+      'invoice.paid': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Invoice;
 
         if (data.status !== 'paid' && !['subscription_create', 'subscription_cycle'].includes(data.billing_reason as Stripe.Invoice.BillingReason)) {
@@ -152,48 +186,62 @@ export class StripeProvider implements PayKitProvider {
 
         // Handle subscription purchase
         return toPaykitEvent<Invoice>({
-          type: '$invoicePaid',
+          type: '$invoiceStatusChanged',
           created: event.created,
           id: event.id,
-          data: toPaykitInvoice({ ...data, billingMode: 'recurring' }),
+          data: paykitInvoice$InboundSchema({ ...data, billingMode: 'recurring' }),
         });
       },
 
       /**
        * Customer
        */
-      'customer.created': (event: Stripe.Event) => {
+      'customer.created': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Customer;
 
-        return toPaykitEvent<Customer>({ type: '$customerCreated', created: event.created, id: event.id, data: toPaykitCustomer(data) });
+        return toPaykitEvent<Customer>({ type: '$customerCreated', created: event.created, id: event.id, data: paykitCustomer$InboundSchema(data) });
       },
 
-      'customer.updated': (event: Stripe.Event) => {
+      'customer.updated': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Customer;
 
-        return toPaykitEvent<Customer>({ type: '$customerUpdated', created: event.created, id: event.id, data: toPaykitCustomer(data) });
+        return toPaykitEvent<Customer>({ type: '$customerUpdated', created: event.created, id: event.id, data: paykitCustomer$InboundSchema(data) });
       },
 
-      'customer.deleted': (event: Stripe.Event) => {
+      'customer.deleted': async (event: Stripe.Event) => {
         return toPaykitEvent<null>({ type: '$customerDeleted', created: event.created, id: event.id, data: null });
       },
 
       /**
        * Subscription
        */
-      'customer.subscription.created': (event: Stripe.Event) => {
+      'customer.subscription.created': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Subscription;
 
-        return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: event.created, id: event.id, data: toPaykitSubscription(data) });
+        const corrToken = JSON.parse(data.metadata?.[PAYKIT_INTERNAL_PREFIX] ?? '{}')?.lookup?.corr;
+
+        const checkout = await this.updateSubscription(event.id, { metadata: { ...data.metadata, __$pk: JSON.stringify({ v: 1, seq: 0 }) } });
+
+        return toPaykitEvent<Subscription>({
+          type: '$subscriptionCreated',
+          created: event.created,
+          id: event.id,
+          data: paykitSubscription$InboundSchema(data),
+        });
       },
 
-      'customer.subscription.updated': (event: Stripe.Event) => {
+      'customer.subscription.updated': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Subscription;
 
-        return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: event.created, id: event.id, data: toPaykitSubscription(data) });
+        return toPaykitEvent<Subscription>({
+          type: '$subscriptionUpdated',
+          created: event.created,
+          id: event.id,
+          data: paykitSubscription$InboundSchema(data),
+        });
       },
 
-      'customer.subscription.deleted': (event: Stripe.Event) => {
+      'customer.subscription.deleted': async (event: Stripe.Event) => {
         return toPaykitEvent<null>({ type: '$subscriptionCancelled', created: event.created, id: event.id, data: null });
       },
     };
@@ -202,7 +250,7 @@ export class StripeProvider implements PayKitProvider {
 
     if (!handler) throw new Error(`Unhandled event type: ${event.type}`);
 
-    const result = handler(event);
+    const result = await handler(event);
 
     if (!result) throw new Error(`Unhandled event type: ${event.type}`);
 

@@ -18,24 +18,9 @@ export type Invoice = {
   billing_mode: BillingMode;
 
   /**
-   * The amount due in smallest currency unit.
-   */
-  amount_due: number;
-
-  /**
    * The amount paid in smallest currency unit.
    */
   amount_paid: number;
-
-  /**
-   * The tax amount in smallest currency unit.
-   */
-  tax_amount?: number;
-
-  /**
-   * The discount amount in smallest currency unit.
-   */
-  discount_amount?: number;
 
   /**
    * The status of the invoice.
@@ -50,7 +35,7 @@ export type Invoice = {
   /**
    * The date the invoice was paid.
    */
-  paid_at?: string;
+  paid_at: string | null;
 
   /**
    * The line items of the invoice.
@@ -65,7 +50,7 @@ export type Invoice = {
   /**
    * Linked subscription (if recurring).
    */
-  subscription_id?: string;
+  subscription_id: string | null;
 
   /**
    * The current cycle number in subscription.

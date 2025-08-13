@@ -114,5 +114,5 @@ export type Checkout = {
   /**
    * The subscription specification of the checkout.
    */
-  subscription?: CheckoutSubscription;
+  subscription?: CheckoutSubscription | null;
 };

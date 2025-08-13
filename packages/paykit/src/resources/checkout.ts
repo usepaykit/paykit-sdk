@@ -14,7 +14,7 @@ export const checkoutSubscriptionSchema = z.object({
   billing_interval_count: z.number(),
 });
 
-type CheckoutSubscription = z.infer<typeof checkoutSubscriptionSchema>;
+export type CheckoutSubscription = z.infer<typeof checkoutSubscriptionSchema>;
 
 export const billingModeSchema = z.enum(['one_time', 'recurring']);
 
@@ -40,6 +40,11 @@ export const createCheckoutSchema = z.object({
    * The item ID of the checkout.
    */
   item_id: z.string(),
+
+  /**
+   * The quantity of the item.
+   */
+  quantity: z.number(),
 
   /**
    * The subscription specification of the checkout.
@@ -104,7 +109,7 @@ export type Checkout = {
   /**
    * The date the checkout expires.
    */
-  expires_at: string;
+  expires_at: string | null;
 
   /**
    * The subscription specification of the checkout.

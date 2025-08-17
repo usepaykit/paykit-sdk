@@ -17,7 +17,7 @@
     "typescript"
   ],
   "author": "Emmanuel Odii",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
     "commander": "^14.0.0",
     "inquirer": "^12.6.3"

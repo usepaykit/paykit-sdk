@@ -239,4 +239,4 @@ PAYKIT_PAYMENT_URL=http://localhost:3001
 
 ## License
 
-ISC
+GPL-3.0

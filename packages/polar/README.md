@@ -183,4 +183,4 @@ POLAR_WEBHOOK_SECRET=your-webhook-secret
 
 ## License
 
-ISC
+GPL-3.0

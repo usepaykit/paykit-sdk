@@ -40,8 +40,8 @@
       "^[./]"
     ]
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Emmanuel Odii",
+  "license": "GPL-3.0",
   "bugs": {
     "url": "https://github.com/devodii/paykit/issues"
   },

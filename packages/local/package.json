@@ -2,6 +2,7 @@
   "name": "@paykit-sdk/local",
   "version": "1.1.8",
   "description": "PayKit Local Provider for development and testing",
+  "license": "GPL-3.0",
   "main": "./dist/index.js",
   "module": "./dist/index.mjs",
   "types": "./dist/index.d.ts",

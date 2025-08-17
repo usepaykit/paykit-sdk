@@ -177,4 +177,4 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ## License
 
-ISC
+GPL-3.0

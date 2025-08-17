@@ -19,7 +19,7 @@
     "typescript"
   ],
   "author": "Emmanuel Odii",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "dependencies": {
     "stripe": "^18.2.1"
   },

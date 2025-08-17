@@ -27,7 +27,7 @@
     "payment-processing"
   ],
   "author": "Emmanuel Odii",
-  "license": "ISC",
+  "license": "GPL-3.0",
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"

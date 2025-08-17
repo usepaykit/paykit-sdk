@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Emmanuel Odii",
+  "license": "GPL-3.0",
   "devDependencies": {
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",

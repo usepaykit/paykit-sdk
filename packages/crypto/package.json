@@ -7,8 +7,8 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Emmanuel Odii",
+  "license": "GPL-3.0",
   "dependencies": {
     "@paykit-sdk/core": "workspace:*"
   }

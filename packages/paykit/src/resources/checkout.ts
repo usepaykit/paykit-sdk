@@ -107,11 +107,6 @@ export type Checkout = {
   amount: number;
 
   /**
-   * The date the checkout expires.
-   */
-  expires_at: string | null;
-
-  /**
    * The subscription specification of the checkout.
    */
   subscription?: CheckoutSubscription | null;

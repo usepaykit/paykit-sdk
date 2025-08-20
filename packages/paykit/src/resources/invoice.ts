@@ -6,64 +6,54 @@ export const invoiceStatusSchema = z.enum(['draft', 'paid', 'refunded']);
 
 export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 
-export type Invoice = {
+export interface Invoice {
   /**
-   * The ID of the invoice.
+   * The ID for the invoice
    */
   id: string;
 
   /**
-   * The billing mode of the invoice.
-   */
-  billing_mode: BillingMode;
-
-  /**
-   * The amount paid in smallest currency unit.
-   */
-  amount_paid: number;
-
-  /**
-   * The status of the invoice.
-   */
-  status: InvoiceStatus;
-
-  /**
-   * ISO 4217 currency code (e.g. USD, EUR, GBP, etc.)
-   */
-  currency: string;
-
-  /**
-   * The date the invoice was paid.
-   */
-  paid_at: string | null;
-
-  /**
-   * The line items of the invoice.
-   */
-  line_items: Array<{ id: string; quantity: number }>;
-
-  /**
-   * The customer reference.
+   * Customer ID linked to the invoice.
    */
   customer_id: string;
 
   /**
-   * Linked subscription (if recurring).
+   * Subscription ID, if recurring (null for one-time).
    */
   subscription_id: string | null;
 
   /**
-   * The current cycle number in subscription.
+   * Billing mode: one-time or recurring.
    */
-  current_cycle: number;
+  billing_mode: BillingMode;
 
   /**
-   * The total cycles completed.
+   * Amount paid in smallest currency unit (e.g., cents).
    */
-  total_cycles: number;
+  amount_paid: number;
 
   /**
-   * The metadata of the invoice.
+   * ISO 4217 currency code (e.g., USD, EUR).
    */
-  metadata: PaykitMetadata;
-};
+  currency: string;
+
+  /**
+   * Invoice status.
+   */
+  status: InvoiceStatus;
+
+  /**
+   * Date the invoice was paid (ISO 8601 string, null if unpaid).
+   */
+  paid_at: string | null;
+
+  /**
+   * Line items of the invoice.
+   */
+  line_items: Array<{ id: string; quantity: number }>;
+
+  /**
+   * Metadata for provider-specific or custom data.
+   */
+  metadata: PaykitMetadata | null;
+}

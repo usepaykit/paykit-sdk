@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { BillingMode } from './checkout';
 import { PaykitMetadata } from './metadata';
 
-export const invoiceStatusSchema = z.enum(['draft', 'paid', 'refunded']);
+const invoiceStatus = z.enum(['paid', 'open']);
 
-export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
+export type InvoiceStatus = z.infer<typeof invoiceStatus>;
 
 export interface Invoice {
   /**
@@ -45,12 +45,12 @@ export interface Invoice {
   /**
    * Date the invoice was paid (ISO 8601 string, null if unpaid).
    */
-  paid_at: string | null;
+  paid_at: string;
 
   /**
    * Line items of the invoice.
    */
-  line_items: Array<{ id: string; quantity: number }>;
+  line_items: Array<{ id: string; quantity: number }> | null;
 
   /**
    * Metadata for provider-specific or custom data.

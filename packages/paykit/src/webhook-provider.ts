@@ -7,7 +7,7 @@ import {
   subscriptionCancelled,
   SubscriptionCreated,
   SubscriptionUpdated,
-  InvoiceStatusChanged,
+  InvoicePaid,
   WebhookEventPayload,
 } from './resources/webhook';
 
@@ -19,7 +19,7 @@ export type WebhookEventHandlers = Partial<{
   $subscriptionUpdated: (event: SubscriptionUpdated) => Promise<void>;
   $subscriptionCancelled: (event: subscriptionCancelled) => Promise<void>;
   $checkoutCreated: (event: CheckoutCreated) => Promise<void>;
-  $invoiceStatusChanged: (event: InvoiceStatusChanged) => Promise<void>;
+  $invoicePaid: (event: InvoicePaid) => Promise<void>;
 }>;
 
 export type WebhookEventType = keyof WebhookEventHandlers;

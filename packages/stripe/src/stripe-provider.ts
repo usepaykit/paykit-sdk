@@ -14,9 +14,6 @@ import {
   Invoice,
   HandleWebhookParams,
   stringifyObjectValues,
-  PAYKIT_INTERNAL_PREFIX,
-  ParamsOrFactory,
-  withoutPaykitMetadata,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import {
@@ -70,12 +67,7 @@ export class StripeProvider implements PayKitProvider {
     return paykitCustomer$InboundSchema(customer);
   };
 
-  updateCustomer = async (id: string, params: ParamsOrFactory<UpdateCustomerParams>): Promise<Customer> => {
-    if (typeof params === 'function') {
-      const customer = await this.retrieveCustomer(id);
-      params = await params(customer?.metadata ?? {});
-    }
-
+  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const customer = await this.stripe.customers.update(id, params);
 
     return paykitCustomer$InboundSchema(customer);
@@ -104,12 +96,7 @@ export class StripeProvider implements PayKitProvider {
     return null;
   };
 
-  updateSubscription = async (id: string, params: ParamsOrFactory<UpdateSubscriptionParams>): Promise<Subscription> => {
-    if (typeof params === 'function') {
-      const sub = await this.retrieveSubscription(id);
-      params = await params(sub.metadata);
-    }
-
+  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
     const subscription = await this.stripe.subscriptions.update(id, { metadata: stringifyObjectValues(params.metadata ?? {}) });
 
     return paykitSubscription$InboundSchema(subscription);
@@ -143,21 +130,9 @@ export class StripeProvider implements PayKitProvider {
 
         if (data.mode !== 'payment') return null;
 
-        const sub = data.subscription?.toString();
-
-        if (sub) {
-          await this.updateSubscription(sub, async ({ metadata }) => {
-            if (metadata?.[PAYKIT_INTERNAL_PREFIX]) {
-              const parsed = JSON.parse(metadata[PAYKIT_INTERNAL_PREFIX]);
-              return { metadata: { ...metadata, __$pk: JSON.stringify({ ...parsed, ref: { ...parsed.ref, checkout_id: data.id } }) } };
-            }
-            throw new Error('Untrusted source');
-          });
-        }
-
         // Handle consumeble purchase
         return toPaykitEvent<Invoice>({
-          type: '$invoiceStatusChanged',
+          type: '$invoicePaid',
           created: event.created,
           id: event.id,
           data: {
@@ -166,13 +141,11 @@ export class StripeProvider implements PayKitProvider {
             paid_at: new Date(event.created * 1000).toISOString(),
             amount_paid: data.amount_total ?? 0,
             currency: data.currency ?? '',
-            metadata: withoutPaykitMetadata(stringifyObjectValues({ ...(data.metadata ?? {}) })),
+            metadata: stringifyObjectValues({ ...(data.metadata ?? {}) }),
             customer_id: data.customer?.toString() ?? '',
             billing_mode: 'one_time',
-            line_items: [],
+            line_items: [], // todo: add line item
             subscription_id: null,
-            current_cycle: 0,
-            total_cycles: 0,
           },
         });
       },
@@ -186,7 +159,7 @@ export class StripeProvider implements PayKitProvider {
 
         // Handle subscription purchase
         return toPaykitEvent<Invoice>({
-          type: '$invoiceStatusChanged',
+          type: '$invoicePaid',
           created: event.created,
           id: event.id,
           data: paykitInvoice$InboundSchema({ ...data, billingMode: 'recurring' }),
@@ -217,10 +190,6 @@ export class StripeProvider implements PayKitProvider {
        */
       'customer.subscription.created': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Subscription;
-
-        const corrToken = JSON.parse(data.metadata?.[PAYKIT_INTERNAL_PREFIX] ?? '{}')?.lookup?.corr;
-
-        const checkout = await this.updateSubscription(event.id, { metadata: { ...data.metadata, __$pk: JSON.stringify({ v: 1, seq: 0 }) } });
 
         return toPaykitEvent<Subscription>({
           type: '$subscriptionCreated',

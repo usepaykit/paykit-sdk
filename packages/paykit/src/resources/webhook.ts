@@ -35,7 +35,7 @@ export type SubscriptionUpdated = WebhookEvent<Subscription>;
 export type subscriptionCancelled = WebhookEvent<Subscription>;
 
 export type CheckoutCreated = WebhookEvent<Checkout>;
-export type InvoiceStatusChanged = WebhookEvent<Invoice>;
+export type InvoicePaid = WebhookEvent<Invoice>;
 
 export type WebhookEventPayload =
   | CustomerCreated
@@ -44,7 +44,7 @@ export type WebhookEventPayload =
   | SubscriptionCreated
   | SubscriptionUpdated
   | subscriptionCancelled
-  | InvoiceStatusChanged
+  | InvoicePaid
   | CheckoutCreated;
 
 export const toPaykitEvent = <Resource>(event: WebhookEvent<Resource>) => event;

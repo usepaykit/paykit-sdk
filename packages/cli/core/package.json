@@ -20,7 +20,8 @@
   "license": "GPL-3.0",
   "dependencies": {
     "commander": "^14.0.0",
-    "inquirer": "^12.6.3"
+    "inquirer": "^12.6.3",
+    "nanoid": "^5.1.5"
   },
   "publishConfig": {
     "access": "public"

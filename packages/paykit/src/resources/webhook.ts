@@ -1,17 +1,8 @@
+import { WebhookEventType } from '../webhook-provider';
 import { Checkout } from './checkout';
 import { Customer } from './customer';
 import { Invoice } from './invoice';
 import { Subscription } from './subscription';
-
-export type WebhookEventLiteral =
-  | '$customerCreated'
-  | '$customerUpdated'
-  | '$customerDeleted'
-  | '$subscriptionCreated'
-  | '$subscriptionUpdated'
-  | '$subscriptionCancelled'
-  | '$checkoutCreated'
-  | '$invoicePaid';
 
 export interface WebhookEvent<T extends any> {
   /**
@@ -22,7 +13,7 @@ export interface WebhookEvent<T extends any> {
   /**
    * The type of the webhook event.
    */
-  type: WebhookEventLiteral;
+  type: WebhookEventType;
 
   /**
    * The created timestamp of the webhook event.

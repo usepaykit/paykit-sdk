@@ -85,8 +85,12 @@ export class DevServerService {
   private async startServer(port: number, host: string): Promise<void> {
     const devAppPath = this.findDevAppPath();
 
+    const packageManager = this.packageManager.getInfo();
+    const command = packageManager.name;
+    const args = ['start'];
+
     return new Promise((resolve, reject) => {
-      this.serverProcess = spawn('npm', ['start'], {
+      this.serverProcess = spawn(command, args, {
         cwd: devAppPath,
         stdio: 'pipe',
         env: { ...process.env, PORT: port.toString(), HOST: host },

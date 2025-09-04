@@ -1,59 +1,61 @@
 import { z } from 'zod';
-import { BillingMode } from './checkout';
-import { PaykitMetadata } from './metadata';
+import { billingModeSchema } from './checkout';
+import { metadataSchema } from './metadata';
 
 const invoiceStatus = z.enum(['paid', 'open']);
 
 export type InvoiceStatus = z.infer<typeof invoiceStatus>;
 
-export interface Invoice {
+export const invoiceSchema = z.object({
   /**
    * The ID for the invoice
    */
-  id: string;
+  id: z.string(),
 
   /**
    * Customer ID linked to the invoice.
    */
-  customer_id: string;
+  customer_id: z.string(),
 
   /**
    * Subscription ID, if recurring (null for one-time).
    */
-  subscription_id: string | null;
+  subscription_id: z.string().nullable(),
 
   /**
    * Billing mode: one-time or recurring.
    */
-  billing_mode: BillingMode;
+  billing_mode: billingModeSchema,
 
   /**
    * Amount paid in smallest currency unit (e.g., cents).
    */
-  amount_paid: number;
+  amount_paid: z.number(),
 
   /**
    * ISO 4217 currency code (e.g., USD, EUR).
    */
-  currency: string;
+  currency: z.string(),
 
   /**
    * Invoice status.
    */
-  status: InvoiceStatus;
+  status: invoiceStatus,
 
   /**
    * Date the invoice was paid (ISO 8601 string, null if unpaid).
    */
-  paid_at: string;
+  paid_at: z.string(),
 
   /**
    * Line items of the invoice.
    */
-  line_items: Array<{ id: string; quantity: number }> | null;
+  line_items: z.array(z.object({ id: z.string(), quantity: z.number() })).nullable(),
 
   /**
    * Metadata for provider-specific or custom data.
    */
-  metadata: PaykitMetadata | null;
-}
+  metadata: metadataSchema.nullable().optional(),
+});
+
+export type Invoice = z.infer<typeof invoiceSchema>;

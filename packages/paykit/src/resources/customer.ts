@@ -1,24 +1,29 @@
 import { z } from 'zod';
-import { metadataSchema, PaykitMetadata } from './metadata';
+import { metadataSchema } from './metadata';
 
-export interface Customer {
+export const customerSchema = z.object({
   /**
    * The ID of the customer.
    */
-  id: string;
+  id: z.string(),
+
   /**
    * The email of the customer.
    */
-  email?: string;
+  email: z.string().email().optional(),
+
   /**
    * The name of the customer.
    */
-  name?: string;
+  name: z.string().optional(),
+
   /**
    * The metadata of the customer.
    */
-  metadata?: PaykitMetadata;
-}
+  metadata: metadataSchema.optional(),
+});
+
+export type Customer = z.infer<typeof customerSchema>;
 
 export const createCustomerSchema = z.object({
   /**

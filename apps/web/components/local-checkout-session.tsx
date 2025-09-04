@@ -23,7 +23,7 @@ export const LocalCheckoutSession = () => {
                       <div className="h-3 w-3 rounded-full bg-green-400"></div>
                     </div>
                     <div className="bg-background text-muted-foreground flex-1 rounded px-3 py-1 text-xs">
-                      http://localhost:3001/checkout?id=eyiou...
+                      http://localhost:4242/checkout?id=eyiou...
                     </div>
                   </div>
                 </div>

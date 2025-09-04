@@ -1,13 +1,13 @@
 import { logger } from '@paykit-sdk/core';
 import { Command } from 'commander';
-import { DevServerService } from '../services/dev-server';
+import { DevServerService, DEFAULT_HOST, DEFAULT_PORT } from '../services/dev-server';
 import { RuntimeDetectionService } from '../services/runtime-detection';
 
 export const devCommand = new Command('dev')
   .description('Start the PayKit development server')
-  .option('-p, --port <port>', 'Port to run the server on', '3001')
-  .option('-h, --host <host>', 'Host to bind the server to', 'localhost')
-  .action(async options => {
+  .option('-p, --port <port>', 'Port to run the server on', DEFAULT_PORT.toString())
+  .option('-h, --host <host>', 'Host to bind the server to', DEFAULT_HOST)
+  .action(async () => {
     try {
       // Detect runtime environment
       const runtime = RuntimeDetectionService.detect();
@@ -21,18 +21,16 @@ export const devCommand = new Command('dev')
       }
 
       logger.brand();
-      logger.info('Starting PayKit development server...');
+      logger.info('Starting paykit development server...');
       logger.spacer();
 
       // Start development server
       const devServer = new DevServerService();
-      const status = await devServer.start({
-        port: parseInt(options.port),
-        host: options.host,
-      });
+
+      const status = await devServer.start();
 
       logger.success(`Development server running at ${status.url}`);
-      logger.tip('Press Ctrl+C to stop the server');
+      logger.tip('Press ctrl+c to stop the server');
 
       // Handle graceful shutdown
       process.on('SIGINT', () => {

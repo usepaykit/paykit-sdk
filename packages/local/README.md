@@ -39,7 +39,7 @@ import { createLocal } from '@paykit-sdk/local';
 
 const provider = createLocal({
   webhookUrl: 'http://localhost:3000/api/paykit',
-  paymentUrl: 'http://localhost:3001',
+  paymentUrl: 'http://localhost:4242',
 });
 
 const paykit = new PayKit(provider);
@@ -130,7 +130,7 @@ After a checkout is completed, your config will look like this:
       "products": [{ "id": "it_YsojnrQDeFTuoKdVgtAqnbRolk-3nq", "quantity": 1 }],
       "currency": "USD",
       "id": "eyJhbW91bnQiOiIkMjUi19...",
-      "payment_url": "http://localhost:3001/checkout?id=eyJhbW91bnQiOiIkMjUi19..."
+      "payment_url": "http://localhost:4242/checkout?id=eyJhbW91bnQiOiIkMjUi19..."
     }
   ],
   "invoices": [
@@ -230,7 +230,7 @@ export default defineEventHandler(async event => {
 
 ```bash
 PAYKIT_API_URL=http://localhost:3000/api/paykit
-PAYKIT_PAYMENT_URL=http://localhost:3001
+PAYKIT_PAYMENT_URL=http://localhost:4242
 ```
 
 ## Support

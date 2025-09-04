@@ -1,8 +1,15 @@
 import { logger } from '@paykit-sdk/core';
 import { Command } from 'commander';
+import { existsSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
 import { ConfigurationService } from '../services/configuration';
 import { PackageManagerService } from '../services/package-manager';
 import { RuntimeDetectionService } from '../services/runtime-detection';
+
+// ES module equivalent of __dirname
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 export const doctorCommand = new Command('doctor').description('Diagnose environment issues and provide solutions').action(async () => {
   try {
@@ -64,21 +71,21 @@ export const doctorCommand = new Command('doctor').description('Diagnose environ
 
     // Check dev-app dependencies
     logger.section('Development Dependencies');
-    const devAppPath = require('path').join(__dirname, '..', '..', 'dev-app');
-    const nodeModulesPath = require('path').join(devAppPath, 'node_modules');
+    const devAppPath = join(__dirname, '..', '..', '..', 'dev-app');
+    const nodeModulesPath = join(devAppPath, 'node_modules');
 
-    if (require('fs').existsSync(nodeModulesPath)) {
+    if (existsSync(nodeModulesPath)) {
       logger.success('✓ Development dependencies installed');
     } else {
       logger.warn('⚠ Development dependencies not installed');
-      logger.tip('Dependencies will be installed automatically when running `paykit dev`');
+      logger.tip('Dependencies will be installed automatically when running `npx @paykit-sdk/cli dev`');
     }
 
     logger.spacer();
 
     if (runtime.isCompatible && pmInfo.isAvailable) {
       logger.success('Environment is ready for PayKit development!');
-      logger.tip('Run `paykit dev` to start the development server');
+      logger.tip('Run `npx @paykit-sdk/cli dev` to start the development server');
     } else {
       logger.error('Environment has issues that need to be resolved');
       logger.tip('Fix the issues above before proceeding');

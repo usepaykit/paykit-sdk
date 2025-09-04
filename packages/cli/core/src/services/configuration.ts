@@ -1,16 +1,8 @@
+import { Subscription, Checkout, Invoice } from '@paykit-sdk/core';
 import { existsSync, readFileSync, writeFileSync, mkdirSync } from 'fs';
 import { nanoid } from 'nanoid';
 import { join } from 'path';
-
-export interface PaykitConfig {
-  project: { name: string; description?: string; price: string; itemId: string };
-  customer: { id: string; name: string; email?: string; metadata: Record<string, any> };
-  runtime?: { packageManager?: string; nodeVersion?: string };
-  devServer?: { port: number; host: string; autoOpen: boolean };
-  subscriptions: any[];
-  checkouts: any[];
-  invoices: any[];
-}
+import { PaykitConfig } from '../schema';
 
 export class ConfigurationService {
   private configPath: string;
@@ -24,13 +16,9 @@ export class ConfigurationService {
    * Load configuration from file
    */
   load(): PaykitConfig | null {
-    if (this.config) {
-      return this.config;
-    }
+    if (this.config) return this.config;
 
-    if (!existsSync(this.configPath)) {
-      return null;
-    }
+    if (!existsSync(this.configPath)) return null;
 
     try {
       const content = readFileSync(this.configPath, 'utf8');
@@ -48,11 +36,11 @@ export class ConfigurationService {
   save(config: PaykitConfig): boolean {
     try {
       const dir = join(this.configPath, '..');
-      if (!existsSync(dir)) {
-        mkdirSync(dir, { recursive: true });
-      }
+
+      if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
 
       writeFileSync(this.configPath, JSON.stringify(config, null, 2));
+
       this.config = config;
       return true;
     } catch (error) {
@@ -61,14 +49,19 @@ export class ConfigurationService {
     }
   }
 
-  /**
-   * Create default configuration
-   */
-  createDefault(productName: string, customerName: string, price: string, description?: string, customerEmail?: string): PaykitConfig {
+  createDefault(
+    productName: string,
+    productDescription: string,
+    productPrice: string,
+    productCurrency: string,
+    customerName: string,
+    customerEmail: string,
+    devServerPort: number,
+  ): PaykitConfig {
     return {
-      project: { name: productName, description, price, itemId: `it_${nanoid(30)}` },
+      product: { name: productName, description: productDescription, price: productPrice, currency: productCurrency },
       customer: { id: `cus_${nanoid(30)}`, name: customerName, email: customerEmail, metadata: {} },
-      devServer: { port: 3001, host: 'localhost', autoOpen: false },
+      devServerPort: devServerPort,
       subscriptions: [],
       checkouts: [],
       invoices: [],
@@ -99,30 +92,5 @@ export class ConfigurationService {
    */
   getConfigDir(): string {
     return join(this.configPath, '..');
-  }
-
-  /**
-   * Validate configuration
-   */
-  validate(config: PaykitConfig): { isValid: boolean; errors: string[] } {
-    const errors: string[] = [];
-
-    if (!config.project?.name) {
-      errors.push('Project name is required');
-    }
-
-    if (!config.project?.price) {
-      errors.push('Project price is required');
-    }
-
-    if (!config.customer?.name) {
-      errors.push('Customer name is required');
-    }
-
-    if (!config.customer?.email) {
-      errors.push('Customer email is required');
-    }
-
-    return { isValid: errors.length === 0, errors };
   }
 }

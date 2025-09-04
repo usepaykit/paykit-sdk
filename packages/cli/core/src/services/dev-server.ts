@@ -1,20 +1,17 @@
+import { logger } from '@paykit-sdk/core';
 import { spawn, ChildProcess } from 'child_process';
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { ConfigurationService } from './configuration';
 import { PackageManagerService } from './package-manager';
 
-export interface DevServerOptions {
-  port?: number;
-  host?: string;
-  autoOpen?: boolean;
-}
+export const DEFAULT_PORT = 4242;
+export const DEFAULT_HOST = 'localhost';
 
 export interface DevServerStatus {
-  isRunning: boolean;
-  port: number;
-  host: string;
-  url: string;
-  processId?: number;
+  port: number | null;
+  host: string | null;
+  url: string | null;
 }
 
 export class DevServerService {
@@ -26,27 +23,22 @@ export class DevServerService {
   constructor() {
     this.packageManager = new PackageManagerService();
     this.config = new ConfigurationService();
-    this.status = {
-      isRunning: false,
-      port: 3001,
-      host: 'localhost',
-      url: `http://localhost:3001`,
-    };
+    this.status = { port: null, host: null, url: null };
   }
 
   /**
    * Start the development server
    */
-  async start(options: DevServerOptions = {}): Promise<DevServerStatus> {
-    if (this.status.isRunning) {
-      throw new Error('Development server is already running');
+  async start(): Promise<DevServerStatus> {
+    if (!this.config.exists()) {
+      throw new Error('PayKit project not initialized. Please run `npx @paykit-sdk/cli init` first.');
     }
 
     const config = this.config.load();
-    const port = options.port || config?.devServer?.port || 3001;
-    const host = options.host || config?.devServer?.host || 'localhost';
+    const port = config?.devServerPort || DEFAULT_PORT;
+    const host = DEFAULT_HOST;
 
-    this.status = { isRunning: false, port, host, url: `http://${host}:${port}` };
+    this.status = { port, host, url: `http://${host}:${port}` };
 
     // Ensure dependencies are installed
     await this.ensureDependencies();
@@ -61,14 +53,11 @@ export class DevServerService {
    * Stop the development server
    */
   stop(): boolean {
-    if (!this.serverProcess || !this.status.isRunning) {
-      return false;
-    }
+    if (!this.serverProcess) return false;
 
     try {
       this.serverProcess.kill('SIGTERM');
       this.serverProcess = null;
-      this.status.isRunning = false;
       return true;
     } catch (error) {
       console.error('Failed to stop server:', error);
@@ -76,21 +65,12 @@ export class DevServerService {
     }
   }
 
-  /**
-   * Get current server status
-   */
-  getStatus(): DevServerStatus {
-    return { ...this.status };
-  }
-
-  /**
-   * Ensure dependencies are installed
-   */
   private async ensureDependencies(): Promise<void> {
-    const devAppPath = join(__dirname, '..', '..', 'dev-app');
+    // Find the CLI installation directory and locate dev-app
+    const devAppPath = this.findDevAppPath();
 
-    if (!this.packageManager.isDependenciesInstalled(devAppPath)) {
-      console.log('Installing development dependencies...');
+    if (!existsSync(join(devAppPath, 'node_modules'))) {
+      logger.progressIndicator('Installing development dependencies...');
       const success = await this.packageManager.installDependencies({
         cwd: devAppPath,
         silent: true,
@@ -102,21 +82,14 @@ export class DevServerService {
     }
   }
 
-  /**
-   * Start the Next.js development server
-   */
   private async startServer(port: number, host: string): Promise<void> {
-    const devAppPath = join(__dirname, '..', '..', 'dev-app');
+    const devAppPath = this.findDevAppPath();
 
     return new Promise((resolve, reject) => {
       this.serverProcess = spawn('npm', ['start'], {
         cwd: devAppPath,
         stdio: 'pipe',
-        env: {
-          ...process.env,
-          PORT: port.toString(),
-          HOST: host,
-        },
+        env: { ...process.env, PORT: port.toString(), HOST: host },
       });
 
       let serverReady = false;
@@ -124,7 +97,7 @@ export class DevServerService {
         if (!serverReady) {
           reject(new Error('Server startup timeout'));
         }
-      }, 30000); // 30 second timeout
+      }, 30000);
 
       this.serverProcess.stdout?.on('data', data => {
         const output = data.toString();
@@ -133,7 +106,6 @@ export class DevServerService {
           if (!serverReady) {
             serverReady = true;
             clearTimeout(timeout);
-            this.status.isRunning = true;
             resolve();
           }
         }
@@ -148,15 +120,25 @@ export class DevServerService {
 
       this.serverProcess.on('close', code => {
         if (code !== 0) {
-          this.status.isRunning = false;
           reject(new Error(`Server process exited with code ${code}`));
         }
       });
 
       this.serverProcess.on('error', error => {
-        this.status.isRunning = false;
         reject(new Error(`Failed to start server: ${error.message}`));
       });
     });
+  }
+
+  private findDevAppPath(): string {
+    const cwd = process.cwd();
+
+    const projectDevAppPath = join(cwd, 'node_modules', '@paykit-sdk', 'cli', 'dist', 'dev-app');
+
+    if (existsSync(projectDevAppPath)) {
+      return projectDevAppPath;
+    }
+
+    throw new Error('Could not locate dev-app directory. Please ensure the CLI is properly installed.');
   }
 }

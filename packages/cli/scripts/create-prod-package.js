@@ -20,11 +20,11 @@ const dependencies = devAppPackage.value.dependencies || {};
 
 // Create the production package.json
 const prodPackage = {
-  name: '@paykit-sdk/cli-dev-app',
-  version: '0.1.0',
-  private: true,
+  name: devAppPackage.value.name,
+  version: devAppPackage.value.version,
+  private: devAppPackage.value.private,
   scripts: {
-    start: 'next start -p 3001',
+    start: devAppPackage.value.scripts.start,
   },
   dependencies,
 };

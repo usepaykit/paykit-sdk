@@ -8,9 +8,20 @@ export interface LoggerOptions {
 export class Logger {
   private silent: boolean;
   private verbose: boolean;
-  private spinnerInterval: NodeJS.Timeout | null = null;
-  private spinnerFrames = ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'];
-  private currentSpinnerFrame = 0;
+
+  // Design system colors
+  private colors = {
+    success: '#166534', // Dark green for success messages
+    info: '#15803d', // Green for info messages
+    warning: '#d97706', // Amber for warnings
+    error: '#dc2626', // Red for errors
+    tip: '#16a34a', // Green for tips
+    brand: '#166534', // Dark green for brand
+    divider: '#16a34a', // Green for dividers
+    question: '#16a34a', // Green for questions
+    answer: '#6b7280', // Gray for answers
+    progress: '#15803d', // Green for progress
+  };
 
   constructor(options: LoggerOptions = {}) {
     this.silent = options.silent || false;
@@ -22,15 +33,15 @@ export class Logger {
    */
   success(message: string) {
     if (this.silent) return;
-    console.log(chalk.hex('#166534')(`✔ ${message}`));
+    console.log(chalk.hex(this.colors.success)(`✔ ${message}`));
   }
 
   /**
-   * Info messages (dark green)
+   * Info messages (green)
    */
   info(message: string) {
     if (this.silent) return;
-    console.log(chalk.hex('#15803d')(`ℹ ${message}`));
+    console.log(chalk.hex(this.colors.info)(`ℹ ${message}`));
   }
 
   /**
@@ -38,7 +49,7 @@ export class Logger {
    */
   warn(message: string) {
     if (this.silent) return;
-    console.log(chalk.hex('#d97706')(`⚠ ${message}`));
+    console.log(chalk.hex(this.colors.warning)(`⚠ ${message}`));
   }
 
   /**
@@ -46,7 +57,7 @@ export class Logger {
    */
   error(message: string) {
     if (this.silent) return;
-    console.error(chalk.hex('#dc2626')(`✖ ${message}`));
+    console.error(chalk.hex(this.colors.error)(`✖ ${message}`));
   }
 
   /**
@@ -58,11 +69,11 @@ export class Logger {
   }
 
   /**
-   * Tip messages (dark green)
+   * Tip messages (green)
    */
   tip(message: string) {
     if (this.silent) return;
-    console.log(chalk.hex('#16a34a')(`💡 ${message}`));
+    console.log(chalk.hex(this.colors.tip)(`💡 ${message}`));
   }
 
   /**
@@ -78,59 +89,23 @@ export class Logger {
    */
   section(title: string) {
     if (this.silent) return;
-    console.log(chalk.hex('#166534').bold.underline(`\n${title}`));
+    console.log(chalk.hex(this.colors.brand).bold.underline(`\n${title}`));
   }
 
   /**
-   * Progress indicator with spinning animation
+   * Progress indicator (deprecated - use progressIndicator instead)
    */
   progress(message: string) {
     if (this.silent) return;
-
-    // Clear any existing spinner
-    this.stopSpinner();
-
-    // Start the spinning animation
-    this.startSpinner(message);
+    this.progressIndicator(message);
   }
 
   /**
-   * Start the spinner animation
-   */
-  private startSpinner(message: string) {
-    const updateSpinner = () => {
-      process.stdout.clearLine(0);
-      process.stdout.cursorTo(0);
-      const spinner = this.spinnerFrames[this.currentSpinnerFrame];
-      process.stdout.write(chalk.hex('#15803d')(`${spinner} ${message}... `));
-      this.currentSpinnerFrame = (this.currentSpinnerFrame + 1) % this.spinnerFrames.length;
-    };
-
-    // Initial display
-    updateSpinner();
-
-    // Update every 80ms for smooth animation
-    this.spinnerInterval = setInterval(updateSpinner, 80);
-  }
-
-  /**
-   * Stop the spinner animation
-   */
-  private stopSpinner() {
-    if (this.spinnerInterval) {
-      clearInterval(this.spinnerInterval);
-      this.spinnerInterval = null;
-    }
-  }
-
-  /**
-   * Clear progress line
+   * Clear progress line (no-op since we don't use spinners anymore)
    */
   clearProgress() {
     if (this.silent) return;
-    this.stopSpinner();
-    process.stdout.clearLine(0);
-    process.stdout.cursorTo(0);
+    // No-op since we don't use spinners anymore
   }
 
   /**
@@ -152,7 +127,7 @@ export class Logger {
   list(items: string[], bullet = '•') {
     if (this.silent) return;
     items.forEach(item => {
-      console.log(chalk.hex('#16a34a')(`${bullet} `) + chalk.white(item));
+      console.log(chalk.hex(this.colors.tip)(`${bullet} `) + chalk.white(item));
     });
   }
 
@@ -161,7 +136,7 @@ export class Logger {
    */
   divider(char = '─', length = 50) {
     if (this.silent) return;
-    console.log(chalk.hex('#16a34a')(char.repeat(length)));
+    console.log(chalk.hex(this.colors.divider)(char.repeat(length)));
   }
 
   /**
@@ -175,12 +150,74 @@ export class Logger {
   }
 
   /**
-   * Brand header
+   * Brand header with ASCII art
    */
   brand() {
     if (this.silent) return;
-    console.log(chalk.hex('#166534').bold('PayKit CLI'));
+
+    // Simple ASCII art for "PAYKIT"
+    const asciiArt = `
+██████╗  █████╗ ██╗   ██╗██╗  ██╗██╗████████╗
+██╔══██╗██╔══██╗╚██╗ ██╔╝██║ ██╔╝██║╚══██╔══╝
+██████╔╝███████║ ╚████╔╝ █████╔╝ ██║   ██║   
+██╔═══╝ ██╔══██║  ╚██╔╝  ██╔═██╗ ██║   ██║   
+██║     ██║  ██║   ██║   ██║  ██╗██║   ██║   
+╚═╝     ╚═╝  ╚═╝   ╚═╝   ╚═╝  ╚═╝╚═╝   ╚═╝   
+    `.trim();
+
+    console.log(chalk.hex(this.colors.brand).bold(asciiArt));
     this.divider();
+  }
+
+  /**
+   * Welcome message
+   */
+  welcome(message: string) {
+    if (this.silent) return;
+    console.log(chalk.white(message));
+  }
+
+  /**
+   * Interactive question with green diamond
+   */
+  question(message: string) {
+    if (this.silent) return;
+    console.log(chalk.hex(this.colors.question)('◇') + ' ' + chalk.white(message));
+  }
+
+  /**
+   * Selected answer with indentation and gray color
+   */
+  answer(value: string, indent = 2) {
+    if (this.silent) return;
+    const indentStr = ' '.repeat(indent);
+    console.log(indentStr + chalk.hex(this.colors.answer)(value));
+  }
+
+  /**
+   * Progress indicator with green circle
+   */
+  progressIndicator(message: string) {
+    if (this.silent) return;
+    console.log(chalk.hex(this.colors.progress)('•') + ' ' + chalk.white(message));
+  }
+
+  /**
+   * Interactive setup step
+   */
+  setupStep(question: string, answer: string, isLast = false) {
+    if (this.silent) return;
+
+    // Show question with green diamond
+    this.question(question);
+
+    // Show answer with indentation
+    this.answer(answer);
+
+    // Add connecting line if not the last step
+    if (!isLast) {
+      console.log(chalk.gray('│'));
+    }
   }
 }
 

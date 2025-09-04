@@ -1,3 +1,4 @@
+import { tryCatchSync } from '@paykit-sdk/core';
 import { execSync, spawn } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
@@ -107,58 +108,25 @@ export class PackageManagerService {
     let isAvailable = false;
     let lockfilePath = null;
 
-    try {
-      // Get version
-      const output = execSync(`${detectedManager} --version`, { encoding: 'utf8' });
-      version = output.trim();
-      isAvailable = true;
-    } catch {
+    const [output, error] = tryCatchSync(() => execSync(`${detectedManager} --version`, { encoding: 'utf8' }).trim());
+
+    if (error) {
       isAvailable = false;
+    } else {
+      version = output;
+      isAvailable = true;
     }
 
     // Find lockfile
     const cwd = process.cwd();
-    const lockfiles = {
-      npm: 'package-lock.json',
-      yarn: 'yarn.lock',
-      pnpm: 'pnpm-lock.yaml',
-      bun: 'bun.lockb',
-    };
+
+    const lockfiles = { npm: 'package-lock.json', yarn: 'yarn.lock', pnpm: 'pnpm-lock.yaml', bun: 'bun.lockb' };
 
     const lockfile = lockfiles[detectedManager];
     if (lockfile && existsSync(join(cwd, lockfile))) {
       lockfilePath = join(cwd, lockfile);
     }
 
-    return {
-      name: detectedManager,
-      version,
-      isAvailable,
-      lockfilePath,
-    };
-  }
-
-  /**
-   * Check if dependencies are installed in a directory
-   */
-  isDependenciesInstalled(cwd: string): boolean {
-    return existsSync(join(cwd, 'node_modules'));
-  }
-
-  /**
-   * Get package.json from a directory
-   */
-  getPackageJson(cwd: string): any {
-    const packagePath = join(cwd, 'package.json');
-    if (!existsSync(packagePath)) {
-      return null;
-    }
-
-    try {
-      const content = readFileSync(packagePath, 'utf8');
-      return JSON.parse(content);
-    } catch {
-      return null;
-    }
+    return { name: detectedManager, version, isAvailable, lockfilePath };
   }
 }

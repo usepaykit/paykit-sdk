@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { metadataSchema, PaykitMetadata } from './metadata';
+import { metadataSchema } from './metadata';
 import { subscriptionBillingIntervalSchema } from './subscription';
 
 export const checkoutSubscriptionSchema = z.object({
@@ -54,7 +54,7 @@ export const createCheckoutSchema = z.object({
   /**
    * Extra information to be sent to the provider e.g tax, trial days, etc.
    */
-  provider_metadata: z.record(z.string(), z.unknown()).optional(),
+  provider_metadata: metadataSchema.optional(),
 });
 
 export type CreateCheckoutParams = z.infer<typeof createCheckoutSchema>;
@@ -65,49 +65,51 @@ export const retrieveCheckoutSchema = z.object({
 
 export type RetrieveCheckoutParams = z.infer<typeof retrieveCheckoutSchema>;
 
-export type Checkout = {
+export const checkoutSchema = z.object({
   /**
    * The ID of the checkout.
    */
-  id: string;
+  id: z.string(),
 
   /**
    * The ID of the customer.
    */
-  customer_id: string;
+  customer_id: z.string(),
 
   /**
-   * The payment URL where customer completes the transaction.
+   * The payment URL of the checkout.
    */
-  payment_url: string;
+  payment_url: z.string(),
 
   /**
    * The metadata of the checkout.
    */
-  metadata: PaykitMetadata | null;
+  metadata: metadataSchema.nullable().optional(),
 
   /**
    * The mode of the checkout.
    */
-  session_type: BillingMode;
+  session_type: billingModeSchema,
 
   /**
    * The products of the checkout.
    */
-  products: Array<{ id: string; quantity: number }>;
+  products: z.array(z.object({ id: z.string(), quantity: z.number() })),
 
   /**
    * The currency code (ISO 4217).
    */
-  currency: string;
+  currency: z.string(),
 
   /**
-   * Total amount in the smallest currency unit (e.g., cents).
+   * The amount of the checkout.
    */
-  amount: number;
+  amount: z.number(),
 
   /**
    * The subscription specification of the checkout.
    */
-  subscription?: CheckoutSubscription | null;
-};
+  subscription: checkoutSubscriptionSchema.nullable().optional(),
+});
+
+export type Checkout = z.infer<typeof checkoutSchema>;

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { metadataSchema, PaykitMetadata } from './metadata';
+import { metadataSchema } from './metadata';
 
 export const subscriptionBillingIntervalSchema = z.enum(['day', 'week', 'month', 'year']);
 
@@ -9,72 +9,74 @@ export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled'
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
 
-export interface Subscription {
+export const subscriptionSchema = z.object({
   /**
    * The ID for the subscription.
    */
-  id: string;
+  id: z.string(),
 
   /**
    * Customer ID linked to the subscription.
    */
-  customer_id: string;
+  customer_id: z.string(),
 
   /**
    * Amount in smallest currency unit (e.g., cents).
    */
-  amount: number;
+  amount: z.number(),
 
   /**
    * ISO 4217 currency code (e.g., USD, EUR).
    */
-  currency: string;
+  currency: z.string(),
 
   /**
    * Subscription status.
    */
-  status: SubscriptionStatus;
+  status: subscriptionStatusSchema,
 
   /**
    * Start of the current billing period (ISO 8601 string).
    */
-  current_period_start: Date;
+  current_period_start: z.date(),
 
   /**
    * End of the current billing period (ISO 8601 string).
    */
-  current_period_end: Date;
+  current_period_end: z.date(),
 
   /**
    * Current billing cycle number (e.g., 3 for third month of a monthly sub).
    */
-  current_cycle: number;
+  current_cycle: z.number(),
 
   /**
    * Total completed billing cycles (computed dynamically from provider invoices).
    */
-  total_cycles: number;
+  total_cycles: z.number(),
 
   /**
-   * Product/item ID being subscribed to.
+   * Product being subscribed to.
    */
-  item_id: string;
+  item_id: z.string(),
 
   /**
    * Billing interval (e.g., day, week, month, year).
    */
-  billing_interval: SubscriptionBillingInterval;
+  billing_interval: subscriptionBillingIntervalSchema,
 
   /**
    * Number of intervals per billing cycle (e.g., 3 for quarterly).
    */
-  billing_interval_count: number;
+  billing_interval_count: z.number(),
 
   /**
-   * Metadata for provider-specific or custom data.
+   * Metadata of the subscription.
    */
-  metadata: PaykitMetadata | null;
-}
+  metadata: metadataSchema.nullable().optional(),
+});
+
+export type Subscription = z.infer<typeof subscriptionSchema>;
 
 export const updateSubscriptionSchema = z.object({
   metadata: metadataSchema.optional(),

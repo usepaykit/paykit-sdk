@@ -18,7 +18,8 @@ A development checkout page for testing PayKit payments locally.
 
 ## Usage
 
-The dev app is automatically started when you run `npx @paykit-sdk/cli dev` and is accessible at `http://localhost:3001`.
+The dev app is automatically started when you run `npx @paykit-sdk/cli dev` and is accessible at `http://localhost:4242`.
+You can override the port by setting the `devServerPort` value in your .paykit/config.json file
 
 ## Redirect Behavior
 

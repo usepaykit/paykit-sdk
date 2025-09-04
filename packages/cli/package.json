@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/cli",
-  "version": "1.1.92",
+  "version": "1.2.52",
   "description": "PayKit CLI for product setup and development",
   "type": "module",
   "main": "dist/index.js",
@@ -23,7 +23,8 @@
     "commander": "^12.0.0",
     "inquirer": "^10.0.0",
     "nanoid": "^5.1.5",
-    "tw-animate-css": "^1.3.4"
+    "tw-animate-css": "^1.3.4",
+    "zod": "^3.25.76"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

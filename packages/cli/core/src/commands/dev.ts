@@ -1,7 +1,6 @@
 import { logger } from '@paykit-sdk/core';
 import { Command } from 'commander';
 import { DevServerService, DEFAULT_HOST, DEFAULT_PORT } from '../services/dev-server';
-import { RuntimeDetectionService } from '../services/runtime-detection';
 
 export const devCommand = new Command('dev')
   .description('Start the PayKit development server')
@@ -9,17 +8,6 @@ export const devCommand = new Command('dev')
   .option('-h, --host <host>', 'Host to bind the server to', DEFAULT_HOST)
   .action(async () => {
     try {
-      // Detect runtime environment
-      const runtime = RuntimeDetectionService.detect();
-
-      if (!runtime.isCompatible) {
-        logger.error('Environment compatibility issues detected:');
-        runtime.compatibilityIssues.forEach(issue => {
-          logger.error(`  - ${issue}`);
-        });
-        process.exit(1);
-      }
-
       logger.brand();
       logger.info('Starting paykit development server...');
       logger.spacer();

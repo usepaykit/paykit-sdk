@@ -1,15 +1,8 @@
-import { tryCatchSync } from '@paykit-sdk/core';
-import { execSync, spawn } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
+import { spawn } from 'child_process';
+import { existsSync } from 'fs';
 import { join } from 'path';
-import { RuntimeDetectionService } from './runtime-detection';
 
-export interface PackageManagerInfo {
-  name: 'npm' | 'yarn' | 'pnpm' | 'bun';
-  version: string;
-  isAvailable: boolean;
-  lockfilePath: string | null;
-}
+type PackageManager = 'npm' | 'yarn' | 'pnpm' | 'bun';
 
 export interface InstallOptions {
   cwd: string;
@@ -18,7 +11,7 @@ export interface InstallOptions {
 }
 
 export class PackageManagerService {
-  private packageManager: PackageManagerInfo;
+  private packageManager: PackageManager | null;
 
   constructor() {
     this.packageManager = this.detectPackageManager();
@@ -27,7 +20,7 @@ export class PackageManagerService {
   /**
    * Get package manager information
    */
-  getInfo(): PackageManagerInfo {
+  getInfo(): PackageManager | null {
     return this.packageManager;
   }
 
@@ -37,11 +30,11 @@ export class PackageManagerService {
   async installDependencies(options: InstallOptions): Promise<boolean> {
     const { cwd, silent = false, force = false } = options;
 
-    if (!this.packageManager.isAvailable) {
-      throw new Error(`Package manager ${this.packageManager.name} is not available`);
+    if (!this.packageManager) {
+      throw new Error('No package manager detected');
     }
 
-    const command = this.getInstallCommand(force);
+    const command = this.packageManager;
     const args = this.getInstallArgs(force);
 
     return new Promise(resolve => {
@@ -62,28 +55,10 @@ export class PackageManagerService {
   }
 
   /**
-   * Get the install command for the detected package manager
-   */
-  private getInstallCommand(force: boolean): string {
-    switch (this.packageManager.name) {
-      case 'npm':
-        return 'npm';
-      case 'yarn':
-        return 'yarn';
-      case 'pnpm':
-        return 'pnpm';
-      case 'bun':
-        return 'bun';
-      default:
-        return 'npm';
-    }
-  }
-
-  /**
    * Get install arguments for the detected package manager
    */
   private getInstallArgs(force: boolean): string[] {
-    switch (this.packageManager.name) {
+    switch (this.packageManager) {
       case 'npm':
         return force ? ['install', '--force'] : ['install'];
       case 'yarn':
@@ -96,37 +71,22 @@ export class PackageManagerService {
         return ['install'];
     }
   }
-
-  /**
-   * Detect package manager and get detailed information
-   */
-  private detectPackageManager(): PackageManagerInfo {
-    const runtime = RuntimeDetectionService.detect();
-    const detectedManager = runtime.packageManager || 'npm';
-
-    let version = 'unknown';
-    let isAvailable = false;
-    let lockfilePath = null;
-
-    const [output, error] = tryCatchSync(() => execSync(`${detectedManager} --version`, { encoding: 'utf8' }).trim());
-
-    if (error) {
-      isAvailable = false;
-    } else {
-      version = output;
-      isAvailable = true;
-    }
-
-    // Find lockfile
+  private detectPackageManager(): PackageManager | null {
     const cwd = process.cwd();
 
-    const lockfiles = { npm: 'package-lock.json', yarn: 'yarn.lock', pnpm: 'pnpm-lock.yaml', bun: 'bun.lockb' };
+    const lockfiles: { [key: string]: PackageManager } = {
+      'pnpm-lock.yaml': 'pnpm',
+      'yarn.lock': 'yarn',
+      'bun.lockb': 'bun',
+      'package-lock.json': 'npm',
+    };
 
-    const lockfile = lockfiles[detectedManager];
-    if (lockfile && existsSync(join(cwd, lockfile))) {
-      lockfilePath = join(cwd, lockfile);
+    for (const file in lockfiles) {
+      if (existsSync(join(cwd, file))) {
+        return lockfiles[file];
+      }
     }
 
-    return { name: detectedManager, version, isAvailable, lockfilePath };
+    return null;
   }
 }

@@ -2,7 +2,6 @@
 import { logger, tryCatchSync } from '@paykit-sdk/core';
 import { Command } from 'commander';
 import { devCommand } from './commands/dev';
-import { doctorCommand } from './commands/doctor';
 import { initCommand } from './commands/init';
 
 const program = new Command();
@@ -12,7 +11,6 @@ program.name('paykit').description('PayKit CLI for payment development and testi
 // Add commands
 program.addCommand(initCommand);
 program.addCommand(devCommand);
-program.addCommand(doctorCommand);
 
 // Global error handler
 program.exitOverride();

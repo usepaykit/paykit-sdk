@@ -1,7 +1,8 @@
 import { logger } from '@paykit-sdk/core';
 import { spawn, ChildProcess } from 'child_process';
 import { existsSync } from 'fs';
-import { join } from 'path';
+import { createRequire } from 'module';
+import { join, dirname } from 'path';
 import { ConfigurationService } from './configuration';
 import { PackageManagerService } from './package-manager';
 
@@ -85,12 +86,8 @@ export class DevServerService {
   private async startServer(port: number, host: string): Promise<void> {
     const devAppPath = this.findDevAppPath();
 
-    const packageManager = this.packageManager.getInfo();
-    const command = packageManager.name;
-    const args = ['start'];
-
     return new Promise((resolve, reject) => {
-      this.serverProcess = spawn(command, args, {
+      this.serverProcess = spawn('npm', ['start'], {
         cwd: devAppPath,
         stdio: 'pipe',
         env: { ...process.env, PORT: port.toString(), HOST: host },
@@ -135,14 +132,27 @@ export class DevServerService {
   }
 
   private findDevAppPath(): string {
-    const cwd = process.cwd();
+    try {
+      // 1. Create a require function that is scoped to the current module.
+      //    'import.meta.url' is a special ESM variable that gives the path to the current file.
+      const require = createRequire(import.meta.url);
 
-    const projectDevAppPath = join(cwd, 'node_modules', '@paykit-sdk', 'cli', 'dist', 'dev-app');
+      // 2. Use the new require function to resolve the path to the dev-app's package.json.
+      //    This will work regardless of npm, pnpm, or yarn's node_modules structure.
+      //    NOTE: I am assuming your dev-app is located inside your CLI package.
+      //    If it's a separate package, change the path to '@paykit-sdk/dev-app/package.json'.
+      const devAppPackageJsonPath = require.resolve('@paykit-sdk/cli/dist/dev-app/package.json');
 
-    if (existsSync(projectDevAppPath)) {
-      return projectDevAppPath;
+      console.log('devAppPackageJsonPath', devAppPackageJsonPath);
+
+      // 3. Get the directory of that package.json file. This is the root of your dev-app.
+      const devAppPath = dirname(devAppPackageJsonPath);
+
+      return devAppPath;
+    } catch (error) {
+      console.error('Failed to find dev-app path:', error);
+      // Explicitly re-throw or handle the error to prevent undefined paths.
+      throw new Error('Could not locate dev-app directory. Please ensure the CLI is properly installed.');
     }
-
-    throw new Error('Could not locate dev-app directory. Please ensure the CLI is properly installed.');
   }
 }

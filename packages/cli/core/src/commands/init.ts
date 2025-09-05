@@ -4,20 +4,9 @@ import inquirer from 'inquirer';
 import { configSchema } from '../schema';
 import { ConfigurationService } from '../services/configuration';
 import { DEFAULT_PORT } from '../services/dev-server';
-import { RuntimeDetectionService } from '../services/runtime-detection';
 
 export const initCommand = new Command('init').description('Initialize a new PayKit project').action(async () => {
   try {
-    const runtime = RuntimeDetectionService.detect();
-
-    if (!runtime.isCompatible) {
-      logger.error('Environment compatibility issues detected:');
-      runtime.compatibilityIssues.forEach(issue => {
-        logger.error(`  - ${issue}`);
-      });
-      process.exit(1);
-    }
-
     logger.brand();
     logger.welcome('Welcome to PayKit Setup!');
     logger.spacer();
@@ -33,13 +22,8 @@ export const initCommand = new Command('init').description('Initialize a new Pay
     ]);
     logger.setupStep('Product name:', nameAnswer.name);
 
-    const descriptionAnswer = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'description',
-        message: 'Product description (optional):',
-      },
-    ]);
+    const descriptionAnswer = await inquirer.prompt([{ type: 'input', name: 'description', message: 'Product description (optional):' }]);
+
     logger.setupStep('Product description (optional):', descriptionAnswer.description || 'None');
 
     const priceAnswer = await inquirer.prompt([
@@ -58,14 +42,7 @@ export const initCommand = new Command('init').description('Initialize a new Pay
     ]);
     logger.setupStep('Product price:', priceAnswer.price);
 
-    const currencyAnswer = await inquirer.prompt([
-      {
-        type: 'input',
-        name: 'currency',
-        message: 'Product currency:',
-        default: 'USD',
-      },
-    ]);
+    const currencyAnswer = await inquirer.prompt([{ type: 'input', name: 'currency', message: 'Product currency:', default: 'USD' }]);
 
     logger.setupStep('Product currency:', currencyAnswer.currency);
 

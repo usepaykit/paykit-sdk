@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/cli",
-  "version": "1.2.53",
+  "version": "1.2.56",
   "description": "PayKit CLI for product setup and development",
   "type": "module",
   "main": "dist/index.js",

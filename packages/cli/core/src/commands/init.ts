@@ -4,6 +4,7 @@ import inquirer from 'inquirer';
 import { configSchema } from '../schema';
 import { ConfigurationService } from '../services/configuration';
 import { DEFAULT_PORT } from '../services/dev-server';
+import { getPackageManagerRunner } from '../utils/package-manager';
 
 export const initCommand = new Command('init').description('Initialize a new PayKit project').action(async () => {
   try {
@@ -119,7 +120,8 @@ export const initCommand = new Command('init').description('Initialize a new Pay
 
     logger.spacer();
     logger.success('PayKit project initialized successfully!');
-    logger.tip('Run `npx @paykit-sdk/cli dev` to start the development server');
+    const runner = getPackageManagerRunner();
+    logger.tip(`Run \`${runner} @paykit-sdk/cli dev\` to start the development server`);
   } catch (error) {
     logger.error('Failed to initialize PayKit project');
     if (error instanceof Error) {

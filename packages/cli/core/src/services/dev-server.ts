@@ -3,11 +3,13 @@ import { spawn, ChildProcess } from 'child_process';
 import { existsSync } from 'fs';
 import { createRequire } from 'module';
 import { join, dirname } from 'path';
+import { getPackageManagerInstall, getPackageManagerRunner, getPackageManagerStart } from '../utils/package-manager';
 import { ConfigurationService } from './configuration';
-import { PackageManagerService } from './package-manager';
 
 export const DEFAULT_PORT = 4242;
 export const DEFAULT_HOST = 'localhost';
+
+const INVALID_CONFIG_ERROR = `PayKit is not initialized. Please run \`${getPackageManagerRunner()} @paykit-sdk/cli init\` first.`;
 
 export interface DevServerStatus {
   port: number | null;
@@ -16,13 +18,11 @@ export interface DevServerStatus {
 }
 
 export class DevServerService {
-  private packageManager: PackageManagerService;
   private config: ConfigurationService;
   private serverProcess: ChildProcess | null = null;
   private status: DevServerStatus;
 
   constructor() {
-    this.packageManager = new PackageManagerService();
     this.config = new ConfigurationService();
     this.status = { port: null, host: null, url: null };
   }
@@ -31,9 +31,7 @@ export class DevServerService {
    * Start the development server
    */
   async start(): Promise<DevServerStatus> {
-    if (!this.config.exists()) {
-      throw new Error('PayKit project not initialized. Please run `npx @paykit-sdk/cli init` first.');
-    }
+    if (!this.config.exists()) throw new Error(INVALID_CONFIG_ERROR);
 
     const config = this.config.load();
     const port = config?.devServerPort || DEFAULT_PORT;
@@ -41,7 +39,6 @@ export class DevServerService {
 
     this.status = { port, host, url: `http://${host}:${port}` };
 
-    // Ensure dependencies are installed
     await this.ensureDependencies();
 
     // Start the server
@@ -72,10 +69,7 @@ export class DevServerService {
 
     if (!existsSync(join(devAppPath, 'node_modules'))) {
       logger.progressIndicator('Installing development dependencies...');
-      const success = await this.packageManager.installDependencies({
-        cwd: devAppPath,
-        silent: true,
-      });
+      const success = await this.installDependencies(devAppPath);
 
       if (!success) {
         throw new Error('Failed to install development dependencies');
@@ -83,11 +77,33 @@ export class DevServerService {
     }
   }
 
+  private async installDependencies(cwd: string): Promise<boolean> {
+    const packageManager = getPackageManagerInstall();
+
+    return new Promise(resolve => {
+      const installProcess = spawn(packageManager, ['install'], {
+        cwd,
+        stdio: 'ignore',
+        shell: true,
+      });
+
+      installProcess.on('close', code => {
+        resolve(code === 0);
+      });
+
+      installProcess.on('error', () => {
+        resolve(false);
+      });
+    });
+  }
+
   private async startServer(port: number, host: string): Promise<void> {
     const devAppPath = this.findDevAppPath();
+    const startCommand = getPackageManagerStart();
+    const [command, ...args] = startCommand.split(' ');
 
     return new Promise((resolve, reject) => {
-      this.serverProcess = spawn('npm', ['start'], {
+      this.serverProcess = spawn(command, args, {
         cwd: devAppPath,
         stdio: 'pipe',
         env: { ...process.env, PORT: port.toString(), HOST: host },

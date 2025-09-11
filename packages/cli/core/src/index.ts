@@ -4,6 +4,9 @@ import { Command } from 'commander';
 import { devCommand } from './commands/dev';
 import { initCommand } from './commands/init';
 
+// Export utilities for external use
+export * from './utils';
+
 const program = new Command();
 
 program.name('paykit').description('PayKit CLI for payment development and testing').version('1.1.0');

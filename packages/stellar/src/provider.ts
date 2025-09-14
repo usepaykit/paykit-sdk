@@ -20,14 +20,9 @@ export interface StellarOptions
     apiKey: string;
 
     /**
-     * The supported assets
+     * Th assets supported
      */
-    assetCodes: Array<string>;
-
-    /**
-     * The supported issuer
-     */
-    assetIssuer: string;
+    assets: Array<{ issuer: string; code: string }>;
 
     /**
      * The developer's webhook URL

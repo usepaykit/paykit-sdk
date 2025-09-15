@@ -62,9 +62,14 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
     billing_interval_count: subscription.items.data[0].price.recurring?.interval_count ?? 1,
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
+    metadata: stringifyObjectValues(subscription.metadata ?? {}),
+
+    /**
+     * todo: fix
+     */
+    custom_fields: null,
     current_cycle: 0,
     total_cycles: 0,
-    metadata: stringifyObjectValues(subscription.metadata ?? {}),
   };
 };
 
@@ -80,16 +85,28 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     throw new Error(`Unknown status: ${invoice.status}`);
   })();
 
+  const subscriptionId = (() => {
+    // todo: fix
+    return null;
+  })();
+
+  const customerId = (() => {
+    if (typeof invoice.customer === 'string') return invoice.customer;
+    if (invoice.customer?.id) return invoice.customer.id;
+    throw new Error(`Unknown customer ID: ${invoice.customer}`);
+  })();
+
   return {
     id: invoice.id!,
     currency: invoice.currency,
-    customer_id: typeof invoice.customer === 'string' ? invoice.customer.toString() : (invoice.customer?.id ?? ''),
+    customer_id: customerId,
     billing_mode: invoice.billingMode,
     amount_paid: invoice.amount_paid,
-    line_items: [],
-    subscription_id: null,
+    line_items: invoice.lines.data.map(line => ({ id: line.id!, quantity: line.quantity! })),
+    subscription_id: subscriptionId,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
     metadata: stringifyObjectValues(invoice.metadata ?? {}),
+    custom_fields: invoice.custom_fields ?? null,
   };
 };

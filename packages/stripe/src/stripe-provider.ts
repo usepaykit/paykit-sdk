@@ -144,8 +144,9 @@ export class StripeProvider implements PayKitProvider {
             metadata: stringifyObjectValues({ ...(data.metadata ?? {}) }),
             customer_id: data.customer?.toString() ?? '',
             billing_mode: 'one_time',
-            line_items: [], // todo: add line item
             subscription_id: null,
+            custom_fields: data.custom_fields ?? null,
+            line_items: data.line_items?.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })) ?? [],
           },
         });
       },
@@ -153,11 +154,13 @@ export class StripeProvider implements PayKitProvider {
       'invoice.paid': async (event: Stripe.Event) => {
         const data = event.data.object as Stripe.Invoice;
 
-        if (data.status !== 'paid' && !['subscription_create', 'subscription_cycle'].includes(data.billing_reason as Stripe.Invoice.BillingReason)) {
-          return null;
-        }
+        const relevantBillingReasons = ['subscription_create', 'subscription_cycle'];
 
-        // Handle subscription purchase
+        if (data.status !== 'paid' && !relevantBillingReasons.includes(data.billing_reason!)) return null;
+
+        /**
+         * Handle subscription creation and cycle
+         */
         return toPaykitEvent<Invoice>({
           type: '$invoicePaid',
           created: event.created,

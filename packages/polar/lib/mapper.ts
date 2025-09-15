@@ -46,18 +46,38 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
     metadata: stringifyObjectValues({ ...(subscription.metadata ?? {}) }),
-    custom_fields: subscription.customFieldData,
+    custom_fields: subscription.customFieldData ?? null,
+    item_id: subscription.productId,
+    billing_interval: subscription.recurringInterval,
+    currency: subscription.currency,
+    amount: subscription.amount,
+
+    /**
+     * todo: fix
+     */
+    billing_interval_count: 1,
+    current_cycle: 0,
+    total_cycles: 0,
   };
 };
 
 export const toPaykitInvoice = (invoice: Order & { billingMode: BillingMode }): PaykitInvoice => {
+  const status = (() => {
+    if (invoice.status == 'paid') return 'paid';
+    return 'open';
+  })();
+
   return {
     id: invoice.id,
-    amount: invoice.totalAmount,
+    amount_paid: invoice.totalAmount,
     currency: invoice.currency,
     metadata: stringifyObjectValues({ ...(invoice.metadata ?? {}) }),
     customer_id: invoice.customerId,
     billing_mode: invoice.billingMode,
-    custom_fields: invoice.customFieldData,
+    custom_fields: invoice.customFieldData ?? null,
+    status,
+    subscription_id: invoice.subscription?.id ?? null,
+    paid_at: new Date(invoice.createdAt).toISOString(),
+    line_items: [],
   };
 };

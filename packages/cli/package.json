@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/cli",
-  "version": "1.2.57",
+  "version": "1.2.6",
   "description": "PayKit CLI for product setup and development",
   "type": "module",
   "main": "dist/index.js",
@@ -8,13 +8,9 @@
     "paykit": "dist/index.js"
   },
   "scripts": {
-    "build": "rm -rf dist && npm run build:cli && npm run app:build && npm run copy-assets",
+    "build:dev-app": "rm -rf dist/dev-app && mkdir -p dist/dev-app && cd dev-app && npm run build && cp -r .next/standalone/. ../dist/dev-app && cp -r .next/static ../dist/dev-app/.next/static && cd .. && node scripts/create-prod-package.js",
     "build:cli": "tsup core/src/index.ts --format esm --out-dir dist",
-    "app:build": "cd dev-app && npm run build",
-    "create-prod-package": "node scripts/create-prod-package.js",
-    "cli:dev": "npm run build:cli && node dist/index.js",
-    "prepublishOnly": "rm -rf dist && npm run build",
-    "copy-assets": "mkdir -p dist/dev-app && cp -r dev-app/.next dist/dev-app/.next && rm -rf dist/dev-app/.next/cache && npm run create-prod-package"
+    "prepublishOnly": "rm -rf dist && npm run build:dev-app && npm run build:cli"
   },
   "files": [
     "dist"

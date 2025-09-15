@@ -148,27 +148,12 @@ export class DevServerService {
   }
 
   private findDevAppPath(): string {
-    try {
-      // 1. Create a require function that is scoped to the current module.
-      //    'import.meta.url' is a special ESM variable that gives the path to the current file.
-      const require = createRequire(import.meta.url);
+    const require = createRequire(import.meta.url);
 
-      // 2. Use the new require function to resolve the path to the dev-app's package.json.
-      //    This will work regardless of npm, pnpm, or yarn's node_modules structure.
-      //    NOTE: I am assuming your dev-app is located inside your CLI package.
-      //    If it's a separate package, change the path to '@paykit-sdk/dev-app/package.json'.
-      const devAppPackageJsonPath = require.resolve('@paykit-sdk/cli/dist/dev-app/package.json');
+    const devAppPackageJsonPath = require.resolve('@paykit-sdk/cli/dist/dev-app/package.json');
 
-      console.log('devAppPackageJsonPath', devAppPackageJsonPath);
+    console.log('devAppPackageJsonPath', devAppPackageJsonPath);
 
-      // 3. Get the directory of that package.json file. This is the root of your dev-app.
-      const devAppPath = dirname(devAppPackageJsonPath);
-
-      return devAppPath;
-    } catch (error) {
-      console.error('Failed to find dev-app path:', error);
-      // Explicitly re-throw or handle the error to prevent undefined paths.
-      throw new Error('Could not locate dev-app directory. Please ensure the CLI is properly installed.');
-    }
+    return dirname(devAppPackageJsonPath);
   }
 }

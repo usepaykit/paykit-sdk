@@ -24,7 +24,7 @@ const prodPackage = {
   version: devAppPackage.value.version,
   private: devAppPackage.value.private,
   scripts: {
-    start: devAppPackage.value.scripts.start,
+    start: 'node server.js',
   },
   dependencies,
 };

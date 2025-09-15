@@ -56,6 +56,11 @@ export const invoiceSchema = z.object({
    * Metadata for provider-specific or custom data.
    */
   metadata: metadataSchema.nullable().optional(),
+
+  /**
+   * The provider custom field
+   */
+  custom_fields: z.record(z.string(), z.any()).nullable(),
 });
 
 export type Invoice = z.infer<typeof invoiceSchema>;

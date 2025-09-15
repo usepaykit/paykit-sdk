@@ -74,6 +74,11 @@ export const subscriptionSchema = z.object({
    * Metadata of the subscription.
    */
   metadata: metadataSchema.nullable().optional(),
+
+  /**
+   * The provider custom fields
+   */
+  custom_fields: z.record(z.string(), z.any()).nullable(),
 });
 
 export type Subscription = z.infer<typeof subscriptionSchema>;

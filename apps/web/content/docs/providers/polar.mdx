@@ -126,7 +126,7 @@ export async function POST(request: NextRequest) {
       console.log('Payment received:', event.data);
 
       // Access custom field data filled by users
-      const customFieldData = JSON.parse(event.data.metadata?.$customFieldData);
+      const customFieldData = event.data.custom_fields;
       if (customFieldData) {
         console.log('Custom fields:', customFieldData);
       }
@@ -168,27 +168,6 @@ export default defineEventHandler(async event => {
   await webhook.handle({ body, headers });
 
   return { success: true };
-});
-```
-
-## Custom Fields
-
-Polar supports custom fields that users can fill during checkout. PayKit automatically includes these in the webhook metadata as `$customFieldData` for resources like invoices and subscriptions.
-
-The `$customFieldData` is of type [PaykitMetadata](/docs/concepts/api-reference) and needs to be parsed to access the values. It's available in both subscription and invoice retrieval:
-
-```typescript
-// In your webhook handler
-.on('$invoicePaid', async event => {
-  const customFieldData = JSON.parse(event.data.metadata?.$customFieldData || '{}');
-
-  // Access specific custom fields
-  const companyName = customFieldData.company_name;
-});
-
-// Also available in subscription events
-.on('$subscriptionCreated', async event => {
-  const customFieldData = JSON.parse(event.data.metadata?.$customFieldData || '{}');
 });
 ```
 

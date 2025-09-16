@@ -27,6 +27,7 @@ export const LifetimeAccess = () => {
                       <h3 className="text-2xl font-bold">What’s included</h3>
                       <div className="space-y-3">
                         {[
+                          'Stellar crypto payments integration',
                           'Invoice builder',
                           'See total income across all providers',
                           'Manage all customers in one place',

@@ -11,7 +11,7 @@ export const POST = async (request: NextRequest) => {
         console.log({ customer });
       })
       .on('$invoicePaid', async invoice => {
-        const email = invoice.data.custom_fields['account-email'] as string;
+        const email = invoice.data.custom_fields?.['account-email'] as string;
 
         const { error } = await resend.emails.send({
           from: 'PayKit <odii@usepaykit.dev>',

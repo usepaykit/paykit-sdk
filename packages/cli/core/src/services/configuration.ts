@@ -59,7 +59,7 @@ export class ConfigurationService {
     devServerPort: number,
   ): PaykitConfig {
     return {
-      product: { name: productName, description: productDescription, price: productPrice, currency: productCurrency },
+      product: { itemId: `it_${nanoid(30)}`, name: productName, description: productDescription, price: productPrice, currency: productCurrency },
       customer: { id: `cus_${nanoid(30)}`, name: customerName, email: customerEmail, metadata: {} },
       devServerPort: devServerPort,
       subscriptions: [],

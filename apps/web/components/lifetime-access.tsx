@@ -67,7 +67,7 @@ export const LifetimeAccess = () => {
                           <div className="text-sm font-medium text-green-600 dark:text-green-400">🎁 First 100 persons - 95 left</div>
                         </div>
                         <Button className="mt-6 w-full" size="lg" asChild>
-                          <Link href={process.env.NEXT_PUBLIC_CHECKOUT_URL!} target="_blank">
+                          <Link href={`${process.env.NEXT_PUBLIC_CHECKOUT_URL!}`} target="_blank">
                             <CreditCard className="mr-2 h-4 w-4" />
                             Get Lifetime Access
                           </Link>

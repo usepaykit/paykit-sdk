@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export const DocsAd = () => {
   return (
-    <Link target="_blank" href={process.env.NEXT_PUBLIC_CHECKOUT_URL!}>
+    <Link target="_blank" href={`${process.env.NEXT_PUBLIC_CHECKOUT_URL!}`}>
       <Card.Root className="border-border/50 bg-card/50 cursor-pointer">
         <Card.Header className="pb-3">
           <Card.Title className="text-lg font-semibold">Get PayKit Cloud Lifetime Access</Card.Title>

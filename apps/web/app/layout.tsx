@@ -2,11 +2,11 @@ import '@/app/globals.css';
 import { AppProviders } from '@/providers';
 import { cn } from '@paykit-sdk/ui';
 import type { Metadata } from 'next';
-import { Manrope } from 'next/font/google';
+import { PT_Sans } from 'next/font/google';
 
-const manrope = Manrope({
+const ptSans = PT_Sans({
   subsets: ['latin'],
-  variable: '--font-manrope ',
+  variable: '--font-pt-sans',
   display: 'swap',
   weight: ['400', '700'],
 });
@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={cn(manrope.variable, 'font-manropema antialiased')}>
+      <body className={cn(ptSans.variable, ' antialiased')}>
         <AppProviders>{children}</AppProviders>
       </body>
     </html>

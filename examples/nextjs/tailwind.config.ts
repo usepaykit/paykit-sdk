@@ -22,6 +22,7 @@ const config = {
       fontFamily: {
         sans: ["var(--font-inter)"],
         outfit: ["var(--font-outfit)"],
+        
       },
       colors: {
         border: "hsl(var(--border))",

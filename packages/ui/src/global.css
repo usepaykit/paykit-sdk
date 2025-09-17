@@ -195,4 +195,8 @@ body {
   .font-pt-sans {
     font-family: var(--font-pt-sans);
   }
+
+  .font-manrope {
+    font-family: var(--font-manrope);
+  }
 }

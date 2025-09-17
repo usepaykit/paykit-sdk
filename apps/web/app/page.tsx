@@ -19,7 +19,7 @@ export const dynamic = 'force-dynamic';
 
 const Index = () => {
   return (
-    <div className="font-inter bg-background min-h-screen">
+    <div className="font-inter bg-background min-h-screen font-pt-sans">
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center space-x-3">

@@ -3,6 +3,15 @@ import { MobileDocsNav } from '@/components/mobile-docs-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { docsConfig } from '@/config/docs';
 import Link from 'next/link';
+import { Manrope } from 'next/font/google';
+import { cn } from '@/lib/utils';
+
+const manrope = Manrope({
+  subsets: ['latin'],
+  variable: '--font-manrope',
+  display: 'swap',
+  weight: ['400', '700'],
+});
 
 interface DocsLayoutProps {
   children: React.ReactNode;
@@ -10,7 +19,7 @@ interface DocsLayoutProps {
 
 export default function DocsLayout({ children }: DocsLayoutProps) {
   return (
-    <div className="bg-background min-h-screen">
+    <div className={cn(manrope.variable, 'font-manrope antialiased min-h-screen bg-background text-foreground')}>
       {/* Header with theme toggle */}
       <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-sm">
         <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4">

@@ -1,9 +1,9 @@
-import { delay } from '@paykit-sdk/core';
+import { setTimeout } from 'timers/promises';
 import type { Task } from '../interface';
 import { mockTasks } from './mock-data';
 
 export const generateContent = async (prompt: string): Promise<{ content: string }> => {
-  await delay(2000);
+  await setTimeout(2000);
 
   const responses = [
     `Based on your prompt "${prompt}", here's a comprehensive task description that outlines the key objectives, deliverables, and success criteria for this project.`,
@@ -20,7 +20,7 @@ export const createTask = async (data: Partial<Task>): Promise<Task> => {
   console.log('Mock createTask called with:', data);
 
   try {
-    await delay(1000);
+    await setTimeout(1000);
 
     if (!data.title || !data.description) {
       throw new Error('Title and description are required');
@@ -45,35 +45,30 @@ export const createTask = async (data: Partial<Task>): Promise<Task> => {
 };
 
 export const updateTask = async (id: string, data: Partial<Task>): Promise<Task> => {
-  console.log('Mock updateTask called with:', id, data);
-  await delay(500);
+  await setTimeout(500);
+
   const existingTask = mockTasks.find(task => task.id === id) || mockTasks[0];
-  const updatedTask = {
-    ...existingTask,
-    ...data,
-    updatedAt: new Date(),
-  };
-  console.log('Mock updateTask returning:', updatedTask);
+
+  const updatedTask = { ...existingTask, ...data, updatedAt: new Date() };
+
   return updatedTask;
 };
 
 export const deleteTask = async (id: string): Promise<{ success: boolean }> => {
-  console.log('Mock deleteTask called with:', id);
-  await delay(500);
+  await setTimeout(500);
+
   return { success: true };
 };
 
 export const getTasks = async (): Promise<Task[]> => {
-  console.log('Mock getTasks called');
-  await delay(500);
-  console.log('Mock getTasks returning:', mockTasks);
+  await setTimeout(500);
+
   return mockTasks;
 };
 
 export const getTask = async (id: string): Promise<Task | null> => {
-  console.log('Mock getTask called with:', id);
-  await delay(500);
+  await setTimeout(500);
   const task = mockTasks.find(task => task.id === id) || null;
-  console.log('Mock getTask returning:', task);
+
   return task;
 };

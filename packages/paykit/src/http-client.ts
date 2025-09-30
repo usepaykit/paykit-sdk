@@ -1,17 +1,5 @@
-import {
-  AbortedError,
-  TimeoutError,
-  ERR,
-  isConnectionError,
-  isUnauthorizedError,
-  OK,
-  Result,
-  UnauthorizedError,
-  isTimeoutError,
-  isAbortError,
-  UnknownError,
-  ConnectionError,
-} from './tools';
+import { ERR, OK, Result, buildError } from './tools';
+import { classifyError } from './tools/classify-error';
 
 export type HTTPClientConfig = {
   baseUrl: string;
@@ -22,18 +10,8 @@ export class HTTPClient {
   constructor(private config: HTTPClientConfig) {}
 
   private errorHandler = (err: unknown) => {
-    switch (true) {
-      case isUnauthorizedError(err):
-        return ERR(new UnauthorizedError('Unauthorized', { cause: err }));
-      case isConnectionError(err):
-        return ERR(new ConnectionError('Connection error', { cause: err }));
-      case isTimeoutError(err):
-        return ERR(new TimeoutError('Timeout error', { cause: err }));
-      case isAbortError(err):
-        return ERR(new AbortedError('Aborted error', { cause: err }));
-      default:
-        return ERR(new UnknownError('Unknown error', { cause: err }));
-    }
+    const errorType = classifyError(err);
+    return ERR(buildError(errorType, err));
   };
 
   private getFullUrl(endpoint: string): string {

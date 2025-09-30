@@ -1,13 +1,5 @@
-import {
-  BillingMode,
-  Checkout,
-  Customer,
-  Invoice,
-  InvoiceStatus,
-  stringifyObjectValues,
-  Subscription,
-  SubscriptionBillingInterval,
-} from '@paykit-sdk/core';
+import { BillingMode, Checkout, Customer, Invoice, InvoiceStatus, Subscription, SubscriptionBillingInterval } from '@paykit-sdk/core';
+import _ from 'lodash';
 import Stripe from 'stripe';
 
 /**
@@ -23,7 +15,7 @@ export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session):
     currency: checkout.currency!,
     amount: checkout.amount_total!,
     subscription: null,
-    metadata: stringifyObjectValues(checkout.metadata ?? {}),
+    metadata: _.mapValues(checkout.metadata ?? {}, value => JSON.stringify(value)),
   };
 };
 
@@ -35,7 +27,7 @@ export const paykitCustomer$InboundSchema = (customer: Stripe.Customer): Custome
     id: customer.id,
     email: customer.email ?? undefined,
     name: customer.name ?? undefined,
-    metadata: stringifyObjectValues(customer.metadata ?? {}),
+    metadata: _.mapValues(customer.metadata ?? {}, value => JSON.stringify(value)),
   };
 };
 
@@ -62,7 +54,7 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
     billing_interval_count: subscription.items.data[0].price.recurring?.interval_count ?? 1,
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
-    metadata: stringifyObjectValues(subscription.metadata ?? {}),
+    metadata: _.mapValues(subscription.metadata ?? {}, value => JSON.stringify(value)),
 
     /**
      * todo: fix
@@ -106,7 +98,7 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     subscription_id: subscriptionId,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
-    metadata: stringifyObjectValues(invoice.metadata ?? {}),
+    metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
     custom_fields: invoice.custom_fields ?? null,
   };
 };

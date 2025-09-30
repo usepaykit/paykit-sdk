@@ -1,7 +1,8 @@
 'use client';
 
 import * as React from 'react';
-import { delay, type Subscription, truncate } from '@paykit-sdk/core';
+import _ from 'lodash';
+import { delay, type Subscription } from '@paykit-sdk/core';
 import { useSubscription } from '@paykit-sdk/react';
 import { Dialog, Button, Card, Badge, Toast } from '@paykit-sdk/ui';
 import { format } from 'date-fns';
@@ -109,7 +110,7 @@ export function SubscriptionModal({ open, onOpenChange }: SubscriptionModalProps
                       <User className="h-4 w-4" />
                       Customer ID
                     </div>
-                    <p className="font-mono text-sm">{truncate(subscription.customer_id, 10, '...')}</p>
+                    <p className="font-mono text-sm">{_.truncate(subscription.customer_id, { length: 10, omission: '...' })}</p>
                   </div>
                   <div className="space-y-2">
                     <div className="text-muted-foreground flex items-center gap-2 text-sm">

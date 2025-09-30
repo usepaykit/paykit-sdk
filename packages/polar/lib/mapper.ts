@@ -5,13 +5,13 @@ import {
   Invoice as PaykitInvoice,
   PaykitMetadata,
   SubscriptionStatus,
-  stringifyObjectValues,
   BillingMode,
 } from '@paykit-sdk/core';
 import { Checkout } from '@polar-sh/sdk/models/components/checkout';
 import { Customer } from '@polar-sh/sdk/models/components/customer';
 import { Order } from '@polar-sh/sdk/models/components/order';
 import { Subscription } from '@polar-sh/sdk/models/components/subscription';
+import _ from 'lodash';
 
 export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
   return {
@@ -45,7 +45,7 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
-    metadata: stringifyObjectValues({ ...(subscription.metadata ?? {}) }),
+    metadata: _.mapValues(subscription.metadata ?? {}, value => JSON.stringify(value)),
     custom_fields: subscription.customFieldData ?? null,
     item_id: subscription.productId,
     billing_interval: subscription.recurringInterval,
@@ -71,7 +71,7 @@ export const toPaykitInvoice = (invoice: Order & { billingMode: BillingMode }): 
     id: invoice.id,
     amount_paid: invoice.totalAmount,
     currency: invoice.currency,
-    metadata: stringifyObjectValues({ ...(invoice.metadata ?? {}) }),
+    metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
     customer_id: invoice.customerId,
     billing_mode: invoice.billingMode,
     custom_fields: invoice.customFieldData ?? null,

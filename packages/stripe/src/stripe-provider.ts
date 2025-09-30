@@ -13,8 +13,8 @@ import {
   headersExtractor,
   Invoice,
   HandleWebhookParams,
-  stringifyObjectValues,
 } from '@paykit-sdk/core';
+import _ from 'lodash';
 import Stripe from 'stripe';
 import {
   paykitCheckout$InboundSchema,
@@ -43,8 +43,10 @@ export class StripeProvider implements PayKitProvider {
     const checkout = await this.stripe.checkout.sessions.create({
       customer: params.customer_id,
       mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
-      ...(params.session_type == 'one_time' && { metadata: stringifyObjectValues(params.metadata ?? {}) }),
-      ...(params.session_type == 'recurring' && { subscription_data: { metadata: stringifyObjectValues(params.metadata ?? {}) } }),
+      ...(params.session_type == 'one_time' && { metadata: _.mapValues(params.metadata ?? {}, value => JSON.stringify(value)) }),
+      ...(params.session_type == 'recurring' && {
+        subscription_data: { metadata: _.mapValues(params.metadata ?? {}, value => JSON.stringify(value)) },
+      }),
       line_items: [{ price: params.item_id, quantity: params.quantity }],
       ...params.provider_metadata,
     });
@@ -97,7 +99,7 @@ export class StripeProvider implements PayKitProvider {
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
-    const subscription = await this.stripe.subscriptions.update(id, { metadata: stringifyObjectValues(params.metadata ?? {}) });
+    const subscription = await this.stripe.subscriptions.update(id, { metadata: _.mapValues(params.metadata ?? {}, value => JSON.stringify(value)) });
 
     return paykitSubscription$InboundSchema(subscription);
   };
@@ -141,7 +143,7 @@ export class StripeProvider implements PayKitProvider {
             paid_at: new Date(event.created * 1000).toISOString(),
             amount_paid: data.amount_total ?? 0,
             currency: data.currency ?? '',
-            metadata: stringifyObjectValues({ ...(data.metadata ?? {}) }),
+            metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)),
             customer_id: data.customer?.toString() ?? '',
             billing_mode: 'one_time',
             subscription_id: null,

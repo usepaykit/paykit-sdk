@@ -14,6 +14,7 @@ import {
   updateSubscriptionSchema,
   WebhookEventPayload,
   HandleWebhookParams,
+  validateRequiredKeys,
 } from '@paykit-sdk/core';
 import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -48,15 +49,24 @@ export class ComgateProvider implements PayKitProvider {
 
     if (error) throw new Error(error.message);
 
+    const providerMetadata = validateRequiredKeys(
+      ['price', 'email', 'currency', 'label'],
+      params.provider_metadata ?? {},
+      'Missing required provider metadata: {keys}',
+    );
+
+    const { price, email, currency, label, ...restMetadata } = providerMetadata;
+
     const requestBody = {
       code: 0,
       test: this.opts.sandbox,
       refId: params.item_id,
       payerId: params.customer_id,
-      price: params.provider_metadata?.['price'],
-      email: params.provider_metadata?.['email'],
-      curr: params.provider_metadata?.['currency'],
-      label: params.provider_metadata?.['label'] ?? 'Untitled Checkout',
+      price,
+      email,
+      curr: currency,
+      label: label ?? 'Untitled Checkout',
+      ...restMetadata,
     };
 
     const checkout = await this._client.post<Record<string, unknown>>('create', { body: JSON.stringify(data) });

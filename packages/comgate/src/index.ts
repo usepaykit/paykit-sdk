@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { ComgateProvider, ComgateConfig } from './comgate-provider';
 
 export const createComgate = (config: ComgateConfig) => {
@@ -6,7 +6,11 @@ export const createComgate = (config: ComgateConfig) => {
 };
 
 export const comgate = () => {
-  const envVars = validateEnvVars(['COMGATE_MERCHANT', 'COMGATE_SECRET', 'COMGATE_BASE_URL', 'COMGATE_SANDBOX'], process.env);
+  const envVars = validateRequiredKeys(
+    ['COMGATE_MERCHANT', 'COMGATE_SECRET', 'COMGATE_BASE_URL', 'COMGATE_SANDBOX'],
+    process.env,
+    'Missing required environment variables: {keys}',
+  );
 
   const merchant = envVars.COMGATE_MERCHANT;
   const secret = envVars.COMGATE_SECRET;

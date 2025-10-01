@@ -65,7 +65,11 @@ export function buildError(message: string, cause?: unknown): Error {
   return error;
 }
 
-export const validateEnvVars = <K extends string>(requiredKeys: readonly K[], source: Record<string, string | undefined>): Record<K, string> => {
+export const validateRequiredKeys = <K extends string>(
+  requiredKeys: readonly K[],
+  source: Record<string, string | undefined>,
+  errorMessage: string | ((missingKeys: K[]) => string),
+): Record<K, string> => {
   const missingKeys: K[] = [];
   const result: Partial<Record<K, string>> = {};
 
@@ -80,7 +84,8 @@ export const validateEnvVars = <K extends string>(requiredKeys: readonly K[], so
 
   if (missingKeys.length > 0) {
     const missingKeysList = missingKeys.join(', ');
-    throw new Error(`Missing required environment variables: ${missingKeysList}`);
+    const error = typeof errorMessage === 'function' ? errorMessage(missingKeys) : errorMessage.replace('{keys}', missingKeysList);
+    throw new Error(error);
   }
 
   return result as Record<K, string>;

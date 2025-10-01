@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { PolarProvider, PolarConfig } from './polar-provider';
 
 export const createPolar = (config: PolarConfig) => {
@@ -6,7 +6,7 @@ export const createPolar = (config: PolarConfig) => {
 };
 
 export const polar = () => {
-  const envVars = validateEnvVars(['POLAR_ACCESS_TOKEN'], process.env);
+  const envVars = validateRequiredKeys(['POLAR_ACCESS_TOKEN'], process.env, 'Missing required environment variables: {keys}');
 
   const isDev = process.env.NODE_ENV === 'development';
 

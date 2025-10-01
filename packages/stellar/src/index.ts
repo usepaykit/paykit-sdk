@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { StellarOptions, StellarProvider } from './provider';
 
 export const createStellar = (config: StellarOptions) => {
@@ -6,7 +6,11 @@ export const createStellar = (config: StellarOptions) => {
 };
 
 export const stellar = () => {
-  const envVars = validateEnvVars(['PAYKIT_API_KEY', 'PAYKIT_WEBHOOK_URL', 'STELLAR_ASSETS'], process.env);
+  const envVars = validateRequiredKeys(
+    ['PAYKIT_API_KEY', 'PAYKIT_WEBHOOK_URL', 'STELLAR_ASSETS'],
+    process.env,
+    'Missing required environment variables: {keys}',
+  );
 
   const apiKey = envVars.PAYKIT_API_KEY;
   const webhookUrl = envVars.PAYKIT_WEBHOOK_URL;

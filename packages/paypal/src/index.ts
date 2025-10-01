@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { PayPalProvider, PayPalConfig } from './paypal-provider';
 
 export const createPaypal = (config: PayPalConfig) => {
@@ -6,7 +6,11 @@ export const createPaypal = (config: PayPalConfig) => {
 };
 
 export const paypal = () => {
-  const envVars = validateEnvVars(['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_AUTH_WEBHOOK_ID'] as const, process.env);
+  const envVars = validateRequiredKeys(
+    ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_AUTH_WEBHOOK_ID'] as const,
+    process.env,
+    'Missing required environment variables: {keys}',
+  );
 
   const isSandbox = process.env.NODE_ENV === 'development';
 

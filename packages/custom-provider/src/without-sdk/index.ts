@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { WithoutProviderSDK, WithoutProviderSDKOptions } from './provider';
 
 export const createWithoutProviderSDK = (config: WithoutProviderSDKOptions) => {
@@ -6,7 +6,7 @@ export const createWithoutProviderSDK = (config: WithoutProviderSDKOptions) => {
 };
 
 export const withoutProviderSDK = () => {
-  const envVars = validateEnvVars(['PROVIDER_API_KEY'], process.env);
+  const envVars = validateRequiredKeys(['PROVIDER_API_KEY'], process.env, 'Missing required environment variables: {keys}');
 
   const apiKey = envVars.PROVIDER_API_KEY;
 

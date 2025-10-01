@@ -7,12 +7,13 @@
   "keywords": [],
   "author": "Emmanuel Odii",
   "license": "GPL-3.0",
-  "dependencies": {
+  "peerDependencies": {
     "@paykit-sdk/core": "^1.1.8"
   },
   "devDependencies": {
     "@types/node": "^24.2.0",
     "tsup": "^8.5.0",
-    "typescript": "^5.9.2"
+    "typescript": "^5.9.2",
+    "@paykit-sdk/core": "workspace:*"
   }
 }

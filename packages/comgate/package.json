@@ -9,7 +9,7 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "dependencies": {
+  "peerDependencies": {
     "@paykit-sdk/core": "^1.1.8"
   },
   "devDependencies": {

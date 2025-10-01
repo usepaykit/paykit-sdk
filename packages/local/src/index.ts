@@ -1,4 +1,4 @@
-import { validateEnvVars } from '@paykit-sdk/core';
+import { validateRequiredKeys } from '@paykit-sdk/core';
 import { LocalProvider, LocalConfig } from './local-provider';
 
 export const createLocal = (config: LocalConfig) => {
@@ -6,7 +6,7 @@ export const createLocal = (config: LocalConfig) => {
 };
 
 export const local = () => {
-  const envVars = validateEnvVars(['PAYKIT_WEBHOOK_URL', 'PAYKIT_PAYMENT_URL'], process.env);
+  const envVars = validateRequiredKeys(['PAYKIT_WEBHOOK_URL', 'PAYKIT_PAYMENT_URL'], process.env, 'Missing required environment variables: {keys}');
 
   return createLocal({ debug: true, webhookUrl: envVars.PAYKIT_WEBHOOK_URL, paymentUrl: envVars.PAYKIT_PAYMENT_URL });
 };

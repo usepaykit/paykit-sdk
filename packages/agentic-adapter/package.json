@@ -1,0 +1,21 @@
+{
+  "name": "@paykit-sdk/agentic-adapter",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "devDependencies": {
+    "@paykit-sdk/core": "workspace:*"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "dependencies": {
+    "@types/lodash": "^4.17.20",
+    "lodash": "^4.17.21",
+    "zod": "^3.23.8"
+  }
+}

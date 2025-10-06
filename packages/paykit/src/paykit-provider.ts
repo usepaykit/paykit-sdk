@@ -6,6 +6,11 @@ import { HandleWebhookParams } from './webhook-provider';
 
 export interface PayKitProvider {
   /**
+   * The name of the provider implementation
+   */
+  readonly providerName: string;
+
+  /**
    * Checkout sessions
    */
   createCheckout(params: CreateCheckoutParams): Promise<Checkout>;

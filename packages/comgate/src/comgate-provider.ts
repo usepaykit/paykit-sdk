@@ -27,6 +27,8 @@ export interface ComgateConfig {
 }
 
 export class ComgateProvider implements PayKitProvider {
+  readonly providerName = 'comgate';
+
   private _client: HTTPClient;
 
   constructor(private readonly opts: ComgateConfig) {

@@ -17,6 +17,8 @@ export interface WithProviderSDKOptions extends PaykitProviderOptions<{ apiKey: 
 export class WithProviderSDK implements PayKitProvider {
   constructor(private readonly opts: WithProviderSDKOptions) {}
 
+  readonly providerName = 'with-sdk';
+
   createCheckout(checkout: CreateCheckoutParams): Promise<Checkout> {
     throw new Error('Method not implemented.');
   }

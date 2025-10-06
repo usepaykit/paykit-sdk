@@ -28,6 +28,8 @@ export class LocalProvider implements PayKitProvider {
     this._client = new HTTPClient({ baseUrl: config.webhookUrl, headers: {} });
   }
 
+  readonly providerName = 'local';
+
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const urlParams = new URLSearchParams({
       resource: 'checkout',

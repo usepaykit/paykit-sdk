@@ -35,6 +35,8 @@ export class WithoutProviderSDK implements PayKitProvider {
     });
   }
 
+  readonly providerName = 'without-sdk';
+
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
 

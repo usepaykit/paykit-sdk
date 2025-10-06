@@ -36,6 +36,8 @@ export class StripeProvider implements PayKitProvider {
     this.stripe = new Stripe(apiKey, rest);
   }
 
+  readonly providerName = 'stripe';
+
   /**
    * Checkout management
    */

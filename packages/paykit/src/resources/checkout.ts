@@ -54,7 +54,7 @@ export const createCheckoutSchema = z.object({
   /**
    * Extra information to be sent to the provider e.g tax, trial days, etc.
    */
-  provider_metadata: metadataSchema.optional(),
+  provider_metadata: z.record(z.string(), z.unknown()).optional(),
 });
 
 export type CreateCheckoutParams = z.infer<typeof createCheckoutSchema>;

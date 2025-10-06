@@ -34,6 +34,8 @@ export class PolarProvider implements PayKitProvider {
     this.polar = new Polar({ accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL, ...rest });
   }
 
+  readonly providerName = 'polar';
+
   /**
    * Checkout management
    */

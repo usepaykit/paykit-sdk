@@ -29,7 +29,9 @@ export class PayPalProvider implements PayKitProvider {
     this._client = new PayPalClient(options);
   }
 
-  async createCheckout(data: CreateCheckoutParams): Promise<Checkout> {
+  readonly providerName = 'paypal';
+
+  createCheckout = async (data: CreateCheckoutParams): Promise<Checkout> => {
     const { success, error } = createCheckoutSchema.safeParse(data);
 
     if (!success) throw new Error(error.message);
@@ -46,7 +48,7 @@ export class PayPalProvider implements PayKitProvider {
     if (!response.ok) throw response.error;
 
     return response.value as Checkout;
-  }
+  };
 
   retrieveCheckout = async (id: string): Promise<Checkout | null> => {
     const { success, error } = retrieveCheckoutSchema.safeParse({ id });

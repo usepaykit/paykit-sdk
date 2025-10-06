@@ -42,6 +42,8 @@ export class StellarProvider implements PayKitProvider {
    * metadata: any additional information about the payment
    */
 
+  readonly providerName = 'stellar';
+
   createCheckout(checkout: CreateCheckoutParams): Promise<Checkout> {
     throw new Error('Method not implemented.');
   }

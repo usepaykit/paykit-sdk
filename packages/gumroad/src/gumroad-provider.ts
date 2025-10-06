@@ -10,7 +10,6 @@ import {
   unwrapAsync,
   HandleWebhookParams,
   WebhookEventPayload,
-  UnknownError,
   PaykitProviderOptions,
   HTTPClient,
 } from '@paykit-sdk/core';
@@ -23,6 +22,8 @@ export class GumroadProvider implements PayKitProvider {
   constructor(private config: GumroadConfig) {
     this._client = new HTTPClient({ baseUrl: 'https://api.gumroad.com/v2', headers: { Authorization: `Bearer ${config.accessToken}` } });
   }
+
+  readonly providerName = 'gumroad';
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const response = await unwrapAsync(this._client.post<{ url: string }>('checkouts', { body: JSON.stringify(params) }));
@@ -40,34 +41,34 @@ export class GumroadProvider implements PayKitProvider {
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   retrieveCustomer = async (id: string): Promise<Customer> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   cancelSubscription = async (id: string): Promise<null> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 
   handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
-    throw new UnknownError('Not implemented', { cause: 'Not Implemented' });
+    throw new Error('Not implemented');
   };
 }

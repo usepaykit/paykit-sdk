@@ -187,6 +187,12 @@ export class StripeProvider implements PayKitProvider {
     return paykitPayment$InboundSchema(payment);
   };
 
+  cancelPayment = async (id: string): Promise<Payment> => {
+    const payment = await this.stripe.paymentIntents.cancel(id);
+
+    return paykitPayment$InboundSchema(payment);
+  };
+
   /**
    * Refund management
    */

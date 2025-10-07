@@ -45,6 +45,7 @@ export interface PayKitProvider {
   retrievePayment(id: string): Promise<Payment | null>;
   deletePayment(id: string): Promise<null>;
   capturePayment(id: string): Promise<Payment>;
+  cancelPayment(id: string): Promise<Payment>;
 
   /**
    * Refund management

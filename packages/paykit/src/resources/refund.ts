@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { metadataSchema } from './metadata';
 
-const refundReasonSchema = z.string().nullable();
+const refundReasonSchema = z.string().nullable().optional();
 
 export const createRefundSchema = z.object({
   /**
@@ -17,7 +17,7 @@ export const createRefundSchema = z.object({
   /**
    * The amount of the refund.
    */
-  amount: z.number(),
+  amount: z.number().min(0),
 
   /**
    * The provider metadata of the refund.

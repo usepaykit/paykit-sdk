@@ -37,6 +37,7 @@ class PayKit {
     update: (id: string, params: UpdatePaymentSchema) => this.provider.updatePayment(id, params),
     capture: (id: string) => this.provider.capturePayment(id),
     delete: (id: string) => this.provider.deletePayment(id),
+    cancel: (id: string) => this.provider.cancelPayment(id),
   };
 
   refunds = {

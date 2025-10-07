@@ -24,7 +24,7 @@ export const paymentSchema = z.object({
   /**
    * The amount of the payment.
    */
-  amount: z.number(),
+  amount: z.number().min(0),
 
   /**
    * The currency of the payment.
@@ -49,7 +49,9 @@ export const paymentSchema = z.object({
 
 export type Payment = z.infer<typeof paymentSchema>;
 
-export const createPaymentSchema = paymentSchema.omit({ id: true }).extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+export const createPaymentSchema = paymentSchema
+  .omit({ id: true, status: true })
+  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
 
 export type CreatePaymentSchema = z.infer<typeof createPaymentSchema>;
 

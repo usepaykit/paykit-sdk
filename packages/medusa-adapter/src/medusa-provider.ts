@@ -150,7 +150,7 @@ export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAda
 
     if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
 
-    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.update(id, { status: 'canceled' }));
+    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.cancel(id));
 
     if (paymentIntentError) throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
 

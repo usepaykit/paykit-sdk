@@ -9,7 +9,7 @@ import {
   retrieveSubscriptionSchema,
   Subscription,
   UpdateCustomerParams,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   updateCustomerSchema,
   updateSubscriptionSchema,
   WebhookEventPayload,
@@ -53,11 +53,11 @@ export class ComgateProvider implements PayKitProvider {
 
     const providerMetadata = validateRequiredKeys(
       ['price', 'email', 'currency', 'label'],
-      params.provider_metadata ?? {},
+      (params.provider_metadata ?? {}) as Record<string, string | undefined>,
       'Missing required provider metadata: {keys}',
     );
 
-    const { price, email, currency, label, ...restMetadata } = providerMetadata;
+    const { price, email, currency, label = 'Untitled Checkout', ...restMetadata } = providerMetadata;
 
     const requestBody = {
       code: 0,
@@ -67,7 +67,7 @@ export class ComgateProvider implements PayKitProvider {
       price,
       email,
       curr: currency,
-      label: label ?? 'Untitled Checkout',
+      label,
       ...restMetadata,
     };
 
@@ -126,7 +126,7 @@ export class ComgateProvider implements PayKitProvider {
     return customer.value as unknown as Customer;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     const { error, data } = updateSubscriptionSchema.safeParse({
       id,
       ...params,
@@ -153,14 +153,16 @@ export class ComgateProvider implements PayKitProvider {
     return subscription.value as unknown as Subscription;
   };
 
-  cancelSubscription = async (id: string): Promise<null> => {
-    // TODO: Add validation, currently working on adding validation schema to the SDK
+  cancelSubscription = async (id: string): Promise<Subscription> => {
+    const { error } = updateSubscriptionSchema.safeParse({ id });
+
+    if (error) throw new Error(error.message);
 
     const subscription = await this._client.delete<Record<string, unknown>>(`/subscriptions/${id}`);
 
     if (!subscription.ok) throw new Error('Failed to cancel subscription');
 
-    return null;
+    return subscription.value as unknown as Subscription;
   };
 
   handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {

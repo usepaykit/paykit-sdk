@@ -87,10 +87,16 @@ export const updateSubscriptionSchema = z.object({
   metadata: metadataSchema.optional(),
 });
 
-export type UpdateSubscriptionParams = z.infer<typeof updateSubscriptionSchema>;
+export type UpdateSubscriptionSchema = z.infer<typeof updateSubscriptionSchema>;
 
 export const retrieveSubscriptionSchema = z.object({
   id: z.string(),
 });
 
 export type RetrieveSubscriptionParams = z.infer<typeof retrieveSubscriptionSchema>;
+
+export const createSubscriptionSchema = subscriptionSchema
+  .omit({ id: true })
+  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+
+export type CreateSubscriptionSchema = z.infer<typeof createSubscriptionSchema>;

@@ -2,6 +2,7 @@ import { WebhookEventType } from '../webhook-provider';
 import { Checkout } from './checkout';
 import { Customer } from './customer';
 import { Invoice } from './invoice';
+import { Payment } from './payment';
 import { Subscription } from './subscription';
 
 export interface WebhookEvent<T extends any> {
@@ -26,25 +27,37 @@ export interface WebhookEvent<T extends any> {
   data: T;
 }
 
+export type CheckoutCreated = WebhookEvent<Checkout>;
+export type CheckoutUpdated = WebhookEvent<Checkout>;
+export type CheckoutDeleted = WebhookEvent<Checkout | null>;
+
 export type CustomerCreated = WebhookEvent<Customer>;
 export type CustomerUpdated = WebhookEvent<Customer | null>;
-export type CustomerDeleted = WebhookEvent<null>;
+export type CustomerDeleted = WebhookEvent<Customer | null>;
 
 export type SubscriptionCreated = WebhookEvent<Subscription>;
-export type SubscriptionUpdated = WebhookEvent<Subscription>;
-export type subscriptionCancelled = WebhookEvent<Subscription>;
+export type SubscriptionUpdated = WebhookEvent<Subscription | null>;
+export type SubscriptionCanceled = WebhookEvent<Subscription | null>;
 
-export type CheckoutCreated = WebhookEvent<Checkout>;
-export type InvoicePaid = WebhookEvent<Invoice>;
+export type PaymentCreated = WebhookEvent<Payment>;
+export type PaymentUpdated = WebhookEvent<Payment | null>;
+export type PaymentCanceled = WebhookEvent<Payment | null>;
+
+export type InvoiceGenerated = WebhookEvent<Invoice>;
 
 export type WebhookEventPayload =
+  | CheckoutCreated
+  | CheckoutUpdated
+  | CheckoutDeleted
   | CustomerCreated
   | CustomerUpdated
   | CustomerDeleted
   | SubscriptionCreated
   | SubscriptionUpdated
-  | subscriptionCancelled
-  | InvoicePaid
-  | CheckoutCreated;
+  | SubscriptionCanceled
+  | PaymentCreated
+  | PaymentUpdated
+  | PaymentCanceled
+  | InvoiceGenerated;
 
-export const toPaykitEvent = <Resource>(event: WebhookEvent<Resource>) => event;
+export const paykitEvent$InboundSchema = <Resource>(event: WebhookEvent<Resource>) => event;

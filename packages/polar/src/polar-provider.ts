@@ -1,5 +1,5 @@
 import {
-  toPaykitEvent,
+  paykitEvent$InboundSchema,
   WebhookEventPayload,
   CreateCustomerParams,
   Customer,
@@ -7,7 +7,7 @@ import {
   Checkout,
   CreateCheckoutParams,
   Subscription,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   HandleWebhookParams,
   headersExtractor,
   PayKitProvider,
@@ -96,7 +96,7 @@ export class PolarProvider implements PayKitProvider {
     return toPaykitSubscription(response);
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     /**
      * Polar handles validation of the subscriptionUpdate object
      * For supported operations, see: https://docs.polar.sh/
@@ -139,7 +139,7 @@ export class PolarProvider implements PayKitProvider {
         if (status !== 'paid') return null;
 
         // Handle consumeble purchase
-        return toPaykitEvent<Invoice>({
+        return paykitEvent$InboundSchema<Invoice>({
           type: '$invoicePaid',
           created: parseInt(timestamp),
           id,
@@ -152,7 +152,7 @@ export class PolarProvider implements PayKitProvider {
 
         // Handle Subscription
         if (['subscription_create', 'subscription_cycle'].includes(billingReason)) {
-          return toPaykitEvent<Invoice>({
+          return paykitEvent$InboundSchema<Invoice>({
             type: '$invoicePaid',
             created: parseInt(timestamp),
             id,
@@ -167,30 +167,45 @@ export class PolarProvider implements PayKitProvider {
        * Customer
        */
       'customer.created': (data: PolarCustomer) => {
-        return toPaykitEvent<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+        return paykitEvent$InboundSchema<Customer>({ type: '$customerCreated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
       },
 
       'customer.updated': (data: PolarCustomer) => {
-        return toPaykitEvent<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
+        return paykitEvent$InboundSchema<Customer>({ type: '$customerUpdated', created: parseInt(timestamp), id, data: toPaykitCustomer(data) });
       },
 
       'customer.deleted': () => {
-        return toPaykitEvent<null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
+        return paykitEvent$InboundSchema<null>({ type: '$customerDeleted', created: parseInt(timestamp), id, data: null });
       },
 
       /**
        * Subscription
        */
       'subscription.updated': (data: PolarSubscription) => {
-        return toPaykitEvent<Subscription>({ type: '$subscriptionUpdated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+        return paykitEvent$InboundSchema<Subscription>({
+          type: '$subscriptionUpdated',
+          created: parseInt(timestamp),
+          id,
+          data: toPaykitSubscription(data),
+        });
       },
 
       'subscription.created': (data: PolarSubscription) => {
-        return toPaykitEvent<Subscription>({ type: '$subscriptionCreated', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+        return paykitEvent$InboundSchema<Subscription>({
+          type: '$subscriptionCreated',
+          created: parseInt(timestamp),
+          id,
+          data: toPaykitSubscription(data),
+        });
       },
 
       'subscription.revoked': (data: PolarSubscription) => {
-        return toPaykitEvent<Subscription>({ type: '$subscriptionCancelled', created: parseInt(timestamp), id, data: toPaykitSubscription(data) });
+        return paykitEvent$InboundSchema<Subscription>({
+          type: '$subscriptionCancelled',
+          created: parseInt(timestamp),
+          id,
+          data: toPaykitSubscription(data),
+        });
       },
     };
 

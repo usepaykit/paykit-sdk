@@ -2,7 +2,7 @@ import {
   PayKitProvider,
   CreateCheckoutParams,
   CreateCustomerParams,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   Subscription,
   HandleWebhookParams,
   UpdateCustomerParams,
@@ -88,7 +88,7 @@ export class LocalProvider implements PayKitProvider {
     return response.data;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     const subscription = { id, ...params };
 
     const urlParams = new URLSearchParams({ resource: 'subscription', type: '$subscriptionUpdated', body: JSON.stringify(subscription) });

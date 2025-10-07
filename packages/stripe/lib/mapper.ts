@@ -1,4 +1,15 @@
-import { BillingMode, Checkout, Customer, Invoice, InvoiceStatus, Subscription, SubscriptionBillingInterval } from '@paykit-sdk/core';
+import {
+  BillingMode,
+  Checkout,
+  Customer,
+  Invoice,
+  InvoiceStatus,
+  PaymentStatus,
+  Refund,
+  Subscription,
+  SubscriptionBillingInterval,
+} from '@paykit-sdk/core';
+import { Payment } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
 
@@ -100,5 +111,52 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     paid_at: new Date(invoice.created * 1000).toISOString(),
     metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
     custom_fields: invoice.custom_fields ?? null,
+  };
+};
+
+/**
+ * Payment
+ */
+const stripeToPaykitStatus = (status: Stripe.PaymentIntent.Status): PaymentStatus => {
+  switch (status) {
+    case 'requires_payment_method':
+    case 'requires_confirmation':
+      return 'pending';
+    case 'processing':
+      return 'processing';
+    case 'requires_action':
+      return 'requires_action';
+    case 'requires_capture':
+      return 'requires_capture';
+    case 'succeeded':
+      return 'succeeded';
+    case 'canceled':
+      return 'canceled';
+    default:
+      return 'failed';
+  }
+};
+
+export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payment => {
+  return {
+    id: intent.id,
+    amount: intent.amount,
+    currency: intent.currency,
+    customer_id: (intent.customer as string) ?? '',
+    status: stripeToPaykitStatus(intent.status),
+    metadata: _.mapValues(intent.metadata ?? {}, value => JSON.parse(value)),
+  };
+};
+
+/**
+ * Refund
+ */
+export const paykitRefund$InboundSchema = (refund: Stripe.Refund): Refund => {
+  return {
+    id: refund.id,
+    amount: refund.amount,
+    currency: refund.currency,
+    reason: refund.reason,
+    metadata: _.mapValues(refund.metadata ?? {}, value => JSON.parse(value)),
   };
 };

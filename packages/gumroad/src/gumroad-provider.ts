@@ -6,7 +6,7 @@ import {
   Customer,
   UpdateCustomerParams,
   Subscription,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   unwrapAsync,
   HandleWebhookParams,
   WebhookEventPayload,
@@ -56,7 +56,7 @@ export class GumroadProvider implements PayKitProvider {
     throw new Error('Not implemented');
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     throw new Error('Not implemented');
   };
 

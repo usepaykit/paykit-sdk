@@ -12,7 +12,7 @@ import {
   retrieveSubscriptionSchema,
   Subscription,
   UpdateCustomerParams,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   updateSubscriptionSchema,
   WebhookEventPayload,
 } from '@paykit-sdk/core';
@@ -115,7 +115,7 @@ export class PayPalProvider implements PayKitProvider {
     return null;
   };
 
-  updateSubscription = async (id: string, data: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, data: UpdateSubscriptionSchema): Promise<Subscription> => {
     const { success, error } = updateSubscriptionSchema.safeParse({ id, ...data });
 
     if (!success) throw new Error(error.message);

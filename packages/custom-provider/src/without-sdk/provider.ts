@@ -9,7 +9,7 @@ import {
   retrieveSubscriptionSchema,
   Subscription,
   UpdateCustomerParams,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   updateCustomerSchema,
   updateSubscriptionSchema,
   WebhookEventPayload,
@@ -97,7 +97,7 @@ export class WithoutProviderSDK implements PayKitProvider {
     return customer.value as unknown as Customer;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionParams): Promise<Subscription> => {
+  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     const { error, data } = updateSubscriptionSchema.safeParse({
       id,
       ...params,

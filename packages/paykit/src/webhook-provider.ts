@@ -4,22 +4,32 @@ import {
   CustomerCreated,
   CustomerDeleted,
   CustomerUpdated,
-  subscriptionCancelled,
+  SubscriptionCanceled,
   SubscriptionCreated,
   SubscriptionUpdated,
-  InvoicePaid,
+  InvoiceGenerated,
   WebhookEventPayload,
+  CheckoutUpdated,
+  CheckoutDeleted,
+  PaymentCreated,
+  PaymentUpdated,
+  PaymentCanceled,
 } from './resources/webhook';
 
 export type WebhookEventHandlers = Partial<{
-  $customerCreated: (event: CustomerCreated) => Promise<void>;
-  $customerUpdated: (event: CustomerUpdated) => Promise<void>;
-  $customerDeleted: (event: CustomerDeleted) => Promise<void>;
-  $subscriptionCreated: (event: SubscriptionCreated) => Promise<void>;
-  $subscriptionUpdated: (event: SubscriptionUpdated) => Promise<void>;
-  $subscriptionCancelled: (event: subscriptionCancelled) => Promise<void>;
-  $checkoutCreated: (event: CheckoutCreated) => Promise<void>;
-  $invoicePaid: (event: InvoicePaid) => Promise<void>;
+  'checkout.created': (event: CheckoutCreated) => Promise<any>;
+  'checkout.updated': (event: CheckoutUpdated) => Promise<any>;
+  'checkout.deleted': (event: CheckoutDeleted) => Promise<any>;
+  'customer.created': (event: CustomerCreated) => Promise<any>;
+  'customer.updated': (event: CustomerUpdated) => Promise<any>;
+  'customer.deleted': (event: CustomerDeleted) => Promise<any>;
+  'subscription.created': (event: SubscriptionCreated) => Promise<any>;
+  'subscription.updated': (event: SubscriptionUpdated) => Promise<any>;
+  'subscription.canceled': (event: SubscriptionCanceled) => Promise<any>;
+  'payment.created': (event: PaymentCreated) => Promise<any>;
+  'payment.updated': (event: PaymentUpdated) => Promise<any>;
+  'payment.canceled': (event: PaymentCanceled) => Promise<any>;
+  'invoice.generated': (event: InvoiceGenerated) => Promise<any>;
 }>;
 
 export type WebhookEventType = keyof WebhookEventHandlers;
@@ -50,7 +60,7 @@ export class Webhook {
 
     if (!this.handlers.has(eventType)) this.handlers.set(eventType, []);
 
-    this.handlers.get(eventType)?.push(handler as (event: WebhookEventPayload) => Promise<void>);
+    this.handlers.get(eventType)?.push(handler as (event: WebhookEventPayload) => Promise<any>);
     return this;
   }
 

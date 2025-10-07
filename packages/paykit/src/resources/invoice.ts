@@ -2,9 +2,9 @@ import { z } from 'zod';
 import { billingModeSchema } from './checkout';
 import { metadataSchema } from './metadata';
 
-const invoiceStatus = z.enum(['paid', 'open']);
+export const invoiceStatusSchema = z.enum(['paid', 'open']);
 
-export type InvoiceStatus = z.infer<typeof invoiceStatus>;
+export type InvoiceStatus = z.infer<typeof invoiceStatusSchema>;
 
 export const invoiceSchema = z.object({
   /**
@@ -40,7 +40,7 @@ export const invoiceSchema = z.object({
   /**
    * Invoice status.
    */
-  status: invoiceStatus,
+  status: invoiceStatusSchema,
 
   /**
    * Date the invoice was paid (ISO 8601 string, null if unpaid).

@@ -7,7 +7,7 @@
   "keywords": [],
   "author": "Emmanuel Odii",
   "license": "GPL-3.0",
-  "dependencies": {
+  "peerDependencies": {
     "@paykit-sdk/core": "^1.1.8"
   },
   "devDependencies": {

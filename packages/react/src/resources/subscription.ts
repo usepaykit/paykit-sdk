@@ -8,9 +8,10 @@ export const useSubscription = () => {
     throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
   }
 
-  const retrieve = useAsyncFn(ctx.provider.retrieveSubscription);
+  const create = useAsyncFn(ctx.provider.createSubscription);
   const update = useAsyncFn(ctx.provider.updateSubscription);
+  const retrieve = useAsyncFn(ctx.provider.retrieveSubscription);
   const cancel = useAsyncFn(ctx.provider.cancelSubscription);
 
-  return { retrieve, update, cancel };
+  return { create, update, retrieve, cancel };
 };

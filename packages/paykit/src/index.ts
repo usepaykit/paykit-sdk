@@ -1,7 +1,9 @@
 import { PayKitProvider } from './paykit-provider';
-import { CreateCheckoutParams } from './resources/checkout';
+import { CreateRefundSchema } from './resources';
+import { CreateCheckoutParams, UpdateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, UpdateCustomerParams } from './resources/customer';
-import { UpdateSubscriptionParams } from './resources/subscription';
+import { CreatePaymentSchema, UpdatePaymentSchema } from './resources/payment';
+import { CreateSubscriptionSchema, UpdateSubscriptionSchema } from './resources/subscription';
 import { Webhook, WebhookSetupConfig } from './webhook-provider';
 
 class PayKit {
@@ -10,17 +12,35 @@ class PayKit {
   checkouts = {
     create: (params: CreateCheckoutParams) => this.provider.createCheckout(params),
     retrieve: (id: string) => this.provider.retrieveCheckout(id),
+    update: (id: string, params: UpdateCheckoutParams) => this.provider.updateCheckout(id, params),
+    delete: (id: string) => this.provider.deleteCheckout(id),
   };
 
   customers = {
     create: (params: CreateCustomerParams) => this.provider.createCustomer(params),
     update: (id: string, params: UpdateCustomerParams) => this.provider.updateCustomer(id, params),
     retrieve: (id: string) => this.provider.retrieveCustomer(id),
+    delete: (id: string) => this.provider.deleteCustomer(id),
   };
 
   subscriptions = {
-    update: (id: string, params: UpdateSubscriptionParams) => this.provider.updateSubscription(id, params),
+    create: (params: CreateSubscriptionSchema) => this.provider.createSubscription(params),
+    update: (id: string, params: UpdateSubscriptionSchema) => this.provider.updateSubscription(id, params),
     cancel: (id: string) => this.provider.cancelSubscription(id),
+    retrieve: (id: string) => this.provider.retrieveSubscription(id),
+    delete: (id: string) => this.provider.deleteSubscription(id),
+  };
+
+  payments = {
+    create: (params: CreatePaymentSchema) => this.provider.createPayment(params),
+    retrieve: (id: string) => this.provider.retrievePayment(id),
+    update: (id: string, params: UpdatePaymentSchema) => this.provider.updatePayment(id, params),
+    capture: (id: string) => this.provider.capturePayment(id),
+    delete: (id: string) => this.provider.deletePayment(id),
+  };
+
+  refunds = {
+    create: (params: CreateRefundSchema) => this.provider.createRefund(params),
   };
 
   webhooks = {

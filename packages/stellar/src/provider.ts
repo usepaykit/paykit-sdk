@@ -8,7 +8,7 @@ import {
   PaykitProviderOptions,
   Subscription,
   UpdateCustomerParams,
-  UpdateSubscriptionParams,
+  UpdateSubscriptionSchema,
   WebhookEventPayload,
 } from '@paykit-sdk/core';
 
@@ -64,7 +64,7 @@ export class StellarProvider implements PayKitProvider {
     throw new Error('Method not implemented.');
   }
 
-  updateSubscription(id: string, params: UpdateSubscriptionParams): Promise<Subscription> {
+  updateSubscription(id: string, params: UpdateSubscriptionSchema): Promise<Subscription> {
     throw new Error('Method not implemented.');
   }
 

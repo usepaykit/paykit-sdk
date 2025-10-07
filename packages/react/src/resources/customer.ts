@@ -11,6 +11,7 @@ export const useCustomer = () => {
   const retrieve = useAsyncFn(ctx.provider.retrieveCustomer);
   const create = useAsyncFn(ctx.provider.createCustomer);
   const update = useAsyncFn(ctx.provider.updateCustomer);
+  const remove = useAsyncFn(ctx.provider.deleteCustomer);
 
-  return { retrieve, create, update };
+  return { retrieve, create, update, remove };
 };

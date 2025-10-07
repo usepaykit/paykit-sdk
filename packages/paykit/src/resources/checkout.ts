@@ -59,6 +59,10 @@ export const createCheckoutSchema = z.object({
 
 export type CreateCheckoutParams = z.infer<typeof createCheckoutSchema>;
 
+export const updateCheckoutSchema = createCheckoutSchema.partial();
+
+export type UpdateCheckoutParams = z.infer<typeof updateCheckoutSchema>;
+
 export const retrieveCheckoutSchema = z.object({
   id: z.string(),
 });

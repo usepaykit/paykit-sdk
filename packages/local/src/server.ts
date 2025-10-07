@@ -7,7 +7,6 @@ import {
   PaykitMetadata,
   safeEncode,
   Subscription,
-  ValidationError,
   Webhook,
   WebhookEvent,
   WebhookEventType,
@@ -57,7 +56,7 @@ const customerHandlers = {
   delete: async (id: string) => {
     const customer = await getKeyValue('customer');
 
-    if (!customer) throw new ValidationError('Customer not found', {});
+    if (!customer) throw new Error('Customer not found');
 
     if (customer.id === id) await updateKey('customer', __defaultPaykitConfig().customer);
 
@@ -79,11 +78,11 @@ const checkoutHandlers = {
   createWithMetadata: async (data: Record<string, any>) => {
     const product = await productHandlers.retrieve(data.item_id);
 
-    if (!product) throw new ValidationError('Product not found', {});
+    if (!product) throw new Error('Product not found');
 
     const customer = await customerHandlers.retrieve(data.customer_id);
 
-    if (!customer) throw new ValidationError('Customer not found', {});
+    if (!customer) throw new Error('Customer not found');
 
     const amount = await (async () => {
       if (product?.price) return product?.price;
@@ -114,7 +113,7 @@ const checkoutHandlers = {
 
     const flowId = safeEncode(checkoutData);
 
-    if (!flowId.ok) throw new ValidationError('Failed to create checkout', {});
+    if (!flowId.ok) throw new Error('Failed to create checkout');
 
     const checkout = {
       ...checkoutData,
@@ -143,11 +142,11 @@ const subscriptionHandlers = {
   update: async (id: string, updateFn: (record: Subscription) => Subscription) => {
     const subscriptions = await getKeyValue('subscriptions');
 
-    if (!subscriptions) throw new ValidationError('Subscriptions not found', {});
+    if (!subscriptions) throw new Error('Subscriptions not found');
 
     const index = subscriptions.findIndex(sub => sub.id === id);
 
-    if (index === -1) throw new ValidationError('Subscription not found', {});
+    if (index === -1) throw new Error('Subscription not found');
 
     const updatedSubscriptions = [...subscriptions];
 
@@ -244,15 +243,15 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
 
   const resource = urlParams.get('resource') as WebhookResource;
 
-  if (!resource) throw new ValidationError('Missing resource parameter', {});
+  if (!resource) throw new Error('Missing resource parameter');
 
   const type = urlParams.get('type') as LooseAutoComplete<WebhookEventType>;
 
-  if (!type) throw new ValidationError('Missing type parameter', {});
+  if (!type) throw new Error('Missing type parameter');
 
   const bodyParam = urlParams.get('body');
 
-  if (!bodyParam) throw new ValidationError('Missing body parameter', {});
+  if (!bodyParam) throw new Error('Missing body parameter');
 
   const data = JSON.parse(bodyParam) as Record<string, any>;
 
@@ -270,7 +269,7 @@ export const server$HandleWebhook = async (url: string, webhook: Webhook): Promi
       await Promise.all(handlers.map((handler: (event: any) => Promise<void>) => handler(result)));
     }
   } catch (error) {
-    throw new ValidationError('Failed to call webhook handlers', { cause: error });
+    throw new Error('Failed to call webhook handlers');
   }
 
   return event as WebhookEventPayload;

@@ -1,3 +1,4 @@
+import { checkoutSchema, createCheckoutSchema } from '@paykit-sdk/core';
 import { z } from 'zod';
 import { agenticAddressSchema } from './agentic-address';
 import { agenticBuyerSchema } from './agentic-buyer';
@@ -121,14 +122,14 @@ export const createAgenticCheckoutSessionParamsSchema = z.object({
   buyer: agenticBuyerSchema,
 
   /**
-   * The items of the checkout.
-   */
-  items: z.array(z.object({ id: z.string(), quantity: z.number() })),
-
-  /**
    * The fulfillment address of the checkout.
    */
   fulfillment_address: agenticAddressSchema.optional().nullable(),
+
+  /**
+   * The checkout of the checkout.
+   */
+  checkout: createCheckoutSchema,
 });
 
 export type CreateAgenticCheckoutSessionParams = z.infer<typeof createAgenticCheckoutSessionParamsSchema>;

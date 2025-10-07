@@ -1,4 +1,5 @@
 import { setTimeout } from 'timers/promises';
+import { z } from 'zod';
 import { tryCatchSync } from './try-catch';
 
 export type Result<T, E = unknown> = { ok: true; value: T; error?: never } | { ok: false; value?: never; error: E };
@@ -89,4 +90,9 @@ export const validateRequiredKeys = <K extends string>(
   }
 
   return result as Record<K, string>;
+};
+
+export const parseJSON = <T>(str: string, schema: z.ZodSchema<T>): T => {
+  const parsed = JSON.parse(str);
+  return schema.parse(parsed);
 };

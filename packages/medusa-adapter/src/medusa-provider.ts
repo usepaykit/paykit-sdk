@@ -81,7 +81,7 @@ const optionsSchema = z.object({
   debug: z.boolean().optional(),
 });
 
-type PaykitMedusaAdapterOptions = z.infer<typeof optionsSchema>;
+export type PaykitMedusaAdapterOptions = z.infer<typeof optionsSchema>;
 
 export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAdapterOptions> {
   /**

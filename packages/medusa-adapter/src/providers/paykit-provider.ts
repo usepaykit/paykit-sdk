@@ -23,7 +23,7 @@ import {
 import { AbstractPaymentProvider, MedusaError, PaymentActions } from '@medusajs/framework/utils';
 import { CreatePaymentSchema, PayKit, PayKitProvider, PaymentStatus, tryCatchAsync, validateRequiredKeys } from '@paykit-sdk/core';
 import { z } from 'zod';
-import { medusaStatus$InboundSchema } from './utils';
+import { medusaStatus$InboundSchema } from '../utils/mapper';
 
 const optionsSchema = z.object({
   /**

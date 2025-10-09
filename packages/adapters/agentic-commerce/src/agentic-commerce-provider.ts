@@ -11,7 +11,7 @@ import {
 } from './schema/agentic-checkout';
 import { DelegatePaymentParams, DelegatePaymentResponse } from './schema/delegate-payment';
 
-export class AgenticAdapterProvider {
+export class PaykitAgenticCommerceAdapter {
   constructor(private baseProvider: PayKitProvider) {}
 
   createAgenticCheckoutSession = async (params: CreateAgenticCheckoutSessionParams): Promise<AgenticCheckoutSession> => {

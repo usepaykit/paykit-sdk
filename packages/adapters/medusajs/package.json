@@ -1,5 +1,5 @@
 {
-  "name": "@paykit-sdk/medusa-adapter",
+  "name": "@paykit-sdk/medusajs-adapter",
   "version": "1.0.0",
   "description": "MedusaJS Integrations for Paykit",
   "main": "dist/index.js",

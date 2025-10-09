@@ -81,9 +81,9 @@ const optionsSchema = z.object({
   debug: z.boolean().optional(),
 });
 
-export type PaykitMedusaAdapterOptions = z.infer<typeof optionsSchema>;
+export type PaykitMedusaJSAdapterOptions = z.infer<typeof optionsSchema>;
 
-export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAdapterOptions> {
+export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJSAdapterOptions> {
   /**
    * The unique identifier for this payment provider
    * Will be stored as `pp_paykit_{id}` in Medusa
@@ -92,7 +92,7 @@ export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAda
 
   protected readonly paykit: PayKit;
   protected readonly provider: PayKitProvider;
-  protected readonly options: PaykitMedusaAdapterOptions;
+  protected readonly options: PaykitMedusaJSAdapterOptions;
 
   static validateOptions(options: Record<string, any>): void | never {
     const { error } = optionsSchema.safeParse(options);

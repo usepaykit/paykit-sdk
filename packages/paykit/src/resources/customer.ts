@@ -59,6 +59,11 @@ export const updateCustomerSchema = z.object({
    * The metadata of the customer.
    */
   metadata: metadataSchema.optional(),
+
+  /**
+   * The phone number of the customer.
+   */
+  provider_metadata: z.record(z.string(), z.string()).optional(),
 });
 
 export type UpdateCustomerParams = z.infer<typeof updateCustomerSchema>;

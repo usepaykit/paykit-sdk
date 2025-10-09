@@ -6,14 +6,23 @@ import {
   PaykitMetadata,
   SubscriptionStatus,
   BillingMode,
+  Payment,
+  PaymentStatus,
+  Refund as PaykitRefund,
 } from '@paykit-sdk/core';
 import { Checkout } from '@polar-sh/sdk/models/components/checkout';
+import { CheckoutStatus } from '@polar-sh/sdk/models/components/checkoutstatus.js';
 import { Customer } from '@polar-sh/sdk/models/components/customer';
 import { Order } from '@polar-sh/sdk/models/components/order';
+import { Refund } from '@polar-sh/sdk/models/components/refund.js';
+import { RefundReason } from '@polar-sh/sdk/models/components/refundreason.js';
 import { Subscription } from '@polar-sh/sdk/models/components/subscription';
 import _ from 'lodash';
 
-export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
+/**
+ * Checkout
+ */
+export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout => {
   return {
     id: checkout.id,
     payment_url: checkout.url,
@@ -26,10 +35,16 @@ export const toPaykitCheckout = (checkout: Checkout): PaykitCheckout => {
   };
 };
 
-export const toPaykitCustomer = (customer: Customer): PaykitCustomer => {
+/**
+ * Customer
+ */
+export const paykitCustomer$InboundSchema = (customer: Customer): PaykitCustomer => {
   return { id: customer.id, email: customer.email, name: customer.name ?? undefined };
 };
 
+/**
+ * Subscription
+ */
 const toPaykitSubscriptionStatus = (status: Subscription['status']): SubscriptionStatus => {
   if (status === 'active') return 'active';
   if (status === 'past_due' || status === 'incomplete') return 'past_due';
@@ -38,7 +53,10 @@ const toPaykitSubscriptionStatus = (status: Subscription['status']): Subscriptio
   throw new Error(`Unhandled status: ${status}`);
 };
 
-export const toPaykitSubscription = (subscription: Subscription): PaykitSubscription => {
+/**
+ * Subscription
+ */
+export const paykitSubscription$InboundSchema = (subscription: Subscription): PaykitSubscription => {
   return {
     id: subscription.id,
     customer_id: subscription.customerId,
@@ -51,17 +69,16 @@ export const toPaykitSubscription = (subscription: Subscription): PaykitSubscrip
     billing_interval: subscription.recurringInterval,
     currency: subscription.currency,
     amount: subscription.amount,
-
-    /**
-     * todo: fix
-     */
-    billing_interval_count: 1,
-    current_cycle: 0,
-    total_cycles: 0,
   };
 };
 
-export const toPaykitInvoice = (invoice: Order & { billingMode: BillingMode }): PaykitInvoice => {
+/**
+ * Invoice
+ */
+
+type InvoicePayload = Order & { billingMode: BillingMode };
+
+export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): PaykitInvoice => {
   const status = (() => {
     if (invoice.status == 'paid') return 'paid';
     return 'open';
@@ -79,5 +96,58 @@ export const toPaykitInvoice = (invoice: Order & { billingMode: BillingMode }): 
     subscription_id: invoice.subscription?.id ?? null,
     paid_at: new Date(invoice.createdAt).toISOString(),
     line_items: [],
+  };
+};
+
+/**
+ * Payment
+ */
+export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
+  const statusMap: Record<CheckoutStatus, PaymentStatus> = {
+    open: 'pending',
+    expired: 'canceled',
+    confirmed: 'requires_capture',
+    succeeded: 'succeeded',
+    failed: 'failed',
+  } as const;
+
+  return {
+    id: checkout.id,
+    amount: checkout.amount,
+    currency: checkout.currency,
+    customer_id: checkout.customerId!,
+    status: statusMap[checkout.status],
+    metadata: (checkout.metadata as PaykitMetadata) ?? {},
+    product_id: checkout.products.length > 0 ? checkout.products[0].id : null,
+  };
+};
+
+/**
+ * Refund
+ */
+export const mapRefundReason = (debug: boolean, reason: string): RefundReason => {
+  const reasonMap: Record<string, RefundReason> = {
+    duplicate: 'duplicate',
+    fraudulent: 'fraudulent',
+    requested_by_customer: 'customer_request',
+    customer_request: 'customer_request',
+  };
+
+  const mapped = reasonMap[reason.toLowerCase()] ?? 'other';
+
+  if (debug && mapped === 'other' && !reason.toLowerCase().includes('other')) {
+    console.warn(`[Polar Provider] Unmapped refund reason: "${reason}" -> defaulting to "other"`);
+  }
+
+  return mapped;
+};
+
+export const paykitRefund$InboundSchema = (refund: Refund): PaykitRefund => {
+  return {
+    id: refund.id,
+    amount: refund.amount,
+    currency: refund.currency,
+    reason: refund.reason,
+    metadata: _.mapValues(refund.metadata ?? {}, value => JSON.stringify(value)) as Record<string, string>,
   };
 };

@@ -12,6 +12,8 @@ export const usePayment = () => {
   const retrieve = useAsyncFn(ctx.provider.retrievePayment);
   const update = useAsyncFn(ctx.provider.updatePayment);
   const remove = useAsyncFn(ctx.provider.deletePayment);
+  const capture = useAsyncFn(ctx.provider.capturePayment);
+  const cancel = useAsyncFn(ctx.provider.cancelPayment);
 
-  return { create, retrieve, update, remove };
+  return { create, retrieve, update, remove, capture, cancel };
 };

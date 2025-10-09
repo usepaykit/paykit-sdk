@@ -46,16 +46,6 @@ export const subscriptionSchema = z.object({
   current_period_end: z.date(),
 
   /**
-   * Current billing cycle number (e.g., 3 for third month of a monthly sub).
-   */
-  current_cycle: z.number(),
-
-  /**
-   * Total completed billing cycles (computed dynamically from provider invoices).
-   */
-  total_cycles: z.number(),
-
-  /**
    * Product being subscribed to.
    */
   item_id: z.string(),
@@ -64,11 +54,6 @@ export const subscriptionSchema = z.object({
    * Billing interval (e.g., day, week, month, year).
    */
   billing_interval: subscriptionBillingIntervalSchema,
-
-  /**
-   * Number of intervals per billing cycle (e.g., 3 for quarterly).
-   */
-  billing_interval_count: z.number(),
 
   /**
    * Metadata of the subscription.

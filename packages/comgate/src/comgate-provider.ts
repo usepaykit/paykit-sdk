@@ -1,12 +1,7 @@
 import {
-  createCheckoutSchema,
-  createCustomerSchema,
   Customer,
   HTTPClient,
   PayKitProvider,
-  retrieveCheckoutSchema,
-  retrieveCustomerSchema,
-  retrieveSubscriptionSchema,
   Subscription,
   UpdateCustomerParams,
   UpdateSubscriptionSchema,
@@ -63,44 +58,8 @@ export class ComgateProvider implements PayKitProvider {
     });
   }
 
-  /**
-   * Create checkout session using Comgate's /create endpoint
-   * Maps to: POST /v2.0/create (https://apidoc.comgate.cz/en/api/rest/#operation/v2-0-create)
-   */
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
-    const { error, data } = createCheckoutSchema.safeParse(params);
-
-    if (error) throw new Error(error.message);
-
-    const providerMetadata = validateRequiredKeys(
-      ['price', 'email', 'currency', 'label'],
-      (params.provider_metadata ?? {}) as Record<string, string | undefined>,
-      'Missing required provider metadata: {keys}',
-    );
-
-    const { price, email, currency, label = 'Untitled Checkout', ...restMetadata } = providerMetadata;
-
-    const requestBody = new URLSearchParams({
-      code: '0',
-      test: this.opts.sandbox ? 'true' : 'false',
-      refId: params.item_id,
-      payerId: params.customer_id,
-      price,
-      email,
-      curr: currency,
-      label,
-      ..._.mapValues(restMetadata, value => JSON.stringify(value)),
-    });
-
-    const response = await this._client.post<Record<string, any>>(`/v2.0/paymentRedirect/merchant/${this.opts.merchant}`, {
-      body: requestBody.toString(),
-    });
-
-    if (isComgateError(response)) {
-      throw new Error(`Failed to create checkout: ${response['value']?.message || 'Unknown error'}`);
-    }
-
-    return response.value as Checkout;
+    throw new Error('Comgate does not support creating checkouts');
   };
 
   updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
@@ -156,7 +115,7 @@ export class ComgateProvider implements PayKitProvider {
       ...(restMetadata as Record<string, string>),
     });
 
-    const response = await this._client.post<Record<string, any>>('/v2.0/create.json', {
+    const response = await this._client.post<Record<string, any>>(`/v2.0/paymentRedirect/merchant/${this.opts.merchant}`, {
       body: requestBody.toString(),
     });
 

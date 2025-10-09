@@ -21,30 +21,67 @@ import {
   WebhookActionResult,
 } from '@medusajs/framework/types';
 import { AbstractPaymentProvider, MedusaError, PaymentActions } from '@medusajs/framework/utils';
-import {
-  CreatePaymentSchema,
-  Logger,
-  PayKit,
-  PayKitProvider,
-  PaykitProviderOptions,
-  PaymentStatus,
-  tryCatchAsync,
-  validateRequiredKeys,
-} from '@paykit-sdk/core';
-import _ from 'lodash';
+import { CreatePaymentSchema, PayKit, PayKitProvider, PaymentStatus, tryCatchAsync, validateRequiredKeys } from '@paykit-sdk/core';
+import { z } from 'zod';
 import { medusaStatus$InboundSchema } from './utils';
 
-export interface PaykitMedusaAdapterOptions extends PaykitProviderOptions {
+const optionsSchema = z.object({
   /**
    * The underlying PayKit provider instance (Stripe, PayPal, etc.)
+   * This is required and must be a valid PayKit provider instance
    */
-  provider: PayKitProvider;
+  provider: z.custom<PayKitProvider>(
+    (provider: PayKitProvider) => {
+      if (!provider || typeof provider !== 'object') return false;
+
+      const isNamed = 'providerName' in provider && typeof provider.providerName === 'string';
+
+      if (!isNamed) return false;
+
+      const requiredMethods = [
+        'createCheckout',
+        'retrieveCheckout',
+        'updateCheckout',
+        'deleteCheckout',
+        'createCustomer',
+        'updateCustomer',
+        'retrieveCustomer',
+        'deleteCustomer',
+        'createSubscription',
+        'updateSubscription',
+        'cancelSubscription',
+        'deleteSubscription',
+        'retrieveSubscription',
+        'createPayment',
+        'updatePayment',
+        'retrievePayment',
+        'deletePayment',
+        'capturePayment',
+        'cancelPayment',
+        'createRefund',
+      ] as const;
+
+      return requiredMethods.every(method => typeof provider[method] === 'function');
+    },
+    {
+      message: 'Invalid PayKit provider: must implement PayKitProvider interface with all required methods and providerName property',
+    },
+  ),
 
   /**
    * The webhook secret for the provider
+   * This is required and must be a valid webhook secret
    */
-  webhookSecret: string;
-}
+  webhookSecret: z.string(),
+
+  /**
+   * Whether to enable debug mode
+   * If enabled, the adapter will log debug information to the console
+   */
+  debug: z.boolean().optional(),
+});
+
+type PaykitMedusaAdapterOptions = z.infer<typeof optionsSchema>;
 
 export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAdapterOptions> {
   /**
@@ -55,27 +92,26 @@ export class PaykitMedusaAdapter extends AbstractPaymentProvider<PaykitMedusaAda
 
   protected readonly paykit: PayKit;
   protected readonly provider: PayKitProvider;
-  protected readonly logger?: Logger;
   protected readonly options: PaykitMedusaAdapterOptions;
 
   static validateOptions(options: Record<string, any>): void | never {
-    if (!options.provider) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, 'PayKit provider instance is required in options.provider');
+    const { error } = optionsSchema.safeParse(options);
+
+    if (error) {
+      throw new MedusaError(MedusaError.Types.INVALID_DATA, error.message);
     }
 
-    if (!options.webhookSecret) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Webhook secret is required in options.webhookSecret');
-    }
+    return;
   }
 
   /**
    * Constructor receives Medusa's container and provider options
    *
-   * @param container - Medusa's dependency injection container
+   * @param cradle - Medusa's dependency injection container
    * @param options - PayKit provider configuration
    */
-  constructor(container: Record<string, unknown>, options: PaykitMedusaAdapterOptions) {
-    super(container, options);
+  constructor(cradle: Record<string, unknown>, options: PaykitMedusaAdapterOptions) {
+    super(cradle, options);
 
     this.options = options;
     this.provider = options.provider;

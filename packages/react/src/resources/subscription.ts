@@ -12,6 +12,7 @@ export const useSubscription = () => {
   const update = useAsyncFn(ctx.provider.updateSubscription);
   const retrieve = useAsyncFn(ctx.provider.retrieveSubscription);
   const cancel = useAsyncFn(ctx.provider.cancelSubscription);
+  const remove = useAsyncFn(ctx.provider.deleteSubscription);
 
-  return { create, update, retrieve, cancel };
+  return { create, update, retrieve, cancel, remove };
 };

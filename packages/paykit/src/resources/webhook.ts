@@ -3,6 +3,7 @@ import { Checkout } from './checkout';
 import { Customer } from './customer';
 import { Invoice } from './invoice';
 import { Payment } from './payment';
+import { Refund } from './refund';
 import { Subscription } from './subscription';
 
 export interface WebhookEvent<T extends any> {
@@ -43,6 +44,8 @@ export type PaymentCreated = WebhookEvent<Payment>;
 export type PaymentUpdated = WebhookEvent<Payment | null>;
 export type PaymentCanceled = WebhookEvent<Payment | null>;
 
+export type RefundCreated = WebhookEvent<Refund>;
+
 export type InvoiceGenerated = WebhookEvent<Invoice>;
 
 export type WebhookEventPayload =
@@ -58,6 +61,7 @@ export type WebhookEventPayload =
   | PaymentCreated
   | PaymentUpdated
   | PaymentCanceled
+  | RefundCreated
   | InvoiceGenerated;
 
 export const paykitEvent$InboundSchema = <Resource>(event: WebhookEvent<Resource>) => event;

@@ -9,6 +9,7 @@ import { HandleWebhookParams } from './webhook-provider';
 export interface PayKitProvider {
   /**
    * The name of the provider implementation
+   * This is a required property for agentic operations on the provider
    */
   readonly providerName: string;
 
@@ -55,5 +56,5 @@ export interface PayKitProvider {
   /**
    * Webhook management
    */
-  handleWebhook(payload: HandleWebhookParams): Promise<WebhookEventPayload>;
+  handleWebhook(payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>>;
 }

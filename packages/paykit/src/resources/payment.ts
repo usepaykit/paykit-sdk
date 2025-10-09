@@ -45,6 +45,11 @@ export const paymentSchema = z.object({
    * The metadata of the payment.
    */
   metadata: metadataSchema,
+
+  /**
+   * Id of product for payment.
+   */
+  product_id: z.string().nullable(),
 });
 
 export type Payment = z.infer<typeof paymentSchema>;

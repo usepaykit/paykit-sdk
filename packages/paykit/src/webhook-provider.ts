@@ -14,6 +14,7 @@ import {
   PaymentCreated,
   PaymentUpdated,
   PaymentCanceled,
+  RefundCreated,
 } from './resources/webhook';
 
 export type WebhookEventHandlers = Partial<{
@@ -29,6 +30,7 @@ export type WebhookEventHandlers = Partial<{
   'payment.created': (event: PaymentCreated) => Promise<any>;
   'payment.updated': (event: PaymentUpdated) => Promise<any>;
   'payment.canceled': (event: PaymentCanceled) => Promise<any>;
+  'refund.created': (event: RefundCreated) => Promise<any>;
   'invoice.generated': (event: InvoiceGenerated) => Promise<any>;
 }>;
 
@@ -68,11 +70,14 @@ export class Webhook {
     if (!this.config) throw new Error('Webhook not configured. Call setup() first.');
 
     const { webhookSecret, provider } = this.config;
-    const event = await provider.handleWebhook({ ...dto, webhookSecret });
-    const handlers = this.handlers.get(event.type);
+    const events = await provider.handleWebhook({ ...dto, webhookSecret });
 
-    if (handlers && handlers.length > 0) {
-      await Promise.all(handlers.map(handler => handler(event)));
+    for (const event of events) {
+      const handlers = this.handlers.get(event.type);
+
+      if (handlers && handlers.length > 0) {
+        await Promise.all(handlers.map(handler => handler(event)));
+      }
     }
   }
 }

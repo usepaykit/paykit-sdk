@@ -62,17 +62,10 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
     currency: subscription.items.data[0].price.currency!,
     item_id: subscription.items.data[0].id,
     billing_interval: subscription.items.data[0].price.recurring?.interval as SubscriptionBillingInterval,
-    billing_interval_count: subscription.items.data[0].price.recurring?.interval_count ?? 1,
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
     metadata: _.mapValues(subscription.metadata ?? {}, value => JSON.stringify(value)),
-
-    /**
-     * todo: fix
-     */
     custom_fields: null,
-    current_cycle: 0,
-    total_cycles: 0,
   };
 };
 
@@ -145,6 +138,7 @@ export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payme
     customer_id: (intent.customer as string) ?? '',
     status: stripeToPaykitStatus(intent.status),
     metadata: _.mapValues(intent.metadata ?? {}, value => JSON.parse(value)),
+    product_id: intent.metadata?.product_id as string | null,
   };
 };
 

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
 import { subscriptionBillingIntervalSchema } from './subscription';
 
@@ -22,9 +23,9 @@ export type BillingMode = z.infer<typeof billingModeSchema>;
 
 export const createCheckoutSchema = z.object({
   /**
-   * The ID of the customer.
+   * The payee of the checkout.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * The metadata of the checkout.
@@ -76,9 +77,9 @@ export const checkoutSchema = z.object({
   id: z.string(),
 
   /**
-   * The ID of the customer.
+   * The payee of the checkout.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * The payment URL of the checkout.

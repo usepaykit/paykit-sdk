@@ -1,0 +1,24 @@
+{
+  "name": "@paykit-sdk/paypal",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Emmanuel Odii",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "peerDependencies": {
+    "@paykit-sdk/core": "1.1.8"
+  },
+  "devDependencies": {
+    "@paykit-sdk/core": "workspace:*"
+  },
+  "dependencies": {
+    "@paypal/paypal-server-sdk": "^1.1.0",
+    "@types/lodash": "^4.17.20",
+    "lodash": "^4.17.21"
+  }
+}

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
 
 /**
@@ -32,9 +33,9 @@ export const paymentSchema = z.object({
   currency: z.string(),
 
   /**
-   * The customer ID of the payment.
+   * The payee of the payment.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * The status of the payment.

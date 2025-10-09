@@ -14,6 +14,13 @@ import {
   updateSubscriptionSchema,
   WebhookEventPayload,
   HandleWebhookParams,
+  CreatePaymentSchema,
+  CreateRefundSchema,
+  CreateSubscriptionSchema,
+  Payment,
+  Refund,
+  UpdateCheckoutParams,
+  UpdatePaymentSchema,
 } from '@paykit-sdk/core';
 import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -36,6 +43,54 @@ export class WithoutProviderSDK implements PayKitProvider {
   }
 
   readonly providerName = 'without-sdk';
+
+  updateCheckout(id: string, params: UpdateCheckoutParams): Promise<Checkout> {
+    throw new Error('Method not implemented.');
+  }
+
+  deleteCheckout(id: string): Promise<null> {
+    throw new Error('Method not implemented.');
+  }
+
+  deleteCustomer(id: string): Promise<null> {
+    throw new Error('Method not implemented.');
+  }
+
+  createSubscription(params: CreateSubscriptionSchema): Promise<Subscription> {
+    throw new Error('Method not implemented.');
+  }
+
+  deleteSubscription(id: string): Promise<null> {
+    throw new Error('Method not implemented.');
+  }
+
+  createPayment(params: CreatePaymentSchema): Promise<Payment> {
+    throw new Error('Method not implemented.');
+  }
+
+  updatePayment(id: string, params: UpdatePaymentSchema): Promise<Payment> {
+    throw new Error('Method not implemented.');
+  }
+
+  retrievePayment(id: string): Promise<Payment | null> {
+    throw new Error('Method not implemented.');
+  }
+
+  deletePayment(id: string): Promise<null> {
+    throw new Error('Method not implemented.');
+  }
+
+  capturePayment(id: string): Promise<Payment> {
+    throw new Error('Method not implemented.');
+  }
+
+  cancelPayment(id: string): Promise<Payment> {
+    throw new Error('Method not implemented.');
+  }
+
+  createRefund(params: CreateRefundSchema): Promise<Refund> {
+    throw new Error('Method not implemented.');
+  }
 
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
@@ -124,17 +179,17 @@ export class WithoutProviderSDK implements PayKitProvider {
     return subscription.value as unknown as Subscription;
   };
 
-  cancelSubscription = async (id: string): Promise<null> => {
+  cancelSubscription = async (id: string): Promise<Subscription> => {
     // TODO: Add validation, currently working on adding validation schema to the SDK
 
     const subscription = await this._client.delete<Record<string, unknown>>(`/subscriptions/${id}`);
 
     if (!subscription.ok) throw new Error('Failed to cancel subscription');
 
-    return null;
+    return subscription.value as unknown as Subscription;
   };
 
-  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
     throw new Error('Method not implemented.');
   };
 }

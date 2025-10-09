@@ -16,7 +16,7 @@ export class AgenticAdapterProvider {
 
   createAgenticCheckoutSession = async (params: CreateAgenticCheckoutSessionParams): Promise<AgenticCheckoutSession> => {
     const checkout = await this.baseProvider.createCheckout({
-      customer_id: agenticBuyerToCustomer(params.buyer).id,
+      customer: agenticBuyerToCustomer(params.buyer).id,
       session_type: params.checkout.session_type,
       item_id: params.checkout.item_id,
       quantity: params.checkout.quantity,

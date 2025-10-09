@@ -97,17 +97,23 @@ export class ComgateProvider implements PayKitProvider {
 
     const providerMetadata = validateRequiredKeys(
       ['email', 'label', 'refId'],
-      (params.provider_metadata ?? {}) as Record<string, string | undefined>,
+      (data.provider_metadata as Record<string, string>) ?? {},
       'Missing required provider metadata: {keys}',
     );
 
     const { email, label = 'Untitled Payment', refId, ...restMetadata } = providerMetadata;
 
+    const { customer } = data;
+
+    if (typeof customer === 'object') {
+      throw new Error('Customer must be a string');
+    }
+
     const requestBody = new URLSearchParams({
       code: '0',
       test: this.opts.sandbox ? 'true' : 'false',
       refId,
-      payerId: params.customer_id,
+      payerId: customer,
       price: String(data.amount),
       email,
       curr: String(data.currency),
@@ -219,7 +225,7 @@ export class ComgateProvider implements PayKitProvider {
     throw new Error('Comgate does not support canceling subscriptions');
   };
 
-  handleWebhook = async (payload: HandleWebhookParams): Promise<WebhookEventPayload> => {
+  handleWebhook = async (payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
     const body = JSON.parse(payload.body) as Record<string, unknown>;
 
     if (!body || typeof body !== 'object') {
@@ -228,7 +234,7 @@ export class ComgateProvider implements PayKitProvider {
 
     const { merchant, secret, transId, status } = validateRequiredKeys(
       ['merchant', 'secret', 'transId', 'status'],
-      body as Record<string, string | undefined>,
+      body as Record<string, string>,
       'Missing required webhook parameters: {keys}',
     );
 
@@ -267,6 +273,6 @@ export class ComgateProvider implements PayKitProvider {
 
     console.log({ status: statusMap[verifiedStatus], body });
 
-    return verifyResponse.value as WebhookEventPayload;
+    return [verifyResponse.value as WebhookEventPayload];
   };
 }

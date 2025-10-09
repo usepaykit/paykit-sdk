@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { billingModeSchema } from './checkout';
+import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
 
 export const invoiceStatusSchema = z.enum(['paid', 'open']);
@@ -13,9 +14,9 @@ export const invoiceSchema = z.object({
   id: z.string(),
 
   /**
-   * Customer ID linked to the invoice.
+   * Payee linked to the invoice.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * Subscription ID, if recurring (null for one-time).

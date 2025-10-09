@@ -22,6 +22,9 @@ import {
   UpdatePaymentSchema,
   CreateRefundSchema,
   Refund,
+  createSubscriptionSchema,
+  createPaymentSchema,
+  updatePaymentSchema,
 } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
@@ -56,7 +59,8 @@ export class StripeProvider implements PayKitProvider {
     const metadata = _.mapValues(params.metadata ?? {}, value => JSON.stringify(value));
 
     const checkout = await this.stripe.checkout.sessions.create({
-      customer: params.customer_id,
+      ...(typeof params.customer === 'string' && { customer: params.customer }),
+      ...(typeof params.customer === 'object' && { customer: params.customer.email }),
       mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
       line_items: [{ price: params.item_id, quantity: params.quantity }],
       ...(params.session_type == 'one_time' && { metadata }),
@@ -118,11 +122,19 @@ export class StripeProvider implements PayKitProvider {
    * Subscription management
    */
   createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
+    const { error, data } = createSubscriptionSchema.safeParse(params);
+
+    if (error) throw new Error(error.message.split('\n').join(' '));
+
+    if (typeof data.customer === 'object') {
+      throw new Error('Customer must be a string');
+    }
+
     const subscription = await this.stripe.subscriptions.create({
-      customer: params.customer_id,
-      items: [{ price: params.item_id }],
-      metadata: _.mapValues(params.metadata ?? {}, value => JSON.stringify(value)),
-      ...params.provider_metadata,
+      customer: data.customer,
+      items: [{ price: data.item_id }],
+      metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)),
+      ...data.provider_metadata,
     });
 
     return paykitSubscription$InboundSchema(subscription);
@@ -156,22 +168,38 @@ export class StripeProvider implements PayKitProvider {
    * Payment management
    */
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
-    const { provider_metadata, ...rest } = params;
+    const { error, data } = createPaymentSchema.safeParse(params);
+
+    if (error) throw new Error(error.message.split('\n').join(' '));
+
+    const { provider_metadata, customer, ...rest } = data;
+
+    if (typeof customer === 'object') {
+      throw new Error('Customer must be a string');
+    }
 
     const metadataCore = _.mapValues(
       { ...(rest.metadata ?? {}), ...(provider_metadata?.metadata ?? {}), product_id: params.product_id ?? null },
       value => JSON.stringify(value),
     );
 
-    const payment = await this.stripe.paymentIntents.create({ ...provider_metadata, ...rest, metadata: metadataCore });
+    const payment = await this.stripe.paymentIntents.create({ ...provider_metadata, ...rest, metadata: metadataCore, customer });
 
     return paykitPayment$InboundSchema(payment);
   };
 
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
-    const { provider_metadata, ...rest } = params;
+    const { error, data } = updatePaymentSchema.safeParse(params);
 
-    const payment = await this.stripe.paymentIntents.update(id, { ...rest, ...provider_metadata });
+    if (error) throw new Error(error.message.split('\n').join(' '));
+
+    const { provider_metadata, customer, ...rest } = data;
+
+    if (typeof customer === 'object') {
+      throw new Error('Customer must be a string');
+    }
+
+    const payment = await this.stripe.paymentIntents.update(id, { ...rest, ...provider_metadata, customer });
 
     return paykitPayment$InboundSchema(payment);
   };
@@ -249,7 +277,7 @@ export class StripeProvider implements PayKitProvider {
           amount_paid: data.amount_total ?? 0,
           currency: data.currency ?? '',
           metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)),
-          customer_id: data.customer?.toString() ?? '',
+          customer: typeof data.customer === 'string' ? data.customer : (data.customer?.id ?? ''),
           billing_mode: billingModeSchema.parse('one_time'),
           subscription_id: null,
           custom_fields: data.custom_fields ?? null,

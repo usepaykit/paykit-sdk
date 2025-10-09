@@ -217,9 +217,13 @@ export class PolarProvider implements PayKitProvider {
 
     const metadataCore = _.mapValues(data.metadata ?? {}, value => JSON.stringify(value));
 
+    if (typeof data.customer === 'string') {
+    }
+
     const checkoutResponse = await this.polar.checkouts.create({
       amount: data.amount,
-      customerId: data.customer_id,
+      ...(typeof data.customer === 'string' && { customerId: data.customer }),
+      ...(typeof data.customer === 'object' && { customerEmail: data.customer.email }),
       metadata: metadataCore,
       products: data.product_id ? [data.product_id] : [],
       ...(data.provider_metadata && { ...data.provider_metadata }),
@@ -343,7 +347,7 @@ export class PolarProvider implements PayKitProvider {
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer_id: data.status,
+            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
             product_id: data.product.id,
@@ -373,7 +377,7 @@ export class PolarProvider implements PayKitProvider {
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer_id: data.status,
+            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
             product_id: data.product.id,

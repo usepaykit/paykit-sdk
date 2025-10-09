@@ -81,11 +81,6 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     throw new Error(`Unknown status: ${invoice.status}`);
   })();
 
-  const subscriptionId = (() => {
-    // todo: fix
-    return null;
-  })();
-
   const customerId = (() => {
     if (typeof invoice.customer === 'string') return invoice.customer;
     if (invoice.customer?.id) return invoice.customer.id;
@@ -99,7 +94,7 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     billing_mode: invoice.billingMode,
     amount_paid: invoice.amount_paid,
     line_items: invoice.lines.data.map(line => ({ id: line.id!, quantity: line.quantity! })),
-    subscription_id: subscriptionId,
+    subscription_id: invoice.parent?.subscription_details?.subscription?.toString() ?? null,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
     metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),

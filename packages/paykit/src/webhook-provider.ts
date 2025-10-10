@@ -1,6 +1,5 @@
 import { PayKitProvider } from './paykit-provider';
 import {
-  CheckoutCreated,
   CustomerCreated,
   CustomerDeleted,
   CustomerUpdated,
@@ -9,8 +8,6 @@ import {
   SubscriptionUpdated,
   InvoiceGenerated,
   WebhookEventPayload,
-  CheckoutUpdated,
-  CheckoutDeleted,
   PaymentCreated,
   PaymentUpdated,
   PaymentCanceled,
@@ -18,9 +15,6 @@ import {
 } from './resources/webhook';
 
 export type WebhookEventHandlers = Partial<{
-  'checkout.created': (event: CheckoutCreated) => Promise<any>;
-  'checkout.updated': (event: CheckoutUpdated) => Promise<any>;
-  'checkout.deleted': (event: CheckoutDeleted) => Promise<any>;
   'customer.created': (event: CustomerCreated) => Promise<any>;
   'customer.updated': (event: CustomerUpdated) => Promise<any>;
   'customer.deleted': (event: CustomerDeleted) => Promise<any>;

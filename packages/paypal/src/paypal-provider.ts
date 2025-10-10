@@ -19,6 +19,11 @@ import {
   CreateRefundSchema,
   Refund,
   validateRequiredKeys,
+  ProviderNotSupportedError,
+  ConstraintViolationError,
+  ResourceNotFoundError,
+  WebhookError,
+  NotImplementedError,
 } from '@paykit-sdk/core';
 import {
   CheckoutPaymentIntent,
@@ -31,15 +36,31 @@ import {
   Refund as PayPalRefund,
   OrderApplicationContextUserAction,
 } from '@paypal/paypal-server-sdk';
-import { PayPalCoreApi } from './api/core-api';
+import { SubscriptionsController } from './controllers/subscription';
+import { PayPalCoreApi } from './paypal-core';
 import { paykitCheckout$InboundSchema, paykitPayment$InboundSchema, paykitRefund$InboundSchema } from './utils/mapper';
 
 const PAYPAL_METADATA_MAX_LENGTH = 127;
 
 export interface PayPalConfig extends PaykitProviderOptions {
+  /**
+   * The client ID for the PayPal API
+   */
   clientId: string;
+
+  /**
+   * The client secret for the PayPal API
+   */
   clientSecret: string;
+  /**
+   * Whether to use the sandbox environment
+   */
   isSandbox?: boolean;
+
+  /**
+   * The webhook ID for the PayPal API
+   */
+  webhookId: string;
 }
 
 export class PayPalProvider implements PayKitProvider {
@@ -47,6 +68,7 @@ export class PayPalProvider implements PayKitProvider {
   private core: PayPalCoreApi;
   private ordersController: OrdersController;
   private paymentsController: PaymentsController;
+  private subscriptionsController: SubscriptionsController;
 
   constructor(config: PayPalConfig) {
     const { clientId, clientSecret, isSandbox = true, debug } = config;
@@ -67,6 +89,7 @@ export class PayPalProvider implements PayKitProvider {
     this.core = new PayPalCoreApi(this.client, config);
     this.ordersController = new OrdersController(this.client);
     this.paymentsController = new PaymentsController(this.client);
+    this.subscriptionsController = new SubscriptionsController(this.client);
   }
 
   readonly providerName = 'paypal';
@@ -79,35 +102,55 @@ export class PayPalProvider implements PayKitProvider {
     const stringifiedMetadata = JSON.stringify(params.metadata);
 
     if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
-      throw new Error(`Metadata is too long, max ${PAYPAL_METADATA_MAX_LENGTH} characters when stringified`);
+      throw new ConstraintViolationError('Metadata exceeds maximum length', {
+        value: stringifiedMetadata.length,
+        limit: PAYPAL_METADATA_MAX_LENGTH,
+        provider: 'PayPal',
+      });
     }
-
     const { currency = 'USD', amount = '0' } = validateRequiredKeys(
       ['currency', 'amount'],
       params.provider_metadata as Record<string, string>,
       'Missing required parameters: {keys}',
     );
 
-    const order = await this.ordersController.createOrder({
-      body: {
-        intent: CheckoutPaymentIntent.Capture,
-        purchaseUnits: [
-          {
-            amount: { currencyCode: currency, value: amount },
-            customId: stringifiedMetadata,
-            items: [
-              {
-                sku: params.item_id,
-                quantity: params.quantity.toString(),
-                name: params.item_id, // todo: fix
-                unitAmount: { currencyCode: currency, value: amount },
-              },
-            ],
-          },
-        ],
-        applicationContext: { userAction: OrderApplicationContextUserAction.PayNow },
-      },
-    });
+    const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
+      intent: CheckoutPaymentIntent.Capture,
+      purchaseUnits: [
+        {
+          amount: { currencyCode: currency, value: amount },
+          customId: stringifiedMetadata,
+          items: [
+            {
+              sku: params.item_id,
+              quantity: params.quantity.toString(),
+              name: params.item_id, // todo: fix
+              unitAmount: { currencyCode: currency, value: amount },
+            },
+          ],
+        },
+      ],
+      applicationContext: { userAction: OrderApplicationContextUserAction.PayNow },
+    };
+
+    if (params.shipping_info) {
+      orderOptionsBody.purchaseUnits[0].shipping = {
+        name: { fullName: params.shipping_info.address.name },
+        address: {
+          addressLine1: params.shipping_info.address.line1,
+          addressLine2: params.shipping_info.address.line2,
+          adminArea1: params.shipping_info.address.city,
+          adminArea2: params.shipping_info.address.state,
+          postalCode: params.shipping_info.address.postal_code,
+          countryCode: params.shipping_info.address.country,
+        },
+        ...(params.shipping_info.address.phone && {
+          phoneNumber: { nationalNumber: params.shipping_info.address.phone, countryCode: params.shipping_info.address.country },
+        }),
+      };
+    }
+
+    const order = await this.ordersController.createOrder({ body: orderOptionsBody });
 
     return paykitCheckout$InboundSchema(order.result);
   };
@@ -119,34 +162,40 @@ export class PayPalProvider implements PayKitProvider {
   };
 
   updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
-    throw new Error('PayPal does not support updating orders. Cancel and create a new order instead.');
+    throw new ProviderNotSupportedError('updateCheckout', 'PayPal', {
+      reason: 'PayPal does not support updating orders. Cancel and create a new order instead.',
+    });
   };
 
   deleteCheckout = async (id: string): Promise<null> => {
-    throw new Error('PayPal orders cannot be deleted. They expire automatically.');
+    throw new ProviderNotSupportedError('deleteCheckout', 'PayPal', {
+      reason: 'PayPal orders cannot be deleted. They expire automatically.',
+    });
   };
 
-  /**
-   * Customer management
-   * PayPal doesn't have standalone customer entities
-   * Customer data is embedded in orders via Payer info
-   */
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    // Store customer email/info in your own database
-    // PayPal Vault API could be used but requires separate implementation
-    throw new Error('PayPal does not support standalone customer management. Use Payer info within orders.');
+    throw new ProviderNotSupportedError('customer management', 'PayPal', {
+      reason: 'PayPal does not have standalone customer entities.',
+      alternative: 'Use Payer information within orders or implement PayPal Vault API',
+    });
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
-    throw new Error('PayPal does not support standalone customer management.');
+    throw new ProviderNotSupportedError('updateCustomer', 'PayPal', {
+      reason: 'PayPal does not support standalone customer management.',
+    });
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
-    throw new Error('PayPal does not support standalone customer management.');
+    throw new ProviderNotSupportedError('deleteCustomer', 'PayPal', {
+      reason: 'PayPal does not support standalone customer management.',
+    });
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
-    throw new Error('PayPal does not support standalone customer management.');
+    throw new ProviderNotSupportedError('retrieveCustomer', 'PayPal', {
+      reason: 'PayPal does not support standalone customer management.',
+    });
   };
 
   /**
@@ -154,23 +203,39 @@ export class PayPalProvider implements PayKitProvider {
    * Would need PayPal Subscriptions API - different from Orders
    */
   createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
-    throw new Error('PayPal subscriptions not implemented. Use PayPal Billing Plans API.');
+    const subscription = await this.subscriptionsController.createSubscription({ body: params });
+    return subscription as unknown as Subscription;
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    throw new Error('PayPal subscriptions not implemented.');
+    const subscription = await this.subscriptionsController.cancelSubscription({ subscriptionId: id, reason: 'Customer requested cancellation' });
+
+    return subscription as unknown as Subscription;
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
-    throw new Error('PayPal subscriptions not implemented.');
+    const stringifiedMetadata = JSON.stringify(params.metadata);
+
+    if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
+      throw new ConstraintViolationError('Metadata exceeds maximum length', {
+        value: stringifiedMetadata.length,
+        limit: PAYPAL_METADATA_MAX_LENGTH,
+        provider: 'PayPal',
+      });
+    }
+    const subscription = await this.subscriptionsController.updateSubscription({ subscriptionId: id, metadata: params.metadata ?? {} });
+
+    return subscription as unknown as Subscription;
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
-    throw new Error('PayPal subscriptions not implemented.');
+    const subscription = await this.subscriptionsController.retrieveSubscription({ subscriptionId: id });
+
+    return subscription as unknown as Subscription;
   };
 
   deleteSubscription = async (id: string): Promise<null> => {
-    throw new Error('PayPal subscriptions not implemented.');
+    throw new NotImplementedError('deleteSubscription', 'PayPal', { futureSupport: false });
   };
 
   /**
@@ -178,27 +243,52 @@ export class PayPalProvider implements PayKitProvider {
    * In PayPal, Order IS the payment
    */
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
-    const order = await this.ordersController.createOrder({
-      body: {
-        intent: CheckoutPaymentIntent.Capture,
-        purchaseUnits: [
-          {
-            amount: {
-              currencyCode: params.currency,
-              value: params.amount.toString(),
-            },
-            customId: params.metadata?.session_id as string,
-          },
-        ],
-      },
-    });
+    const stringifiedMetadata = JSON.stringify(params.metadata);
+
+    if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
+      throw new ConstraintViolationError('Metadata exceeds maximum length', {
+        value: stringifiedMetadata.length,
+        limit: PAYPAL_METADATA_MAX_LENGTH,
+        provider: 'PayPal',
+      });
+    }
+
+    const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
+      intent: CheckoutPaymentIntent.Capture,
+      purchaseUnits: [
+        {
+          amount: { currencyCode: params.currency, value: params.amount.toString() },
+          customId: stringifiedMetadata,
+        },
+      ],
+    };
+
+    if (params.shipping_info) {
+      orderOptionsBody.purchaseUnits[0].shipping = {
+        name: { fullName: params.shipping_info.address.name },
+        address: {
+          addressLine1: params.shipping_info.address.line1,
+          addressLine2: params.shipping_info.address.line2,
+          adminArea1: params.shipping_info.address.city,
+          adminArea2: params.shipping_info.address.state,
+          postalCode: params.shipping_info.address.postal_code,
+          countryCode: params.shipping_info.address.country,
+        },
+        ...(params.shipping_info.address.phone && {
+          phoneNumber: { nationalNumber: params.shipping_info.address.phone, countryCode: params.shipping_info.address.country },
+        }),
+      };
+    }
+
+    const order = await this.ordersController.createOrder({ body: orderOptionsBody });
 
     return paykitPayment$InboundSchema(order.result);
   };
 
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
-    // PayPal doesn't allow updating orders after creation
-    throw new Error('PayPal does not support updating orders.');
+    throw new ProviderNotSupportedError('updatePayment', 'PayPal', {
+      reason: 'PayPal does not support updating orders.',
+    });
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
@@ -208,8 +298,9 @@ export class PayPalProvider implements PayKitProvider {
   };
 
   deletePayment = async (id: string): Promise<null> => {
-    // PayPal orders expire automatically
-    return null;
+    throw new ProviderNotSupportedError('deletePayment', 'PayPal', {
+      reason: 'PayPal orders cannot be deleted. They expire automatically.',
+    });
   };
 
   capturePayment = async (id: string): Promise<Payment> => {
@@ -219,33 +310,29 @@ export class PayPalProvider implements PayKitProvider {
 
   cancelPayment = async (id: string): Promise<Payment> => {
     // PayPal doesn't have explicit cancel, but you can void authorizations
-    throw new Error('PayPal order cancellation not directly supported. Orders expire automatically.');
+    throw new ProviderNotSupportedError('cancelPayment', 'PayPal', {
+      reason: 'PayPal order cancellation not directly supported. Orders expire automatically.',
+    });
   };
 
   /**
    * Refund management
    */
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
-    // Need to get capture IDs from the order first
     const order = await this.ordersController.getOrder({ id: params.payment_id });
 
     const captureIds = order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
 
     if (captureIds.length === 0) {
-      throw new Error('No captures found for this order');
+      throw new ResourceNotFoundError('Capture', params.payment_id, 'PayPal');
     }
 
-    // Refund the first capture (or all if needed)
+    const currencyCode = order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD';
+    const amount = params.amount ? params.amount.toString() : order.result.purchaseUnits?.[0]?.amount?.value || '0';
+
     const refund = await this.paymentsController.refundCapturedPayment({
       captureId: captureIds[0],
-      body: {
-        amount: params.amount
-          ? {
-              currencyCode: order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD',
-              value: params.amount.toString(),
-            }
-          : undefined,
-      },
+      body: { amount: { currencyCode, value: amount } },
     });
 
     return paykitRefund$InboundSchema(refund.result);
@@ -260,7 +347,7 @@ export class PayPalProvider implements PayKitProvider {
     const verified = await this.core.verifyWebhook({ headers, body });
 
     if (!verified.success) {
-      throw new Error('Webhook verification failed');
+      throw new WebhookError('Webhook verification failed', { provider: 'PayPal' });
     }
 
     const event = JSON.parse(body);

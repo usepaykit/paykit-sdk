@@ -21,6 +21,7 @@ import {
   Refund,
   UpdateCheckoutParams,
   UpdatePaymentSchema,
+  ValidationError,
 } from '@paykit-sdk/core';
 import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -95,7 +96,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'createCheckout');
+    }
 
     const checkout = await this._client.post<Record<string, unknown>>('/checkouts', { body: JSON.stringify(data) });
 
@@ -107,7 +110,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     const { error } = retrieveCheckoutSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'retrieveCheckout');
+    }
 
     const checkout = await this._client.get<Record<string, unknown>>(`/checkouts/${id}`);
 
@@ -119,7 +124,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const { error, data } = createCustomerSchema.safeParse(params);
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'createCustomer');
+    }
 
     const customer = await this._client.post<Record<string, unknown>>('/customers', { body: JSON.stringify(data) });
 
@@ -131,7 +138,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   retrieveCustomer = async (id: string): Promise<Customer> => {
     const { error } = retrieveCustomerSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'retrieveCustomer');
+    }
 
     const customer = await this._client.get<Record<string, unknown>>(`/customers/${id}`);
 
@@ -143,7 +152,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const { error, data } = updateCustomerSchema.safeParse({ id, ...params });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'updateCustomer');
+    }
 
     const customer = await this._client.put<Record<string, unknown>>(`/customers/${id}`, { body: JSON.stringify(data) });
 
@@ -158,7 +169,9 @@ export class WithoutProviderSDK implements PayKitProvider {
       ...params,
     });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'updateSubscription');
+    }
 
     const subscription = await this._client.put<Record<string, unknown>>(`/subscriptions/${id}`, { body: JSON.stringify(data) });
 
@@ -170,7 +183,9 @@ export class WithoutProviderSDK implements PayKitProvider {
   retrieveSubscription = async (id: string): Promise<Subscription> => {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message);
+    if (error) {
+      throw ValidationError.fromZodError(error, 'without-sdk', 'retrieveSubscription');
+    }
 
     const subscription = await this._client.get<Record<string, unknown>>(`/subscriptions/${id}`);
 

@@ -1,6 +1,6 @@
 import { HTTPClient } from '@paykit-sdk/core';
 import { Client, OAuthAuthorizationController } from '@paypal/paypal-server-sdk';
-import { PayPalConfig } from '../paypal-provider';
+import { PayPalConfig } from './paypal-provider';
 
 export const MAX_METADATA_LENGTH = 127;
 
@@ -10,12 +10,14 @@ export class PayPalCoreApi {
   private clientId: string;
   private clientSecret: string;
   private baseUrl: string;
+  private webhookId: string;
 
   constructor(client: Client, config: PayPalConfig) {
     this.authController = new OAuthAuthorizationController(client);
     this.clientId = config.clientId;
     this.clientSecret = config.clientSecret;
     this.baseUrl = config.isSandbox ? 'https://api-m.sandbox.paypal.com' : 'https://api-m.paypal.com';
+    this.webhookId = config.webhookId;
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
       headers: {},
@@ -35,6 +37,10 @@ export class PayPalCoreApi {
   };
 
   verifyWebhook = async ({ headers, body }: { headers: Record<string, string | string[]>; body: string }): Promise<{ success: boolean }> => {
+    if (!this.webhookId) {
+      throw new Error('Webhook ID is not set');
+    }
+
     const accessToken = await this.getAccessToken();
 
     const res = await this._client.post<{ verification_status: 'SUCCESS' | 'FAILURE' }>('/v1/notifications/verify-webhook-signature', {
@@ -48,7 +54,7 @@ export class PayPalCoreApi {
         transmission_id: headers['paypal-transmission-id'],
         transmission_sig: headers['paypal-transmission-sig'],
         transmission_time: headers['paypal-transmission-time'],
-        webhook_id: headers['webhook-id'],
+        webhook_id: this.webhookId,
         webhook_event: JSON.parse(body),
       }),
     });

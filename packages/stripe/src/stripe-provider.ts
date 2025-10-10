@@ -25,6 +25,9 @@ import {
   createSubscriptionSchema,
   createPaymentSchema,
   updatePaymentSchema,
+  NotImplementedError,
+  ValidationError,
+  InvalidTypeError,
 } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
@@ -58,7 +61,7 @@ export class StripeProvider implements PayKitProvider {
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const metadata = _.mapValues(params.metadata ?? {}, value => JSON.stringify(value));
 
-    const checkout = await this.stripe.checkout.sessions.create({
+    const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
       ...(typeof params.customer === 'string' && { customer: params.customer }),
       ...(typeof params.customer === 'object' && { customer: params.customer.email }),
       mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
@@ -66,7 +69,26 @@ export class StripeProvider implements PayKitProvider {
       ...(params.session_type == 'one_time' && { metadata }),
       ...(params.session_type == 'recurring' && { subscription_data: { metadata } }),
       ...params.provider_metadata,
-    });
+    };
+
+    if (params.shipping_info) {
+      // todo: get stripe list of allowed countries and validate against that
+      checkoutOptions.shipping_address_collection = {
+        allowed_countries: [params.shipping_info.address.country as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry],
+      };
+
+      checkoutOptions.shipping_options = [
+        {
+          shipping_rate: params.shipping_info.carrier,
+          shipping_rate_data: {
+            display_name: params.shipping_info.carrier ?? '',
+            fixed_amount: { amount: 0, currency: params.shipping_info.currency },
+          },
+        },
+      ];
+    }
+
+    const checkout = await this.stripe.checkout.sessions.create(checkoutOptions);
 
     return paykitCheckout$InboundSchema(checkout);
   };
@@ -84,7 +106,7 @@ export class StripeProvider implements PayKitProvider {
   };
 
   deleteCheckout = async (id: string): Promise<null> => {
-    throw new Error('Not implemented');
+    throw new NotImplementedError('deleteCheckout', 'stripe', { futureSupport: false });
   };
 
   /**
@@ -124,10 +146,15 @@ export class StripeProvider implements PayKitProvider {
   createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
     const { error, data } = createSubscriptionSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'stripe', 'createSubscription');
+    }
 
     if (typeof data.customer === 'object') {
-      throw new Error('Customer must be a string');
+      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+        provider: 'stripe',
+        method: 'createSubscription',
+      });
     }
 
     const subscription = await this.stripe.subscriptions.create({
@@ -175,15 +202,34 @@ export class StripeProvider implements PayKitProvider {
     const { provider_metadata, customer, ...rest } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string');
+      throw new Error('Customer must be a string, email is not supported for this operation');
     }
 
-    const metadataCore = _.mapValues(
-      { ...(rest.metadata ?? {}), ...(provider_metadata?.metadata ?? {}), product_id: params.product_id ?? null },
-      value => JSON.stringify(value),
-    );
+    const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
+      ...provider_metadata,
+      ...rest,
+      metadata: _.mapValues({ ...(rest.metadata ?? {}), ...(provider_metadata?.metadata ?? {}), product_id: params.product_id ?? null }, value =>
+        JSON.stringify(value),
+      ),
+      customer,
+    };
 
-    const payment = await this.stripe.paymentIntents.create({ ...provider_metadata, ...rest, metadata: metadataCore, customer });
+    if (data.shipping_info) {
+      paymentIntentOptions.shipping = {
+        name: data.shipping_info.address.name,
+        phone: data.shipping_info.address.phone,
+        address: {
+          line1: data.shipping_info.address.line1,
+          line2: data.shipping_info.address.line2,
+          city: data.shipping_info.address.city,
+          state: data.shipping_info.address.state,
+          postal_code: data.shipping_info.address.postal_code,
+          country: data.shipping_info.address.country,
+        },
+      };
+    }
+
+    const payment = await this.stripe.paymentIntents.create(paymentIntentOptions);
 
     return paykitPayment$InboundSchema(payment);
   };
@@ -196,7 +242,7 @@ export class StripeProvider implements PayKitProvider {
     const { provider_metadata, customer, ...rest } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string');
+      throw new Error('Customer must be a string, email is not supported for this operation');
     }
 
     const payment = await this.stripe.paymentIntents.update(id, { ...rest, ...provider_metadata, customer });

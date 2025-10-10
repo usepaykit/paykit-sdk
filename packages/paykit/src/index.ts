@@ -57,3 +57,4 @@ export * from './tools';
 export * from './logger';
 export * from './webhook-provider';
 export * from './http-client';
+export * from './error';

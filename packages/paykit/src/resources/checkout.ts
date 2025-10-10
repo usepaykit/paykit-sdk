@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
+import { shippingInfoSchema } from './shipping';
 import { subscriptionBillingIntervalSchema } from './subscription';
 
 export const checkoutSubscriptionSchema = z.object({
@@ -56,6 +57,11 @@ export const createCheckoutSchema = z.object({
    * Extra information to be sent to the provider e.g tax, trial days, etc.
    */
   provider_metadata: z.record(z.string(), z.unknown()).optional(),
+
+  /**
+   * The shipping information of the checkout.
+   */
+  shipping_info: shippingInfoSchema.optional(),
 });
 
 export type CreateCheckoutParams = z.infer<typeof createCheckoutSchema>;

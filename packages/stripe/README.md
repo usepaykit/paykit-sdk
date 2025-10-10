@@ -34,9 +34,6 @@ const checkout = await paykit.checkouts.create({
 // Handle webhooks
 paykit.webhooks
   .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('checkout.created', async event => {
-    console.log('Checkout created:', event.data);
-  })
   .on('customer.created', async event => {
     console.log('Customer created:', event.data);
   });
@@ -67,9 +64,6 @@ export async function POST(request: NextRequest) {
 
   const webhook = paykit.webhooks
     .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-    .on('checkout.created', async event => {
-      console.log('Checkout created:', event.data);
-    })
     .on('customer.created', async event => {
       console.log('Customer created:', event.data);
     });
@@ -108,9 +102,6 @@ app.post('/api/webhooks/stripe', async (req, res) => {
 
  const webhook = paykit.webhooks
   .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('checkout.created', async event => {
-    console.log('Checkout created:', event.data);
-  })
   .on('customer.created', async event => {
     console.log('Customer created:', event.data);
   });
@@ -145,9 +136,6 @@ export default defineEventHandler(async event => {
 
   const webhook = paykit.webhooks
   .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('checkout.created', async event => {
-    console.log('Checkout created:', event.data);
-  })
   .on('customer.created', async event => {
     console.log('Customer created:', event.data);
   });

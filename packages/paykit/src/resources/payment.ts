@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
+import { shippingInfoSchema } from './shipping';
 
 /**
  * @description Payment statuses
@@ -57,7 +58,7 @@ export type Payment = z.infer<typeof paymentSchema>;
 
 export const createPaymentSchema = paymentSchema
   .omit({ id: true, status: true })
-  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), shipping_info: shippingInfoSchema.optional() });
 
 export type CreatePaymentSchema = z.infer<typeof createPaymentSchema>;
 

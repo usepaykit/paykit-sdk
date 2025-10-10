@@ -110,7 +110,7 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
    * @param cradle - Medusa's dependency injection container
    * @param options - PayKit provider configuration
    */
-  constructor(cradle: Record<string, unknown>, options: PaykitMedusaAdapterOptions) {
+  constructor(cradle: Record<string, unknown>, options: PaykitMedusaJSAdapterOptions) {
     super(cradle, options);
 
     this.options = options;

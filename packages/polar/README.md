@@ -31,12 +31,24 @@ const checkout = await paykit.checkouts.create({
 
 // Handle webhooks
 paykit.webhooks
-  .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET })
-  .on('$checkoutCreated', async event => {
+  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+  .on('checkout.created', async event => {
     console.log('Checkout created:', event.data);
   })
-  .on('$invoicePaid', async event => {
-    console.log('Payment received:', event.data);
+  .on('customer.created', async event => {
+    console.log('Customer created:', event.data);
+  });
+  .on('subscription.created', async event => {
+    console.log('Subscription created:', event.data);
+  });
+  .on('payment.created', async event => {
+    console.log('Payment created:', event.data);
+  });
+  .on('refund.created', async event => {
+    console.log('Refund created:', event.data);
+  });
+  .on('invoice.generated', async event => {
+    console.log('Invoice generated:', event.data);
   });
 ```
 
@@ -52,30 +64,24 @@ export async function POST(request: NextRequest) {
   console.log('Polar webhook received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+    .on('checkout.created', async event => {
       console.log('Checkout created:', event.data);
     })
-    .on('$customerCreated', async event => {
+    .on('customer.created', async event => {
       console.log('Customer created:', event.data);
-    })
-    .on('$customerUpdated', async event => {
-      console.log('Customer updated:', event.data);
-    })
-    .on('$customerDeleted', async event => {
-      console.log('Customer deleted:', event.data);
-    })
-    .on('$subscriptionCreated', async event => {
+    });
+    .on('subscription.created', async event => {
       console.log('Subscription created:', event.data);
-    })
-    .on('$subscriptionUpdated', async event => {
-      console.log('Subscription updated:', event.data);
-    })
-    .on('$subscriptionCancelled', async event => {
-      console.log('Subscription cancelled:', event.data);
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
+    });
+    .on('payment.created', async event => {
+      console.log('Payment created:', event.data);
+    });
+    .on('refund.created', async event => {
+      console.log('Refund created:', event.data);
+    });
+    .on('invoice.generated', async event => {
+      console.log('Invoice generated:', event.data);
     });
 
   const headers = Object.fromEntries(request.headers.entries());
@@ -99,15 +105,24 @@ app.post('/api/webhooks/polar', async (req, res) => {
   console.log('Polar webhook received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+    .on('checkout.created', async event => {
       console.log('Checkout created:', event.data);
     })
-    .on('$customerCreated', async event => {
+    .on('customer.created', async event => {
       console.log('Customer created:', event.data);
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
+    });
+    .on('subscription.created', async event => {
+      console.log('Subscription created:', event.data);
+    });
+    .on('payment.created', async event => {
+      console.log('Payment created:', event.data);
+    });
+    .on('refund.created', async event => {
+      console.log('Refund created:', event.data);
+    });
+    .on('invoice.generated', async event => {
+      console.log('Invoice generated:', event.data);
     });
 
   const headers = req.headers;
@@ -115,58 +130,6 @@ app.post('/api/webhooks/polar', async (req, res) => {
   await webhook.handle({ body, headers });
 
   res.json({ success: true });
-});
-```
-
-### Vite.js/Nuxt.js
-
-```typescript
-import { paykit } from '@/lib/paykit';
-
-export default defineEventHandler(async event => {
-  console.log('Polar webhook received');
-
-  const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-    })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
-    });
-
-  const headers = getHeaders(event);
-  const body = await readBody(event);
-  await webhook.handle({ body, headers });
-
-  return { success: true };
-});
-```
-
-## Subscription Updates
-
-Polar requires specific update types:
-
-```typescript
-// Change product
-await paykit.subscriptions.update('sub_123', {
-  metadata: { productId: 'new-product-id' },
-});
-
-// Cancel at period end
-await paykit.subscriptions.update('sub_123', {
-  metadata: { cancelAtPeriodEnd: 'true' },
-});
-
-// Cancel with reason
-await paykit.subscriptions.update('sub_123', {
-  metadata: {
-    cancelAtPeriodEnd: 'true',
-    customerCancellationReason: 'too_expensive',
-  },
 });
 ```
 

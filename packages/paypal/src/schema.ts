@@ -109,7 +109,31 @@ export interface Subscription {
   /**
    * The subscriber of the subscription.
    */
-  subscriber: { email_address: string; name: { given_name: string; surname: string }; payer_id: string };
+  subscriber: {
+    /**
+     * The email address of the subscriber.
+     */
+    email_address: string;
+
+    /**
+     * The name of the subscriber.
+     */
+    name: {
+      /**
+       * The given name of the subscriber.
+       */
+      given_name: string;
+      /**
+       * The surname of the subscriber.
+       */
+      surname: string;
+    };
+
+    /**
+     * The ID of the payer.
+     */
+    payer_id: string;
+  };
 
   /**
    * Whether the plan was overridden.
@@ -153,4 +177,69 @@ interface ResumeSubscriptionSchema {
 
 export const resumeSubscriptionApticSchemaRequest: Schema<ResumeSubscriptionSchema> = object({
   reason: ['reason', string()],
+});
+
+// WEBHOOK
+
+export enum VerifyWebhookStatus {
+  SUCCESS = 'SUCCESS',
+  FAILURE = 'FAILURE',
+}
+
+export interface VerifyWebhookSchema {
+  /**
+   * The status of the verification.
+   */
+  verification_status: VerifyWebhookStatus;
+}
+
+export const verifyWebhookSchema: Schema<VerifyWebhookSchema> = object({
+  verification_status: ['verification_status', stringEnum(VerifyWebhookStatus)],
+});
+
+export interface VerifyWebhookRequestSchema {
+  /**
+   * The algorithm used to sign the webhook.
+   */
+  authAlgo: string;
+
+  /**
+   * The URL of the certificate.
+   */
+  certUrl: string;
+
+  /**
+   * The ID of the transmission.
+   */
+  transmissionId: string;
+
+  /**
+   * The signature of the transmission.
+   */
+  transmissionSig: string;
+
+  /**
+   * The time of the transmission.
+   */
+  transmissionTime: string;
+
+  /**
+   * The ID of the webhook.
+   */
+  webhookId: string;
+
+  /**
+   * The event of the webhook.
+   */
+  webhookEvent: string;
+}
+
+export const verifyWebhookRequestSchema: Schema<VerifyWebhookRequestSchema> = object({
+  authAlgo: ['authAlgo', string()],
+  certUrl: ['certUrl', string()],
+  transmissionId: ['transmissionId', string()],
+  transmissionSig: ['transmissionSig', string()],
+  transmissionTime: ['transmissionTime', string()],
+  webhookId: ['webhookId', string()],
+  webhookEvent: ['webhookEvent', string()],
 });

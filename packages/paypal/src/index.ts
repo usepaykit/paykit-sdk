@@ -3,7 +3,7 @@ import { PayPalConfig, PayPalProvider } from './paypal-provider';
 
 export const paypal = () => {
   const envVars = validateRequiredKeys(
-    ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_IS_SANDBOX', 'PAYPAL_WEBHOOK_ID'],
+    ['PAYPAL_CLIENT_ID', 'PAYPAL_CLIENT_SECRET', 'PAYPAL_IS_SANDBOX'],
     process.env as Record<string, string>,
     'Missing required environment variables: {keys}',
   );
@@ -12,7 +12,6 @@ export const paypal = () => {
     clientId: envVars.PAYPAL_CLIENT_ID,
     clientSecret: envVars.PAYPAL_CLIENT_SECRET,
     isSandbox: envVars.PAYPAL_IS_SANDBOX === 'true',
-    webhookId: envVars.PAYPAL_WEBHOOK_ID,
   });
 };
 

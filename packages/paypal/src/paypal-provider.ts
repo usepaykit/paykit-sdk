@@ -37,7 +37,8 @@ import {
   OrderApplicationContextUserAction,
 } from '@paypal/paypal-server-sdk';
 import { SubscriptionsController } from './controllers/subscription';
-import { PayPalCoreApi } from './paypal-core';
+import { WebhookController } from './controllers/webhook';
+import { VerifyWebhookStatus } from './schema';
 import { paykitCheckout$InboundSchema, paykitPayment$InboundSchema, paykitRefund$InboundSchema } from './utils/mapper';
 
 const PAYPAL_METADATA_MAX_LENGTH = 127;
@@ -55,20 +56,15 @@ export interface PayPalConfig extends PaykitProviderOptions {
   /**
    * Whether to use the sandbox environment
    */
-  isSandbox?: boolean;
-
-  /**
-   * The webhook ID for the PayPal API
-   */
-  webhookId: string;
+  isSandbox: boolean;
 }
 
 export class PayPalProvider implements PayKitProvider {
   private client: Client;
-  private core: PayPalCoreApi;
   private ordersController: OrdersController;
   private paymentsController: PaymentsController;
   private subscriptionsController: SubscriptionsController;
+  private webhookController: WebhookController;
 
   constructor(config: PayPalConfig) {
     const { clientId, clientSecret, isSandbox = true, debug } = config;
@@ -86,10 +82,10 @@ export class PayPalProvider implements PayKitProvider {
       },
     });
 
-    this.core = new PayPalCoreApi(this.client, config);
     this.ordersController = new OrdersController(this.client);
     this.paymentsController = new PaymentsController(this.client);
     this.subscriptionsController = new SubscriptionsController(this.client);
+    this.webhookController = new WebhookController(this.client);
   }
 
   readonly providerName = 'paypal';
@@ -342,11 +338,19 @@ export class PayPalProvider implements PayKitProvider {
    * Webhook management
    */
   handleWebhook = async (params: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
-    const { body, headers, webhookSecret } = params;
+    const { body, headers, webhookSecret: webhookId } = params;
 
-    const verified = await this.core.verifyWebhook({ headers, body });
+    const { result } = await this.webhookController.verifyWebhook({
+      authAlgo: headers['paypal-auth-algo'] as string,
+      certUrl: headers['paypal-cert-url'] as string,
+      transmissionId: headers['paypal-transmission-id'] as string,
+      transmissionSig: headers['paypal-transmission-sig'] as string,
+      transmissionTime: headers['paypal-transmission-time'] as string,
+      webhookId,
+      webhookEvent: JSON.parse(body),
+    });
 
-    if (!verified.success) {
+    if (result.verification_status !== VerifyWebhookStatus.SUCCESS) {
       throw new WebhookError('Webhook verification failed', { provider: 'PayPal' });
     }
 

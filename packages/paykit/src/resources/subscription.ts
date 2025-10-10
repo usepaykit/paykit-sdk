@@ -1,11 +1,12 @@
 import { z } from 'zod';
+import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
 
 export const subscriptionBillingIntervalSchema = z.enum(['day', 'week', 'month', 'year']);
 
 export type SubscriptionBillingInterval = z.infer<typeof subscriptionBillingIntervalSchema>;
 
-export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled', 'expired']);
+export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled', 'expired', 'pending']);
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
 
@@ -16,9 +17,9 @@ export const subscriptionSchema = z.object({
   id: z.string(),
 
   /**
-   * Customer ID linked to the subscription.
+   * The payee linked to the subscription.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * Amount in smallest currency unit (e.g., cents).

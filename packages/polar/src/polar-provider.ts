@@ -32,9 +32,13 @@ import {
   retrieveCustomerSchema,
   retrieveSubscriptionSchema,
   updateSubscriptionSchema,
+  ProviderNotSupportedError,
+  OperationFailedError,
+  ValidationError,
+  ResourceNotFoundError,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
-import { Checkout as PolarCheckout } from '@polar-sh/sdk/models/components/checkout.js';
+import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
 import { Customer as PolarCustomer } from '@polar-sh/sdk/models/components/customer.js';
 import { Order as PolarOrder } from '@polar-sh/sdk/models/components/order.js';
 import { Refund as PolarRefund } from '@polar-sh/sdk/models/components/refund.js';
@@ -76,11 +80,36 @@ export class PolarProvider implements PayKitProvider {
   createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'createCheckout');
+    }
 
     const { metadata, item_id, provider_metadata } = data;
 
-    const response = await this.polar.checkouts.create({ metadata, products: [item_id], ...provider_metadata });
+    const checkoutCreateOptions: CheckoutCreate = {
+      metadata,
+      products: [item_id],
+      ...provider_metadata,
+    };
+
+    if (data.shipping_info) {
+      checkoutCreateOptions.customerBillingAddress = {
+        line1: data.shipping_info.address.line1,
+        line2: data.shipping_info.address.line2,
+        postalCode: data.shipping_info.address.postal_code,
+        city: data.shipping_info.address.city,
+        country: data.shipping_info.address.country,
+        state: data.shipping_info.address.state,
+      };
+
+      checkoutCreateOptions.metadata = {
+        ...metadata,
+        _shipping_phone: data.shipping_info.address.phone ?? '',
+        _shipping_carrier: data.shipping_info.carrier ?? '',
+      };
+    }
+
+    const response = await this.polar.checkouts.create(checkoutCreateOptions);
 
     return paykitCheckout$InboundSchema(response);
   };
@@ -88,7 +117,9 @@ export class PolarProvider implements PayKitProvider {
   updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
     const { error, data } = updateCheckoutSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'updateCheckout');
+    }
 
     const { provider_metadata } = params;
 
@@ -108,7 +139,9 @@ export class PolarProvider implements PayKitProvider {
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     const { error } = retrieveCheckoutSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'retrieveCheckout');
+    }
 
     const response = await this.polar.checkouts.get({ id });
 
@@ -116,7 +149,9 @@ export class PolarProvider implements PayKitProvider {
   };
 
   deleteCheckout = async (id: string): Promise<null> => {
-    throw new Error('Polar does not support deleting checkouts');
+    throw new ProviderNotSupportedError('deleteCheckout', 'Polar', {
+      reason: 'Polar does not support deleting checkouts',
+    });
   };
 
   /**
@@ -137,7 +172,9 @@ export class PolarProvider implements PayKitProvider {
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
     const { error, data } = updateCustomerSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'retrieveCustomer');
+    }
 
     const { email, name, metadata, provider_metadata } = data;
 
@@ -152,7 +189,9 @@ export class PolarProvider implements PayKitProvider {
   retrieveCustomer = async (id: string): Promise<Customer> => {
     const { error } = retrieveCustomerSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'retrieveCustomer');
+    }
 
     const response = await this.polar.customers.get({ id });
 
@@ -169,13 +208,17 @@ export class PolarProvider implements PayKitProvider {
    * Subscription management
    */
   createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
-    throw new Error('Subscriptions can only be created through checkouts');
+    throw new ProviderNotSupportedError('createSubscription', 'Polar', {
+      reason: 'Subscriptions can only be created through checkouts',
+    });
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'retrieveSubscription');
+    }
 
     const subscription = await this.polar.subscriptions.revoke({ id });
 
@@ -185,7 +228,9 @@ export class PolarProvider implements PayKitProvider {
   retrieveSubscription = async (id: string): Promise<Subscription> => {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'retrieveSubscription');
+    }
 
     const response = await this.polar.subscriptions.get({ id });
 
@@ -195,7 +240,9 @@ export class PolarProvider implements PayKitProvider {
   updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
     const { error, data } = updateSubscriptionSchema.safeParse({ id, ...params });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'updateSubscription');
+    }
 
     const response = await this.polar.subscriptions.update({ id, subscriptionUpdate: { ...(data.metadata ?? {}) } });
 
@@ -213,17 +260,39 @@ export class PolarProvider implements PayKitProvider {
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'createPayment');
+    }
 
     const metadataCore = _.mapValues(data.metadata ?? {}, value => JSON.stringify(value));
 
-    const checkoutResponse = await this.polar.checkouts.create({
+    const checkoutCreateOptions: CheckoutCreate = {
       amount: data.amount,
-      customerId: data.customer_id,
-      metadata: metadataCore,
+      ...(typeof data.customer === 'string' && { customerId: data.customer }),
+      ...(typeof data.customer === 'object' && { customerEmail: data.customer.email }),
+      metadata: _.mapValues(metadataCore ?? {}, value => JSON.stringify(value)),
       products: data.product_id ? [data.product_id] : [],
       ...(data.provider_metadata && { ...data.provider_metadata }),
-    });
+    };
+
+    if (data.shipping_info) {
+      checkoutCreateOptions.customerBillingAddress = {
+        line1: data.shipping_info.address.line1,
+        line2: data.shipping_info.address.line2,
+        postalCode: data.shipping_info.address.postal_code,
+        city: data.shipping_info.address.city,
+        country: data.shipping_info.address.country,
+        state: data.shipping_info.address.state,
+      };
+
+      checkoutCreateOptions.metadata = {
+        ...metadataCore,
+        _shipping_phone: data.shipping_info.address.phone ?? '',
+        _shipping_carrier: data.shipping_info.carrier ?? '',
+      };
+    }
+
+    const checkoutResponse = await this.polar.checkouts.create(checkoutCreateOptions);
 
     return paykitPayment$InboundSchema(checkoutResponse);
   };
@@ -231,7 +300,9 @@ export class PolarProvider implements PayKitProvider {
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
     const { error, data } = updatePaymentSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'updatePayment');
+    }
 
     const { provider_metadata, ...rest } = data;
 
@@ -253,11 +324,15 @@ export class PolarProvider implements PayKitProvider {
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    throw new Error('Polar does not support canceling payments');
+    throw new ProviderNotSupportedError('cancelPayment', 'Polar', {
+      reason: 'Polar does not support canceling payments',
+    });
   };
 
   deletePayment = async (id: string): Promise<null> => {
-    throw new Error('Polar does not support deleting payments');
+    throw new ProviderNotSupportedError('deletePayment', 'Polar', {
+      reason: 'Polar does not support deleting payments',
+    });
   };
 
   retrievePayment = async (id: string): Promise<Payment> => {
@@ -269,11 +344,15 @@ export class PolarProvider implements PayKitProvider {
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
     const { error, data } = createRefundSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, 'polar', 'createRefund');
+    }
 
     const order = await this.polar.orders.get({ id: data.payment_id });
 
-    if (!order) throw new Error('Order not found');
+    if (!order) {
+      throw new ResourceNotFoundError('Order', data.payment_id, 'Polar');
+    }
 
     const refund = await this.refunds.create({
       orderId: order.id,
@@ -282,7 +361,9 @@ export class PolarProvider implements PayKitProvider {
       ...(data.provider_metadata && { ...data.provider_metadata }),
     });
 
-    if (!refund) throw new Error('Failed to create refund');
+    if (!refund) {
+      throw new OperationFailedError('Failed to create refund', 'Polar');
+    }
 
     return paykitRefund$InboundSchema(refund);
   };
@@ -312,21 +393,6 @@ export class PolarProvider implements PayKitProvider {
 
     const webhookHandlers: Partial<Record<PolarEventLiteral, (data: any) => Array<WebhookEventPayload> | null>> = {
       /**
-       * Payment
-       */
-      'checkout.created': (data: PolarCheckout) => {
-        const payment = paykitCheckout$InboundSchema(data);
-
-        return [paykitEvent$InboundSchema<Checkout>({ type: 'payment.created', created: parseInt(timestamp), id, data: payment })];
-      },
-
-      'checkout.updated': (data: PolarCheckout) => {
-        const payment = paykitCheckout$InboundSchema(data);
-
-        return [paykitEvent$InboundSchema<Checkout>({ type: 'payment.updated', created: parseInt(timestamp), id, data: payment })];
-      },
-
-      /**
        * Invoice
        */
       'order.paid': (data: PolarOrder) => {
@@ -343,7 +409,7 @@ export class PolarProvider implements PayKitProvider {
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer_id: data.status,
+            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
             product_id: data.product.id,
@@ -373,14 +439,14 @@ export class PolarProvider implements PayKitProvider {
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer_id: data.status,
+            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
             product_id: data.product.id,
           };
 
           return [
-            paykitEvent$InboundSchema<Payment>({ type: 'payment.updated', created: parseInt(timestamp), id, data: payment }),
+            paykitEvent$InboundSchema<Payment>({ type: 'payment.created', created: parseInt(timestamp), id, data: payment }),
             paykitEvent$InboundSchema<Invoice>({ type: 'invoice.generated', created: parseInt(timestamp), id, data: invoice }),
           ];
         }

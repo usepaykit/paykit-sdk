@@ -14,9 +14,9 @@ npm install @paykit-sdk/react
 
 ```tsx
 import { PayKit } from '@paykit-sdk/core';
-import { local } from '@paykit-sdk/local';
+import { paypal } from '@paykit-sdk/paypal';
 
-const provider = local();
+const provider = paypal();
 const paykit = new PayKit(provider);
 
 export { provider, paykit };

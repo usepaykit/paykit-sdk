@@ -28,10 +28,6 @@ export interface WebhookEvent<T extends any> {
   data: T;
 }
 
-export type CheckoutCreated = WebhookEvent<Checkout>;
-export type CheckoutUpdated = WebhookEvent<Checkout>;
-export type CheckoutDeleted = WebhookEvent<Checkout | null>;
-
 export type CustomerCreated = WebhookEvent<Customer>;
 export type CustomerUpdated = WebhookEvent<Customer | null>;
 export type CustomerDeleted = WebhookEvent<Customer | null>;
@@ -49,9 +45,6 @@ export type RefundCreated = WebhookEvent<Refund>;
 export type InvoiceGenerated = WebhookEvent<Invoice>;
 
 export type WebhookEventPayload =
-  | CheckoutCreated
-  | CheckoutUpdated
-  | CheckoutDeleted
   | CustomerCreated
   | CustomerUpdated
   | CustomerDeleted

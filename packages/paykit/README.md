@@ -42,5 +42,5 @@ PayKit works with multiple payment providers:
 
 - [`@paykit-sdk/stripe`](../stripe) - Stripe integration
 - [`@paykit-sdk/polar`](../polar) - Polar integration
-- [`@paykit-sdk/local`](../local) - Local development
+- [`@paykit-sdk/paypal`](../paypal) - PayPal integration
 - [Custom providers](../custom-provider) - Build your own

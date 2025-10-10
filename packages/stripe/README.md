@@ -34,11 +34,20 @@ const checkout = await paykit.checkouts.create({
 // Handle webhooks
 paykit.webhooks
   .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('$checkoutCreated', async event => {
-    console.log('Checkout created:', event.data);
-  })
-  .on('$invoicePaid', async event => {
-    console.log('Payment received:', event.data);
+  .on('customer.created', async event => {
+    console.log('Customer created:', event.data);
+  });
+  .on('subscription.created', async event => {
+    console.log('Subscription created:', event.data);
+  });
+  .on('payment.created', async event => {
+    console.log('Payment created:', event.data);
+  });
+  .on('refund.created', async event => {
+    console.log('Refund created:', event.data);
+  });
+  .on('invoice.generated', async event => {
+    console.log('Invoice generated:', event.data);
   });
 ```
 
@@ -54,34 +63,21 @@ export async function POST(request: NextRequest) {
   console.log('Stripe webhook received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-      // Handle checkout creation
-    })
-    .on('$customerCreated', async event => {
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+    .on('customer.created', async event => {
       console.log('Customer created:', event.data);
-      // Handle customer creation
-    })
-    .on('$customerUpdated', async event => {
-      console.log('Customer updated:', event.data);
-      // Handle customer updates
-    })
-    .on('$subscriptionCreated', async event => {
+    });
+    .on('subscription.created', async event => {
       console.log('Subscription created:', event.data);
-      // Handle subscription creation
-    })
-    .on('$subscriptionUpdated', async event => {
-      console.log('Subscription updated:', event.data);
-      // Handle subscription updates
-    })
-    .on('$subscriptionCancelled', async event => {
-      console.log('Subscription cancelled:', event.data);
-      // Handle subscription cancellation
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
-      // Handle successful payment
+    });
+    .on('payment.created', async event => {
+      console.log('Payment created:', event.data);
+    });
+    .on('refund.created', async event => {
+     console.log('Refund created:', event.data);
+    });
+    .on('invoice.generated', async event => {
+      console.log('Invoice generated:', event.data);
     });
 
   const headers = Object.fromEntries(request.headers.entries());
@@ -104,17 +100,23 @@ app.use(express.raw({ type: 'application/json' }));
 app.post('/api/webhooks/stripe', async (req, res) => {
   console.log('Stripe webhook received');
 
-  const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-    })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
-    });
+ const webhook = paykit.webhooks
+  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+  .on('customer.created', async event => {
+    console.log('Customer created:', event.data);
+  });
+  .on('subscription.created', async event => {
+    console.log('Subscription created:', event.data);
+  });
+  .on('payment.created', async event => {
+    console.log('Payment created:', event.data);
+  });
+  .on('refund.created', async event => {
+    console.log('Refund created:', event.data);
+  });
+  .on('invoice.generated', async event => {
+    console.log('Invoice generated:', event.data);
+  });
 
   const headers = req.headers;
   const body = req.body;
@@ -133,16 +135,22 @@ export default defineEventHandler(async event => {
   console.log('Stripe webhook received');
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-    })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
-    });
+  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+  .on('customer.created', async event => {
+    console.log('Customer created:', event.data);
+  });
+  .on('subscription.created', async event => {
+    console.log('Subscription created:', event.data);
+  });
+  .on('payment.created', async event => {
+    console.log('Payment created:', event.data);
+  });
+  .on('refund.created', async event => {
+    console.log('Refund created:', event.data);
+  });
+  .on('invoice.generated', async event => {
+    console.log('Invoice generated:', event.data);
+  });
 
   const headers = getHeaders(event);
   const body = await readBody(event);

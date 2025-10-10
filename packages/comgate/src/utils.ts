@@ -13,8 +13,9 @@ export const paykitPayment$InboundSchema = (baseParams: Record<string, any>, api
     id: apiResponse.value.transId,
     amount: baseParams.amount,
     currency: baseParams.currency,
-    customer_id: baseParams.customer_id,
+    customer: baseParams.customer_id,
     status: baseParams.status,
     metadata: {},
+    product_id: baseParams.product_id,
   };
 };

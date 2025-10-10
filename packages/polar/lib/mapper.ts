@@ -26,7 +26,7 @@ export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout
   return {
     id: checkout.id,
     payment_url: checkout.url,
-    customer_id: checkout.customerId!,
+    customer: checkout.customerId ? checkout.customerId : { email: checkout.customerEmail ?? '' },
     session_type: checkout.subscriptionId ? 'recurring' : 'one_time',
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
     metadata: (checkout.metadata as PaykitMetadata) ?? null,
@@ -59,7 +59,7 @@ const toPaykitSubscriptionStatus = (status: Subscription['status']): Subscriptio
 export const paykitSubscription$InboundSchema = (subscription: Subscription): PaykitSubscription => {
   return {
     id: subscription.id,
-    customer_id: subscription.customerId,
+    customer: subscription.customerId ? subscription.customerId : { email: subscription.customer.email ?? '' },
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
@@ -89,7 +89,7 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): PaykitInvo
     amount_paid: invoice.totalAmount,
     currency: invoice.currency,
     metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
-    customer_id: invoice.customerId,
+    customer: invoice.customerId ? invoice.customerId : { email: invoice.customer.email ?? '' },
     billing_mode: invoice.billingMode,
     custom_fields: invoice.customFieldData ?? null,
     status,
@@ -115,7 +115,7 @@ export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
     id: checkout.id,
     amount: checkout.amount,
     currency: checkout.currency,
-    customer_id: checkout.customerId!,
+    customer: checkout.customerId ? checkout.customerId : { email: checkout.customerEmail ?? '' },
     status: statusMap[checkout.status],
     metadata: (checkout.metadata as PaykitMetadata) ?? {},
     product_id: checkout.products.length > 0 ? checkout.products[0].id : null,

@@ -15,7 +15,7 @@ import {
   HandleWebhookParams,
   invoiceStatusSchema,
   billingModeSchema,
-  UpdateCheckoutParams,
+  UpdateCheckoutSchema,
   CreateSubscriptionSchema,
   CreatePaymentSchema,
   Payment,
@@ -106,7 +106,7 @@ export class StripeProvider implements PayKitProvider {
     return paykitCheckout$InboundSchema(checkout);
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
+  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
     const checkout = await this.stripe.checkout.sessions.update(id, params);
 
     return paykitCheckout$InboundSchema(checkout);
@@ -227,7 +227,10 @@ export class StripeProvider implements PayKitProvider {
     const { provider_metadata, customer, ...rest } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string, email is not supported for this operation');
+      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+        provider: this.providerName,
+        method: 'createPayment',
+      });
     }
 
     const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
@@ -269,7 +272,10 @@ export class StripeProvider implements PayKitProvider {
     const { provider_metadata, customer, ...rest } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string, email is not supported for this operation');
+      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+        provider: this.providerName,
+        method: 'updatePayment',
+      });
     }
 
     const payment = await this.stripe.paymentIntents.update(id, { ...rest, ...provider_metadata, customer });

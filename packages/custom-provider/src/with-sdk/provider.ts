@@ -15,7 +15,7 @@ import {
   CreateSubscriptionSchema,
   Payment,
   Refund,
-  UpdateCheckoutParams,
+  UpdateCheckoutSchema,
   UpdatePaymentSchema,
 } from '@paykit-sdk/core';
 
@@ -26,7 +26,7 @@ export class WithProviderSDK implements PayKitProvider {
 
   readonly providerName = 'with-sdk';
 
-  updateCheckout(id: string, params: UpdateCheckoutParams): Promise<Checkout> {
+  updateCheckout(id: string, params: UpdateCheckoutSchema): Promise<Checkout> {
     throw new Error('Method not implemented.');
   }
 

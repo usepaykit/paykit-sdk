@@ -22,7 +22,7 @@ import {
   CreateRefundSchema,
   CreateSubscriptionSchema,
   Refund,
-  UpdateCheckoutParams,
+  UpdateCheckoutSchema,
   updateCheckoutSchema,
   createRefundSchema,
   createCheckoutSchema,
@@ -116,7 +116,7 @@ export class PolarProvider implements PayKitProvider {
     return paykitCheckout$InboundSchema(response);
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
+  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
     const { error, data } = updateCheckoutSchema.safeParse(params);
 
     if (error) {

@@ -11,7 +11,7 @@ import {
   WebhookEventPayload,
   PaykitProviderOptions,
   HandleWebhookParams,
-  UpdateCheckoutParams,
+  UpdateCheckoutSchema,
   CreateSubscriptionSchema,
   CreatePaymentSchema,
   Payment,
@@ -157,7 +157,7 @@ export class PayPalProvider implements PayKitProvider {
     return paykitCheckout$InboundSchema(order.result);
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
+  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
     throw new ProviderNotSupportedError('updateCheckout', 'PayPal', {
       reason: 'PayPal does not support updating orders. Cancel and create a new order instead.',
     });

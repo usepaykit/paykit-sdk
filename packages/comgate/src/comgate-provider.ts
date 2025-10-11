@@ -13,7 +13,7 @@ import {
   CreateSubscriptionSchema,
   Payment,
   Refund,
-  UpdateCheckoutParams,
+  UpdateCheckoutSchema,
   UpdatePaymentSchema,
   createRefundSchema,
   createPaymentSchema,
@@ -27,6 +27,7 @@ import {
   CapturePaymentSchema,
   capturePaymentSchema,
   ValidationError,
+  InvalidTypeError,
 } from '@paykit-sdk/core';
 import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -116,7 +117,10 @@ export class ComgateProvider implements PayKitProvider {
     const { customer } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string');
+      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+        provider: this.providerName,
+        method: 'createCheckout',
+      });
     }
 
     const requestBody = new URLSearchParams({
@@ -147,7 +151,7 @@ export class ComgateProvider implements PayKitProvider {
     return null as unknown as Checkout;
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutParams): Promise<Checkout> => {
+  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
     throw new ProviderNotSupportedError('updateCheckout', 'Comgate', {
       reason: 'Comgate does not support updating checkouts',
       alternative: 'Create a new checkout instead',
@@ -216,7 +220,10 @@ export class ComgateProvider implements PayKitProvider {
     const { customer } = data;
 
     if (typeof customer === 'object') {
-      throw new Error('Customer must be a string');
+      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+        provider: this.providerName,
+        method: 'createPayment',
+      });
     }
 
     const requestBody = new URLSearchParams({

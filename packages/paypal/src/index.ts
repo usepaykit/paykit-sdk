@@ -1,5 +1,5 @@
 import { validateRequiredKeys } from '@paykit-sdk/core';
-import { PayPalConfig, PayPalProvider } from './paypal-provider';
+import { PayPalOptions, PayPalProvider } from './paypal-provider';
 
 export const paypal = () => {
   const envVars = validateRequiredKeys(
@@ -15,6 +15,6 @@ export const paypal = () => {
   });
 };
 
-export const createPayPal = (config: PayPalConfig) => {
+export const createPayPal = (config: PayPalOptions) => {
   return new PayPalProvider(config);
 };

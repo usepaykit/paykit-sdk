@@ -47,14 +47,14 @@ import {
   paykitSubscription$InboundSchema,
 } from '../lib/mapper';
 
-export interface StripeConfig extends PaykitProviderOptions<Stripe.StripeConfig> {
+export interface StripeOptions extends PaykitProviderOptions<Stripe.StripeConfig> {
   apiKey: string;
 }
 
 export class StripeProvider implements PayKitProvider {
   private stripe: Stripe;
 
-  constructor(config: StripeConfig) {
+  constructor(config: StripeOptions) {
     const { debug, apiKey, ...rest } = config;
 
     this.stripe = new Stripe(apiKey, rest);

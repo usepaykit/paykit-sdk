@@ -6,7 +6,7 @@ export const createWithProviderSDK = (config: WithProviderSDKOptions) => {
 };
 
 export const withProviderSDK = () => {
-  const envVars = validateRequiredKeys(['PROVIDER_API_KEY'], process.env, 'Missing required environment variables: {keys}');
+  const envVars = validateRequiredKeys(['PROVIDER_API_KEY'], process.env as Record<string, string>, 'Missing required environment variables: {keys}');
 
   const apiKey = envVars.PROVIDER_API_KEY;
 

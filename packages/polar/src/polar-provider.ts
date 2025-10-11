@@ -58,7 +58,7 @@ import {
   paykitSubscription$InboundSchema,
 } from '../lib/mapper';
 
-export interface PolarConfig extends PaykitProviderOptions<SDKOptions> {}
+export interface PolarOptions extends PaykitProviderOptions<SDKOptions> {}
 
 export class PolarProvider implements PayKitProvider {
   private polar: Polar;
@@ -67,7 +67,7 @@ export class PolarProvider implements PayKitProvider {
   private readonly productionURL = ServerList['production'];
   private readonly sandboxURL = ServerList['sandbox'];
 
-  constructor(private config: PolarConfig) {
+  constructor(private config: PolarOptions) {
     const { accessToken, server, ...rest } = config;
 
     this.polar = new Polar({ accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL, ...rest });

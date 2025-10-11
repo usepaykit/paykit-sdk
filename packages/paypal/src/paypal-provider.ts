@@ -43,7 +43,7 @@ import { paykitCheckout$InboundSchema, paykitPayment$InboundSchema, paykitRefund
 
 const PAYPAL_METADATA_MAX_LENGTH = 127;
 
-export interface PayPalConfig extends PaykitProviderOptions {
+export interface PayPalOptions extends PaykitProviderOptions {
   /**
    * The client ID for the PayPal API
    */
@@ -66,7 +66,7 @@ export class PayPalProvider implements PayKitProvider {
   private subscriptionsController: SubscriptionsController;
   private webhookController: WebhookController;
 
-  constructor(config: PayPalConfig) {
+  constructor(config: PayPalOptions) {
     const { clientId, clientSecret, isSandbox = true, debug } = config;
 
     const environment = isSandbox ? Environment.Sandbox : Environment.Production;

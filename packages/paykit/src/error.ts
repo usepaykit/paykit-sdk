@@ -149,19 +149,12 @@ export class ResourceNotFoundError extends PayKitError {
  * Use for webhook verification failures or event handling errors
  */
 export class WebhookError extends PayKitError {
-  constructor(
-    message: string,
-    options?: {
-      provider?: string;
-      eventType?: string;
-      webhookId?: string;
-    },
-  ) {
+  constructor(message: string, options?: { provider?: string }) {
     super(message, {
       code: 'WEBHOOK_ERROR',
       statusCode: 400,
       provider: options?.provider,
-      context: { eventType: options?.eventType, webhookId: options?.webhookId },
+      context: { provider: options?.provider },
     });
   }
 }

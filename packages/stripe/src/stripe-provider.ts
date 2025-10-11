@@ -28,6 +28,13 @@ import {
   NotImplementedError,
   ValidationError,
   InvalidTypeError,
+  updateSubscriptionSchema,
+  retrieveSubscriptionSchema,
+  retrievePaymentSchema,
+  deletePaymentSchema,
+  createRefundSchema,
+  CapturePaymentSchema,
+  capturePaymentSchema,
 } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
@@ -147,12 +154,12 @@ export class StripeProvider implements PayKitProvider {
     const { error, data } = createSubscriptionSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'stripe', 'createSubscription');
+      throw ValidationError.fromZodError(error, this.providerName, 'createSubscription');
     }
 
     if (typeof data.customer === 'object') {
       throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
-        provider: 'stripe',
+        provider: this.providerName,
         method: 'createSubscription',
       });
     }
@@ -174,19 +181,37 @@ export class StripeProvider implements PayKitProvider {
   };
 
   updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
-    const subscription = await this.stripe.subscriptions.update(id, { metadata: _.mapValues(params.metadata ?? {}, value => JSON.stringify(value)) });
+    const { error, data } = updateSubscriptionSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'updateSubscription');
+    }
+
+    const subscription = await this.stripe.subscriptions.update(id, { metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)) });
 
     return paykitSubscription$InboundSchema(subscription);
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
-    const subscription = await this.stripe.subscriptions.retrieve(id);
+    const { error, data } = retrieveSubscriptionSchema.safeParse({ id });
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveSubscription');
+    }
+
+    const subscription = await this.stripe.subscriptions.retrieve(data.id);
 
     return paykitSubscription$InboundSchema(subscription);
   };
 
   deleteSubscription = async (id: string): Promise<null> => {
-    await this.stripe.subscriptions.cancel(id);
+    const { error, data } = retrieveSubscriptionSchema.safeParse({ id });
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'deleteSubscription');
+    }
+
+    await this.stripe.subscriptions.cancel(data.id);
 
     return null;
   };
@@ -237,7 +262,9 @@ export class StripeProvider implements PayKitProvider {
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
     const { error, data } = updatePaymentSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'updatePayment');
+    }
 
     const { provider_metadata, customer, ...rest } = data;
 
@@ -251,19 +278,35 @@ export class StripeProvider implements PayKitProvider {
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
-    const payment = await this.stripe.paymentIntents.retrieve(id);
+    const { error, data } = retrievePaymentSchema.safeParse({ id });
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'retrievePayment');
+    }
+
+    const payment = await this.stripe.paymentIntents.retrieve(data.id);
 
     return paykitPayment$InboundSchema(payment);
   };
 
   deletePayment = async (id: string): Promise<null> => {
-    await this.stripe.paymentIntents.cancel(id);
+    const { error, data } = deletePaymentSchema.safeParse({ id });
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'deletePayment');
+    }
+
+    await this.stripe.paymentIntents.cancel(data.id);
 
     return null;
   };
 
-  capturePayment = async (id: string): Promise<Payment> => {
-    const payment = await this.stripe.paymentIntents.capture(id);
+  capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
+    const { error, data } = capturePaymentSchema.safeParse(params);
+
+    if (error) throw new ValidationError(error.message, { provider: this.providerName, method: 'capturePayment' });
+
+    const payment = await this.stripe.paymentIntents.capture(id, { amount_to_capture: data.amount });
 
     return paykitPayment$InboundSchema(payment);
   };
@@ -278,6 +321,12 @@ export class StripeProvider implements PayKitProvider {
    * Refund management
    */
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
+    const { error, data } = createRefundSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
+    }
+
     const { provider_metadata, ...rest } = params;
 
     const refund = await this.stripe.refunds.create({ ...rest, reason: rest.reason as any, ...provider_metadata });

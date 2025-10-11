@@ -158,11 +158,17 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       console.info('[PayKit] Capturing payment', input);
     }
 
-    const { id } = validateRequiredKeys(['id'], (input?.data ?? {}) as Record<string, string | undefined>, 'Missing required payment ID');
+    const { id, amount } = validateRequiredKeys(
+      ['id', 'amount'],
+      (input?.data ?? {}) as Record<string, string | undefined>,
+      'Missing required payment ID',
+    );
 
     if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
 
-    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.capture(id));
+    if (!amount) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment amount');
+
+    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.capture(id, { amount }));
 
     if (paymentIntentError) throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
 

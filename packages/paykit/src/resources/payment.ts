@@ -65,3 +65,17 @@ export type CreatePaymentSchema = z.infer<typeof createPaymentSchema>;
 export const updatePaymentSchema = paymentSchema.partial().extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
 
 export type UpdatePaymentSchema = z.infer<typeof updatePaymentSchema>;
+
+export const retrievePaymentSchema = paymentSchema.pick({ id: true });
+
+export type RetrievePaymentSchema = z.infer<typeof retrievePaymentSchema>;
+
+export const deletePaymentSchema = paymentSchema.pick({ id: true });
+
+export type DeletePaymentSchema = z.infer<typeof deletePaymentSchema>;
+
+export const capturePaymentSchema = z.object({
+  amount: z.number(),
+});
+
+export type CapturePaymentSchema = z.infer<typeof capturePaymentSchema>;

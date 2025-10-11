@@ -23,6 +23,11 @@ export const createRefundSchema = z.object({
    * The provider metadata of the refund.
    */
   provider_metadata: z.record(z.string(), z.unknown()).optional(),
+
+  /**
+   * The metadata of the refund.
+   */
+  metadata: metadataSchema.optional().nullable(),
 });
 
 export type CreateRefundSchema = z.infer<typeof createRefundSchema>;

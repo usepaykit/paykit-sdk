@@ -1,6 +1,6 @@
 import { Checkout, CreateCheckoutParams, UpdateCheckoutParams } from './resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
-import { CreatePaymentSchema, Payment, UpdatePaymentSchema } from './resources/payment';
+import { CapturePaymentSchema, CreatePaymentSchema, Payment, UpdatePaymentSchema } from './resources/payment';
 import { CreateRefundSchema, Refund } from './resources/refund';
 import { CreateSubscriptionSchema, Subscription, UpdateSubscriptionSchema } from './resources/subscription';
 import { WebhookEventPayload } from './resources/webhook';
@@ -45,7 +45,7 @@ export interface PayKitProvider {
   updatePayment(id: string, params: UpdatePaymentSchema): Promise<Payment>;
   retrievePayment(id: string): Promise<Payment | null>;
   deletePayment(id: string): Promise<null>;
-  capturePayment(id: string): Promise<Payment>;
+  capturePayment(id: string, params: CapturePaymentSchema): Promise<Payment>;
   cancelPayment(id: string): Promise<Payment>;
 
   /**

@@ -36,6 +36,8 @@ import {
   OperationFailedError,
   ValidationError,
   ResourceNotFoundError,
+  CapturePaymentSchema,
+  capturePaymentSchema,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
@@ -319,7 +321,13 @@ export class PolarProvider implements PayKitProvider {
     return paykitPayment$InboundSchema(checkoutResponse);
   };
 
-  capturePayment = async (id: string): Promise<Payment> => {
+  capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
+    const { data: _, error } = capturePaymentSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'capturePayment');
+    }
+
     return this.retrievePayment(id); // payments are auto-captured by polar, just return the current state
   };
 

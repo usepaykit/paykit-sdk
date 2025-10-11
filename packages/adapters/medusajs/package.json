@@ -1,0 +1,41 @@
+{
+  "name": "@paykit-sdk/medusajs-adapter",
+  "version": "1.0.0",
+  "description": "MedusaJS Integrations for Paykit",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "prepublishOnly": "rm -rf dist && npm run build"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "peerDependencies": {
+    "@medusajs/framework": ">=2.10.3",
+    "@paykit-sdk/core": ">=1.1.8"
+  },
+  "devDependencies": {
+    "@medusajs/framework": "^2.10.3",
+    "@paykit-sdk/core": "workspace:*",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "@types/lodash": "^4.17.20",
+    "lodash": "^4.17.21",
+    "zod": "^3.25.76"
+  }
+}

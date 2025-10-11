@@ -1,5 +1,7 @@
 import { z } from 'zod';
+import { payeeSchema } from './customer';
 import { metadataSchema } from './metadata';
+import { shippingInfoSchema } from './shipping';
 
 /**
  * @description Payment statuses
@@ -32,9 +34,9 @@ export const paymentSchema = z.object({
   currency: z.string(),
 
   /**
-   * The customer ID of the payment.
+   * The payee of the payment.
    */
-  customer_id: z.string(),
+  customer: payeeSchema,
 
   /**
    * The status of the payment.
@@ -56,10 +58,24 @@ export type Payment = z.infer<typeof paymentSchema>;
 
 export const createPaymentSchema = paymentSchema
   .omit({ id: true, status: true })
-  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), shipping_info: shippingInfoSchema.optional() });
 
 export type CreatePaymentSchema = z.infer<typeof createPaymentSchema>;
 
 export const updatePaymentSchema = paymentSchema.partial().extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
 
 export type UpdatePaymentSchema = z.infer<typeof updatePaymentSchema>;
+
+export const retrievePaymentSchema = paymentSchema.pick({ id: true });
+
+export type RetrievePaymentSchema = z.infer<typeof retrievePaymentSchema>;
+
+export const deletePaymentSchema = paymentSchema.pick({ id: true });
+
+export type DeletePaymentSchema = z.infer<typeof deletePaymentSchema>;
+
+export const capturePaymentSchema = z.object({
+  amount: z.number(),
+});
+
+export type CapturePaymentSchema = z.infer<typeof capturePaymentSchema>;

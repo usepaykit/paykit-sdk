@@ -25,6 +25,10 @@ export const customerSchema = z.object({
 
 export type Customer = z.infer<typeof customerSchema>;
 
+export const payeeSchema = z.union([z.string(), customerSchema.pick({ email: true })]);
+
+export type Payee = z.infer<typeof payeeSchema>;
+
 export const createCustomerSchema = z.object({
   /**
    * The email of the customer.

@@ -1,6 +1,6 @@
+import { WebhookError } from './error';
 import { PayKitProvider } from './paykit-provider';
 import {
-  CheckoutCreated,
   CustomerCreated,
   CustomerDeleted,
   CustomerUpdated,
@@ -9,8 +9,6 @@ import {
   SubscriptionUpdated,
   InvoiceGenerated,
   WebhookEventPayload,
-  CheckoutUpdated,
-  CheckoutDeleted,
   PaymentCreated,
   PaymentUpdated,
   PaymentCanceled,
@@ -18,9 +16,6 @@ import {
 } from './resources/webhook';
 
 export type WebhookEventHandlers = Partial<{
-  'checkout.created': (event: CheckoutCreated) => Promise<any>;
-  'checkout.updated': (event: CheckoutUpdated) => Promise<any>;
-  'checkout.deleted': (event: CheckoutDeleted) => Promise<any>;
   'customer.created': (event: CustomerCreated) => Promise<any>;
   'customer.updated': (event: CustomerUpdated) => Promise<any>;
   'customer.deleted': (event: CustomerDeleted) => Promise<any>;
@@ -37,12 +32,26 @@ export type WebhookEventHandlers = Partial<{
 export type WebhookEventType = keyof WebhookEventHandlers;
 
 export type WebhookSetupConfig = {
+  /**
+   * The secret key for the webhook.
+   */
   webhookSecret: string;
+
+  /**
+   * The provider for the webhook.
+   */
   provider: PayKitProvider;
 };
 
 export type WebhookHandlerConfig = {
+  /**
+   * The raw body of the webhook.
+   */
   body: string;
+
+  /**
+   * The headers of the webhook.
+   */
   headers: Record<string, string | string[]>;
 };
 
@@ -58,7 +67,9 @@ export class Webhook {
   }
 
   on<T extends WebhookEventType>(eventType: T, handler: NonNullable<WebhookEventHandlers[T]>): Webhook {
-    if (!this.config) throw new Error('Webhook not configured. Call setup() first.');
+    if (!this.config) {
+      throw new WebhookError('Webhook not configured. Call setup() first.');
+    }
 
     if (!this.handlers.has(eventType)) this.handlers.set(eventType, []);
 
@@ -67,7 +78,9 @@ export class Webhook {
   }
 
   async handle(dto: WebhookHandlerConfig): Promise<void> {
-    if (!this.config) throw new Error('Webhook not configured. Call setup() first.');
+    if (!this.config) {
+      throw new WebhookError('Webhook not configured. Call setup() first.');
+    }
 
     const { webhookSecret, provider } = this.config;
     const events = await provider.handleWebhook({ ...dto, webhookSecret });

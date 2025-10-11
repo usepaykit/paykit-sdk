@@ -66,13 +66,13 @@ export function buildError(message: string, cause?: unknown): Error {
   return error;
 }
 
-export const validateRequiredKeys = <K extends string, S extends Record<string, any>>(
+export const validateRequiredKeys = <K extends string>(
   requiredKeys: readonly K[],
-  source: S,
+  source: Record<K, string>,
   errorMessage: string | ((missingKeys: K[]) => string),
-): S => {
+): Record<K, string> => {
   const missingKeys: K[] = [];
-  const result: Partial<S> = {};
+  const result: Partial<Record<K, string>> = {};
 
   for (const key of requiredKeys) {
     const value = source[key];
@@ -89,7 +89,7 @@ export const validateRequiredKeys = <K extends string, S extends Record<string, 
     throw new Error(error);
   }
 
-  return result as S;
+  return result as Record<K, string>;
 };
 
 export const parseJSON = <T>(str: string, schema: z.ZodSchema<T>): T => {

@@ -19,7 +19,7 @@ import Stripe from 'stripe';
 export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session): Checkout => {
   return {
     id: checkout.id,
-    customer_id: typeof checkout.customer === 'string' ? checkout.customer.toString() : (checkout.customer?.id ?? ''),
+    customer: typeof checkout.customer === 'string' ? checkout.customer : (checkout.customer?.id ?? ''),
     session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time',
     payment_url: checkout.url!,
     products: checkout.line_items!.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })),
@@ -57,7 +57,7 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
   return {
     id: subscription.id,
     status,
-    customer_id: subscription.customer?.toString(),
+    customer: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id,
     amount: subscription.items.data[0].price.unit_amount!,
     currency: subscription.items.data[0].price.currency!,
     item_id: subscription.items.data[0].id,
@@ -81,11 +81,6 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     throw new Error(`Unknown status: ${invoice.status}`);
   })();
 
-  const subscriptionId = (() => {
-    // todo: fix
-    return null;
-  })();
-
   const customerId = (() => {
     if (typeof invoice.customer === 'string') return invoice.customer;
     if (invoice.customer?.id) return invoice.customer.id;
@@ -95,11 +90,11 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
   return {
     id: invoice.id!,
     currency: invoice.currency,
-    customer_id: customerId,
+    customer: customerId,
     billing_mode: invoice.billingMode,
     amount_paid: invoice.amount_paid,
     line_items: invoice.lines.data.map(line => ({ id: line.id!, quantity: line.quantity! })),
-    subscription_id: subscriptionId,
+    subscription_id: invoice.parent?.subscription_details?.subscription?.toString() ?? null,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
     metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
@@ -135,7 +130,7 @@ export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payme
     id: intent.id,
     amount: intent.amount,
     currency: intent.currency,
-    customer_id: (intent.customer as string) ?? '',
+    customer: (intent.customer as string) ?? '',
     status: stripeToPaykitStatus(intent.status),
     metadata: _.mapValues(intent.metadata ?? {}, value => JSON.parse(value)),
     product_id: intent.metadata?.product_id as string | null,

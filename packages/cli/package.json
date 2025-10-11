@@ -24,7 +24,6 @@
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",
-    "@paykit-sdk/local": "workspace:*",
     "@paykit-sdk/ui": "workspace:*",
     "@types/inquirer": "^9.0.0",
     "@types/node": "^20.0.0",

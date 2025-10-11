@@ -1,5 +1,5 @@
 {
-  "name": "paypal",
+  "name": "@paykit-sdk/paypal",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -8,10 +8,17 @@
   },
   "keywords": [],
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
+  "packageManager": "pnpm@10.13.1",
+  "peerDependencies": {
+    "@paykit-sdk/core": "1.1.8"
+  },
   "devDependencies": {
-    "tsup": "^8.5.0",
-    "typescript": "^5.9.2",
     "@paykit-sdk/core": "workspace:*"
+  },
+  "dependencies": {
+    "@paypal/paypal-server-sdk": "^1.1.0",
+    "@types/lodash": "^4.17.20",
+    "lodash": "^4.17.21"
   }
 }

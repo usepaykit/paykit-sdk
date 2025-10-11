@@ -39,6 +39,8 @@ import { AuthController } from './controllers/auth';
 import { GoPayPaymentRequest, GoPayPaymentResponse } from './schema';
 import { paykitInvoice$InboundSchema, paykitPayment$InboundSchema, paykitSubscription$InboundSchema } from './utils/mapper';
 
+export const PAYKIT_METADATA_KEY = '__paykit';
+
 export interface GoPayOptions extends PaykitProviderOptions {
   /**
    * The client ID for the GoPay API
@@ -101,6 +103,11 @@ export class GoPayProvider implements PayKitProvider {
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
 
+    if (this.opts.debug) {
+      console.info('Specify `lang` in the provider_metadata of createCheckout to set the language of the checkout, default is `EN`');
+      console.info('Creating checkout with metadata:', data.metadata);
+    }
+
     const goPayRequest: GoPayPaymentRequest = {
       payer: {
         allowed_payment_instruments: ['PAYMENT_CARD', 'BANK_ACCOUNT'],
@@ -119,9 +126,15 @@ export class GoPayProvider implements PayKitProvider {
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
       order_description: data.metadata?.description || 'Checkout',
       items: [{ name: data.item_id, amount: Number(amount), count: data.quantity, type: 'ITEM' }],
-      lang: 'EN',
+      lang: data.provider_metadata?.lang ? (data.provider_metadata.lang as string) : 'EN',
       callback: { return_url: successUrl, notification_url: this.opts.webhookUrl },
-      additional_params: data.metadata ? Object.entries(data.metadata ?? {}).map(([name, value]) => ({ name, value: String(value) })) : undefined,
+      additional_params: Object.entries({
+        ...data.metadata,
+        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id, qty: data.quantity }),
+      }).map(([name, value]) => ({
+        name,
+        value: String(value),
+      })),
     };
 
     const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
@@ -203,8 +216,8 @@ export class GoPayProvider implements PayKitProvider {
       });
     }
 
-    const { successUrl } = validateRequiredKeys(
-      ['successUrl'],
+    const { successUrl, quantity } = validateRequiredKeys(
+      ['successUrl', 'quantity'],
       data.provider_metadata as Record<string, string>,
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
@@ -229,8 +242,12 @@ export class GoPayProvider implements PayKitProvider {
       currency: data.currency ?? 'CZK',
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
       order_description: data.metadata?.description || 'Subscription',
-      items: [{ name: data.item_id, amount: Number(data.amount), count: 1 }],
-      recurrence: { recurrence_cycle: recurrenceCycle, recurrence_period: 1, recurrence_date_to: new Date(data.current_period_end).toISOString() },
+      items: [{ name: data.item_id, amount: Number(data.amount), count: parseInt(quantity) }],
+      recurrence: {
+        recurrence_cycle: recurrenceCycle,
+        recurrence_period: parseInt(quantity),
+        recurrence_date_to: new Date(data.current_period_end).toISOString(),
+      },
       callback: { return_url: successUrl, notification_url: this.opts.webhookUrl },
     };
 
@@ -322,6 +339,12 @@ export class GoPayProvider implements PayKitProvider {
       });
     }
 
+    const { quantity } = validateRequiredKeys(
+      ['quantity'],
+      data.provider_metadata as Record<string, string>,
+      'The following fields must be present in the provider_metadata of createPayment: {keys}',
+    );
+
     const goPayRequest: GoPayPaymentRequest = {
       payer: {
         allowed_payment_instruments: ['PAYMENT_CARD', 'BANK_ACCOUNT'],
@@ -333,9 +356,15 @@ export class GoPayProvider implements PayKitProvider {
       currency: data.currency ?? 'CZK',
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
       order_description: data.metadata?.description || 'Payment',
-      items: [{ name: data.product_id, amount: data.amount, count: 1 }],
+      items: [{ name: data.product_id, amount: data.amount, count: parseInt(quantity) }],
       preauthorization: false, // automatically captures the payment
-      additional_params: data.metadata ? Object.entries(data.metadata ?? {}).map(([name, value]) => ({ name, value: String(value) })) : undefined,
+      additional_params: Object.entries({
+        ...data.metadata,
+        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.product_id, qty: parseInt(quantity) }),
+      }).map(([name, value]) => ({
+        name,
+        value: String(value),
+      })),
     };
 
     const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
@@ -378,19 +407,18 @@ export class GoPayProvider implements PayKitProvider {
   };
 
   capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
-    const productId = 'Payment'; // todo: add to the API
-
-    const captureBody = {
-      amount: params.amount,
-      items: [{ name: productId, amount: params.amount, count: 1 }],
-    };
-
-    await this._client.post<GoPayPaymentResponse>(`/payments/payment/${id}/capture`, {
-      body: JSON.stringify(captureBody),
+    const payment = await this._client.get<GoPayPaymentResponse>(`/payments/payment/${id}`, {
       headers: await this.authController.getAuthHeaders(),
     });
 
-    const payment = await this.retrievePayment(id);
+    if (!payment.ok) {
+      throw new OperationFailedError('capturePayment', this.providerName, {
+        cause: new Error('Failed to retrieve payment'),
+      });
+    }
+
+    const productId = JSON.parse(payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
+    const quantity = JSON.parse(payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').qty;
 
     if (!payment) {
       throw new OperationFailedError('capturePayment', this.providerName, {
@@ -398,7 +426,17 @@ export class GoPayProvider implements PayKitProvider {
       });
     }
 
-    return payment;
+    const captureBody = {
+      amount: params.amount,
+      items: [{ name: productId, amount: params.amount, count: quantity }],
+    };
+
+    await this._client.post<GoPayPaymentResponse>(`/payments/payment/${id}/capture`, {
+      body: JSON.stringify(captureBody),
+      headers: await this.authController.getAuthHeaders(),
+    });
+
+    return paykitPayment$InboundSchema(payment.value);
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
@@ -554,7 +592,18 @@ export class GoPayProvider implements PayKitProvider {
       canceled: data => {
         const payment = paykitPayment$InboundSchema(data);
 
+        const isCancellingSubscription = parentId && data.recurrence?.recurrence_state == 'STOPPED';
+        const subscription = paykitSubscription$InboundSchema(data);
+
+        const subscriptionCanceledWebhookEvent = {
+          type: 'subscription.canceled' as const,
+          created: new Date().getTime(),
+          id: crypto.randomBytes(8).toString('hex').slice(0, 15),
+          data: subscription,
+        };
+
         return [
+          ...(isCancellingSubscription ? [paykitEvent$InboundSchema<Subscription>(subscriptionCanceledWebhookEvent)] : []),
           paykitEvent$InboundSchema<Payment>({
             type: 'payment.canceled',
             created: new Date().getTime(),
@@ -580,17 +629,15 @@ export class GoPayProvider implements PayKitProvider {
         const invoice = paykitInvoice$InboundSchema(data, !!parentId);
         const subscription = paykitSubscription$InboundSchema(data);
 
+        const subscriptionCreatedWebhookEvent = {
+          type: 'subscription.created' as const,
+          created: new Date().getTime(),
+          id: crypto.randomBytes(8).toString('hex').slice(0, 15),
+          data: subscription,
+        };
+
         return [
-          ...(parentId
-            ? [
-                paykitEvent$InboundSchema<Subscription>({
-                  type: 'subscription.created',
-                  created: new Date().getTime(),
-                  id: crypto.randomBytes(8).toString('hex').slice(0, 15),
-                  data: subscription,
-                }),
-              ]
-            : []),
+          ...(parentId ? [paykitEvent$InboundSchema<Subscription>(subscriptionCreatedWebhookEvent)] : []),
           paykitEvent$InboundSchema<Invoice>({
             type: 'invoice.generated',
             created: new Date().getTime(),

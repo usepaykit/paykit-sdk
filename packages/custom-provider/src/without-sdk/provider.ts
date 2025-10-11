@@ -195,8 +195,6 @@ export class WithoutProviderSDK implements PayKitProvider {
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    // TODO: Add validation, currently working on adding validation schema to the SDK
-
     const subscription = await this._client.delete<Record<string, unknown>>(`/subscriptions/${id}`);
 
     if (!subscription.ok) throw new Error('Failed to cancel subscription');

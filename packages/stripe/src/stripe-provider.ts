@@ -79,7 +79,6 @@ export class StripeProvider implements PayKitProvider {
     };
 
     if (params.shipping_info) {
-      // todo: get stripe list of allowed countries and validate against that
       checkoutOptions.shipping_address_collection = {
         allowed_countries: [params.shipping_info.address.country as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry],
       };

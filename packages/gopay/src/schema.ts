@@ -64,7 +64,27 @@ export interface GoPayPaymentResponse {
   /**
    * The recurrence of the payment
    */
-  recurrence?: any;
+  recurrence?: {
+    /**
+     * The recurrence cycle of the payment
+     */
+    recurrence_cycle?: string;
+
+    /**
+     * The state of the recurrence e.g (STOPPED)
+     */
+    recurrence_state?: string;
+
+    /**
+     * The recurrence date to of the payment
+     */
+    recurrence_date_to?: string;
+
+    /**
+     * The recurrence date from of the payment
+     */
+    recurrence_date_from?: string;
+  };
 
   /**
    * The preauthorization of the payment
@@ -80,6 +100,21 @@ export interface GoPayPaymentResponse {
    * The language of the payment
    */
   lang?: string;
+
+  /**
+   * The additional parameters of the payment
+   */
+  additional_params?: Array<{
+    /**
+     * The name of the additional parameter
+     */
+    name: string;
+
+    /**
+     * The value of the additional parameter
+     */
+    value: string;
+  }>;
 }
 
 export interface GoPayPaymentItem {

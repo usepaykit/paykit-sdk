@@ -32,9 +32,10 @@ export class AuthController {
 
     // Set expiry 5 minutes before actual expiry
     const expiryTime = Date.now() + (response.value.expires_in - 300) * 1000;
-    this._accessToken = `${response.value.access_token}::paykit::${expiryTime}`;
+    const accessToken = `${response.value.access_token}::paykit::${expiryTime}`;
+    this._accessToken = accessToken;
 
-    return response.value.access_token;
+    return accessToken;
   };
 
   getAuthHeaders = async () => {

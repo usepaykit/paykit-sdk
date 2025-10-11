@@ -104,8 +104,12 @@ export class PayPalProvider implements PayKitProvider {
         provider: 'PayPal',
       });
     }
-    const { currency = 'USD', amount = '0' } = validateRequiredKeys(
-      ['currency', 'amount'],
+    const {
+      currency = 'USD',
+      amount = '0',
+      itemName = 'Untitled Item',
+    } = validateRequiredKeys(
+      ['currency', 'amount', 'itemName'],
       params.provider_metadata as Record<string, string>,
       'Missing required parameters: {keys}',
     );
@@ -120,7 +124,7 @@ export class PayPalProvider implements PayKitProvider {
             {
               sku: params.item_id,
               quantity: params.quantity.toString(),
-              name: params.item_id, // todo: fix
+              name: itemName,
               unitAmount: { currencyCode: currency, value: amount },
             },
           ],

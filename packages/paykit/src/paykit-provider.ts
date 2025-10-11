@@ -1,4 +1,4 @@
-import { Checkout, CreateCheckoutParams, UpdateCheckoutParams } from './resources/checkout';
+import { Checkout, CreateCheckoutParams, UpdateCheckoutSchema } from './resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
 import { CapturePaymentSchema, CreatePaymentSchema, Payment, UpdatePaymentSchema } from './resources/payment';
 import { CreateRefundSchema, Refund } from './resources/refund';
@@ -18,7 +18,7 @@ export interface PayKitProvider {
    */
   createCheckout(params: CreateCheckoutParams): Promise<Checkout>;
   retrieveCheckout(id: string): Promise<Checkout | null>;
-  updateCheckout(id: string, params: UpdateCheckoutParams): Promise<Checkout>;
+  updateCheckout(id: string, params: UpdateCheckoutSchema): Promise<Checkout>;
   deleteCheckout(id: string): Promise<null>;
 
   /**

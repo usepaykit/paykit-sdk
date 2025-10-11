@@ -53,6 +53,11 @@ export type WebhookHandlerConfig = {
    * The headers of the webhook.
    */
   headers: Record<string, string | string[]>;
+
+  /**
+   * The full URL of the webhook.
+   */
+  fullUrl: string;
 };
 
 export interface HandleWebhookParams extends WebhookHandlerConfig, Pick<WebhookSetupConfig, 'webhookSecret'> {}

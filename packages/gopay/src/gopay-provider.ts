@@ -37,7 +37,12 @@ import { CreateCustomerParams } from '@paykit-sdk/core';
 import crypto from 'crypto';
 import { AuthController } from './controllers/auth';
 import { GoPayPaymentRequest, GoPayPaymentResponse } from './schema';
-import { paykitInvoice$InboundSchema, paykitPayment$InboundSchema, paykitSubscription$InboundSchema } from './utils/mapper';
+import {
+  paykitInvoice$InboundSchema,
+  paykitPayment$InboundSchema,
+  paykitRefund$InboundSchema,
+  paykitSubscription$InboundSchema,
+} from './utils/mapper';
 
 export const PAYKIT_METADATA_KEY = '__paykit';
 
@@ -539,20 +544,39 @@ export class GoPayProvider implements PayKitProvider {
       console.info('Webhook verified successfully, status:', payment.value.state);
     }
 
-    const statusMap: Record<string, Payment['status']> = {
+    const statusMap: Record<string, Payment['status'] | '__INDETERMINATE'> = {
       CREATED: 'pending',
       PAYMENT_METHOD_CHOSEN: 'processing',
       PAID: 'succeeded',
       AUTHORIZED: 'requires_capture',
       CANCELED: 'canceled',
       TIMEOUTED: 'failed',
-      REFUNDED: 'succeeded', // Payment was successful (refund is separate action)
-      PARTIALLY_REFUNDED: 'succeeded', // Payment was successful (partial refund is separate)
-    };
+      REFUNDED: '__INDETERMINATE', // Payment was successful (refund is separate action)
+      PARTIALLY_REFUNDED: '__INDETERMINATE', // Payment was successful (partial refund is another separate action)
+    } as const;
 
     const status = statusMap[payment.value.state];
 
-    const webhookHandlers: Record<Payment['status'], (data: GoPayPaymentResponse) => Array<WebhookEventPayload>> = {
+    const webhookHandlers: Record<(typeof statusMap)[keyof typeof statusMap], (data: GoPayPaymentResponse) => Array<WebhookEventPayload>> = {
+      __INDETERMINATE: data => {
+        const isRefundEvent = data.state === 'REFUNDED' || data.state === 'PARTIALLY_REFUNDED';
+
+        if (isRefundEvent) {
+          const refund = paykitRefund$InboundSchema(data);
+
+          return [
+            paykitEvent$InboundSchema<Refund>({
+              type: 'refund.created',
+              created: new Date().getTime(),
+              id: crypto.randomBytes(8).toString('hex').slice(0, 15),
+              data: refund,
+            }),
+          ];
+        }
+
+        return [];
+      },
+
       pending: data => {
         const payment = paykitPayment$InboundSchema(data);
 

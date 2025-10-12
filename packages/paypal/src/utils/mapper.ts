@@ -45,7 +45,7 @@ export const paykitPayment$InboundSchema = (order: Order): Payment => {
     PAYER_ACTION_REQUIRED: 'requires_action',
   };
 
-  const status = statusMap[order.status!] || 'pending';
+  const status = statusMap[order.status ?? statusMap.CREATED];
 
   return {
     id: order.id!,
@@ -71,7 +71,7 @@ export const paykitSubscription$InboundSchema = (subscription: PayPalSubscriptio
     EXPIRED: 'canceled',
   };
 
-  const status = statusMap[subscription.status] || 'pending';
+  const status = statusMap[subscription.status ?? statusMap.APPROVAL_PENDING];
 
   return {
     id: subscription.id,

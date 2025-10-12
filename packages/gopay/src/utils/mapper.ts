@@ -1,4 +1,4 @@
-import { Invoice, Payment, Subscription } from '@paykit-sdk/core';
+import { Invoice, Payment, Refund, Subscription } from '@paykit-sdk/core';
 import { PAYKIT_METADATA_KEY } from '../gopay-provider';
 import { GoPayPaymentResponse } from '../schema';
 
@@ -97,5 +97,18 @@ export const paykitSubscription$InboundSchema = (data: GoPayPaymentResponse): Su
     custom_fields: null,
     current_period_start: currentPeriodStart,
     current_period_end: currentPeriodEnd,
+  };
+};
+
+/**
+ * Refund
+ */
+export const paykitRefund$InboundSchema = (data: GoPayPaymentResponse): Refund => {
+  return {
+    id: data.id.toString(),
+    amount: data.amount,
+    currency: data.currency,
+    reason: data.state,
+    metadata: {},
   };
 };

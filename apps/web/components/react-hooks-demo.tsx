@@ -2,25 +2,33 @@ import { CodeBlock } from '@/components/code-block';
 
 const code = `
 import { useCheckout } from '@paykit-sdk/react';
+import { Button } from "@components/ui";
 
 export function PaymentForm() {
-const { create } = useCheckout();
+  const { create } = useCheckout();
 
-const handlePayment = async () => {
-  const [checkout, error] = await create.run({
-    customer_id: 'cus_123',
-    item_id: 'price_123',
-    session_type: 'one_time',
-    metadata: { plan: 'pro' },
-    provider_metadata: {
-      success_url: 'https://example.com/success',
-      cancel_url: 'https://example.com/cancel'
-    }
-  });
+  const handlePayment = async () => {
+    const [checkout, error] = await create.run({
+      customer_id: 'cus_123',
+      item_id: 'price_123',
+      session_type: 'one_time',
+      metadata: { plan: 'pro' },
+      provider_metadata: {
+        success_url: 'https://example.com/success',
+        cancel_url: 'https://example.com/cancel'
+      }
+    });
 
-  if (error) return;
-  
-  window.location.href = checkout.payment_url;
+    if (error) return;
+    
+    window.location.href = checkout.payment_url;
+  };
+
+  return (
+    <Button onClick={handlePayment} disabled={create.loading}>
+      {create.loading ? 'Processing...' : 'Pay Now'}
+    </Button>
+  );
 }
 `;
 

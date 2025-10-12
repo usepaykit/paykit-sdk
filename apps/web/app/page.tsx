@@ -3,7 +3,6 @@ import { CopyButton } from '@/components/copy-button';
 import { FinalCTA } from '@/components/final-cta';
 import { Paykit as PaykitIcon } from '@/components/icons';
 import { LifetimeAccess } from '@/components/lifetime-access';
-import { LocalCheckoutSession } from '@/components/local-checkout-session';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ReactHooksDemo } from '@/components/react-hooks-demo';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -19,7 +18,7 @@ export const dynamic = 'force-dynamic';
 
 const Index = () => {
   return (
-    <div className="font-inter bg-background min-h-screen font-pt-sans">
+    <div className="font-inter bg-background font-pt-sans min-h-screen">
       <header className="bg-background/80 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 w-full border-b backdrop-blur-xl">
         <nav className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center space-x-3">
@@ -106,8 +105,6 @@ const Index = () => {
       <ProviderDemo />
 
       <ReactHooksDemo />
-
-      <LocalCheckoutSession />
 
       <LifetimeAccess />
 

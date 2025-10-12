@@ -80,7 +80,7 @@ export const paykitSubscription$InboundSchema = (subscription: PayPalSubscriptio
     item_id: subscription.plan_id,
     current_period_start: subscription.start_time ? new Date(subscription.start_time) : new Date(),
     current_period_end: subscription.status_update_time ? new Date(subscription.status_update_time) : new Date(), // todo: Would need to calculate based on billing cycle
-    metadata: {}, // todo: find metadata path
+    metadata: subscription.customId ? JSON.parse(subscription.customId) : {},
     billing_interval: 'month',
     amount: 0,
     currency: 'USD',

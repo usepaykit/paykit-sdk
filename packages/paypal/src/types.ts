@@ -112,4 +112,9 @@ export interface PayPalSubscription {
      */
     method?: string;
   }>;
+
+  /**
+   * The custom ID of the subscription, i.e metadata
+   */
+  customId?: string;
 }

@@ -9,19 +9,24 @@ interface ProviderListProps {
 
 const providers = [
   {
-    key: 'local' as const,
-    name: 'Local',
-    description: 'Local payment processing',
-  },
-  {
     key: 'stripe' as const,
     name: 'Stripe',
     description: 'Global payment processing',
   },
   {
+    key: 'paypal' as const,
+    name: 'PayPal',
+    description: 'PayPal payments',
+  },
+  {
+    key: 'gopay' as const,
+    name: 'GoPay',
+    description: 'Monetization in Czechia',
+  },
+  {
     key: 'polar' as const,
     name: 'Polar',
-    description: 'Creator monetization',
+    description: 'Open source monetization',
   },
 ];
 

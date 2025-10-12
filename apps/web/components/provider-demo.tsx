@@ -32,7 +32,7 @@ export function ProviderDemo() {
   return (
     <section className="relative py-4">
       {/* Background Pattern */}
-      <div className="from-muted/30 via-background to-muted/20 absolute inset-0 bg-gradient-to-br"></div>
+      <div className="from-muted/30 via-background to-muted/20 absolute inset-0 bg-gradient-to-br" />
 
       <div className="relative container mx-auto px-6">
         <div className="mx-auto max-w-6xl">
@@ -87,7 +87,7 @@ export function ProviderDemo() {
                           <h3 className="text-lg font-semibold">
                             {selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1)} Implementation
                           </h3>
-                          <p className="text-muted-foreground text-sm">TypeScript • PayKit SDK</p>
+                          <p className="text-muted-foreground text-sm">TypeScript</p>
                         </div>
                       </div>
                     </div>

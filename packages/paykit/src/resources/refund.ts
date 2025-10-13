@@ -1,62 +1,66 @@
 import { z } from 'zod';
-import { metadataSchema } from './metadata';
+import { schema } from '../tools';
+import { metadataSchema, PaykitMetadata } from './metadata';
 
-const refundReasonSchema = z.string().nullable().optional();
+export type RefundReason = string | null;
 
-export const createRefundSchema = z.object({
-  /**
-   * The ID of the payment.
-   */
-  payment_id: z.string(),
+const refundReasonSchema = schema<RefundReason>()(z.string().nullable());
 
-  /**
-   * The reason for the refund.
-   */
-  reason: refundReasonSchema,
-
-  /**
-   * The amount of the refund.
-   */
-  amount: z.number().min(0),
-
-  /**
-   * The provider metadata of the refund.
-   */
-  provider_metadata: z.record(z.string(), z.unknown()).optional(),
-
-  /**
-   * The metadata of the refund.
-   */
-  metadata: metadataSchema.optional().nullable(),
-});
-
-export type CreateRefundSchema = z.infer<typeof createRefundSchema>;
-
-export const refundSchema = z.object({
+export interface Refund {
   /**
    * The ID of the refund.
    */
-  id: z.string(),
+  id: string;
 
   /**
-   * The amount of the refund.
+   * The amount refunded.
    */
-  amount: z.number(),
+  amount: number;
 
   /**
    * The currency of the refund.
    */
-  currency: z.string(),
+  currency: string;
 
   /**
    * The reason for the refund.
    */
-  reason: refundReasonSchema,
+  reason: RefundReason;
 
   /**
    * The metadata of the refund.
    */
-  metadata: metadataSchema.optional().nullable(),
-});
+  metadata: PaykitMetadata | null;
+}
 
-export type Refund = z.infer<typeof refundSchema>;
+export const refundSchema = schema<Refund>()(
+  z.object({
+    id: z.string(),
+    amount: z.number(),
+    currency: z.string(),
+    reason: refundReasonSchema,
+    metadata: metadataSchema.nullable(),
+  }),
+);
+
+export interface CreateRefundSchema extends Pick<Refund, 'amount' | 'reason' | 'metadata'> {
+  /**
+   * The unique identifier of the payment.
+   */
+  payment_id: string;
+
+  /**
+   * The provider metadata of the refund.
+   */
+  provider_metadata?: Record<string, unknown>;
+}
+
+export const createRefundSchema = schema<CreateRefundSchema>()(
+  z.object({
+    payment_id: z.string(),
+    reason: refundReasonSchema,
+    amount: z.number().min(0),
+    provider_metadata: z.record(z.string(), z.unknown()).optional(),
+    metadata: metadataSchema.nullable(),
+  }),
+);

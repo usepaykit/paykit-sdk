@@ -96,3 +96,16 @@ export const parseJSON = <T>(str: string, schema: z.ZodSchema<T>): T => {
   const parsed = JSON.parse(str);
   return schema.parse(parsed);
 };
+
+/**
+ * Validates that a Zod schema exactly matches a TypeScript interface.
+ * Preserves all Zod methods while ensuring type safety.
+ *
+ * @example
+ * export const mySchema = schema<MyInterface>()(z.object({ ... }));
+ */
+export const schema = <TInterface>() => {
+  return <TSchema extends z.ZodType<any>>(
+    schema: TSchema & (z.infer<TSchema> extends TInterface ? (TInterface extends z.infer<TSchema> ? unknown : never) : never),
+  ): TSchema => schema;
+};

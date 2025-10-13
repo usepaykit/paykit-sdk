@@ -1,7 +1,8 @@
 import { z } from 'zod';
-import { payeeSchema } from './customer';
-import { metadataSchema } from './metadata';
-import { shippingInfoSchema } from './shipping';
+import { schema } from '../tools';
+import { Payee, payeeSchema } from './customer';
+import { metadataSchema, PaykitMetadata } from './metadata';
+import { ShippingInfo, shippingInfoSchema } from './shipping';
 
 /**
  * @description Payment statuses
@@ -17,65 +18,108 @@ export const paymentStatusSchema = z.enum(['pending', 'processing', 'requires_ac
 
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
 
-export const paymentSchema = z.object({
+export interface Payment {
   /**
-   * The ID of the payment.
+   * The unique identifier of the payment.
    */
-  id: z.string(),
+  id: string;
 
   /**
    * The amount of the payment.
    */
-  amount: z.number().min(0),
+  amount: number;
 
   /**
    * The currency of the payment.
    */
-  currency: z.string(),
+  currency: string;
 
   /**
    * The payee of the payment.
    */
-  customer: payeeSchema,
+  customer: Payee;
 
   /**
    * The status of the payment.
    */
-  status: paymentStatusSchema,
+  status: PaymentStatus;
 
   /**
    * The metadata of the payment.
    */
-  metadata: metadataSchema,
+  metadata: PaykitMetadata;
 
   /**
-   * Id of product for payment.
+   * The product ID of the payment.
    */
-  product_id: z.string().nullable(),
-});
+  product_id: string | null;
+}
 
-export type Payment = z.infer<typeof paymentSchema>;
+export const paymentSchema = schema<Payment>()(
+  z.object({
+    id: z.string(),
+    amount: z.number().min(0),
+    currency: z.string(),
+    customer: payeeSchema,
+    status: paymentStatusSchema,
+    metadata: metadataSchema,
+    product_id: z.string().nullable(),
+  }),
+);
 
-export const createPaymentSchema = paymentSchema
-  .omit({ id: true, status: true })
-  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), shipping_info: shippingInfoSchema.optional() });
+interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
+  /**
+   * The provider specific params of the payment.
+   */
+  provider_metadata?: Record<string, unknown>;
 
-export type CreatePaymentSchema = z.infer<typeof createPaymentSchema>;
+  /**
+   * The shipping info of the payment.
+   */
+  shipping_info?: ShippingInfo;
+}
 
-export const updatePaymentSchema = paymentSchema.partial().extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+export const createPaymentSchema = schema<CreatePaymentSchema>()(
+  paymentSchema
+    .omit({ id: true, status: true })
+    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), shipping_info: shippingInfoSchema.optional() }),
+);
 
-export type UpdatePaymentSchema = z.infer<typeof updatePaymentSchema>;
+export interface UpdatePaymentSchema extends Partial<Omit<Payment, 'id' | 'status'>> {
+  provider_metadata?: Record<string, unknown>;
+}
 
-export const retrievePaymentSchema = paymentSchema.pick({ id: true });
+export const updatePaymentSchema = schema<UpdatePaymentSchema>()(
+  paymentSchema.partial().extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
+);
 
-export type RetrievePaymentSchema = z.infer<typeof retrievePaymentSchema>;
+export interface RetrievePaymentSchema {
+  /**
+   * The unique identifier of the payment.
+   */
+  id: string;
+}
 
-export const deletePaymentSchema = paymentSchema.pick({ id: true });
+export const retrievePaymentSchema = schema<RetrievePaymentSchema>()(paymentSchema.pick({ id: true }));
 
-export type DeletePaymentSchema = z.infer<typeof deletePaymentSchema>;
+export interface DeletePaymentSchema {
+  /**
+   * The unique identifier of the payment.
+   */
+  id: string;
+}
 
-export const capturePaymentSchema = z.object({
-  amount: z.number(),
-});
+export const deletePaymentSchema = schema<DeletePaymentSchema>()(paymentSchema.pick({ id: true }));
 
-export type CapturePaymentSchema = z.infer<typeof capturePaymentSchema>;
+export interface CapturePaymentSchema {
+  /**
+   * The amount to capture.
+   */
+  amount: number;
+}
+
+export const capturePaymentSchema = schema<CapturePaymentSchema>()(
+  z.object({
+    amount: z.number(),
+  }),
+);

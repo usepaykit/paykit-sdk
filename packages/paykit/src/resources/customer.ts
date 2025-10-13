@@ -1,79 +1,86 @@
 import { z } from 'zod';
+import { schema } from '../tools';
+import { OverrideProps } from '../types';
 import { metadataSchema } from './metadata';
 
-export const customerSchema = z.object({
+export interface Customer {
   /**
-   * The ID of the customer.
+   * The unique identifier of the customer.
    */
-  id: z.string(),
+  id: string;
 
   /**
    * The email of the customer.
    */
-  email: z.string().email().optional(),
+  email: string;
 
   /**
    * The name of the customer.
    */
-  name: z.string().optional(),
-
-  /**
-   * The metadata of the customer.
-   */
-  metadata: metadataSchema.optional(),
-});
-
-export type Customer = z.infer<typeof customerSchema>;
-
-export const payeeSchema = z.union([z.string(), customerSchema.pick({ email: true })]);
-
-export type Payee = z.infer<typeof payeeSchema>;
-
-export const createCustomerSchema = z.object({
-  /**
-   * The email of the customer.
-   */
-  email: z.string().email(),
-
-  /**
-   * The name of the customer.
-   */
-  name: z.string().optional(),
-
-  /**
-   * The metadata of the customer.
-   */
-  metadata: metadataSchema.optional(),
-});
-
-export type CreateCustomerParams = z.infer<typeof createCustomerSchema>;
-
-export const updateCustomerSchema = z.object({
-  /**
-   * The email of the customer.
-   */
-  email: z.string().email().optional(),
-
-  /**
-   * The name of the customer.
-   */
-  name: z.string().optional(),
-
-  /**
-   * The metadata of the customer.
-   */
-  metadata: metadataSchema.optional(),
+  name: string;
 
   /**
    * The phone number of the customer.
    */
-  provider_metadata: z.record(z.string(), z.string()).optional(),
-});
+  phone: string;
 
-export type UpdateCustomerParams = z.infer<typeof updateCustomerSchema>;
+  /**
+   * The metadata of the customer.
+   */
+  metadata?: Record<string, string>;
+}
 
-export const retrieveCustomerSchema = z.object({
-  id: z.string(),
-});
+export const customerSchema = schema<Customer>()(
+  z.object({
+    id: z.string(),
+    email: z.string().email(),
+    name: z.string(),
+    phone: z.string(),
+    metadata: metadataSchema.optional(),
+  }),
+);
 
-export type RetrieveCustomerParams = z.infer<typeof retrieveCustomerSchema>;
+type CustomerIdPayee = Customer['id'];
+
+type EmailPayee = { email: Customer['email'] };
+
+export type Payee = CustomerIdPayee | EmailPayee;
+
+export const payeeSchema = schema<Payee>()(z.union([z.string(), customerSchema.pick({ email: true })]));
+
+export interface CreateCustomerParams extends OverrideProps<Omit<Customer, 'id'>, { name?: string }> {}
+
+export const createCustomerSchema = schema<CreateCustomerParams>()(
+  z.object({
+    email: z.string().email(),
+    name: z.string().optional(),
+    phone: z.string(),
+    metadata: metadataSchema.optional(),
+  }),
+);
+
+export interface UpdateCustomerParams extends Partial<Omit<Customer, 'id'>> {
+  provider_metadata?: Record<string, unknown>;
+}
+
+export const updateCustomerSchema = schema<UpdateCustomerParams>()(
+  z.object({
+    email: z.string().email().optional(),
+    name: z.string().optional(),
+    metadata: metadataSchema.optional(),
+    provider_metadata: z.record(z.string(), z.unknown()).optional(),
+  }),
+);
+
+export interface RetrieveCustomerParams {
+  /**
+   * The unique identifier of the customer.
+   */
+  id: string;
+}
+
+export const retrieveCustomerSchema = schema<RetrieveCustomerParams>()(
+  z.object({
+    id: z.string(),
+  }),
+);

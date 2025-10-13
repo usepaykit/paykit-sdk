@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { payeeSchema } from './customer';
-import { metadataSchema } from './metadata';
+import { schema } from '../tools';
+import { Payee, payeeSchema } from './customer';
+import { metadataSchema, PaykitMetadata } from './metadata';
 
 export const subscriptionBillingIntervalSchema = z.enum(['day', 'week', 'month', 'year']);
 
@@ -10,79 +11,125 @@ export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled'
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
 
-export const subscriptionSchema = z.object({
+export interface Subscription {
   /**
-   * The ID for the subscription.
+   * The unique identifier of the subscription.
    */
-  id: z.string(),
+  id: string;
 
   /**
    * The payee linked to the subscription.
    */
-  customer: payeeSchema,
+  customer: Payee;
 
   /**
-   * Amount in smallest currency unit (e.g., cents).
+   * The amount of the subscription.
    */
-  amount: z.number(),
+  amount: number;
 
   /**
-   * ISO 4217 currency code (e.g., USD, EUR).
+   * The currency of the subscription.
    */
-  currency: z.string(),
+  currency: string;
 
   /**
-   * Subscription status.
+   * The status of the subscription.
    */
-  status: subscriptionStatusSchema,
+  status: SubscriptionStatus;
 
   /**
-   * Start of the current billing period (ISO 8601 string).
+   * The start of the current billing period.
    */
-  current_period_start: z.date(),
+  current_period_start: Date;
 
   /**
-   * End of the current billing period (ISO 8601 string).
+   * The end of the current billing period.
    */
-  current_period_end: z.date(),
+  current_period_end: Date;
 
   /**
-   * Product being subscribed to.
+   * The item ID of the subscription.
    */
-  item_id: z.string(),
+  item_id: string;
 
   /**
-   * Billing interval (e.g., day, week, month, year).
+   * The billing interval of the subscription.
    */
-  billing_interval: subscriptionBillingIntervalSchema,
+  billing_interval: SubscriptionBillingInterval;
 
   /**
-   * Metadata of the subscription.
+   * The metadata of the subscription.
    */
-  metadata: metadataSchema.nullable().optional(),
+  metadata: PaykitMetadata | null;
 
   /**
-   * The provider custom fields
+   * The custom fields of the subscription.
    */
-  custom_fields: z.record(z.string(), z.any()).nullable(),
-});
+  custom_fields: Record<string, unknown> | null;
+}
 
-export type Subscription = z.infer<typeof subscriptionSchema>;
+export const subscriptionSchema = schema<Subscription>()(
+  z.object({
+    id: z.string(),
+    customer: payeeSchema,
+    amount: z.number(),
+    currency: z.string(),
+    status: subscriptionStatusSchema,
+    current_period_start: z.date(),
+    current_period_end: z.date(),
+    item_id: z.string(),
+    billing_interval: subscriptionBillingIntervalSchema,
+    metadata: metadataSchema.nullable(),
+    custom_fields: z.record(z.string(), z.unknown()).nullable(),
+  }),
+);
 
-export const updateSubscriptionSchema = z.object({
-  metadata: metadataSchema.optional(),
-});
+export interface UpdateSubscriptionSchema {
+  /**
+   * The metadata of the subscription.
+   */
+  metadata: PaykitMetadata;
+}
 
-export type UpdateSubscriptionSchema = z.infer<typeof updateSubscriptionSchema>;
+export const updateSubscriptionSchema = schema<UpdateSubscriptionSchema>()(
+  z.object({
+    metadata: metadataSchema,
+  }),
+);
 
-export const retrieveSubscriptionSchema = z.object({
-  id: z.string(),
-});
+export interface RetrieveSubscriptionSchema {
+  /**
+   * The unique identifier of the subscription.
+   */
+  id: string;
+}
 
-export type RetrieveSubscriptionParams = z.infer<typeof retrieveSubscriptionSchema>;
+export const retrieveSubscriptionSchema = schema<RetrieveSubscriptionSchema>()(
+  z.object({
+    id: z.string(),
+  }),
+);
 
-export const createSubscriptionSchema = subscriptionSchema
-  .omit({ id: true })
-  .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() });
+export interface DeleteSubscriptionSchema {
+  /**
+   * The unique identifier of the subscription.
+   */
+  id: string;
+}
 
-export type CreateSubscriptionSchema = z.infer<typeof createSubscriptionSchema>;
+export const deleteSubscriptionSchema = schema<DeleteSubscriptionSchema>()(
+  z.object({
+    id: z.string(),
+  }),
+);
+
+export interface CreateSubscriptionSchema extends Omit<Subscription, 'id'> {
+  /**
+   * The provider metadata of the subscription.
+   */
+  provider_metadata?: Record<string, unknown>;
+}
+
+export const createSubscriptionSchema = schema<CreateSubscriptionSchema>()(
+  subscriptionSchema.omit({ id: true }).extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
+);

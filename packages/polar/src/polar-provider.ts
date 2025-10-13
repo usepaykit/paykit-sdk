@@ -195,7 +195,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       throw ValidationError.fromZodError(error, this.providerName, 'createCustomer');
     }
 
-    const { email, name, metadata } = data;
+    const { email, metadata } = data;
+
+    const name = data?.name ?? email.split('@')[0];
 
     const response = await this.polar.customers.create({ email, name, ...(metadata && { metadata }) });
 

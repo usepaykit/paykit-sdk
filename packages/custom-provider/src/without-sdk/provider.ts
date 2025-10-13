@@ -25,12 +25,13 @@ import {
   AbstractPayKitProvider,
   schema,
   NotImplementedError,
+  PaykitProviderOptions,
 } from '@paykit-sdk/core';
 import { CreateCheckoutSchema, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
 import { z } from 'zod';
 
-export interface WithoutProviderSDKOptions {
+export interface WithoutProviderSDKOptions extends PaykitProviderOptions {
   /**
    * The API key for the provider
    */
@@ -51,12 +52,15 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
   constructor(private readonly opts: WithoutProviderSDKOptions) {
     super(withoutProviderSDKOptionsSchema, opts, providerName);
 
+    const debug = opts.debug ?? true;
+
     this._client = new HTTPClient({
       baseUrl: 'https://api.your-provider.com',
       headers: {
         'x-api-key': opts.apiKey,
         'Content-Type': 'application/json',
       },
+      retryOptions: { max: 3, baseDelay: 1000, debug },
     });
   }
 

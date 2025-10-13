@@ -37,6 +37,7 @@ import {
   capturePaymentSchema,
   AbstractPayKitProvider,
   schema,
+  createCustomerSchema,
 } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
@@ -135,7 +136,15 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
    * Customer management
    */
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    const customer = await this.stripe.customers.create(params);
+    const { error, data } = createCustomerSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'createCustomer');
+    }
+
+    const name = data?.name ?? data.email.split('@')[0];
+
+    const customer = await this.stripe.customers.create({ ...params, name });
 
     return paykitCustomer$InboundSchema(customer);
   };

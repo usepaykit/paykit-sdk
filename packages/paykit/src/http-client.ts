@@ -1,9 +1,10 @@
-import { ERR, OK, Result, buildError } from './tools';
+import { ERR, OK, Result, buildError, executeWithRetryWithHandler } from './tools';
 import { classifyError } from './tools/classify-error';
 
 export type HTTPClientConfig = {
   baseUrl: string;
   headers: Record<string, string>;
+  retryOptions: { max: number; baseDelay: number; debug: boolean };
 };
 
 export class HTTPClient {
@@ -23,48 +24,70 @@ export class HTTPClient {
     return { headers: { 'Content-Type': 'application/json', ...this.config.headers, ...options?.headers }, ...options };
   }
 
-  async get<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {
-    const url = this.getFullUrl(endpoint);
-    const requestOptions = this.getRequestOptions(options);
+  private retryErrorHandler = (error: unknown, attempt: number) => {
+    const errorType = classifyError(error);
+    const retryableTypes = ['rate_limit', 'connection', 'timeout', 'internal_server_error', 'bad_gateway', 'service_unavailable', 'gateway_timeout'];
 
-    return await fetch(url, { method: 'GET', ...requestOptions })
-      .then(res => OK(res.json() as T))
-      .catch(err => this.errorHandler(err));
+    const shouldRetry = retryableTypes.includes(errorType);
+
+    if (this.config.retryOptions.debug) {
+      console.info(`[HTTPClient] Attempt ${attempt} failed: ${classifyError(error)} - Retry: ${shouldRetry}`);
+    }
+
+    return { retry: shouldRetry, data: null };
+  };
+
+  private async withRetry<T>(apiCall: () => Promise<Result<T>>): Promise<Result<T>> {
+    return executeWithRetryWithHandler(apiCall, this.retryErrorHandler, this.config.retryOptions.max, this.config.retryOptions.baseDelay);
   }
 
-  async post<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {
-    const url = this.getFullUrl(endpoint);
-    const requestOptions = this.getRequestOptions(options);
+  get = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+    return this.withRetry(async () => {
+      const url = this.getFullUrl(endpoint);
+      const requestOptions = this.getRequestOptions(options);
+      return await fetch(url, { method: 'GET', ...requestOptions })
+        .then(res => OK(res.json() as T))
+        .catch(err => this.errorHandler(err));
+    });
+  };
 
-    return await fetch(url, { method: 'POST', ...requestOptions })
-      .then(res => OK(res.json() as T))
-      .catch(err => this.errorHandler(err));
-  }
+  post = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+    return this.withRetry(async () => {
+      const url = this.getFullUrl(endpoint);
+      const requestOptions = this.getRequestOptions(options);
+      return await fetch(url, { method: 'POST', ...requestOptions })
+        .then(res => OK(res.json() as T))
+        .catch(err => this.errorHandler(err));
+    });
+  };
 
-  async delete<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {
-    const url = this.getFullUrl(endpoint);
-    const requestOptions = this.getRequestOptions(options);
+  delete = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+    return this.withRetry(async () => {
+      const url = this.getFullUrl(endpoint);
+      const requestOptions = this.getRequestOptions(options);
+      return await fetch(url, { method: 'DELETE', ...requestOptions })
+        .then(res => OK(res.json() as T))
+        .catch(err => this.errorHandler(err));
+    });
+  };
 
-    return await fetch(url, { method: 'DELETE', ...requestOptions })
-      .then(res => OK(res.json() as T))
-      .catch(err => this.errorHandler(err));
-  }
+  put = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+    return this.withRetry(async () => {
+      const url = this.getFullUrl(endpoint);
+      const requestOptions = this.getRequestOptions(options);
+      return await fetch(url, { method: 'PUT', ...requestOptions })
+        .then(res => OK(res.json() as T))
+        .catch(err => this.errorHandler(err));
+    });
+  };
 
-  async put<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {
-    const url = this.getFullUrl(endpoint);
-    const requestOptions = this.getRequestOptions(options);
-
-    return await fetch(url, { method: 'PUT', ...requestOptions })
-      .then(res => OK(res.json() as T))
-      .catch(err => this.errorHandler(err));
-  }
-
-  async patch<T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> {
-    const url = this.getFullUrl(endpoint);
-    const requestOptions = this.getRequestOptions(options);
-
-    return await fetch(url, { method: 'PATCH', ...requestOptions })
-      .then(res => OK(res.json() as T))
-      .catch(err => this.errorHandler(err));
-  }
+  patch = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+    return this.withRetry(async () => {
+      const url = this.getFullUrl(endpoint);
+      const requestOptions = this.getRequestOptions(options);
+      return await fetch(url, { method: 'PATCH', ...requestOptions })
+        .then(res => OK(res.json() as T))
+        .catch(err => this.errorHandler(err));
+    });
+  };
 }

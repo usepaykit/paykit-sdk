@@ -42,7 +42,7 @@ export const customerSchema = schema<Customer>()(
 
 type CustomerIdPayee = Customer['id'];
 
-type EmailPayee = { email: Customer['email'] };
+type EmailPayee = Pick<Customer, 'email'>;
 
 export type Payee = CustomerIdPayee | EmailPayee;
 

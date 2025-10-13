@@ -7,7 +7,9 @@ export class AuthController {
   private _accessToken: string | null = null;
 
   constructor(private opts: GoPayOptions & { baseUrl: string }) {
-    this._client = new HTTPClient({ baseUrl: this.opts.baseUrl, headers: {} });
+    const debug = opts.debug ?? true;
+
+    this._client = new HTTPClient({ baseUrl: this.opts.baseUrl, headers: {}, retryOptions: { max: 3, baseDelay: 1000, debug } });
   }
 
   getAccessToken = async () => {

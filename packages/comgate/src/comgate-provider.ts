@@ -79,6 +79,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
   constructor(private readonly opts: ComgateOptions) {
     super(comgateOptionsSchema, opts, providerName);
 
+    const debug = opts.debug ?? true;
+
     this.baseUrl = opts.sandbox ? 'https://sandbox.comgate.cz' : 'https://payments.comgate.cz';
 
     this._client = new HTTPClient({
@@ -88,6 +90,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
         'Content-Type': 'application/x-www-form-urlencoded',
         Accept: 'application/x-www-form-urlencoded',
       },
+      retryOptions: { max: 3, baseDelay: 1000, debug },
     });
   }
 
@@ -119,7 +122,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     if (error) throw new Error(error.message.split('\n').join(' '));
 
     const providerMetadata = validateRequiredKeys(
-      ['email', 'label'],
+      ['email'],
       (data.provider_metadata as Record<string, string>) ?? {},
       'Missing required provider metadata: {keys}',
     );
@@ -128,7 +131,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       console.log('Creating payment with metadata:', providerMetadata);
     }
 
-    const { email, label = 'Untitled Payment', ...restMetadata } = providerMetadata;
+    const { email, ...restMetadata } = providerMetadata as Record<string, string>;
 
     const { customer } = data;
 
@@ -147,7 +150,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       price: String(data.amount),
       email,
       curr: String(data.currency),
-      label: String(label),
+      label: restMetadata?.label ? String(restMetadata.label) : 'Order from Eshop',
       ...(restMetadata as Record<string, string>),
     });
 

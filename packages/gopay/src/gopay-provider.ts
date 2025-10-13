@@ -98,8 +98,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   constructor(private readonly opts: GoPayOptions) {
     super(gopayOptionsSchema, opts, providerName);
 
+    const debug = opts.debug ?? true;
+
     this.baseUrl = opts.isSandbox ? 'https://gate.gopay.cz/api' : 'https://gw.sandbox.gopay.com/api';
-    this._client = new HTTPClient({ baseUrl: this.baseUrl, headers: {} });
+    this._client = new HTTPClient({ baseUrl: this.baseUrl, headers: {}, retryOptions: { max: 3, baseDelay: 1000, debug } });
     this.authController = new AuthController({ ...opts, baseUrl: this.baseUrl });
   }
 

@@ -38,7 +38,11 @@ const optionsSchema = z.object({
 
       if (!isNamed) return false;
 
-      const requiredMethods = [
+      type MethodNames = {
+        [K in keyof PayKitProvider]: PayKitProvider[K] extends (...args: any[]) => any ? K : never;
+      }[keyof PayKitProvider & string];
+
+      const requiredMethods: Array<MethodNames> = [
         'createCheckout',
         'retrieveCheckout',
         'updateCheckout',
@@ -59,7 +63,8 @@ const optionsSchema = z.object({
         'capturePayment',
         'cancelPayment',
         'createRefund',
-      ] as const;
+        'handleWebhook',
+      ];
 
       return requiredMethods.every(method => typeof provider[method] === 'function');
     },

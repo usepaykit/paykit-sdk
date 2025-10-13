@@ -5,7 +5,7 @@ import {
   Customer,
   UpdateCustomerParams,
   Checkout,
-  CreateCheckoutParams,
+  CreateCheckoutSchema,
   Subscription,
   UpdateSubscriptionSchema,
   HandleWebhookParams,
@@ -38,6 +38,9 @@ import {
   ResourceNotFoundError,
   CapturePaymentSchema,
   capturePaymentSchema,
+  schema,
+  OverrideProps,
+  AbstractPayKitProvider,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
@@ -48,6 +51,7 @@ import { Subscription as PolarSubscription } from '@polar-sh/sdk/models/componen
 import { Refunds } from '@polar-sh/sdk/sdk/refunds.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
 import _ from 'lodash';
+import { z } from 'zod';
 import {
   mapRefundReason,
   paykitCheckout$InboundSchema,
@@ -58,9 +62,32 @@ import {
   paykitSubscription$InboundSchema,
 } from '../lib/mapper';
 
-export interface PolarOptions extends PaykitProviderOptions<SDKOptions> {}
+export interface PolarOptions
+  extends PaykitProviderOptions<
+    OverrideProps<
+      SDKOptions,
+      {
+        accessToken: string;
+        server: keyof typeof ServerList;
+      }
+    >
+  > {}
 
-export class PolarProvider implements PayKitProvider {
+const polarOptionsSchema = schema<PolarOptions>()(
+  z
+    .object({
+      accessToken: z.string(),
+      debug: z.boolean().optional(),
+      server: z.enum(Object.keys(ServerList) as [keyof typeof ServerList, ...Array<keyof typeof ServerList>]),
+    })
+    .passthrough(),
+);
+
+const providerName = 'polar';
+
+export class PolarProvider extends AbstractPayKitProvider implements PayKitProvider {
+  readonly providerName = providerName;
+
   private polar: Polar;
   private refunds: Refunds;
 
@@ -68,28 +95,30 @@ export class PolarProvider implements PayKitProvider {
   private readonly sandboxURL = ServerList['sandbox'];
 
   constructor(private config: PolarOptions) {
-    const { accessToken, server, ...rest } = config;
+    super(polarOptionsSchema, config, providerName);
 
-    this.polar = new Polar({ accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL, ...rest });
-    this.refunds = new Refunds({ accessToken, serverURL: server === 'sandbox' ? this.sandboxURL : this.productionURL, ...rest });
+    const { accessToken, server, debug = true, ...rest } = config;
+
+    const serverURL = server === 'sandbox' ? this.sandboxURL : this.productionURL;
+
+    this.polar = new Polar({ accessToken, serverURL, ...rest });
+    this.refunds = new Refunds({ accessToken, serverURL, ...rest });
   }
-
-  readonly providerName = 'polar';
 
   /**
    * Checkout management
    */
-  createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'createCheckout');
+      throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
     }
 
     const { metadata, item_id, provider_metadata } = data;
 
     const checkoutCreateOptions: CheckoutCreate = {
-      metadata,
+      metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
       products: [item_id],
       ...provider_metadata,
     };
@@ -120,17 +149,17 @@ export class PolarProvider implements PayKitProvider {
     const { error, data } = updateCheckoutSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'updateCheckout');
+      throw ValidationError.fromZodError(error, this.providerName, 'updateCheckout');
     }
 
-    const { provider_metadata } = params;
+    const { metadata, item_id, provider_metadata, ...restData } = data;
 
     const response = await this.polar.checkouts.update({
       id,
       checkoutUpdate: {
-        ...data,
-        ...(data.metadata && { metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)) }),
-        ...(data.item_id && { products: [data.item_id] }),
+        ...restData,
+        ...(metadata && { metadata: _.mapValues(metadata, value => JSON.stringify(value)) }),
+        ...(item_id && { products: [item_id] }),
         ...provider_metadata,
       },
     });
@@ -142,7 +171,7 @@ export class PolarProvider implements PayKitProvider {
     const { error } = retrieveCheckoutSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'retrieveCheckout');
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveCheckout');
     }
 
     const response = await this.polar.checkouts.get({ id });
@@ -162,7 +191,9 @@ export class PolarProvider implements PayKitProvider {
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
     const { error, data } = createCustomerSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'createCustomer');
+    }
 
     const { email, name, metadata } = data;
 
@@ -175,7 +206,7 @@ export class PolarProvider implements PayKitProvider {
     const { error, data } = updateCustomerSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'retrieveCustomer');
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveCustomer');
     }
 
     const { email, name, metadata, provider_metadata } = data;
@@ -192,7 +223,7 @@ export class PolarProvider implements PayKitProvider {
     const { error } = retrieveCustomerSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'retrieveCustomer');
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveCustomer');
     }
 
     const response = await this.polar.customers.get({ id });
@@ -219,7 +250,7 @@ export class PolarProvider implements PayKitProvider {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'retrieveSubscription');
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveSubscription');
     }
 
     const subscription = await this.polar.subscriptions.revoke({ id });
@@ -231,7 +262,7 @@ export class PolarProvider implements PayKitProvider {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'retrieveSubscription');
+      throw ValidationError.fromZodError(error, this.providerName, 'retrieveSubscription');
     }
 
     const response = await this.polar.subscriptions.get({ id });
@@ -243,7 +274,7 @@ export class PolarProvider implements PayKitProvider {
     const { error, data } = updateSubscriptionSchema.safeParse({ id, ...params });
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'updateSubscription');
+      throw ValidationError.fromZodError(error, this.providerName, 'updateSubscription');
     }
 
     const response = await this.polar.subscriptions.update({ id, subscriptionUpdate: { ...(data.metadata ?? {}) } });
@@ -254,7 +285,9 @@ export class PolarProvider implements PayKitProvider {
   deleteSubscription = async (id: string): Promise<null> => {
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'deleteSubscription');
+    }
 
     return (await this.cancelSubscription(id)) === null ? null : null;
   };
@@ -332,13 +365,13 @@ export class PolarProvider implements PayKitProvider {
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    throw new ProviderNotSupportedError('cancelPayment', 'Polar', {
+    throw new ProviderNotSupportedError('cancelPayment', this.providerName, {
       reason: 'Polar does not support canceling payments',
     });
   };
 
   deletePayment = async (id: string): Promise<null> => {
-    throw new ProviderNotSupportedError('deletePayment', 'Polar', {
+    throw new ProviderNotSupportedError('deletePayment', this.providerName, {
       reason: 'Polar does not support deleting payments',
     });
   };
@@ -353,24 +386,24 @@ export class PolarProvider implements PayKitProvider {
     const { error, data } = createRefundSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'createRefund');
+      throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
     }
 
     const order = await this.polar.orders.get({ id: data.payment_id });
 
     if (!order) {
-      throw new ResourceNotFoundError('Order', data.payment_id, 'Polar');
+      throw new ResourceNotFoundError('Order', data.payment_id, this.providerName);
     }
 
     const refund = await this.refunds.create({
       orderId: order.id,
-      reason: data.reason ? mapRefundReason(this.config.debug ?? false, data.reason) : 'other',
+      reason: data.reason ? mapRefundReason(this.config.debug ?? true, data.reason) : 'other',
       amount: data.amount,
       ...(data.provider_metadata && { ...data.provider_metadata }),
     });
 
     if (!refund) {
-      throw new OperationFailedError('Failed to create refund', 'Polar');
+      throw new OperationFailedError('Failed to create refund', this.providerName);
     }
 
     return paykitRefund$InboundSchema(refund);
@@ -513,11 +546,11 @@ export class PolarProvider implements PayKitProvider {
 
     const handler = webhookHandlers[type as PolarEventLiteral];
 
-    if (!handler) throw new Error(`Unhandled event type: ${type}`);
+    if (!handler) throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
 
     const results = handler(data);
 
-    if (!results) throw new Error(`Unhandled event type: ${type}`);
+    if (!results) throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
 
     return results;
   };

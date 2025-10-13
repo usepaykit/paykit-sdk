@@ -67,7 +67,7 @@ export const paymentSchema = schema<Payment>()(
   }),
 );
 
-interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
+export interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
   /**
    * The provider specific params of the payment.
    */

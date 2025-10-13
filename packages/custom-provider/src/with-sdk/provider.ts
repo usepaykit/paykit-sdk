@@ -1,7 +1,7 @@
 import {
   HandleWebhookParams,
   Checkout,
-  CreateCheckoutParams,
+  CreateCheckoutSchema,
   CreateCustomerParams,
   Customer,
   PayKitProvider,
@@ -17,96 +17,118 @@ import {
   Refund,
   UpdateCheckoutSchema,
   UpdatePaymentSchema,
+  schema,
+  AbstractPayKitProvider,
+  NotImplementedError,
 } from '@paykit-sdk/core';
+import { z } from 'zod';
 
-export interface WithProviderSDKOptions extends PaykitProviderOptions<{ apiKey: string }> {}
+export interface WithProviderSDKOptions
+  extends PaykitProviderOptions<{
+    /**
+     * The API key for the provider
+     */
+    apiKey: string;
+  }> {}
 
-export class WithProviderSDK implements PayKitProvider {
-  constructor(private readonly opts: WithProviderSDKOptions) {}
+const withProviderSDKOptionsSchema = schema<WithProviderSDKOptions>()(
+  z.object({
+    apiKey: z.string(),
+  }),
+);
 
-  readonly providerName = 'with-sdk';
+const providerName = 'withSDK';
+
+export class WithProviderSDK extends AbstractPayKitProvider implements PayKitProvider {
+  readonly providerName = providerName;
+
+  constructor(private readonly opts: WithProviderSDKOptions) {
+    super(withProviderSDKOptionsSchema, opts, providerName);
+
+    // init provider specific sdk with the options
+  }
 
   updateCheckout(id: string, params: UpdateCheckoutSchema): Promise<Checkout> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   deleteCheckout(id: string): Promise<null> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   deleteCustomer(id: string): Promise<null> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   createSubscription(params: CreateSubscriptionSchema): Promise<Subscription> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   deleteSubscription(id: string): Promise<null> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   createPayment(params: CreatePaymentSchema): Promise<Payment> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   updatePayment(id: string, params: UpdatePaymentSchema): Promise<Payment> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   retrievePayment(id: string): Promise<Payment | null> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   deletePayment(id: string): Promise<null> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   capturePayment(id: string): Promise<Payment> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   cancelPayment(id: string): Promise<Payment> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   createRefund(params: CreateRefundSchema): Promise<Refund> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
-  createCheckout(checkout: CreateCheckoutParams): Promise<Checkout> {
-    throw new Error('Method not implemented.');
+  createCheckout(checkout: CreateCheckoutSchema): Promise<Checkout> {
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   retrieveCheckout(id: string): Promise<Checkout> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   createCustomer(params: CreateCustomerParams): Promise<Customer> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   retrieveCustomer(id: string): Promise<Customer> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   updateCustomer(id: string, params: UpdateCustomerParams): Promise<Customer> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   updateSubscription(id: string, params: UpdateSubscriptionSchema): Promise<Subscription> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   retrieveSubscription(id: string): Promise<Subscription> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   cancelSubscription(id: string): Promise<Subscription> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 
   handleWebhook(payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> {
-    throw new Error('Method not implemented.');
+    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
   }
 }

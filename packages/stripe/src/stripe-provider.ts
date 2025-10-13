@@ -1,7 +1,7 @@
 import {
   PayKitProvider,
   Checkout,
-  CreateCheckoutParams,
+  CreateCheckoutSchema,
   CreateCustomerParams,
   Customer,
   UpdateCustomerParams,
@@ -35,9 +35,12 @@ import {
   createRefundSchema,
   CapturePaymentSchema,
   capturePaymentSchema,
+  AbstractPayKitProvider,
+  schema,
 } from '@paykit-sdk/core';
 import _ from 'lodash';
 import Stripe from 'stripe';
+import { z } from 'zod';
 import {
   paykitCheckout$InboundSchema,
   paykitCustomer$InboundSchema,
@@ -51,21 +54,34 @@ export interface StripeOptions extends PaykitProviderOptions<Stripe.StripeConfig
   apiKey: string;
 }
 
-export class StripeProvider implements PayKitProvider {
+const stripeOptionsSchema = schema<Pick<StripeOptions, 'apiKey' | 'debug'>>()(
+  z
+    .object({
+      apiKey: z.string(),
+      debug: z.boolean().optional(),
+    })
+    .passthrough(),
+);
+
+const providerName = 'stripe';
+
+export class StripeProvider extends AbstractPayKitProvider implements PayKitProvider {
   private stripe: Stripe;
 
   constructor(config: StripeOptions) {
+    super(stripeOptionsSchema, config, providerName);
+
     const { debug, apiKey, ...rest } = config;
 
     this.stripe = new Stripe(apiKey, rest);
   }
 
-  readonly providerName = 'stripe';
+  readonly providerName = providerName;
 
   /**
    * Checkout management
    */
-  createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
     const metadata = _.mapValues(params.metadata ?? {}, value => JSON.stringify(value));
 
     const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
@@ -370,6 +386,20 @@ export class StripeProvider implements PayKitProvider {
 
         if (data.mode !== 'payment') return null;
 
+        const customFields = data.custom_fields.reduce(
+          (acc, field) => {
+            if (field.type == 'dropdown') {
+              acc[field.key] = field.dropdown?.value;
+            } else if (field.type == 'text') {
+              acc[field.key] = field.text?.value;
+            } else if (field.type == 'numeric') {
+              acc[field.key] = field.numeric?.value;
+            }
+            return acc;
+          },
+          {} as Record<string, any>,
+        );
+
         const invoiceData = {
           id: data.id,
           status: invoiceStatusSchema.parse('paid'),
@@ -380,7 +410,7 @@ export class StripeProvider implements PayKitProvider {
           customer: typeof data.customer === 'string' ? data.customer : (data.customer?.id ?? ''),
           billing_mode: billingModeSchema.parse('one_time'),
           subscription_id: null,
-          custom_fields: data.custom_fields ?? null,
+          custom_fields: customFields ?? null,
           line_items: data.line_items?.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })) ?? [],
         };
 

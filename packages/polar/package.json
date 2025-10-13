@@ -31,16 +31,17 @@
     "@paykit-sdk/core": "workspace:*",
     "@types/lodash": "^4.17.20",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "zod": "^3.24.2"
   },
   "publishConfig": {
     "access": "public"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devodii/paykit.git"
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/devodii/paykit/issues"
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
   }
 }

@@ -1,6 +1,6 @@
 import { PayKitProvider } from './paykit-provider';
 import { CreateRefundSchema } from './resources';
-import { CreateCheckoutParams, UpdateCheckoutSchema } from './resources/checkout';
+import { CreateCheckoutSchema, UpdateCheckoutSchema } from './resources/checkout';
 import { CreateCustomerParams, UpdateCustomerParams } from './resources/customer';
 import { CapturePaymentSchema, CreatePaymentSchema, UpdatePaymentSchema } from './resources/payment';
 import { CreateSubscriptionSchema, UpdateSubscriptionSchema } from './resources/subscription';
@@ -10,7 +10,7 @@ class PayKit {
   constructor(private provider: PayKitProvider) {}
 
   checkouts = {
-    create: (params: CreateCheckoutParams) => this.provider.createCheckout(params),
+    create: (params: CreateCheckoutSchema) => this.provider.createCheckout(params),
     retrieve: (id: string) => this.provider.retrieveCheckout(id),
     update: (id: string, params: UpdateCheckoutSchema) => this.provider.updateCheckout(id, params),
     delete: (id: string) => this.provider.deleteCheckout(id),
@@ -58,3 +58,4 @@ export * from './logger';
 export * from './webhook-provider';
 export * from './http-client';
 export * from './error';
+export * from './paykit-provider';

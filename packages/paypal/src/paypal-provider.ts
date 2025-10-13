@@ -1,7 +1,7 @@
 import {
   PayKitProvider,
   Checkout,
-  CreateCheckoutParams,
+  CreateCheckoutSchema,
   CreateCustomerParams,
   Customer,
   UpdateCustomerParams,
@@ -24,6 +24,8 @@ import {
   ResourceNotFoundError,
   WebhookError,
   NotImplementedError,
+  schema,
+  AbstractPayKitProvider,
 } from '@paykit-sdk/core';
 import {
   CheckoutPaymentIntent,
@@ -36,6 +38,7 @@ import {
   Refund as PayPalRefund,
   OrderApplicationContextUserAction,
 } from '@paypal/paypal-server-sdk';
+import { z } from 'zod';
 import { SubscriptionsController } from './controllers/subscription';
 import { WebhookController } from './controllers/webhook';
 import { VerifyWebhookStatus } from './schema';
@@ -53,13 +56,24 @@ export interface PayPalOptions extends PaykitProviderOptions {
    * The client secret for the PayPal API
    */
   clientSecret: string;
+
   /**
    * Whether to use the sandbox environment
    */
   isSandbox: boolean;
 }
 
-export class PayPalProvider implements PayKitProvider {
+const paypalOptionsSchema = schema<PayPalOptions>()(
+  z.object({
+    clientId: z.string(),
+    clientSecret: z.string(),
+    isSandbox: z.boolean(),
+    debug: z.boolean().optional(),
+  }),
+);
+
+const providerName = 'paypal';
+export class PayPalProvider extends AbstractPayKitProvider implements PayKitProvider {
   private client: Client;
   private ordersController: OrdersController;
   private paymentsController: PaymentsController;
@@ -67,6 +81,8 @@ export class PayPalProvider implements PayKitProvider {
   private webhookController: WebhookController;
 
   constructor(config: PayPalOptions) {
+    super(paypalOptionsSchema, config, providerName);
+
     const { clientId, clientSecret, isSandbox = true, debug } = config;
 
     const environment = isSandbox ? Environment.Sandbox : Environment.Production;
@@ -88,20 +104,20 @@ export class PayPalProvider implements PayKitProvider {
     this.webhookController = new WebhookController(this.client);
   }
 
-  readonly providerName = 'paypal';
+  readonly providerName = providerName;
 
   /**
    * Checkout management
    * In PayPal, Order IS the checkout
    */
-  createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
     const stringifiedMetadata = JSON.stringify(params.metadata);
 
     if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
       throw new ConstraintViolationError('Metadata exceeds maximum length', {
         value: stringifiedMetadata.length,
         limit: PAYPAL_METADATA_MAX_LENGTH,
-        provider: 'PayPal',
+        provider: this.providerName,
       });
     }
     const {
@@ -162,38 +178,38 @@ export class PayPalProvider implements PayKitProvider {
   };
 
   updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
-    throw new ProviderNotSupportedError('updateCheckout', 'PayPal', {
+    throw new ProviderNotSupportedError('updateCheckout', this.providerName, {
       reason: 'PayPal does not support updating orders. Cancel and create a new order instead.',
     });
   };
 
   deleteCheckout = async (id: string): Promise<null> => {
-    throw new ProviderNotSupportedError('deleteCheckout', 'PayPal', {
+    throw new ProviderNotSupportedError('deleteCheckout', this.providerName, {
       reason: 'PayPal orders cannot be deleted. They expire automatically.',
     });
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
-    throw new ProviderNotSupportedError('customer management', 'PayPal', {
+    throw new ProviderNotSupportedError('customer management', this.providerName, {
       reason: 'PayPal does not have standalone customer entities.',
       alternative: 'Use Payer information within orders or implement PayPal Vault API',
     });
   };
 
   updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
-    throw new ProviderNotSupportedError('updateCustomer', 'PayPal', {
+    throw new ProviderNotSupportedError('updateCustomer', this.providerName, {
       reason: 'PayPal does not support standalone customer management.',
     });
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
-    throw new ProviderNotSupportedError('deleteCustomer', 'PayPal', {
+    throw new ProviderNotSupportedError('deleteCustomer', this.providerName, {
       reason: 'PayPal does not support standalone customer management.',
     });
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
-    throw new ProviderNotSupportedError('retrieveCustomer', 'PayPal', {
+    throw new ProviderNotSupportedError('retrieveCustomer', this.providerName, {
       reason: 'PayPal does not support standalone customer management.',
     });
   };
@@ -220,7 +236,7 @@ export class PayPalProvider implements PayKitProvider {
       throw new ConstraintViolationError('Metadata exceeds maximum length', {
         value: stringifiedMetadata.length,
         limit: PAYPAL_METADATA_MAX_LENGTH,
-        provider: 'PayPal',
+        provider: this.providerName,
       });
     }
     const subscription = await this.subscriptionsController.updateSubscription({ subscriptionId: id, metadata: params.metadata ?? {} });
@@ -249,7 +265,7 @@ export class PayPalProvider implements PayKitProvider {
       throw new ConstraintViolationError('Metadata exceeds maximum length', {
         value: stringifiedMetadata.length,
         limit: PAYPAL_METADATA_MAX_LENGTH,
-        provider: 'PayPal',
+        provider: this.providerName,
       });
     }
 
@@ -286,7 +302,7 @@ export class PayPalProvider implements PayKitProvider {
   };
 
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
-    throw new ProviderNotSupportedError('updatePayment', 'PayPal', {
+    throw new ProviderNotSupportedError('updatePayment', this.providerName, {
       reason: 'PayPal does not support updating orders.',
     });
   };
@@ -298,7 +314,7 @@ export class PayPalProvider implements PayKitProvider {
   };
 
   deletePayment = async (id: string): Promise<null> => {
-    throw new ProviderNotSupportedError('deletePayment', 'PayPal', {
+    throw new ProviderNotSupportedError('deletePayment', this.providerName, {
       reason: 'PayPal orders cannot be deleted. They expire automatically.',
     });
   };
@@ -310,7 +326,7 @@ export class PayPalProvider implements PayKitProvider {
 
   cancelPayment = async (id: string): Promise<Payment> => {
     // PayPal doesn't have explicit cancel, but you can void authorizations
-    throw new ProviderNotSupportedError('cancelPayment', 'PayPal', {
+    throw new ProviderNotSupportedError('cancelPayment', this.providerName, {
       reason: 'PayPal order cancellation not directly supported. Orders expire automatically.',
     });
   };
@@ -324,7 +340,7 @@ export class PayPalProvider implements PayKitProvider {
     const captureIds = order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
 
     if (captureIds.length === 0) {
-      throw new ResourceNotFoundError('Capture', params.payment_id, 'PayPal');
+      throw new ResourceNotFoundError('Capture', params.payment_id, this.providerName);
     }
 
     const currencyCode = order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD';
@@ -355,7 +371,7 @@ export class PayPalProvider implements PayKitProvider {
     });
 
     if (result.verification_status !== VerifyWebhookStatus.SUCCESS) {
-      throw new WebhookError('Webhook verification failed', { provider: 'PayPal' });
+      throw new WebhookError('Webhook verification failed', { provider: this.providerName });
     }
 
     const event = JSON.parse(body);
@@ -394,7 +410,7 @@ export class PayPalProvider implements PayKitProvider {
     const handler = webhookHandlers[eventType];
 
     if (!handler) {
-      throw new Error(`Unhandled event type: ${eventType}`);
+      throw new Error(`Unhandled event type: ${eventType} for provider: ${this.providerName}`);
     }
 
     return await handler();

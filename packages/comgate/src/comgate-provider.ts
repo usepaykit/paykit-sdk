@@ -28,10 +28,13 @@ import {
   capturePaymentSchema,
   ValidationError,
   InvalidTypeError,
+  schema,
+  AbstractPayKitProvider,
 } from '@paykit-sdk/core';
-import { CreateCheckoutParams, CreateCustomerParams } from '@paykit-sdk/core';
+import { CreateCheckoutSchema, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
 import _ from 'lodash';
+import { z } from 'zod';
 import {
   ComgatePaymentOperationResponse,
   ComgateRefundResponse,
@@ -57,14 +60,27 @@ export interface ComgateOptions extends PaykitProviderOptions {
   sandbox: boolean;
 }
 
-export class ComgateProvider implements PayKitProvider {
-  readonly providerName = 'comgate';
+const comgateOptionsSchema = schema<ComgateOptions>()(
+  z.object({
+    merchant: z.string(),
+    secret: z.string(),
+    sandbox: z.boolean(),
+  }),
+);
+
+const providerName = 'comgate';
+
+export class ComgateProvider extends AbstractPayKitProvider implements PayKitProvider {
+  readonly providerName = providerName;
+  private baseUrl: string;
 
   private _client: HTTPClient;
 
-  private readonly baseUrl = 'https://payments.comgate.cz';
-
   constructor(private readonly opts: ComgateOptions) {
+    super(comgateOptionsSchema, opts, providerName);
+
+    this.baseUrl = opts.sandbox ? 'https://sandbox.comgate.cz' : 'https://payments.comgate.cz';
+
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
       headers: {
@@ -97,7 +113,7 @@ export class ComgateProvider implements PayKitProvider {
     return req.value as T;
   };
 
-  createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
     if (error) throw new Error(error.message.split('\n').join(' '));
@@ -203,19 +219,7 @@ export class ComgateProvider implements PayKitProvider {
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
-
-    const providerMetadata = validateRequiredKeys(
-      ['email', 'label'],
-      (data.provider_metadata as Record<string, string>) ?? {},
-      'Missing required provider metadata: {keys}',
-    );
-
-    if (this.opts.debug) {
-      console.log('Creating payment with metadata:', providerMetadata);
-    }
-
-    const { email, label = 'Untitled Payment', ...restMetadata } = providerMetadata;
+    if (error) throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
 
     const { customer } = data;
 
@@ -226,6 +230,16 @@ export class ComgateProvider implements PayKitProvider {
       });
     }
 
+    const { email, paymentLabel = 'Order from Eshop' } = validateRequiredKeys(
+      ['email', 'paymentLabel'],
+      (data.provider_metadata as Record<string, string>) ?? {},
+      'Missing required provider metadata: {keys}',
+    );
+
+    if (this.opts.debug) {
+      console.log('Creating payment with metadata:', { email, paymentLabel });
+    }
+
     const requestBody = new URLSearchParams({
       code: '0',
       test: this.opts.sandbox ? 'true' : 'false',
@@ -234,8 +248,7 @@ export class ComgateProvider implements PayKitProvider {
       price: String(data.amount),
       email,
       curr: String(data.currency),
-      label: String(label),
-      ...(restMetadata as Record<string, string>),
+      label: String(paymentLabel),
     });
 
     const response = await this._client.post<ComgatePaymentOperationResponse>(`/v2.0/payment`, {

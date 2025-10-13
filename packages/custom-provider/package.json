@@ -14,6 +14,7 @@
     "@types/node": "^24.2.0",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
-    "@paykit-sdk/core": "workspace:*"
+    "@paykit-sdk/core": "workspace:*",
+    "zod": "^3.24.2"
   }
 }

@@ -1,4 +1,6 @@
-import { Checkout, CreateCheckoutParams, UpdateCheckoutSchema } from './resources/checkout';
+import { z } from 'zod';
+import { ConfigurationError } from './error';
+import { Checkout, CreateCheckoutSchema, UpdateCheckoutSchema } from './resources/checkout';
 import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
 import { CapturePaymentSchema, CreatePaymentSchema, Payment, UpdatePaymentSchema } from './resources/payment';
 import { CreateRefundSchema, Refund } from './resources/refund';
@@ -16,7 +18,7 @@ export interface PayKitProvider {
   /**
    * Checkout sessions
    */
-  createCheckout(params: CreateCheckoutParams): Promise<Checkout>;
+  createCheckout(params: CreateCheckoutSchema): Promise<Checkout>;
   retrieveCheckout(id: string): Promise<Checkout | null>;
   updateCheckout(id: string, params: UpdateCheckoutSchema): Promise<Checkout>;
   deleteCheckout(id: string): Promise<null>;
@@ -57,4 +59,17 @@ export interface PayKitProvider {
    * Webhook management
    */
   handleWebhook(payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>>;
+}
+
+export class AbstractPayKitProvider {
+  protected constructor(schema: z.ZodType<Record<string, unknown>>, options: unknown, providerName: string) {
+    const { error } = schema.safeParse(options);
+
+    if (error) {
+      throw new ConfigurationError(`Invalid ${providerName} configuration`, {
+        provider: providerName,
+        missingKeys: Object.keys(error.flatten().fieldErrors ?? {}),
+      });
+    }
+  }
 }

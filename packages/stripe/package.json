@@ -31,7 +31,8 @@
     "@types/lodash": "^4.17.20",
     "lodash": "^4.17.21",
     "tsup": "^8.0.0",
-    "typescript": "^5.0.0"
+    "typescript": "^5.0.0",
+    "zod": "^3.24.2"
   },
   "publishConfig": {
     "access": "public"

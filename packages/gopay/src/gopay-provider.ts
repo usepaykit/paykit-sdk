@@ -15,7 +15,7 @@ import {
   Refund,
   UpdatePaymentSchema,
   PaykitProviderOptions,
-  CreateCheckoutParams,
+  CreateCheckoutSchema,
   OperationFailedError,
   createCheckoutSchema,
   ValidationError,
@@ -32,9 +32,12 @@ import {
   tryCatchAsync,
   paykitEvent$InboundSchema,
   Invoice,
+  schema,
+  AbstractPayKitProvider,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
 import crypto from 'crypto';
+import { z } from 'zod';
 import { AuthController } from './controllers/auth';
 import { GoPayPaymentRequest, GoPayPaymentResponse } from './schema';
 import {
@@ -73,20 +76,34 @@ export interface GoPayOptions extends PaykitProviderOptions {
   webhookUrl: string;
 }
 
-export class GoPayProvider implements PayKitProvider {
-  readonly providerName = 'gopay';
+const gopayOptionsSchema = schema<GoPayOptions>()(
+  z.object({
+    clientId: z.string(),
+    clientSecret: z.string(),
+    goId: z.string(),
+    isSandbox: z.boolean(),
+    webhookUrl: z.string(),
+  }),
+);
+
+const providerName = 'gopay';
+
+export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvider {
+  readonly providerName = providerName;
 
   private _client: HTTPClient;
   private baseUrl: string;
   private authController: AuthController;
 
   constructor(private readonly opts: GoPayOptions) {
+    super(gopayOptionsSchema, opts, providerName);
+
     this.baseUrl = opts.isSandbox ? 'https://gate.gopay.cz/api' : 'https://gw.sandbox.gopay.com/api';
     this._client = new HTTPClient({ baseUrl: this.baseUrl, headers: {} });
     this.authController = new AuthController({ ...opts, baseUrl: this.baseUrl });
   }
 
-  createCheckout = async (params: CreateCheckoutParams): Promise<Checkout> => {
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
     const { error, data } = createCheckoutSchema.safeParse(params);
 
     if (error) throw ValidationError.fromZodError(error, 'gopay', 'createCheckout');

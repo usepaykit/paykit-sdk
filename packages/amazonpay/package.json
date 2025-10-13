@@ -1,0 +1,50 @@
+{
+  "name": "@paykit-sdk/amazonpay",
+  "version": "1.0.0",
+  "description": "Amazon Pay provider for PayKit",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "prepublishOnly": "rm -rf dist && npm run build"
+  },
+  "keywords": [
+    "amazonpay",
+    "paykit",
+    "payment",
+    "typescript"
+  ],
+  "author": "Emmanuel Odii",
+  "license": "GPL-3.0",
+  "packageManager": "pnpm@10.13.1",
+  "peerDependencies": {
+    "@paykit-sdk/core": "^1.1.8"
+  },
+  "devDependencies": {
+    "@paykit-sdk/core": "workspace:*",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2",
+    "zod": "^3.24.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
+  },
+  "dependencies": {
+    "@amazonpay/amazon-pay-api-sdk-nodejs": "^2.3.4"
+  }
+}

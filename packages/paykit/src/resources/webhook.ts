@@ -1,5 +1,4 @@
 import { WebhookEventType } from '../webhook-provider';
-import { Checkout } from './checkout';
 import { Customer } from './customer';
 import { Invoice } from './invoice';
 import { Payment } from './payment';

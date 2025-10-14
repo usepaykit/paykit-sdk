@@ -1,7 +1,6 @@
 import { Checkout, Customer } from '@paykit-sdk/core';
-import _ from 'lodash';
-import { AgenticBuyer } from './schema/agentic-buyer';
-import { AgenticCheckoutSession, CreateAgenticCheckoutSessionParams } from './schema/agentic-checkout';
+import { AgenticBuyer } from '../schema/agentic-buyer';
+import { AgenticCheckoutSession, CreateAgenticCheckoutSessionParams } from '../schema/agentic-checkout';
 
 export const customerToAgenticBuyer = (customer: Customer) => {
   return {
@@ -30,7 +29,7 @@ export const agenticCheckoutSession$InboundSchema = (
   return {
     id: checkout.id,
     buyer: agenticParams.buyer,
-    payment_provider: { provider: _.toLower(providerName), supported_payment_methods: ['card'] },
+    payment_provider: { provider: providerName.toLowerCase(), supported_payment_methods: ['card'] },
     status: 'in_progress',
     currency: checkout.currency,
     line_items: checkout.products,

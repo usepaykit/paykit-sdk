@@ -1,5 +1,4 @@
-import { Invoice, Payment } from '@paykit-sdk/core';
-import _ from 'lodash';
+import { Invoice, omitInternalMetadata, Payment } from '@paykit-sdk/core';
 import { ComgateWebhookStatusSuccessResponse } from '../schema';
 
 export const paykitPayment$InboundSchema = (webhookResponse: ComgateWebhookStatusSuccessResponse, status: Payment['status']): Payment => {
@@ -9,7 +8,7 @@ export const paykitPayment$InboundSchema = (webhookResponse: ComgateWebhookStatu
     currency: webhookResponse.curr,
     customer: webhookResponse.payerId ?? { email: webhookResponse.email },
     status,
-    metadata: _.mapValues(JSON.parse(webhookResponse.refId) as Record<string, unknown>, value => String(value)),
+    metadata: omitInternalMetadata(JSON.parse(webhookResponse.refId) as Record<string, unknown>),
     product_id: null,
   };
 };
@@ -31,6 +30,6 @@ export const paykitInvoice$InboundSchema = (webhookResponse: ComgateWebhookStatu
     subscription_id: null,
     billing_mode: 'one_time', // comgate does not support recurring payments
     line_items: webhookResponse.name ? [{ id: webhookResponse.name, quantity: 1 }] : [],
-    metadata: _.mapValues(JSON.parse(webhookResponse.refId) as Record<string, unknown>, value => String(value)),
+    metadata: omitInternalMetadata(JSON.parse(webhookResponse.refId) as Record<string, unknown>),
   };
 };

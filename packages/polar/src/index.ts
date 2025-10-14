@@ -7,12 +7,10 @@ export const createPolar = (config: PolarOptions) => {
 
 export const polar = () => {
   const envVars = validateRequiredKeys(
-    ['POLAR_ACCESS_TOKEN'],
+    ['POLAR_ACCESS_TOKEN', 'POLAR_SANDBOX'],
     process.env as Record<string, string>,
     'Missing required environment variables: {keys}',
   );
 
-  const isDev = process.env.NODE_ENV === 'development';
-
-  return createPolar({ debug: true, accessToken: envVars.POLAR_ACCESS_TOKEN, server: isDev ? 'sandbox' : 'production' });
+  return createPolar({ debug: true, accessToken: envVars.POLAR_ACCESS_TOKEN, isSandbox: envVars.POLAR_SANDBOX == 'true' });
 };

@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { schema } from '../tools';
+import { BillingInfo, billingSchema } from './billing';
 import { Payee, payeeSchema } from './customer';
 import { metadataSchema, PaykitMetadata } from './metadata';
-import { ShippingInfo, shippingInfoSchema } from './shipping';
 
 /**
  * @description Payment statuses
@@ -76,13 +76,13 @@ export interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
   /**
    * The shipping info of the payment.
    */
-  shipping_info?: ShippingInfo;
+  billing?: BillingInfo;
 }
 
 export const createPaymentSchema = schema<CreatePaymentSchema>()(
   paymentSchema
     .omit({ id: true, status: true })
-    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), shipping_info: shippingInfoSchema.optional() }),
+    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), billing: billingSchema.optional() }),
 );
 
 export interface UpdatePaymentSchema extends Partial<Omit<Payment, 'id' | 'status'>> {

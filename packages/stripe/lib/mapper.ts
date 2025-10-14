@@ -4,13 +4,13 @@ import {
   Customer,
   Invoice,
   InvoiceStatus,
+  omitInternalMetadata,
   PaymentStatus,
   Refund,
   Subscription,
   SubscriptionBillingInterval,
 } from '@paykit-sdk/core';
 import { Payment } from '@paykit-sdk/core';
-import _ from 'lodash';
 import Stripe from 'stripe';
 
 /**
@@ -26,7 +26,7 @@ export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session):
     currency: checkout.currency!,
     amount: checkout.amount_total!,
     subscription: null,
-    metadata: _.mapValues(checkout.metadata ?? {}, value => JSON.stringify(value)),
+    metadata: omitInternalMetadata(checkout.metadata ?? {}),
   };
 };
 
@@ -36,9 +36,10 @@ export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session):
 export const paykitCustomer$InboundSchema = (customer: Stripe.Customer): Customer => {
   return {
     id: customer.id,
-    email: customer.email ?? undefined,
-    name: customer.name ?? undefined,
-    metadata: _.mapValues(customer.metadata ?? {}, value => JSON.stringify(value)),
+    email: customer.email ?? '',
+    name: customer.name ?? '',
+    phone: customer.phone ?? '',
+    metadata: omitInternalMetadata(customer.metadata ?? {}),
   };
 };
 
@@ -54,6 +55,8 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
     throw new Error(`Unknown status: ${subscription.status}`);
   })();
 
+  const metadata = omitInternalMetadata(subscription.metadata ?? {});
+
   return {
     id: subscription.id,
     status,
@@ -64,7 +67,7 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
     billing_interval: subscription.items.data[0].price.recurring?.interval as SubscriptionBillingInterval,
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
-    metadata: _.mapValues(subscription.metadata ?? {}, value => JSON.stringify(value)),
+    metadata,
     custom_fields: null,
   };
 };
@@ -97,8 +100,15 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     subscription_id: invoice.parent?.subscription_details?.subscription?.toString() ?? null,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
-    metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
-    custom_fields: invoice.custom_fields ?? null,
+    metadata: omitInternalMetadata(invoice.metadata ?? {}),
+    custom_fields:
+      invoice.custom_fields?.reduce(
+        (acc, field) => {
+          acc[field.name] = field.value;
+          return acc;
+        },
+        {} as Record<string, unknown>,
+      ) ?? null,
   };
 };
 
@@ -132,7 +142,7 @@ export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payme
     currency: intent.currency,
     customer: (intent.customer as string) ?? '',
     status: stripeToPaykitStatus(intent.status),
-    metadata: _.mapValues(intent.metadata ?? {}, value => JSON.parse(value)),
+    metadata: omitInternalMetadata(intent.metadata ?? {}),
     product_id: intent.metadata?.product_id as string | null,
   };
 };
@@ -146,6 +156,6 @@ export const paykitRefund$InboundSchema = (refund: Stripe.Refund): Refund => {
     amount: refund.amount,
     currency: refund.currency,
     reason: refund.reason,
-    metadata: _.mapValues(refund.metadata ?? {}, value => JSON.parse(value)),
+    metadata: omitInternalMetadata(refund.metadata ?? {}),
   };
 };

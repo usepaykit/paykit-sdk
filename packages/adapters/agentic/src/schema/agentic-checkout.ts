@@ -1,6 +1,5 @@
-import { checkoutSchema, createCheckoutSchema } from '@paykit-sdk/core';
+import { createCheckoutSchema, billingSchema } from '@paykit-sdk/core';
 import { z } from 'zod';
-import { agenticAddressSchema } from './agentic-address';
 import { agenticBuyerSchema } from './agentic-buyer';
 import { agenticFufillmentOptionSchema } from './agentic-fufillment';
 import { agenticLinkSchema, agenticMessageSchema } from './agentic-message';
@@ -80,7 +79,7 @@ export const agenticCheckoutSessionSchema = z.object({
   /**
    * The fulfillment address of the checkout.
    */
-  fulfillment_address: agenticAddressSchema.optional().nullable(),
+  fulfillment_address: billingSchema.shape.address.omit({ phone: true }).optional().nullable(),
 
   /**
    * The fulfillment options of the checkout.
@@ -124,7 +123,7 @@ export const createAgenticCheckoutSessionParamsSchema = z.object({
   /**
    * The fulfillment address of the checkout.
    */
-  fulfillment_address: agenticAddressSchema.optional().nullable(),
+  fulfillment_address: billingSchema.shape.address.omit({ phone: true }).optional().nullable(),
 
   /**
    * The checkout of the checkout.

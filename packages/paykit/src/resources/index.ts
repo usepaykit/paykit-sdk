@@ -6,3 +6,4 @@ export * from './invoice';
 export * from './metadata';
 export * from './payment';
 export * from './refund';
+export * from './billing';

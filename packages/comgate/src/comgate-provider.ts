@@ -33,7 +33,6 @@ import {
 } from '@paykit-sdk/core';
 import { CreateCheckoutSchema, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
-import _ from 'lodash';
 import { z } from 'zod';
 import {
   ComgatePaymentOperationResponse,
@@ -121,22 +120,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     if (error) throw new Error(error.message.split('\n').join(' '));
 
-    const providerMetadata = validateRequiredKeys(
-      ['email'],
-      (data.provider_metadata as Record<string, string>) ?? {},
-      'Missing required provider metadata: {keys}',
-    );
-
-    if (this.opts.debug) {
-      console.log('Creating payment with metadata:', providerMetadata);
-    }
-
-    const { email, ...restMetadata } = providerMetadata as Record<string, string>;
-
-    const { customer } = data;
-
-    if (typeof customer === 'object') {
-      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
+    if (typeof data.customer === 'string') {
+      throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
         method: 'createCheckout',
       });
@@ -146,13 +131,16 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       code: '0',
       test: this.opts.sandbox ? 'true' : 'false',
       refId: JSON.stringify(data.metadata ?? {}),
-      payerId: customer,
+      email: data.customer.email,
+      payerId: data.customer.email,
       price: String(data.amount),
-      email,
       curr: String(data.currency),
-      label: restMetadata?.label ? String(restMetadata.label) : 'Order from Eshop',
-      ...(restMetadata as Record<string, string>),
+      label: data.provider_metadata?.label ? String(data.provider_metadata.label) : 'Order from Eshop',
     });
+
+    if (this.opts.debug) {
+      console.log('Creating payment with data:', requestBody.toString());
+    }
 
     const response = await this._client.post<ComgatePaymentOperationResponse>(`/v2.0/paymentRedirect/merchant/${this.opts.merchant}`, {
       body: requestBody.toString(),

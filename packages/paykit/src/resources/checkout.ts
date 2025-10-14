@@ -1,8 +1,8 @@
 import { z } from 'zod';
 import { schema } from '../tools/utils';
+import { billingSchema, BillingInfo } from './billing';
 import { Payee, payeeSchema } from './customer';
 import { metadataSchema, PaykitMetadata } from './metadata';
-import { ShippingInfo, shippingInfoSchema } from './shipping';
 import { SubscriptionBillingInterval, subscriptionBillingIntervalSchema } from './subscription';
 
 export interface CheckoutSubscription {
@@ -108,7 +108,7 @@ interface CreateCheckoutBaseSchema extends Pick<Checkout, 'customer' | 'metadata
   /**
    * The shipping information of the checkout.
    */
-  shipping_info?: ShippingInfo;
+  billing?: BillingInfo;
 }
 
 export interface CreateOneTimeCheckoutSchema extends CreateCheckoutBaseSchema {
@@ -146,7 +146,7 @@ export const createCheckoutSchema = schema<CreateCheckoutSchema>()(
     quantity: z.number(),
     subscription: checkoutSubscriptionSchema.optional(),
     provider_metadata: z.record(z.string(), z.unknown()).optional(),
-    shipping_info: shippingInfoSchema.optional(),
+    billing: billingSchema.optional(),
   }),
 );
 

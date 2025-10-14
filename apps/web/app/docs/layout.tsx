@@ -2,9 +2,9 @@ import { DocsNav } from '@/components/docs-nav';
 import { MobileDocsNav } from '@/components/mobile-docs-nav';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { docsConfig } from '@/config/docs';
-import Link from 'next/link';
-import { Manrope } from 'next/font/google';
 import { cn } from '@/lib/utils';
+import { Manrope } from 'next/font/google';
+import Link from 'next/link';
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -19,7 +19,7 @@ interface DocsLayoutProps {
 
 export default function DocsLayout({ children }: DocsLayoutProps) {
   return (
-    <div className={cn(manrope.variable, 'font-manrope antialiased min-h-screen bg-background text-foreground')}>
+    <div className={cn(manrope.variable, 'font-manrope bg-background text-foreground min-h-screen antialiased')}>
       {/* Header with theme toggle */}
       <header className="bg-background/80 sticky top-0 z-40 border-b backdrop-blur-sm">
         <div className="container mx-auto flex max-w-7xl items-center justify-between px-4 py-4">

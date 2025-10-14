@@ -9,6 +9,8 @@ import {
   Payment,
   PaymentStatus,
   Refund as PaykitRefund,
+  omitInternalMetadata,
+  PAYKIT_METADATA_KEY,
 } from '@paykit-sdk/core';
 import { Checkout } from '@polar-sh/sdk/models/components/checkout';
 import { CheckoutStatus } from '@polar-sh/sdk/models/components/checkoutstatus.js';
@@ -17,7 +19,6 @@ import { Order } from '@polar-sh/sdk/models/components/order';
 import { Refund } from '@polar-sh/sdk/models/components/refund.js';
 import { RefundReason } from '@polar-sh/sdk/models/components/refundreason.js';
 import { Subscription } from '@polar-sh/sdk/models/components/subscription';
-import _ from 'lodash';
 
 /**
  * Checkout
@@ -39,7 +40,15 @@ export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout
  * Customer
  */
 export const paykitCustomer$InboundSchema = (customer: Customer): PaykitCustomer => {
-  return { id: customer.id, email: customer.email, name: customer.name ?? undefined };
+  const phone = JSON.parse((customer.metadata?.[PAYKIT_METADATA_KEY] as string) ?? '{}').phone ?? '';
+
+  return {
+    id: customer.id,
+    email: customer.email,
+    name: customer.name ?? '',
+    phone,
+    metadata: omitInternalMetadata(customer.metadata ?? {}),
+  };
 };
 
 /**
@@ -63,7 +72,7 @@ export const paykitSubscription$InboundSchema = (subscription: Subscription): Pa
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
-    metadata: _.mapValues(subscription.metadata ?? {}, value => JSON.stringify(value)),
+    metadata: omitInternalMetadata(subscription.metadata ?? {}),
     custom_fields: subscription.customFieldData ?? null,
     item_id: subscription.productId,
     billing_interval: subscription.recurringInterval,
@@ -88,7 +97,7 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): PaykitInvo
     id: invoice.id,
     amount_paid: invoice.totalAmount,
     currency: invoice.currency,
-    metadata: _.mapValues(invoice.metadata ?? {}, value => JSON.stringify(value)),
+    metadata: omitInternalMetadata(invoice.metadata ?? {}),
     customer: invoice.customerId ? invoice.customerId : { email: invoice.customer.email ?? '' },
     billing_mode: invoice.billingMode,
     custom_fields: invoice.customFieldData ?? null,
@@ -148,6 +157,6 @@ export const paykitRefund$InboundSchema = (refund: Refund): PaykitRefund => {
     amount: refund.amount,
     currency: refund.currency,
     reason: refund.reason,
-    metadata: _.mapValues(refund.metadata ?? {}, value => JSON.stringify(value)) as Record<string, string>,
+    metadata: omitInternalMetadata(refund.metadata ?? {}),
   };
 };

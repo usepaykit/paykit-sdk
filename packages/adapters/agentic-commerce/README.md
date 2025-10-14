@@ -1,1 +1,0 @@
-# OpenAI Adapter for Paykit

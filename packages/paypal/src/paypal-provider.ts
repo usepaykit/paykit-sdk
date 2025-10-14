@@ -74,6 +74,8 @@ const paypalOptionsSchema = schema<PayPalOptions>()(
 
 const providerName = 'paypal';
 export class PayPalProvider extends AbstractPayKitProvider implements PayKitProvider {
+  readonly providerName = providerName;
+
   private client: Client;
   private ordersController: OrdersController;
   private paymentsController: PaymentsController;
@@ -103,8 +105,6 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     this.subscriptionsController = new SubscriptionsController(this.client);
     this.webhookController = new WebhookController(this.client);
   }
-
-  readonly providerName = providerName;
 
   /**
    * Checkout management
@@ -149,19 +149,19 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       applicationContext: { userAction: OrderApplicationContextUserAction.PayNow },
     };
 
-    if (params.shipping_info) {
+    if (params.billing) {
       orderOptionsBody.purchaseUnits[0].shipping = {
-        name: { fullName: params.shipping_info.address.name },
+        name: { fullName: params.billing.address.name },
         address: {
-          addressLine1: params.shipping_info.address.line1,
-          addressLine2: params.shipping_info.address.line2,
-          adminArea1: params.shipping_info.address.city,
-          adminArea2: params.shipping_info.address.state,
-          postalCode: params.shipping_info.address.postal_code,
-          countryCode: params.shipping_info.address.country,
+          addressLine1: params.billing.address.line1,
+          addressLine2: params.billing.address.line2,
+          adminArea1: params.billing.address.city,
+          adminArea2: params.billing.address.state,
+          postalCode: params.billing.address.postal_code,
+          countryCode: params.billing.address.country,
         },
-        ...(params.shipping_info.address.phone && {
-          phoneNumber: { nationalNumber: params.shipping_info.address.phone, countryCode: params.shipping_info.address.country },
+        ...(params.billing.address.phone && {
+          phoneNumber: { nationalNumber: params.billing.address.phone, countryCode: params.billing.address.country },
         }),
       };
     }
@@ -279,19 +279,19 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       ],
     };
 
-    if (params.shipping_info) {
+    if (params.billing) {
       orderOptionsBody.purchaseUnits[0].shipping = {
-        name: { fullName: params.shipping_info.address.name },
+        name: { fullName: params.billing.address.name },
         address: {
-          addressLine1: params.shipping_info.address.line1,
-          addressLine2: params.shipping_info.address.line2,
-          adminArea1: params.shipping_info.address.city,
-          adminArea2: params.shipping_info.address.state,
-          postalCode: params.shipping_info.address.postal_code,
-          countryCode: params.shipping_info.address.country,
+          addressLine1: params.billing.address.line1,
+          addressLine2: params.billing.address.line2,
+          adminArea1: params.billing.address.city,
+          adminArea2: params.billing.address.state,
+          postalCode: params.billing.address.postal_code,
+          countryCode: params.billing.address.country,
         },
-        ...(params.shipping_info.address.phone && {
-          phoneNumber: { nationalNumber: params.shipping_info.address.phone, countryCode: params.shipping_info.address.country },
+        ...(params.billing.address.phone && {
+          phoneNumber: { nationalNumber: params.billing.address.phone, countryCode: params.billing.address.country },
         }),
       };
     }
@@ -410,7 +410,7 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     const handler = webhookHandlers[eventType];
 
     if (!handler) {
-      throw new Error(`Unhandled event type: ${eventType} for provider: ${this.providerName}`);
+      throw new WebhookError(`Unhandled event type: ${eventType}`, { provider: this.providerName });
     }
 
     return await handler();

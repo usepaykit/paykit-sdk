@@ -1,11 +1,11 @@
-# @paykit-sdk/medusa-adapter
+# @paykit-sdk/medusajs
 
 Universal payment provider adapter for Medusa v2+ using PayKit. Compatible with any PayKit provider.
 
 ## Installation
 
 ```bash
-npm install @paykit-sdk/medusa-adapter @paykit-sdk/core
+npm install @paykit-sdk/medusajs @paykit-sdk/core
 ```
 
 ## Install your provider

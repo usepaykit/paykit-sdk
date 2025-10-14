@@ -1,6 +1,5 @@
 import { ApiResponse, CustomError } from '@paypal/paypal-server-sdk';
 import { BaseController } from '@paypal/paypal-server-sdk/dist/types/controllers/baseController';
-import _ from 'lodash';
 import { VerifyWebhookSchema, verifyWebhookSchema } from '../schema';
 
 export class WebhookController extends BaseController {
@@ -19,7 +18,7 @@ export class WebhookController extends BaseController {
     req.throwOn(400, CustomError, 'Request is not well-formed, syntactically incorrect, or violates schema.');
     req.throwOn(401, CustomError, 'Authentication failed due to missing authorization header, or invalid authentication credentials.');
     req.throwOn(422, CustomError, 'The requested action could not be performed, semantically incorrect, or failed business validation.');
-    req.json(_.mapKeys(body, (value, key) => _.snakeCase(key) as any));
+    req.json(Object.fromEntries(Object.entries(body).map(([key, value]) => [key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`), value])));
 
     req.authenticate([{ oauth2: true }]);
     return req.callAsJson(verifyWebhookSchema);

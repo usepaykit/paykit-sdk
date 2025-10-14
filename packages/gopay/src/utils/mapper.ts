@@ -1,17 +1,17 @@
-import { Invoice, Payment, Refund, Subscription } from '@paykit-sdk/core';
-import { PAYKIT_METADATA_KEY } from '../gopay-provider';
+import { Invoice, Payment, Refund, Subscription, PAYKIT_METADATA_KEY, omitInternalMetadata } from '@paykit-sdk/core';
 import { GoPayPaymentResponse } from '../schema';
 
 export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment => {
   const itemId = JSON.parse(data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
 
-  const metadata = data.additional_params?.reduce(
-    (acc, param) => {
-      if (param.name === PAYKIT_METADATA_KEY) return acc; // Skip paykit metadata
-      acc[param.name] = String(param.value);
-      return acc;
-    },
-    {} as Record<string, string>,
+  const metadata = omitInternalMetadata(
+    data.additional_params?.reduce(
+      (acc, param) => {
+        acc[param.name] = String(param.value);
+        return acc;
+      },
+      {} as Record<string, string>,
+    ) ?? {},
   );
 
   return {
@@ -21,7 +21,7 @@ export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment
     customer: data.payer ?? { email: data.payer?.email ?? '' },
     status: data.state as Payment['status'],
     product_id: itemId,
-    metadata: metadata ?? {},
+    metadata,
   };
 };
 
@@ -37,13 +37,14 @@ export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscr
   // Calculate paid at based on start of subscription or payment
   const paidAt = isSubscription ? new Date(data.recurrence?.recurrence_date_from ?? '') : new Date();
 
-  const metadata = data.additional_params?.reduce(
-    (acc, param) => {
-      if (param.name === PAYKIT_METADATA_KEY) return acc; // Skip paykit metadata
-      acc[param.name] = String(param.value);
-      return acc;
-    },
-    {} as Record<string, string>,
+  const metadata = omitInternalMetadata(
+    data.additional_params?.reduce(
+      (acc, param) => {
+        acc[param.name] = String(param.value);
+        return acc;
+      },
+      {} as Record<string, string>,
+    ) ?? {},
   );
 
   return {
@@ -76,13 +77,14 @@ export const paykitSubscription$InboundSchema = (data: GoPayPaymentResponse): Su
   const currentPeriodStart = new Date(data.recurrence?.recurrence_date_from ?? '');
   const currentPeriodEnd = new Date(data.recurrence?.recurrence_date_to ?? '');
 
-  const metadata = data.additional_params?.reduce(
-    (acc, param) => {
-      if (param.name === PAYKIT_METADATA_KEY) return acc; // Skip paykit metadata
-      acc[param.name] = String(param.value);
-      return acc;
-    },
-    {} as Record<string, string>,
+  const metadata = omitInternalMetadata(
+    data.additional_params?.reduce(
+      (acc, param) => {
+        acc[param.name] = String(param.value);
+        return acc;
+      },
+      {} as Record<string, string>,
+    ) ?? {},
   );
 
   return {

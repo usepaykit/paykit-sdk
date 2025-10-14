@@ -1,5 +1,6 @@
 import { setTimeout } from 'timers/promises';
 import { z } from 'zod';
+import { PAYKIT_METADATA_KEY, PaykitMetadata } from '..';
 import { tryCatchSync } from './try-catch';
 
 export type Result<T, E = unknown> = { ok: true; value: T; error?: never } | { ok: false; value?: never; error: E };
@@ -108,4 +109,13 @@ export const schema = <TInterface>() => {
   return <TSchema extends z.ZodType<any>>(
     schema: TSchema & (z.infer<TSchema> extends TInterface ? (TInterface extends z.infer<TSchema> ? unknown : never) : never),
   ): TSchema => schema;
+};
+
+export const omitInternalMetadata = (metadata: Record<string, any>, internalKeys: string[] = [PAYKIT_METADATA_KEY]): PaykitMetadata => {
+  return Object.entries(metadata).reduce((acc, [key, value]) => {
+    if (!internalKeys.includes(key)) {
+      acc[key] = String(value);
+    }
+    return acc;
+  }, {} as PaykitMetadata);
 };

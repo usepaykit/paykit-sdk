@@ -6,6 +6,8 @@ import { CapturePaymentSchema, CreatePaymentSchema, UpdatePaymentSchema } from '
 import { CreateSubscriptionSchema, UpdateSubscriptionSchema } from './resources/subscription';
 import { Webhook, WebhookSetupConfig } from './webhook-provider';
 
+export const PAYKIT_METADATA_KEY = '__paykit';
+
 class PayKit {
   constructor(private provider: PayKitProvider) {}
 
@@ -59,3 +61,4 @@ export * from './webhook-provider';
 export * from './http-client';
 export * from './error';
 export * from './paykit-provider';
+export * from './provider-shema';

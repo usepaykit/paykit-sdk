@@ -41,6 +41,7 @@ import {
   schema,
   OverrideProps,
   AbstractPayKitProvider,
+  PAYKIT_METADATA_KEY,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
@@ -50,7 +51,6 @@ import { Refund as PolarRefund } from '@polar-sh/sdk/models/components/refund.js
 import { Subscription as PolarSubscription } from '@polar-sh/sdk/models/components/subscription.js';
 import { Refunds } from '@polar-sh/sdk/sdk/refunds.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
-import _ from 'lodash';
 import { z } from 'zod';
 import {
   mapRefundReason,
@@ -65,22 +65,24 @@ import {
 export interface PolarOptions
   extends PaykitProviderOptions<
     OverrideProps<
-      SDKOptions,
+      Pick<SDKOptions, 'accessToken' | 'userAgent' | 'retryConfig' | 'timeoutMs'>,
       {
         accessToken: string;
-        server: keyof typeof ServerList;
       }
     >
-  > {}
+  > {
+  isSandbox: boolean;
+}
 
 const polarOptionsSchema = schema<PolarOptions>()(
-  z
-    .object({
-      accessToken: z.string(),
-      debug: z.boolean().optional(),
-      server: z.enum(Object.keys(ServerList) as [keyof typeof ServerList, ...Array<keyof typeof ServerList>]),
-    })
-    .passthrough(),
+  z.object({
+    accessToken: z.string(),
+    isSandbox: z.boolean(),
+    debug: z.boolean().optional(),
+    userAgent: z.string().optional(),
+    retryConfig: z.any().optional(),
+    timeoutMs: z.number().optional(),
+  }),
 );
 
 const providerName = 'polar';
@@ -97,9 +99,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
   constructor(private config: PolarOptions) {
     super(polarOptionsSchema, config, providerName);
 
-    const { accessToken, server, debug = true, ...rest } = config;
+    const { accessToken, isSandbox, debug = true, ...rest } = config;
 
-    const serverURL = server === 'sandbox' ? this.sandboxURL : this.productionURL;
+    const serverURL = isSandbox ? this.sandboxURL : this.productionURL;
 
     this.polar = new Polar({ accessToken, serverURL, ...rest });
     this.refunds = new Refunds({ accessToken, serverURL, ...rest });
@@ -118,25 +120,25 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { metadata, item_id, provider_metadata } = data;
 
     const checkoutCreateOptions: CheckoutCreate = {
-      metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
+      metadata: Object.fromEntries(Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
       products: [item_id],
       ...provider_metadata,
     };
 
-    if (data.shipping_info) {
+    if (data.billing) {
       checkoutCreateOptions.customerBillingAddress = {
-        line1: data.shipping_info.address.line1,
-        line2: data.shipping_info.address.line2,
-        postalCode: data.shipping_info.address.postal_code,
-        city: data.shipping_info.address.city,
-        country: data.shipping_info.address.country,
-        state: data.shipping_info.address.state,
+        line1: data.billing.address.line1,
+        line2: data.billing.address.line2,
+        postalCode: data.billing.address.postal_code,
+        city: data.billing.address.city,
+        country: data.billing.address.country,
+        state: data.billing.address.state,
       };
 
       checkoutCreateOptions.metadata = {
         ...metadata,
-        _shipping_phone: data.shipping_info.address.phone ?? '',
-        _shipping_carrier: data.shipping_info.carrier ?? '',
+        _shipping_phone: data.billing.address.phone ?? '',
+        _shipping_carrier: data.billing.carrier ?? '',
       };
     }
 
@@ -158,7 +160,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       id,
       checkoutUpdate: {
         ...restData,
-        ...(metadata && { metadata: _.mapValues(metadata, value => JSON.stringify(value)) }),
+        ...(metadata && { metadata: Object.fromEntries(Object.entries(metadata).map(([key, value]) => [key, JSON.stringify(value)])) }),
         ...(item_id && { products: [item_id] }),
         ...provider_metadata,
       },
@@ -199,7 +201,11 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const name = data?.name ?? email.split('@')[0];
 
-    const response = await this.polar.customers.create({ email, name, ...(metadata && { metadata }) });
+    const response = await this.polar.customers.create({
+      email,
+      name,
+      metadata: { ...metadata, [PAYKIT_METADATA_KEY]: JSON.stringify({ phone: data?.phone ?? '' }) },
+    });
 
     return paykitCustomer$InboundSchema(response);
   };
@@ -301,31 +307,31 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       throw ValidationError.fromZodError(error, 'polar', 'createPayment');
     }
 
-    const metadataCore = _.mapValues(data.metadata ?? {}, value => JSON.stringify(value));
+    const metadataCore = Object.fromEntries(Object.entries(data.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]));
 
     const checkoutCreateOptions: CheckoutCreate = {
       amount: data.amount,
       ...(typeof data.customer === 'string' && { customerId: data.customer }),
       ...(typeof data.customer === 'object' && { customerEmail: data.customer.email }),
-      metadata: _.mapValues(metadataCore ?? {}, value => JSON.stringify(value)),
+      metadata: metadataCore,
       products: data.product_id ? [data.product_id] : [],
       ...(data.provider_metadata && { ...data.provider_metadata }),
     };
 
-    if (data.shipping_info) {
+    if (data.billing) {
       checkoutCreateOptions.customerBillingAddress = {
-        line1: data.shipping_info.address.line1,
-        line2: data.shipping_info.address.line2,
-        postalCode: data.shipping_info.address.postal_code,
-        city: data.shipping_info.address.city,
-        country: data.shipping_info.address.country,
-        state: data.shipping_info.address.state,
+        line1: data.billing.address.line1,
+        line2: data.billing.address.line2,
+        postalCode: data.billing.address.postal_code,
+        city: data.billing.address.city,
+        country: data.billing.address.country,
+        state: data.billing.address.state,
       };
 
       checkoutCreateOptions.metadata = {
         ...metadataCore,
-        _shipping_phone: data.shipping_info.address.phone ?? '',
-        _shipping_carrier: data.shipping_info.carrier ?? '',
+        _shipping_phone: data.billing.address.phone ?? '',
+        _shipping_carrier: data.billing.carrier ?? '',
       };
     }
 
@@ -343,11 +349,13 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const { provider_metadata, ...rest } = data;
 
+    const metadata = Object.fromEntries(Object.entries(rest.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]));
+
     const checkoutResponse = await this.polar.checkouts.update({
       id,
       checkoutUpdate: {
         ...rest,
-        ...(rest.metadata && { metadata: _.mapValues(rest.metadata ?? {}, value => JSON.stringify(value)) }),
+        ...(rest.metadata && { metadata }),
         ...(rest.product_id && { products: [rest.product_id] }),
         ...provider_metadata,
       },
@@ -454,7 +462,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
             currency: data.currency,
             customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
+            metadata: Object.fromEntries(Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
             product_id: data.product.id,
           };
 
@@ -484,7 +492,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
             currency: data.currency,
             customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: _.mapValues(metadata ?? {}, value => JSON.stringify(value)),
+            metadata: Object.fromEntries(Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
             product_id: data.product.id,
           };
 

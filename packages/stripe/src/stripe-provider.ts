@@ -38,8 +38,8 @@ import {
   AbstractPayKitProvider,
   schema,
   createCustomerSchema,
+  WebhookError,
 } from '@paykit-sdk/core';
-import _ from 'lodash';
 import Stripe from 'stripe';
 import { z } from 'zod';
 import {
@@ -83,7 +83,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
    * Checkout management
    */
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    const metadata = _.mapValues(params.metadata ?? {}, value => JSON.stringify(value));
+    const metadata = Object.fromEntries(Object.entries(params.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]));
 
     const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
       ...(typeof params.customer === 'string' && { customer: params.customer }),
@@ -95,17 +95,17 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       ...params.provider_metadata,
     };
 
-    if (params.shipping_info) {
+    if (params.billing) {
       checkoutOptions.shipping_address_collection = {
-        allowed_countries: [params.shipping_info.address.country as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry],
+        allowed_countries: [params.billing.address.country as Stripe.Checkout.SessionCreateParams.ShippingAddressCollection.AllowedCountry],
       };
 
       checkoutOptions.shipping_options = [
         {
-          shipping_rate: params.shipping_info.carrier,
+          shipping_rate: params.billing.carrier,
           shipping_rate_data: {
-            display_name: params.shipping_info.carrier ?? '',
-            fixed_amount: { amount: 0, currency: params.shipping_info.currency },
+            display_name: params.billing.carrier ?? '',
+            fixed_amount: { amount: 0, currency: params.billing.currency },
           },
         },
       ];
@@ -191,7 +191,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
     const subscription = await this.stripe.subscriptions.create({
       customer: data.customer,
       items: [{ price: data.item_id }],
-      metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)),
+      metadata: Object.fromEntries(Object.entries(data.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
       ...data.provider_metadata,
     });
 
@@ -211,9 +211,17 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       throw ValidationError.fromZodError(error, this.providerName, 'updateSubscription');
     }
 
-    const subscription = await this.stripe.subscriptions.update(id, { metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)) });
+    const subscription = await this.stripe.subscriptions.retrieve(id);
 
-    return paykitSubscription$InboundSchema(subscription);
+    const metadata = Object.fromEntries(
+      Object.entries({ ...(subscription.metadata ?? {}), ...(data.metadata ?? {}) }).map(([key, value]) => [key, JSON.stringify(value)]),
+    );
+
+    const updatedSubscription = await this.stripe.subscriptions.update(id, {
+      metadata,
+    });
+
+    return paykitSubscription$InboundSchema(updatedSubscription);
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
@@ -246,7 +254,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
-    if (error) throw new Error(error.message.split('\n').join(' '));
+    if (error) throw new ValidationError(error.message.split('\n').join(' '), { provider: this.providerName, method: 'createPayment' });
 
     const { provider_metadata, customer, ...rest } = data;
 
@@ -257,26 +265,25 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       });
     }
 
-    const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
-      ...provider_metadata,
-      ...rest,
-      metadata: _.mapValues({ ...(rest.metadata ?? {}), ...(provider_metadata?.metadata ?? {}), product_id: params.product_id ?? null }, value =>
-        JSON.stringify(value),
+    const metadata = Object.fromEntries(
+      Object.entries({ ...(rest.metadata ?? {}), ...(provider_metadata?.metadata ?? {}), product_id: params.product_id ?? null }).map(
+        ([key, value]) => [key, JSON.stringify(value)],
       ),
-      customer,
-    };
+    );
 
-    if (data.shipping_info) {
+    const paymentIntentOptions: Stripe.PaymentIntentCreateParams = { ...provider_metadata, ...rest, metadata, customer };
+
+    if (data.billing) {
       paymentIntentOptions.shipping = {
-        name: data.shipping_info.address.name,
-        phone: data.shipping_info.address.phone,
+        name: data.billing.address.name,
+        phone: data.billing.address.phone,
         address: {
-          line1: data.shipping_info.address.line1,
-          line2: data.shipping_info.address.line2,
-          city: data.shipping_info.address.city,
-          state: data.shipping_info.address.state,
-          postal_code: data.shipping_info.address.postal_code,
-          country: data.shipping_info.address.country,
+          line1: data.billing.address.line1,
+          line2: data.billing.address.line2,
+          city: data.billing.address.city,
+          state: data.billing.address.state,
+          postal_code: data.billing.address.postal_code,
+          country: data.billing.address.country,
         },
       };
     }
@@ -415,7 +422,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
           paid_at: new Date(event.created * 1000).toISOString(),
           amount_paid: data.amount_total ?? 0,
           currency: data.currency ?? '',
-          metadata: _.mapValues(data.metadata ?? {}, value => JSON.stringify(value)),
+          metadata: Object.fromEntries(Object.entries(data.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
           customer: typeof data.customer === 'string' ? data.customer : (data.customer?.id ?? ''),
           billing_mode: billingModeSchema.parse('one_time'),
           subscription_id: null,
@@ -534,11 +541,11 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const handler = webhookHandlers[event.type];
 
-    if (!handler) throw new Error(`Unhandled event type: ${event.type}`);
+    if (!handler) throw new WebhookError(`Unhandled event type: ${event.type}`, { provider: this.providerName });
 
     const result = await handler(event);
 
-    if (!result) throw new Error(`Unhandled event type: ${event.type}`);
+    if (!result) throw new WebhookError(`Unhandled event type: ${event.type}`, { provider: this.providerName });
 
     return result;
   };

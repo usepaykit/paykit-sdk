@@ -34,6 +34,7 @@ import {
   Invoice,
   schema,
   AbstractPayKitProvider,
+  PAYKIT_METADATA_KEY,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
 import crypto from 'crypto';
@@ -46,8 +47,6 @@ import {
   paykitRefund$InboundSchema,
   paykitSubscription$InboundSchema,
 } from './utils/mapper';
-
-export const PAYKIT_METADATA_KEY = '__paykit';
 
 export interface GoPayOptions extends PaykitProviderOptions {
   /**
@@ -137,11 +136,11 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
         allowed_payment_instruments: ['PAYMENT_CARD', 'BANK_ACCOUNT'],
         default_payment_instrument: 'PAYMENT_CARD',
         contact: { email: data.customer.email! },
-        ...(data.shipping_info && {
-          city: data.shipping_info.address.city,
-          postal_code: data.shipping_info.address.postal_code,
-          country_code: data.shipping_info.address.country,
-          phone_number: data.shipping_info.address.phone,
+        ...(data.billing && {
+          city: data.billing.address.city,
+          postal_code: data.billing.address.postal_code,
+          country_code: data.billing.address.country,
+          phone_number: data.billing.address.phone,
         }),
       },
       target: { type: 'ACCOUNT', goid: parseInt(this.opts.goId) },

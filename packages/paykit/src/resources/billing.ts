@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { schema } from '../tools';
 
-export interface ShippingAddress {
+export interface BillingAddress {
   /**
    * Full name of the recipient
    */
@@ -15,7 +15,7 @@ export interface ShippingAddress {
   /**
    * Secondary address (apartment, suite, unit, etc.)
    */
-  line2?: string;
+  line2: string;
 
   /**
    * City
@@ -45,13 +45,13 @@ export interface ShippingAddress {
 }
 
 /**
- * Shipping address for physical goods delivery
+ * Billing address
  */
-export const shippingAddressSchema = schema<ShippingAddress>()(
+export const billingAddressSchema = schema<BillingAddress>()(
   z.object({
     name: z.string().min(1, 'Recipient name is required'),
     line1: z.string().min(1, 'Address line 1 is required'),
-    line2: z.string().optional(),
+    line2: z.string().default(''),
     city: z.string().min(1, 'City is required'),
     state: z.string().optional(), // Optional because not all countries use states
     postal_code: z.string().min(1, 'Postal code is required'),
@@ -60,14 +60,14 @@ export const shippingAddressSchema = schema<ShippingAddress>()(
   }),
 );
 
-export interface ShippingInfo {
+export interface BillingInfo {
   /**
-   * Shipping address
+   * Billing address
    */
-  address: ShippingAddress;
+  address: BillingAddress;
 
   /**
-   * Shipping carrier preference (optional)
+   * Billing carrier preference (optional)
    * Provider-specific values
    */
   carrier?: string;
@@ -79,11 +79,11 @@ export interface ShippingInfo {
 }
 
 /**
- * Complete shipping information including carrier preferences
+ * Complete billing information including carrier preferences
  */
-export const shippingInfoSchema = schema<ShippingInfo>()(
+export const billingSchema = schema<BillingInfo>()(
   z.object({
-    address: shippingAddressSchema,
+    address: billingAddressSchema,
     carrier: z.string().optional(),
     currency: z.string().min(1, 'Currency is required'),
   }),

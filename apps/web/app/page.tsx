@@ -72,7 +72,7 @@ const Index = () => {
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <CopyButton
               className="min-h-fit max-w-full overflow-hidden px-4 py-3 text-left break-words whitespace-pre-wrap"
-              value="npx shadcn@latest add https://usepaykit.dev/r/stripe-nextjs"
+              value="npx shadcn@latest add https://www.usepaykit.dev/api/r/stripe-nextjs"
               variant="outline"
               size="lg"
             >

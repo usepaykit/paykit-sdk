@@ -3,8 +3,8 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const revalidate = false;
 
-export async function GET(request: NextRequest, { params }: { params: { name: string } }) {
-  const { name } = params;
+export async function GET(request: NextRequest, { params }: { params: Promise<{ name: string }> }) {
+  const { name } = await params;
 
   // Find the item in the registry
   const item = registryIndex.items.find(i => i.name === name);

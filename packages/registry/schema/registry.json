@@ -12,17 +12,20 @@
       "registryDependencies": [],
       "files": [
         {
+          "path": "lib/paykit.ts",
           "content": "import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';\nimport { stripe } from '@paykit-sdk/stripe';\n\nexport const paykit = new PayKit(stripe());\nexport const endpoints = createEndpointHandlers(paykit);\n",
           "type": "registry:lib",
           "target": "lib/paykit.ts"
         },
         {
-          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {\n  const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
+          "path": "app/api/paykit/[...endpoint]/route.ts",
+          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: Promise<{ endpoint: string[] }> }) {\n  const { endpoint: endpointArray } = await params;\n  const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
           "type": "registry:page",
           "target": "app/api/paykit/[...endpoint]/route.ts"
         },
         {
-          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  });\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  });\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  });\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  });\n  .on('invoice.generated', async event => {\n    console.log('Invoice generated:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
+          "path": "app/api/paykit/webhooks/route.ts",
+          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  })\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  })\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  })\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  })\n  .on('invoice.generated', async event => {\n    console.log('Invoice generated:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
           "type": "registry:page",
           "target": "app/api/paykit/webhooks/route.ts"
         }
@@ -57,17 +60,20 @@
         {
           "content": "import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';\nimport { stripe } from '@paykit-sdk/stripe';\n\nexport const paykit = new PayKit(stripe());\nexport const endpoints = createEndpointHandlers(paykit);\n",
           "type": "registry:lib",
-          "target": "lib/paykit.ts"
+          "target": "lib/paykit.ts",
+          "path": "lib/paykit.ts"
         },
         {
-          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {\n  const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
+          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: Promise<{ endpoint: string[] }> }) {\n  const { endpoint: endpointArray } = await params;\n  const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
           "type": "registry:page",
-          "target": "app/api/paykit/[...endpoint]/route.ts"
+          "target": "app/api/paykit/[...endpoint]/route.ts",
+          "path": "app/api/paykit/[...endpoint]/route.ts"
         },
         {
-          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  });\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  });\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  });\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  });\n  .on('invoice.generated', async event => {\n    console.log('Invoice generated:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
+          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  })\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  })\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  })\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  })\n  .on('invoice.generated', async event => {\n    console.log('Invoice generated:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
           "type": "registry:page",
-          "target": "app/api/paykit/webhooks/route.ts"
+          "target": "app/api/paykit/webhooks/route.ts",
+          "path": "app/api/paykit/webhooks/route.ts"
         }
       ],
       "envVars": {
@@ -95,12 +101,14 @@
         {
           "content": "import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';\nimport { stripe } from '@paykit-sdk/stripe';\n\nexport const paykit = new PayKit(stripe());\nexport const endpoints = createEndpointHandlers(paykit);\n",
           "type": "registry:lib",
-          "target": "src/lib/paykit.ts"
+          "target": "src/lib/paykit.ts",
+          "path": "src/lib/paykit.ts"
         },
         {
           "content": "import { paykit, endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { Hono } from 'hono';\n\nexport const app = new Hono();\n\napp.post('/*', async (c) => {\n  const path = c.req.path as EndpointPath;\n  const handler = endpoints[path];\n  if (!handler) return c.json({ message: 'Endpoint not found' }, 404);\n  const body = await c.req.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return c.json({ result });\n});\n",
           "type": "registry:page",
-          "target": "src/routes/paykit.ts"
+          "target": "src/routes/paykit.ts",
+          "path": "src/routes/paykit.ts"
         }
       ],
       "envVars": {
@@ -127,17 +135,20 @@
         {
           "content": "import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';\nimport { stripe } from '@paykit-sdk/stripe';\n\nexport const paykit = new PayKit(stripe());\nexport const endpoints = createEndpointHandlers(paykit);\n",
           "type": "registry:lib",
-          "target": "src/lib/paykit.ts"
+          "target": "src/lib/paykit.ts",
+          "path": "src/lib/paykit.ts"
         },
         {
           "content": "import { pgTable, text, timestamp, integer } from 'drizzle-orm/pg-core';\n\nexport const payments = pgTable('payments', {\n  id: text('id').primaryKey(),\n  customerId: text('customer_id').notNull(),\n  amount: integer('amount').notNull(),\n  currency: text('currency').notNull(),\n  status: text('status').notNull(),\n  provider: text('provider').notNull(),\n  providerPaymentId: text('provider_payment_id'),\n  metadata: text('metadata'),\n  createdAt: timestamp('created_at').defaultNow(),\n  updatedAt: timestamp('updated_at').defaultNow(),\n});\n\nexport const subscriptions = pgTable('subscriptions', {\n  id: text('id').primaryKey(),\n  customerId: text('customer_id').notNull(),\n  status: text('status').notNull(),\n  provider: text('provider').notNull(),\n  providerSubscriptionId: text('provider_subscription_id'),\n  currentPeriodStart: timestamp('current_period_start'),\n  currentPeriodEnd: timestamp('current_period_end'),\n  metadata: text('metadata'),\n  createdAt: timestamp('created_at').defaultNow(),\n  updatedAt: timestamp('updated_at').defaultNow(),\n});\n",
           "type": "registry:lib",
-          "target": "src/db/schema/payments.ts"
+          "target": "src/db/schema/payments.ts",
+          "path": "src/db/schema/payments.ts"
         },
         {
           "content": "import { paykit, endpoints } from '@/lib/paykit'; \n import { EndpointPath } from '@paykit-sdk/core';\nimport { Hono } from 'hono';\n\nexport const app = new Hono();\n\napp.post('/*', async (c) => {\n  const path = c.req.path as EndpointPath;\n  const handler = endpoints[path];\n  if (!handler) return c.json({ message: 'Endpoint not found' }, 404);\n  const body = await c.req.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return c.json({ result });\n});\n",
           "type": "registry:page",
-          "target": "src/routes/paykit.ts"
+          "target": "src/routes/paykit.ts",
+          "path": "src/routes/paykit.ts"
         }
       ],
       "docs": "Payment and subscription schemas have been added. Run 'drizzle-kit push' to sync with your database.",
@@ -160,17 +171,20 @@
         {
           "content": "import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';\nimport { paypal } from '@paykit-sdk/paypal';\n\nexport const paykit = new PayKit(paypal());\nexport const endpoints = createEndpointHandlers(paykit);\n",
           "type": "registry:lib",
-          "target": "lib/paykit.ts"
+          "target": "lib/paykit.ts",
+          "path": "lib/paykit.ts"
         },
         {
-          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {\n  const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
+          "content": "import { endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: Promise<{ endpoint: string[] }> }) {\n  const { endpoint: endpointArray } = await params;\n  const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
           "type": "registry:page",
-          "target": "app/api/paykit/[...endpoint]/route.ts"
+          "target": "app/api/paykit/[...endpoint]/route.ts",
+          "path": "app/api/paykit/[...endpoint]/route.ts"
         },
         {
-          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.PAYPAL_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  });\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  });\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  });\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
+          "content": "import { paykit } from '@/lib/paykit';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest) {\n  const webhookSecret = process.env.PAYPAL_WEBHOOK_SECRET;\n\n  if (!webhookSecret) {\n    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });\n  }\n\n  const webhook = paykit.webhooks\n  .setup({ webhookSecret })\n  .on('customer.created', async event => {\n    console.log('Customer created:', event.data);\n  })\n  .on('subscription.created', async event => {\n    console.log('Subscription created:', event.data);\n  })\n  .on('payment.created', async event => {\n    console.log('Payment created:', event.data);\n  })\n  .on('refund.created', async event => {\n   console.log('Refund created:', event.data);\n  });\n\n  const body = await request.text();\n  const headers = Object.fromEntries(request.headers.entries());\n  await webhook.handle({ body, headers, fullUrl: request.url });\n\n  return NextResponse.json({ success: true });\n}\n",
           "type": "registry:page",
-          "target": "app/api/paykit/webhooks/route.ts"
+          "target": "app/api/paykit/webhooks/route.ts",
+          "path": "app/api/paykit/webhooks/route.ts"
         }
       ],
       "envVars": {
@@ -204,7 +218,8 @@
         {
           "content": "import { paykit, endpoints } from '@/lib/paykit';\nimport { EndpointPath } from '@paykit-sdk/core';\nimport { NextRequest, NextResponse } from 'next/server';\n\nexport async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {\n  const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;\n  const handler = endpoints[endpoint];\n  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });\n  \n  const body = await request.json();\n  const { args } = body;\n  const result = await handler(...args);\n  return NextResponse.json({ result });\n}\n",
           "type": "registry:page",
-          "target": "app/api/paykit/[...endpoint]/route.ts"
+          "target": "app/api/paykit/[...endpoint]/route.ts",
+          "path": "app/api/paykit/[...endpoint]/route.ts"
         }
       ],
       "docs": "Payment and subscription models have been added to your Prisma schema. \n Copy the content from prisma/schema-payments.prisma to your main schema.prisma file. \n Run 'npx prisma migrate dev' to create the tables.",

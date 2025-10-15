@@ -27,7 +27,7 @@ export default defineConfig({
     {
       resolve: '@paykit-sdk/medusa-adapter',
       options: {
-        provider: createStripe({ apiKey: process.env.STRIPE_SECRET_KEY }),
+        provider: createStripe({ apiKey: process.env.STRIPE_API_KEY }),
         webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
         debug: process.env.NODE_ENV === 'development',
       },
@@ -39,7 +39,7 @@ export default defineConfig({
 ## Environment Variables
 
 ```env
-STRIPE_SECRET_KEY=sk_test_...
+STRIPE_API_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 

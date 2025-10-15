@@ -1,0 +1,113 @@
+model Customer {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  phone     String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  payments      Payment[]
+  subscriptions Subscription[]
+  invoices      Invoice[]
+}
+
+model Payment {
+  id         String        @id
+  amount     Int
+  currency   String
+  status     PaymentStatus
+  productId  String?       @map("product_id")
+  metadata   Json
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+
+  customerId String   @map("customer_id")
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  refunds    Refund[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+enum PaymentStatus {
+  pending
+  processing
+  requires_action
+  requires_capture
+  succeeded
+  canceled
+  failed
+}
+
+model Subscription {
+  id                  String               @id
+  amount              Int
+  currency            String
+  status              SubscriptionStatus
+  itemId              String               @map("item_id")
+  billingInterval     String               @map("billing_interval")
+  currentPeriodStart  DateTime             @map("current_period_start")
+  currentPeriodEnd    DateTime             @map("current_period_end")
+  metadata            Json?
+  customFields        Json?                @map("custom_fields")
+  createdAt           DateTime             @default(now())
+  updatedAt           DateTime             @updatedAt
+
+  customerId String   @map("customer_id")
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  invoices   Invoice[]
+
+  @@index([customerId])
+  @@index([status])
+}
+
+enum SubscriptionStatus {
+  active
+  past_due
+  canceled
+  expired
+  pending
+}
+
+model Refund {
+  id        String   @id
+  amount    Int
+  currency  String
+  reason    String?
+  metadata  Json?
+  createdAt DateTime @default(now())
+
+  paymentId String  @map("payment_id")
+  payment   Payment @relation(fields: [paymentId], references: [id], onDelete: Cascade)
+
+  @@index([paymentId])
+}
+
+model Invoice {
+  id             String        @id
+  subscriptionId String?       @map("subscription_id")
+  billingMode    String        @map("billing_mode")
+  amountPaid     Int           @map("amount_paid")
+  currency       String
+  status         InvoiceStatus
+  paidAt         DateTime?     @map("paid_at")
+  lineItems      Json?         @map("line_items")
+  metadata       Json?
+  customFields   Json?         @map("custom_fields")
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+
+  customerId String   @map("customer_id")
+  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([customerId])
+  @@index([subscriptionId])
+  @@index([status])
+}
+
+enum InvoiceStatus {
+  paid
+  open
+}

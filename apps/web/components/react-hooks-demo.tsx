@@ -12,7 +12,7 @@ export function PaymentForm() {
       customer_id: 'cus_123',
       item_id: 'price_123',
       session_type: 'one_time',
-      metadata: { plan: 'pro' },
+      metadata: { lifeTimeAccess: 'true' },
       provider_metadata: {
         success_url: 'https://example.com/success',
         cancel_url: 'https://example.com/cancel'
@@ -41,7 +41,9 @@ export const ReactHooksDemo = () => {
             <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
               React hooks for
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">seamless integration</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                seamless integration
+              </span>
             </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
               Use familiar React patterns with PayKit’s hooks. Type-safe, async-first, and provider-agnostic.
@@ -51,7 +53,12 @@ export const ReactHooksDemo = () => {
           <div className="bg-muted/20 relative mx-auto mt-12 max-w-2xl rounded-2xl border p-1">
             <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20"></div>
             <div className="bg-background relative space-y-6 rounded-xl">
-              <CodeBlock customStyle={{ width: '100%' }} showCopyButton={false} language="typescript" filename="components/payment-form.tsx">
+              <CodeBlock
+                customStyle={{ width: '100%' }}
+                showCopyButton={false}
+                language="typescript"
+                filename="components/payment-form.tsx"
+              >
                 {code}
               </CodeBlock>
             </div>

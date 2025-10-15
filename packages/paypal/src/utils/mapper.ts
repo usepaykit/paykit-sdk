@@ -27,7 +27,9 @@ export const paykitCheckout$InboundSchema = (order: Order): Checkout => {
     customer: order.payer?.payerId ? order.payer?.payerId : { email: order.payer?.emailAddress ?? '' },
     session_type: 'one_time',
     products: [{ id: order.purchaseUnits?.[0]?.items?.[0]?.sku || '', quantity: 1 }],
-    metadata: order.purchaseUnits?.[0]?.customId ? omitInternalMetadata(JSON.parse(order.purchaseUnits?.[0]?.customId)) : {},
+    metadata: order.purchaseUnits?.[0]?.customId
+      ? omitInternalMetadata(JSON.parse(order.purchaseUnits?.[0]?.customId))
+      : {},
     subscription: null,
   };
 };
@@ -52,7 +54,9 @@ export const paykitPayment$InboundSchema = (order: Order): Payment => {
     status,
     amount: parseFloat(order.purchaseUnits?.[0]?.amount?.value || '0'),
     currency: order.purchaseUnits?.[0]?.amount?.currencyCode || 'USD',
-    metadata: order.purchaseUnits?.[0]?.customId ? omitInternalMetadata(JSON.parse(order.purchaseUnits?.[0]?.customId)) : {},
+    metadata: order.purchaseUnits?.[0]?.customId
+      ? omitInternalMetadata(JSON.parse(order.purchaseUnits?.[0]?.customId))
+      : {},
     customer: order.payer?.payerId ? order.payer?.payerId : { email: order.payer?.emailAddress ?? '' },
     product_id: order.purchaseUnits?.[0]?.items?.[0]?.sku || '',
   };

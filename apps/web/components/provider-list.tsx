@@ -40,7 +40,9 @@ export function ProviderList({ selectedProvider, onProviderSelect }: ProviderLis
           onClick={() => onProviderSelect(provider.key)}
           className={cn(
             'w-full cursor-pointer rounded-lg p-3 text-left transition-colors',
-            selectedProvider === provider.key ? 'bg-muted text-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
+            selectedProvider === provider.key
+              ? 'bg-muted text-foreground'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted/50',
           )}
         >
           <div className="font-medium">{provider.name}</div>

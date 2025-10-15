@@ -14,7 +14,15 @@ import { metadataSchema, PaykitMetadata } from './metadata';
  * CANCELED - Payment canceled before completion
  * FAILED - Payment attempt failed
  */
-export const paymentStatusSchema = z.enum(['pending', 'processing', 'requires_action', 'requires_capture', 'succeeded', 'canceled', 'failed']);
+export const paymentStatusSchema = z.enum([
+  'pending',
+  'processing',
+  'requires_action',
+  'requires_capture',
+  'succeeded',
+  'canceled',
+  'failed',
+]);
 
 export type PaymentStatus = z.infer<typeof paymentStatusSchema>;
 
@@ -80,9 +88,10 @@ export interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
 }
 
 export const createPaymentSchema = schema<CreatePaymentSchema>()(
-  paymentSchema
-    .omit({ id: true, status: true })
-    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional(), billing: billingSchema.optional() }),
+  paymentSchema.omit({ id: true, status: true }).extend({
+    provider_metadata: z.record(z.string(), z.unknown()).optional(),
+    billing: billingSchema.optional(),
+  }),
 );
 
 export interface UpdatePaymentSchema extends Partial<Omit<Payment, 'id' | 'status'>> {

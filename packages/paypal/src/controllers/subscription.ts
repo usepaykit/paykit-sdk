@@ -11,8 +11,16 @@ import {
 export class SubscriptionsController extends BaseController {
   private catchAllErrors(req: ReturnType<BaseController['createRequest']>) {
     req.throwOn(400, CustomError, 'Request is not well-formed, syntactically incorrect, or violates schema.');
-    req.throwOn(401, CustomError, 'Authentication failed due to missing authorization header, or invalid authentication credentials.');
-    req.throwOn(422, CustomError, 'The requested action could not be performed, semantically incorrect, or failed business validation.');
+    req.throwOn(
+      401,
+      CustomError,
+      'Authentication failed due to missing authorization header, or invalid authentication credentials.',
+    );
+    req.throwOn(
+      422,
+      CustomError,
+      'The requested action could not be performed, semantically incorrect, or failed business validation.',
+    );
   }
 
   /**
@@ -62,7 +70,13 @@ export class SubscriptionsController extends BaseController {
     return req.callAsJson(subscriptionApticSchema);
   }
 
-  async updateSubscription({ subscriptionId, metadata }: { subscriptionId: string; metadata: Record<string, unknown> }) {
+  async updateSubscription({
+    subscriptionId,
+    metadata,
+  }: {
+    subscriptionId: string;
+    metadata: Record<string, unknown>;
+  }) {
     const req = this.createRequest('PATCH', `v1/billing/subscriptions/${subscriptionId}`);
     req.header('PayPal-Request-Id', Math.random().toString(36).substring(2, 15));
 

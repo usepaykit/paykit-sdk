@@ -29,7 +29,10 @@ export interface PayKitEndpoints {
 
   '/subscription/create': { args: [params: CreateSubscriptionSchema]; return: Subscription };
   '/subscription/retrieve': { args: [id: string]; return: Subscription | null };
-  '/subscription/update': { args: [id: string, params: UpdateSubscriptionSchema]; return: Subscription };
+  '/subscription/update': {
+    args: [id: string, params: UpdateSubscriptionSchema];
+    return: Subscription;
+  };
   '/subscription/cancel': { args: [id: string]; return: Subscription };
   '/subscription/delete': { args: [id: string]; return: null };
 

@@ -20,7 +20,12 @@ const Trigger = ({ ...props }: React.ComponentProps<typeof TooltipPrimitive.Trig
   return <TooltipPrimitive.Trigger data-slot="tooltip-trigger" {...props} />;
 };
 
-const Content = ({ className, sideOffset = 0, children, ...props }: React.ComponentProps<typeof TooltipPrimitive.Content>) => {
+const Content = ({
+  className,
+  sideOffset = 0,
+  children,
+  ...props
+}: React.ComponentProps<typeof TooltipPrimitive.Content>) => {
   return (
     <TooltipPrimitive.Portal>
       <TooltipPrimitive.Content

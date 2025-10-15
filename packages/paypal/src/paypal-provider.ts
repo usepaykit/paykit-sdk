@@ -90,7 +90,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     const environment = isSandbox ? Environment.Sandbox : Environment.Production;
 
     this.client = new Client({
-      clientCredentialsAuthCredentials: { oAuthClientId: clientId, oAuthClientSecret: clientSecret },
+      clientCredentialsAuthCredentials: {
+        oAuthClientId: clientId,
+        oAuthClientSecret: clientSecret,
+      },
       timeout: 0,
       environment,
       logging: {
@@ -167,7 +170,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
           countryCode: params.billing.address.country,
         },
         ...(params.billing.address.phone && {
-          phoneNumber: { nationalNumber: params.billing.address.phone, countryCode: params.billing.address.country },
+          phoneNumber: {
+            nationalNumber: params.billing.address.phone,
+            countryCode: params.billing.address.country,
+          },
         }),
       };
     }
@@ -257,7 +263,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription> => {
-    const subscription = await this.subscriptionsController.retrieveSubscription({ subscriptionId: id });
+    const subscription = await this.subscriptionsController.retrieveSubscription({
+      subscriptionId: id,
+    });
 
     return subscription as unknown as Subscription;
   };
@@ -308,7 +316,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
           countryCode: params.billing.address.country,
         },
         ...(params.billing.address.phone && {
-          phoneNumber: { nationalNumber: params.billing.address.phone, countryCode: params.billing.address.country },
+          phoneNumber: {
+            nationalNumber: params.billing.address.phone,
+            countryCode: params.billing.address.country,
+          },
         }),
       };
     }

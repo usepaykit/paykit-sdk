@@ -48,7 +48,8 @@ const toastVariants = {
   },
   error: {
     icon: XCircle,
-    containerClass: 'border-2 border-destructive/30 bg-card/95 text-card-foreground ring-1 ring-destructive/20 shadow-lg',
+    containerClass:
+      'border-2 border-destructive/30 bg-card/95 text-card-foreground ring-1 ring-destructive/20 shadow-lg',
     iconContainerClass: 'bg-destructive text-destructive-foreground',
   },
   warning: {
@@ -69,7 +70,15 @@ const toastVariants = {
 };
 
 // Custom toast component
-const ToastComponent = ({ variant, title, description }: { variant: keyof typeof toastVariants; title: string; description?: string }) => {
+const ToastComponent = ({
+  variant,
+  title,
+  description,
+}: {
+  variant: keyof typeof toastVariants;
+  title: string;
+  description?: string;
+}) => {
   const variantConfig = toastVariants[variant];
   const Icon = variantConfig.icon;
   const isLoading = variant === 'loading';
@@ -102,7 +111,12 @@ const ToastComponent = ({ variant, title, description }: { variant: keyof typeof
 };
 
 // Enhanced toast functions with modern styling
-const createToast = (variant: keyof typeof toastVariants, title: string, description?: string, options?: ExternalToast) => {
+const createToast = (
+  variant: keyof typeof toastVariants,
+  title: string,
+  description?: string,
+  options?: ExternalToast,
+) => {
   return toast.custom(() => <ToastComponent variant={variant} title={title} description={description} />, {
     duration: variant === 'loading' ? Infinity : 4000,
     ...options,
@@ -110,15 +124,20 @@ const createToast = (variant: keyof typeof toastVariants, title: string, descrip
 };
 
 const Toast = {
-  success: (dto: { title: string; description?: string; options?: ExternalToast }) => createToast('success', dto.title, dto.description, dto.options),
+  success: (dto: { title: string; description?: string; options?: ExternalToast }) =>
+    createToast('success', dto.title, dto.description, dto.options),
 
-  error: (dto: { title: string; description?: string; options?: ExternalToast }) => createToast('error', dto.title, dto.description, dto.options),
+  error: (dto: { title: string; description?: string; options?: ExternalToast }) =>
+    createToast('error', dto.title, dto.description, dto.options),
 
-  warning: (dto: { title: string; description?: string; options?: ExternalToast }) => createToast('warning', dto.title, dto.description, dto.options),
+  warning: (dto: { title: string; description?: string; options?: ExternalToast }) =>
+    createToast('warning', dto.title, dto.description, dto.options),
 
-  info: (dto: { title: string; description?: string; options?: ExternalToast }) => createToast('info', dto.title, dto.description, dto.options),
+  info: (dto: { title: string; description?: string; options?: ExternalToast }) =>
+    createToast('info', dto.title, dto.description, dto.options),
 
-  loading: (dto: { title: string; description?: string; options?: ExternalToast }) => createToast('loading', dto.title, dto.description, dto.options),
+  loading: (dto: { title: string; description?: string; options?: ExternalToast }) =>
+    createToast('loading', dto.title, dto.description, dto.options),
 
   promise: <T,>(
     promise: Promise<T>,
@@ -135,7 +154,10 @@ const Toast = {
     } = {},
   ) => {
     // Show loading toast immediately
-    const loadingToastId = createToast('loading', loadingMessage, undefined, { duration: Infinity, ...options });
+    const loadingToastId = createToast('loading', loadingMessage, undefined, {
+      duration: Infinity,
+      ...options,
+    });
 
     // Handle promise resolution/rejection
     promise

@@ -47,7 +47,8 @@ class PayKit {
   };
 
   webhooks = {
-    setup: (config: Omit<WebhookSetupConfig, 'provider'>) => new Webhook().setup({ ...config, provider: this.provider }),
+    setup: (config: Omit<WebhookSetupConfig, 'provider'>) =>
+      new Webhook().setup({ ...config, provider: this.provider }),
   };
 }
 

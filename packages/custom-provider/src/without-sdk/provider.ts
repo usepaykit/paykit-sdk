@@ -67,51 +67,75 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
   readonly providerName = providerName;
 
   updateCheckout(id: string, params: UpdateCheckoutSchema): Promise<Checkout> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   deleteCheckout(id: string): Promise<null> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   deleteCustomer(id: string): Promise<null> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   createSubscription(params: CreateSubscriptionSchema): Promise<Subscription> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   deleteSubscription(id: string): Promise<null> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   createPayment(params: CreatePaymentSchema): Promise<Payment> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   updatePayment(id: string, params: UpdatePaymentSchema): Promise<Payment> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   retrievePayment(id: string): Promise<Payment | null> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   deletePayment(id: string): Promise<null> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   capturePayment(id: string): Promise<Payment> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   cancelPayment(id: string): Promise<Payment> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   createRefund(params: CreateRefundSchema): Promise<Refund> {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   }
 
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
@@ -121,7 +145,9 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'createCheckout');
     }
 
-    const checkout = await this._client.post<Record<string, unknown>>('/checkouts', { body: JSON.stringify(data) });
+    const checkout = await this._client.post<Record<string, unknown>>('/checkouts', {
+      body: JSON.stringify(data),
+    });
 
     if (!checkout.ok) throw new Error('Failed to create checkout');
 
@@ -149,7 +175,9 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'createCustomer');
     }
 
-    const customer = await this._client.post<Record<string, unknown>>('/customers', { body: JSON.stringify(data) });
+    const customer = await this._client.post<Record<string, unknown>>('/customers', {
+      body: JSON.stringify(data),
+    });
 
     if (!customer.ok) throw new Error('Failed to create customer');
 
@@ -177,7 +205,9 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'updateCustomer');
     }
 
-    const customer = await this._client.put<Record<string, unknown>>(`/customers/${id}`, { body: JSON.stringify(data) });
+    const customer = await this._client.put<Record<string, unknown>>(`/customers/${id}`, {
+      body: JSON.stringify(data),
+    });
 
     if (!customer.ok) throw new Error('Failed to update customer');
 
@@ -194,7 +224,9 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'updateSubscription');
     }
 
-    const subscription = await this._client.put<Record<string, unknown>>(`/subscriptions/${id}`, { body: JSON.stringify(data) });
+    const subscription = await this._client.put<Record<string, unknown>>(`/subscriptions/${id}`, {
+      body: JSON.stringify(data),
+    });
 
     if (!subscription.ok) throw new Error('Failed to update subscription');
 
@@ -224,6 +256,8 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
   };
 
   handleWebhook = async (payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
-    throw new NotImplementedError('Method not implemented.', this.providerName, { futureSupport: true });
+    throw new NotImplementedError('Method not implemented.', this.providerName, {
+      futureSupport: true,
+    });
   };
 }

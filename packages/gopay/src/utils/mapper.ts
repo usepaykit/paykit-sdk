@@ -2,7 +2,9 @@ import { Invoice, Payment, Refund, Subscription, PAYKIT_METADATA_KEY, omitIntern
 import { GoPayPaymentResponse } from '../schema';
 
 export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment => {
-  const itemId = JSON.parse(data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
+  const itemId = JSON.parse(
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+  ).itemId;
 
   const metadata = omitInternalMetadata(
     data.additional_params?.reduce(
@@ -26,8 +28,12 @@ export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment
 };
 
 export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscription: boolean): Invoice => {
-  const quantity = JSON.parse(data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').qty;
-  const itemId = JSON.parse(data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
+  const quantity = JSON.parse(
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+  ).qty;
+  const itemId = JSON.parse(
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+  ).itemId;
 
   const status = (() => {
     if (data.state === 'PAID') return 'paid';
@@ -63,7 +69,9 @@ export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscr
 };
 
 export const paykitSubscription$InboundSchema = (data: GoPayPaymentResponse): Subscription => {
-  const itemId = JSON.parse(data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
+  const itemId = JSON.parse(
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+  ).itemId;
 
   const billingIntervalMap: Record<string, Subscription['billing_interval']> = {
     DAY: 'day',

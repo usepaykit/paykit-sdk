@@ -12,5 +12,9 @@ export const polar = () => {
     'Missing required environment variables: {keys}',
   );
 
-  return createPolar({ debug: true, accessToken: envVars.POLAR_ACCESS_TOKEN, isSandbox: envVars.POLAR_SANDBOX == 'true' });
+  return createPolar({
+    debug: true,
+    accessToken: envVars.POLAR_ACCESS_TOKEN,
+    isSandbox: envVars.POLAR_SANDBOX == 'true',
+  });
 };

@@ -38,7 +38,11 @@ const Trigger = ({ className, ...props }: React.ComponentProps<typeof TabsPrimit
 
 const Content = ({ className, ...props }: React.ComponentProps<typeof TabsPrimitive.Content>) => {
   return (
-    <TabsPrimitive.Content data-slot="tabs-content" className={cn('bg-card flex-1 rounded-lg p-4 shadow-sm outline-none', className)} {...props} />
+    <TabsPrimitive.Content
+      data-slot="tabs-content"
+      className={cn('bg-card flex-1 rounded-lg p-4 shadow-sm outline-none', className)}
+      {...props}
+    />
   );
 };
 

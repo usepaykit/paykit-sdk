@@ -9,7 +9,9 @@ export const agenticMessageSchema = z.object({
   /**
    * The code of the message.
    */
-  code: z.enum(['missing', 'invalid', 'out_of_stock', 'payment_declined', 'requires_sign_in', 'requires_3ds']).optional(),
+  code: z
+    .enum(['missing', 'invalid', 'out_of_stock', 'payment_declined', 'requires_sign_in', 'requires_3ds'])
+    .optional(),
 
   /**
    * The param of the message.

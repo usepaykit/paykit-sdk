@@ -16,9 +16,24 @@ export class WebhookController extends BaseController {
     req.header('Content-Type', 'application/json');
 
     req.throwOn(400, CustomError, 'Request is not well-formed, syntactically incorrect, or violates schema.');
-    req.throwOn(401, CustomError, 'Authentication failed due to missing authorization header, or invalid authentication credentials.');
-    req.throwOn(422, CustomError, 'The requested action could not be performed, semantically incorrect, or failed business validation.');
-    req.json(Object.fromEntries(Object.entries(body).map(([key, value]) => [key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`), value])));
+    req.throwOn(
+      401,
+      CustomError,
+      'Authentication failed due to missing authorization header, or invalid authentication credentials.',
+    );
+    req.throwOn(
+      422,
+      CustomError,
+      'The requested action could not be performed, semantically incorrect, or failed business validation.',
+    );
+    req.json(
+      Object.fromEntries(
+        Object.entries(body).map(([key, value]) => [
+          key.replace(/[A-Z]/g, letter => `_${letter.toLowerCase()}`),
+          value,
+        ]),
+      ),
+    );
 
     req.authenticate([{ oauth2: true }]);
     return req.callAsJson(verifyWebhookSchema);

@@ -29,7 +29,15 @@ export interface GoPayPaymentResponse {
   /**
    * The state of the payment
    */
-  state: 'CREATED' | 'PAYMENT_METHOD_CHOSEN' | 'PAID' | 'AUTHORIZED' | 'CANCELED' | 'TIMEOUTED' | 'REFUNDED' | 'PARTIALLY_REFUNDED';
+  state:
+    | 'CREATED'
+    | 'PAYMENT_METHOD_CHOSEN'
+    | 'PAID'
+    | 'AUTHORIZED'
+    | 'CANCELED'
+    | 'TIMEOUTED'
+    | 'REFUNDED'
+    | 'PARTIALLY_REFUNDED';
 
   /**
    * The sub state of the payment

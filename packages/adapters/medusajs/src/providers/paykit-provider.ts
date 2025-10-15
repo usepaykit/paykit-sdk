@@ -149,7 +149,10 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     if (paymentIntentError)
       throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
 
-    return { id: paymentIntentResult.id, status: medusaStatus$InboundSchema(paymentIntentResult.status) };
+    return {
+      id: paymentIntentResult.id,
+      status: medusaStatus$InboundSchema(paymentIntentResult.status),
+    };
   };
 
   capturePayment = async (input: CapturePaymentInput): Promise<CapturePaymentOutput> => {
@@ -359,7 +362,10 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       .on('payment.created', async event => {
         return {
           action: PaymentActions.PENDING,
-          data: { session_id: event.data?.metadata?.session_id as string, amount: event.data?.amount },
+          data: {
+            session_id: event.data?.metadata?.session_id as string,
+            amount: event.data?.amount,
+          },
         };
       })
       .on('payment.updated', async event => {
@@ -375,13 +381,19 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
 
         return {
           action: event.data?.status ? statusActionMap[event.data.status] : PaymentActions.PENDING,
-          data: { session_id: event.data?.metadata?.session_id as string, amount: event.data?.amount },
+          data: {
+            session_id: event.data?.metadata?.session_id as string,
+            amount: event.data?.amount,
+          },
         };
       })
       .on('payment.canceled', async event => {
         return {
           action: PaymentActions.CANCELED,
-          data: { session_id: event.data?.metadata?.session_id as string, amount: event.data?.amount },
+          data: {
+            session_id: event.data?.metadata?.session_id as string,
+            amount: event.data?.amount,
+          },
         };
       });
 

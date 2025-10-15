@@ -28,7 +28,12 @@ export async function GET(request: NextRequest, { params }: { params: { name: st
 }
 
 export async function OPTIONS() {
-  const items = registryIndex.items.map(({ name, description, type, meta }) => ({ name, description, type, meta }));
+  const items = registryIndex.items.map(({ name, description, type, meta }) => ({
+    name,
+    description,
+    type,
+    meta,
+  }));
 
   return NextResponse.json(
     { registry: registryIndex.name, homepage: registryIndex.homepage, items },

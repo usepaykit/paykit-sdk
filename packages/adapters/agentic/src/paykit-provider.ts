@@ -22,7 +22,9 @@ export class PaykitAgenticAdapter {
     }
   }
 
-  createAgenticCheckoutSession = async (params: CreateAgenticCheckoutSessionParams): Promise<AgenticCheckoutSession> => {
+  createAgenticCheckoutSession = async (
+    params: CreateAgenticCheckoutSessionParams,
+  ): Promise<AgenticCheckoutSession> => {
     const { line2 = '', line1, city, state, country, postal_code } = params.fulfillment_address ?? {};
 
     const checkout = await this.provider.createCheckout({
@@ -54,12 +56,18 @@ export class PaykitAgenticAdapter {
 
     return agenticCheckoutSession$InboundSchema(
       checkout,
-      parseJSON(JSON.parse(checkout.metadata?.PAYKIT_METADATA_KEY ?? '{}').agent ?? '{}', createAgenticCheckoutSessionParamsSchema),
+      parseJSON(
+        JSON.parse(checkout.metadata?.PAYKIT_METADATA_KEY ?? '{}').agent ?? '{}',
+        createAgenticCheckoutSessionParamsSchema,
+      ),
       this.provider.providerName,
     );
   };
 
-  updateAgenticCheckoutSession = async (_id: string, _params: UpdateAgenticCheckoutSessionParams): Promise<AgenticCheckoutSession> => {
+  updateAgenticCheckoutSession = async (
+    _id: string,
+    _params: UpdateAgenticCheckoutSessionParams,
+  ): Promise<AgenticCheckoutSession> => {
     throw new Error('Not implemented');
   };
 
@@ -68,10 +76,17 @@ export class PaykitAgenticAdapter {
 
     if (!checkout) throw new Error('Checkout not found');
 
-    return agenticCheckoutSession$InboundSchema(checkout, JSON.parse(checkout.metadata?.agenticParams ?? '{}'), this.provider.providerName);
+    return agenticCheckoutSession$InboundSchema(
+      checkout,
+      JSON.parse(checkout.metadata?.agenticParams ?? '{}'),
+      this.provider.providerName,
+    );
   };
 
-  completeAgenticCheckoutSession = async (id: string, params: { buyer?: AgenticBuyer }): Promise<AgenticCheckoutSession> => {
+  completeAgenticCheckoutSession = async (
+    id: string,
+    params: { buyer?: AgenticBuyer },
+  ): Promise<AgenticCheckoutSession> => {
     throw new Error('Not Implemented');
   };
 

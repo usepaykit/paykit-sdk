@@ -12,12 +12,16 @@ export const LifetimeAccessEmail = () => {
             {/* Header */}
             <Section tw="text-center mb-8">
               <Heading tw="text-[oklch(0.2046 0 0)] text-3xl font-bold mb-4">Thanks for supporting PayKit</Heading>
-              <Text tw="text-[oklch(0.2435 0 0)] text-lg">You now have lifetime access to everything we’re building, forever.</Text>
+              <Text tw="text-[oklch(0.2435 0 0)] text-lg">
+                You now have lifetime access to everything we’re building, forever.
+              </Text>
             </Section>
 
             {/* Main Content */}
             <Section tw="mb-8">
-              <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed mb-4">No limits. No subscriptions. Just one-time peace of mind.</Text>
+              <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed mb-4">
+                No limits. No subscriptions. Just one-time peace of mind.
+              </Text>
 
               <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed mb-6">
                 When V2 is launched, you’ll get a ping with your login link and full access to the cloud features.

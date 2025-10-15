@@ -3,7 +3,11 @@ import { cn } from '../lib/utils';
 
 const Root = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
-    <div data-slot="card" className={cn('bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm', className)} {...props} />
+    <div
+      data-slot="card"
+      className={cn('bg-card text-card-foreground flex flex-col gap-6 rounded-xl border py-6 shadow-sm', className)}
+      {...props}
+    />
   );
 };
 
@@ -29,7 +33,13 @@ const Description = ({ className, ...props }: React.ComponentProps<'div'>) => {
 };
 
 const Action = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  return <div data-slot="card-action" className={cn('col-start-2 row-span-2 row-start-1 self-start justify-self-end', className)} {...props} />;
+  return (
+    <div
+      data-slot="card-action"
+      className={cn('col-start-2 row-span-2 row-start-1 self-start justify-self-end', className)}
+      {...props}
+    />
+  );
 };
 
 const Content = ({ className, ...props }: React.ComponentProps<'div'>) => {
@@ -37,7 +47,9 @@ const Content = ({ className, ...props }: React.ComponentProps<'div'>) => {
 };
 
 const Footer = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  return <div data-slot="card-footer" className={cn('flex items-center px-6 [.border-t]:pt-6', className)} {...props} />;
+  return (
+    <div data-slot="card-footer" className={cn('flex items-center px-6 [.border-t]:pt-6', className)} {...props} />
+  );
 };
 
 export const Card = { Root, Header, Footer, Title, Action, Description, Content };

@@ -48,7 +48,10 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
       )}
     >
       <div className="[&_*]:!bg-transparent">
-        <CodeBlock language="typescript" customStyle={{ padding: 0, background: 'none', fontSize: '14px', border: 'none' }}>
+        <CodeBlock
+          language="typescript"
+          customStyle={{ padding: 0, background: 'none', fontSize: '14px', border: 'none' }}
+        >
           {currentContent}
         </CodeBlock>
       </div>

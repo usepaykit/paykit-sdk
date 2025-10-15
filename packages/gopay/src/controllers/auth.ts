@@ -9,7 +9,11 @@ export class AuthController {
   constructor(private opts: GoPayOptions & { baseUrl: string }) {
     const debug = opts.debug ?? true;
 
-    this._client = new HTTPClient({ baseUrl: this.opts.baseUrl, headers: {}, retryOptions: { max: 3, baseDelay: 1000, debug } });
+    this._client = new HTTPClient({
+      baseUrl: this.opts.baseUrl,
+      headers: {},
+      retryOptions: { max: 3, baseDelay: 1000, debug },
+    });
   }
 
   getAccessToken = async () => {
@@ -22,8 +26,14 @@ export class AuthController {
     // Generate a new one
     const credentials = Buffer.from(`${this.opts.clientId}:${this.opts.clientSecret}`).toString('base64');
     const response = await this._client.post<GoPayTokenResponse>('/oauth2/token', {
-      headers: { Authorization: `Basic ${credentials}`, 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams({ grant_type: 'client_credentials', scope: 'payment-all' }).toString(),
+      headers: {
+        Authorization: `Basic ${credentials}`,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+      body: new URLSearchParams({
+        grant_type: 'client_credentials',
+        scope: 'payment-all',
+      }).toString(),
     });
 
     if (!response.ok || !response.value.access_token) {
@@ -42,6 +52,10 @@ export class AuthController {
 
   getAuthHeaders = async () => {
     const token = await this.getAccessToken();
-    return { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json', Accept: 'application/json' };
+    return {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    };
   };
 }

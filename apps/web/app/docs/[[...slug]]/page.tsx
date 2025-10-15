@@ -111,7 +111,10 @@ export default async function DocPage({ params }: DocPageProps) {
                   href={doc.links.doc}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                  className={cn(
+                    badgeVariants({ variant: 'secondary' }),
+                    'hover:bg-secondary/80 gap-1 transition-colors',
+                  )}
                 >
                   Docs
                   <ExternalLink className="h-3 w-3" />
@@ -122,7 +125,10 @@ export default async function DocPage({ params }: DocPageProps) {
                   href={doc.links.api}
                   target="_blank"
                   rel="noreferrer"
-                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-secondary/80 gap-1 transition-colors')}
+                  className={cn(
+                    badgeVariants({ variant: 'secondary' }),
+                    'hover:bg-secondary/80 gap-1 transition-colors',
+                  )}
                 >
                   API Reference
                   <ExternalLink className="h-3 w-3" />

@@ -1,7 +1,10 @@
 import { Invoice, omitInternalMetadata, Payment } from '@paykit-sdk/core';
 import { ComgateWebhookStatusSuccessResponse } from '../schema';
 
-export const paykitPayment$InboundSchema = (webhookResponse: ComgateWebhookStatusSuccessResponse, status: Payment['status']): Payment => {
+export const paykitPayment$InboundSchema = (
+  webhookResponse: ComgateWebhookStatusSuccessResponse,
+  status: Payment['status'],
+): Payment => {
   return {
     id: webhookResponse.transId,
     amount: webhookResponse.price,

@@ -39,7 +39,15 @@ function useCarousel() {
   return context;
 }
 
-const Root = ({ orientation = 'horizontal', opts, setApi, plugins, className, children, ...props }: React.ComponentProps<'div'> & CarouselProps) => {
+const Root = ({
+  orientation = 'horizontal',
+  opts,
+  setApi,
+  plugins,
+  className,
+  children,
+  ...props
+}: React.ComponentProps<'div'> & CarouselProps) => {
   const [carouselRef, api] = useEmblaCarousel({ ...opts, axis: orientation === 'horizontal' ? 'x' : 'y' }, plugins);
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
@@ -148,7 +156,9 @@ const Previous = ({ className, variant = 'outline', size = 'icon', ...props }: R
       size={size}
       className={cn(
         'absolute size-8 rounded-full',
-        orientation === 'horizontal' ? 'top-1/2 -left-12 -translate-y-1/2' : '-top-12 left-1/2 -translate-x-1/2 rotate-90',
+        orientation === 'horizontal'
+          ? 'top-1/2 -left-12 -translate-y-1/2'
+          : '-top-12 left-1/2 -translate-x-1/2 rotate-90',
         className,
       )}
       disabled={!canScrollPrev}
@@ -171,7 +181,9 @@ const Next = ({ className, variant = 'outline', size = 'icon', ...props }: React
       size={size}
       className={cn(
         'absolute size-8 rounded-full',
-        orientation === 'horizontal' ? 'top-1/2 -right-12 -translate-y-1/2' : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
+        orientation === 'horizontal'
+          ? 'top-1/2 -right-12 -translate-y-1/2'
+          : '-bottom-12 left-1/2 -translate-x-1/2 rotate-90',
         className,
       )}
       disabled={!canScrollNext}

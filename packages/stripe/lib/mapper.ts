@@ -22,7 +22,10 @@ export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session):
     customer: typeof checkout.customer === 'string' ? checkout.customer : (checkout.customer?.id ?? ''),
     session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time',
     payment_url: checkout.url!,
-    products: checkout.line_items!.data.map(item => ({ id: item.price!.id, quantity: item.quantity! })),
+    products: checkout.line_items!.data.map(item => ({
+      id: item.price!.id,
+      quantity: item.quantity!,
+    })),
     currency: checkout.currency!,
     amount: checkout.amount_total!,
     subscription: null,

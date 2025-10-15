@@ -231,12 +231,15 @@ export class RateLimitError extends PayKitError {
       limit?: number;
     },
   ) {
-    super(`Rate limit exceeded for ${provider}${options?.retryAfter ? `. Retry after ${options.retryAfter} seconds` : ''}`, {
-      code: 'RATE_LIMIT_ERROR',
-      statusCode: 429,
-      provider,
-      context: { retryAfter: options?.retryAfter, limit: options?.limit },
-    });
+    super(
+      `Rate limit exceeded for ${provider}${options?.retryAfter ? `. Retry after ${options.retryAfter} seconds` : ''}`,
+      {
+        code: 'RATE_LIMIT_ERROR',
+        statusCode: 429,
+        provider,
+        context: { retryAfter: options?.retryAfter, limit: options?.limit },
+      },
+    );
   }
 }
 
@@ -277,11 +280,14 @@ export class ConstraintViolationError extends PayKitError {
       provider?: string;
     },
   ) {
-    super(`Constraint violation: ${constraint}${options?.limit ? ` (limit: ${options.limit}, received: ${options.value})` : ''}`, {
-      code: 'CONSTRAINT_VIOLATION',
-      statusCode: 400,
-      provider: options?.provider,
-      context: { constraint, value: options?.value, limit: options?.limit },
-    });
+    super(
+      `Constraint violation: ${constraint}${options?.limit ? ` (limit: ${options.limit}, received: ${options.value})` : ''}`,
+      {
+        code: 'CONSTRAINT_VIOLATION',
+        statusCode: 400,
+        provider: options?.provider,
+        context: { constraint, value: options?.value, limit: options?.limit },
+      },
+    );
   }
 }

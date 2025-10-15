@@ -6,12 +6,18 @@ import { cn } from '../lib/utils';
 
 const Root = ({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Root>) => {
   return (
-    <AvatarPrimitive.Root data-slot="avatar" className={cn('relative flex size-8 shrink-0 overflow-hidden rounded-full', className)} {...props} />
+    <AvatarPrimitive.Root
+      data-slot="avatar"
+      className={cn('relative flex size-8 shrink-0 overflow-hidden rounded-full', className)}
+      {...props}
+    />
   );
 };
 
 const Image = ({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Image>) => {
-  return <AvatarPrimitive.Image data-slot="avatar-image" className={cn('aspect-square size-full', className)} {...props} />;
+  return (
+    <AvatarPrimitive.Image data-slot="avatar-image" className={cn('aspect-square size-full', className)} {...props} />
+  );
 };
 
 const Fallback = ({ className, ...props }: React.ComponentProps<typeof AvatarPrimitive.Fallback>) => {

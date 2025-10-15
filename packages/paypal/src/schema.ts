@@ -41,7 +41,11 @@ export interface CreateSubscriptionSchema {
   /**
    * The subscriber of the subscription.
    */
-  subscriber: { email_address: string; name: { given_name: string; surname: string }; phone: { phone_number: string } };
+  subscriber: {
+    email_address: string;
+    name: { given_name: string; surname: string };
+    phone: { phone_number: string };
+  };
 }
 
 export const createSubscriptionApticSchema: Schema<CreateSubscriptionSchema> = object({

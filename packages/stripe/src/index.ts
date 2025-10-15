@@ -6,9 +6,17 @@ export const createStripe = (config: StripeOptions) => {
 };
 
 export const stripe = () => {
-  const envVars = validateRequiredKeys(['STRIPE_API_KEY'], process.env as Record<string, string>, 'Missing required environment variables: {keys}');
+  const envVars = validateRequiredKeys(
+    ['STRIPE_API_KEY'],
+    process.env as Record<string, string>,
+    'Missing required environment variables: {keys}',
+  );
 
   const isSandbox = process.env.NODE_ENV === 'development';
 
-  return createStripe({ apiKey: envVars.STRIPE_API_KEY, debug: isSandbox, apiVersion: '2025-07-30.basil' });
+  return createStripe({
+    apiKey: envVars.STRIPE_API_KEY,
+    debug: isSandbox,
+    apiVersion: '2025-07-30.basil',
+  });
 };

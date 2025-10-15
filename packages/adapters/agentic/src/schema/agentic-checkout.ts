@@ -42,7 +42,13 @@ export const agenticOrderSchema = z.object({
 
 export type AgenticOrder = z.infer<typeof agenticOrderSchema>;
 
-export const agenticCheckoutSessionStatus = z.enum(['not_ready_for_payment', 'ready_for_payment', 'completed', 'cancelled', 'in_progress']);
+export const agenticCheckoutSessionStatus = z.enum([
+  'not_ready_for_payment',
+  'ready_for_payment',
+  'completed',
+  'cancelled',
+  'in_progress',
+]);
 
 export const agenticCheckoutSessionSchema = z.object({
   /**
@@ -58,7 +64,10 @@ export const agenticCheckoutSessionSchema = z.object({
   /**
    * The payment provider of the checkout.
    */
-  payment_provider: z.object({ provider: z.string(), supported_payment_methods: z.array(z.enum(['card'])) }),
+  payment_provider: z.object({
+    provider: z.string(),
+    supported_payment_methods: z.array(z.enum(['card'])),
+  }),
 
   /**
    * The status of the checkout.

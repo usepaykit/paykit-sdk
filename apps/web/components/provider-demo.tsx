@@ -49,11 +49,14 @@ export function ProviderDemo() {
             <h2 className="mb-6 text-4xl font-bold tracking-tight md:text-5xl">
               Switch providers with
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">just 2 lines of code</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                just 2 lines of code
+              </span>
             </h2>
 
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed">
-              Watch the magic happen. Only the lines that change between providers will animate, showing you exactly what needs to be modified.
+              Watch the magic happen. Only the lines that change between providers will animate, showing you exactly
+              what needs to be modified.
             </p>
           </div>
 

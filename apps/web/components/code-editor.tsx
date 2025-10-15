@@ -20,7 +20,13 @@ interface CodeEditorProps {
  */
 const TypedSyntaxHighlighter = SyntaxHighlighter as any;
 
-export function CodeEditor({ code, language = 'typescript', showCopyButton = true, highlightLines = [], className = '' }: CodeEditorProps) {
+export function CodeEditor({
+  code,
+  language = 'typescript',
+  showCopyButton = true,
+  highlightLines = [],
+  className = '',
+}: CodeEditorProps) {
   const { theme } = useTheme();
   const [copied, setCopied] = useState(false);
 

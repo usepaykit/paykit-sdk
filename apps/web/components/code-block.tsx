@@ -115,13 +115,29 @@ function CodeBlockContent({ language = '', children, customStyle, ...props }: Co
     resolvedTheme === 'dark'
       ? {
           ...oneDark,
-          'pre[class*="language-"]': { ...oneDark['pre[class*="language-"]'], background: '#0f0f0f', margin: 0, borderRadius: '0 0 8px 8px' },
-          'code[class*="language-"]': { ...oneDark['code[class*="language-"]'], background: '#0f0f0f' },
+          'pre[class*="language-"]': {
+            ...oneDark['pre[class*="language-"]'],
+            background: '#0f0f0f',
+            margin: 0,
+            borderRadius: '0 0 8px 8px',
+          },
+          'code[class*="language-"]': {
+            ...oneDark['code[class*="language-"]'],
+            background: '#0f0f0f',
+          },
         }
       : {
           ...oneLight,
-          'pre[class*="language-"]': { ...oneLight['pre[class*="language-"]'], background: '#fafafa', margin: 0, borderRadius: '0 0 8px 8px' },
-          'code[class*="language-"]': { ...oneLight['code[class*="language-"]'], background: '#fafafa' },
+          'pre[class*="language-"]': {
+            ...oneLight['pre[class*="language-"]'],
+            background: '#fafafa',
+            margin: 0,
+            borderRadius: '0 0 8px 8px',
+          },
+          'code[class*="language-"]': {
+            ...oneLight['code[class*="language-"]'],
+            background: '#fafafa',
+          },
         };
 
   // Override theme for bash

@@ -30,7 +30,11 @@ export const safeEncode = <T>(value: T) => {
 };
 
 export const safeDecode = <T>(value: string) => {
-  return safeParse(value, value => JSON.parse(Buffer.from(value, 'base64').toString('utf-8')) as T, 'Failed to decode value');
+  return safeParse(
+    value,
+    value => JSON.parse(Buffer.from(value, 'base64').toString('utf-8')) as T,
+    'Failed to decode value',
+  );
 };
 
 export async function executeWithRetryWithHandler<T>(
@@ -86,7 +90,8 @@ export const validateRequiredKeys = <K extends string>(
 
   if (missingKeys.length > 0) {
     const missingKeysList = missingKeys.join(', ');
-    const error = typeof errorMessage === 'function' ? errorMessage(missingKeys) : errorMessage.replace('{keys}', missingKeysList);
+    const error =
+      typeof errorMessage === 'function' ? errorMessage(missingKeys) : errorMessage.replace('{keys}', missingKeysList);
     throw new Error(error);
   }
 
@@ -107,11 +112,15 @@ export const parseJSON = <T>(str: string, schema: z.ZodSchema<T>): T => {
  */
 export const schema = <TInterface>() => {
   return <TSchema extends z.ZodType<any>>(
-    schema: TSchema & (z.infer<TSchema> extends TInterface ? (TInterface extends z.infer<TSchema> ? unknown : never) : never),
+    schema: TSchema &
+      (z.infer<TSchema> extends TInterface ? (TInterface extends z.infer<TSchema> ? unknown : never) : never),
   ): TSchema => schema;
 };
 
-export const omitInternalMetadata = (metadata: Record<string, any>, internalKeys: string[] = [PAYKIT_METADATA_KEY]): PaykitMetadata => {
+export const omitInternalMetadata = (
+  metadata: Record<string, any>,
+  internalKeys: string[] = [PAYKIT_METADATA_KEY],
+): PaykitMetadata => {
   return Object.entries(metadata).reduce((acc, [key, value]) => {
     if (!internalKeys.includes(key)) {
       acc[key] = String(value);

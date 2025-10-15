@@ -10,7 +10,13 @@ const Root = ({ ...props }: React.ComponentProps<typeof AccordionPrimitive.Root>
 };
 
 const Item = ({ className, ...props }: React.ComponentProps<typeof AccordionPrimitive.Item>) => {
-  return <AccordionPrimitive.Item data-slot="accordion-item" className={cn('border-b last:border-b-0', className)} {...props} />;
+  return (
+    <AccordionPrimitive.Item
+      data-slot="accordion-item"
+      className={cn('border-b last:border-b-0', className)}
+      {...props}
+    />
+  );
 };
 
 const Trigger = ({ className, children, ...props }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) => {

@@ -94,22 +94,33 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
   }
 
   private _throwOnError = <T>(req: Result<T extends { code: number } ? T : never>, message: string) => {
-    if (!req.ok) throw new OperationFailedError(message, this.providerName, { cause: new Error(req.error as string) });
+    if (!req.ok)
+      throw new OperationFailedError(message, this.providerName, {
+        cause: new Error(req.error as string),
+      });
 
     if (req.value.code == 1100) {
-      throw new OperationFailedError('Unknown error', this.providerName, { cause: new Error('Unknown error') });
+      throw new OperationFailedError('Unknown error', this.providerName, {
+        cause: new Error('Unknown error'),
+      });
     }
 
     if (req.value.code == 1200) {
-      throw new OperationFailedError('Database error', this.providerName, { cause: new Error('Database error') });
+      throw new OperationFailedError('Database error', this.providerName, {
+        cause: new Error('Database error'),
+      });
     }
 
     if (req.value.code == 1400) {
-      throw new OperationFailedError('Wrong query error', this.providerName, { cause: new Error('Wrong query error') });
+      throw new OperationFailedError('Wrong query error', this.providerName, {
+        cause: new Error('Wrong query error'),
+      });
     }
 
     if (req.value.code == 1500) {
-      throw new OperationFailedError('Unexpected error', this.providerName, { cause: new Error('Unexpected error') });
+      throw new OperationFailedError('Unexpected error', this.providerName, {
+        cause: new Error('Unexpected error'),
+      });
     }
 
     return req.value as T;
@@ -441,7 +452,11 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     // Verify the webhook
     const verifyResponse = await this._client.post<ComgateWebhookStatusResponseBase>('/v1.0/status', {
-      body: new URLSearchParams({ merchant: this.opts.merchant, transId, secret: this.opts.secret }).toString(),
+      body: new URLSearchParams({
+        merchant: this.opts.merchant,
+        transId,
+        secret: this.opts.secret,
+      }).toString(),
     });
 
     this._throwOnError(verifyResponse, 'Failed to verify webhook');

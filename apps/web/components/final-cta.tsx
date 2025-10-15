@@ -12,9 +12,13 @@ export const FinalCTA = () => {
             <h2 className="text-4xl font-bold tracking-tight md:text-5xl">
               Ready to build
               <br />
-              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">payment-agnostic apps?</span>
+              <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+                payment-agnostic apps?
+              </span>
             </h2>
-            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">Start with local development today. Deploy to any provider tomorrow.</p>
+            <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
+              Start with local development today. Deploy to any provider tomorrow.
+            </p>
           </div>
 
           <div className="flex flex-col items-center justify-center gap-4 sm:flex-row">

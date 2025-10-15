@@ -42,6 +42,7 @@ export const providerSchema = z.custom<PayKitProvider>(
     return requiredMethods.every(method => typeof provider[method] === 'function');
   },
   {
-    message: 'Invalid PayKit provider: must implement PayKitProvider interface with all required methods and providerName property',
+    message:
+      'Invalid PayKit provider: must implement PayKitProvider interface with all required methods and providerName property',
   },
 );

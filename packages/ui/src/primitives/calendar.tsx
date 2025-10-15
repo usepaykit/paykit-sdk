@@ -49,8 +49,14 @@ const Root = ({
           'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
           defaultClassNames.button_next,
         ),
-        month_caption: cn('flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)', defaultClassNames.month_caption),
-        dropdowns: cn('w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5', defaultClassNames.dropdowns),
+        month_caption: cn(
+          'flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)',
+          defaultClassNames.month_caption,
+        ),
+        dropdowns: cn(
+          'w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5',
+          defaultClassNames.dropdowns,
+        ),
         dropdown_root: cn(
           'relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md',
           defaultClassNames.dropdown_root,
@@ -65,7 +71,10 @@ const Root = ({
         ),
         table: 'w-full border-collapse',
         weekdays: cn('flex', defaultClassNames.weekdays),
-        weekday: cn('text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none', defaultClassNames.weekday),
+        weekday: cn(
+          'text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none',
+          defaultClassNames.weekday,
+        ),
         week: cn('flex w-full mt-2', defaultClassNames.week),
         week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
         week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
@@ -76,7 +85,10 @@ const Root = ({
         range_start: cn('rounded-l-md bg-accent', defaultClassNames.range_start),
         range_middle: cn('rounded-none', defaultClassNames.range_middle),
         range_end: cn('rounded-r-md bg-accent', defaultClassNames.range_end),
-        today: cn('bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none', defaultClassNames.today),
+        today: cn(
+          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
+          defaultClassNames.today,
+        ),
         outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
         disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),
         hidden: cn('invisible', defaultClassNames.hidden),
@@ -84,7 +96,9 @@ const Root = ({
       }}
       components={{
         Root: ({ className, rootRef, ...props }) => {
-          return <div data-slot="calendar" ref={rootRef as React.Ref<HTMLDivElement>} className={cn(className)} {...props} />;
+          return (
+            <div data-slot="calendar" ref={rootRef as React.Ref<HTMLDivElement>} className={cn(className)} {...props} />
+          );
         },
         Chevron: ({ className, orientation, ...props }) => {
           if (orientation === 'left') {
@@ -126,7 +140,9 @@ const DayButton = ({ className, day, modifiers, ...props }: React.ComponentProps
       variant="ghost"
       size="icon"
       data-day={day.date.toLocaleDateString()}
-      data-selected-single={modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle}
+      data-selected-single={
+        modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle
+      }
       data-range-start={modifiers.range_start}
       data-range-end={modifiers.range_end}
       data-range-middle={modifiers.range_middle}

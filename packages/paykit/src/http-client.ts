@@ -21,12 +21,23 @@ export class HTTPClient {
   }
 
   private getRequestOptions(options?: Omit<RequestInit, 'method'>): RequestInit {
-    return { headers: { 'Content-Type': 'application/json', ...this.config.headers, ...options?.headers }, ...options };
+    return {
+      headers: { 'Content-Type': 'application/json', ...this.config.headers, ...options?.headers },
+      ...options,
+    };
   }
 
   private retryErrorHandler = (error: unknown, attempt: number) => {
     const errorType = classifyError(error);
-    const retryableTypes = ['rate_limit', 'connection', 'timeout', 'internal_server_error', 'bad_gateway', 'service_unavailable', 'gateway_timeout'];
+    const retryableTypes = [
+      'rate_limit',
+      'connection',
+      'timeout',
+      'internal_server_error',
+      'bad_gateway',
+      'service_unavailable',
+      'gateway_timeout',
+    ];
 
     const shouldRetry = retryableTypes.includes(errorType);
 
@@ -38,7 +49,12 @@ export class HTTPClient {
   };
 
   private async withRetry<T>(apiCall: () => Promise<Result<T>>): Promise<Result<T>> {
-    return executeWithRetryWithHandler(apiCall, this.retryErrorHandler, this.config.retryOptions.max, this.config.retryOptions.baseDelay);
+    return executeWithRetryWithHandler(
+      apiCall,
+      this.retryErrorHandler,
+      this.config.retryOptions.max,
+      this.config.retryOptions.baseDelay,
+    );
   }
 
   get = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {

@@ -22,7 +22,10 @@ export function CopyButton({ value, ...props }: CopyButtonProps) {
       onClick={() => {
         navigator.clipboard.writeText(value);
         setHasCopied(true);
-        Toast.success({ title: 'Copied to clipboard', options: { duration: 4000, position: 'bottom-right', className: 'font-pt-sans' } });
+        Toast.success({
+          title: 'Copied to clipboard',
+          options: { duration: 4000, position: 'bottom-right', className: 'font-pt-sans' },
+        });
       }}
       {...props}
     />

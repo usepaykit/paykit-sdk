@@ -132,6 +132,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
 
     const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
       intent: CheckoutPaymentIntent.Capture,
+      payer: {
+        ...(typeof params.customer === 'string' && { payerId: params.customer }),
+        ...(typeof params.customer === 'object' && 'email' in params.customer && { emailAddress: params.customer.email }),
+      },
       purchaseUnits: [
         {
           amount: { currencyCode: currency, value: amount },
@@ -147,6 +151,7 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
         },
       ],
       applicationContext: { userAction: OrderApplicationContextUserAction.PayNow },
+      ...(params.provider_metadata && { ...params.provider_metadata }),
     };
 
     if (params.billing) {
@@ -271,6 +276,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
 
     const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
       intent: CheckoutPaymentIntent.Capture,
+      payer: {
+        ...(typeof params.customer === 'string' && { payerId: params.customer }),
+        ...(typeof params.customer === 'object' && 'email' in params.customer && { emailAddress: params.customer.email }),
+      },
       purchaseUnits: [
         {
           amount: { currencyCode: params.currency, value: params.amount.toString() },

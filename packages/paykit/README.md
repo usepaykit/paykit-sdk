@@ -41,6 +41,6 @@ PayKit provides a unified interface for payment operations:
 PayKit works with multiple payment providers:
 
 - [`@paykit-sdk/stripe`](../stripe) - Stripe integration
-- [`@paykit-sdk/polar`](../polar) - Polar integration
-- [`@paykit-sdk/paypal`](../paypal) - PayPal integration
+- [`@paykit-sdk/polar`](../polar/src/README.md) - Polar integration
+- [`@paykit-sdk/paypal`](../paypal/src/README.md) - PayPal integration
 - [Custom providers](../custom-provider) - Build your own

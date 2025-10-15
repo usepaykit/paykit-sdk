@@ -1,24 +1,44 @@
 import * as React from 'react';
-import { tryCatchAsync } from '@paykit-sdk/core';
+import { EndpointPath } from '@paykit-sdk/core';
 
 type AsyncResult<T> = [data: T, error: undefined] | [data: undefined, error: Error];
 
-export const useAsyncFn = <Args extends unknown[], R>(fn: (...args: Args) => Promise<R>) => {
+export const useAsyncFn = <Args extends unknown[], Response>(
+  path: EndpointPath,
+  apiUrl: string,
+  headersEsque: Record<string, string> | (() => Record<string, string>),
+) => {
   const [loading, setLoading] = React.useState(false);
 
   const run = React.useCallback(
-    async (...args: Args): Promise<AsyncResult<R>> => {
+    async (...args: Args): Promise<AsyncResult<Response>> => {
       setLoading(true);
-      const [data, error] = await tryCatchAsync(fn(...args));
-      setLoading(false);
 
-      if (error) {
-        return [undefined, error];
+      try {
+        const headers = typeof headersEsque === 'function' ? headersEsque() : (headersEsque ?? {});
+
+        const response = await fetch(`${apiUrl}${path}`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', ...headers },
+          credentials: 'include',
+          body: JSON.stringify({ args }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({ message: 'Request failed' }));
+
+          throw new Error(errorData.message || `HTTP ${response.status}`);
+        }
+
+        const data = await response.json();
+        setLoading(false);
+        return [data.result, undefined];
+      } catch (error) {
+        setLoading(false);
+        return [undefined, error instanceof Error ? error : new Error(String(error))];
       }
-
-      return [data, undefined];
     },
-    [fn],
+    [path, apiUrl, headersEsque],
   );
 
   return { run, loading };

@@ -5,7 +5,7 @@ Stripe provider for PayKit
 ## Quick Start
 
 ```typescript
-import { PayKit } from '@paykit-sdk/core';
+import { createEndpointHandlers, PayKit } from '@paykit-sdk/core';
 import { stripe, createStripe } from '@paykit-sdk/stripe';
 
 // Method 1: Using environment variables
@@ -17,53 +17,58 @@ const provider = createStripe({
   apiVersion: '2024-12-18.acacia',
 });
 
-const paykit = new PayKit(provider);
-
-// Create checkout
-const checkout = await paykit.checkouts.create({
-  customer_id: 'cus_123',
-  item_id: 'price_123',
-  session_type: 'one_time',
-  metadata: { plan: 'pro' },
-  provider_metadata: {
-    ui_mode: 'hosted',
-    success_url: 'https://your-app.com/success',
-  },
-});
-
-// Handle webhooks
-paykit.webhooks
-  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('customer.created', async event => {
-    console.log('Customer created:', event.data);
-  });
-  .on('subscription.created', async event => {
-    console.log('Subscription created:', event.data);
-  });
-  .on('payment.created', async event => {
-    console.log('Payment created:', event.data);
-  });
-  .on('refund.created', async event => {
-    console.log('Refund created:', event.data);
-  });
-  .on('invoice.generated', async event => {
-    console.log('Invoice generated:', event.data);
-  });
+export const paykit = new PayKit(provider);
+export const endpoints = createEndpointHandlers(paykit);
 ```
 
-## Webhook Implementation
-
-### Next.js API Route
+### Next.js Catch All API Route (/api/paykit/[...endpoint]/route.ts)
 
 ```typescript
 import { paykit } from '@/lib/paykit';
-import { NextRequest, NextResponse } from 'next/server';
+import { EndpointPath } from '@paykit-sdk/core';
+
+export async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {
+  try {
+    // Construct the endpoint path with full type safety
+    const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;
+    const handler = endpoints[endpoint];
+
+    if (!handler) {
+      return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });
+    }
+
+    // Parse request body
+    const body = await request.json();
+    const { args } = body;
+
+    const result = await handler(...args);
+
+    return NextResponse.json({ result });
+  } catch (error) {
+    console.error('PayKit API Error:', error);
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 },
+    );
+  }
+}
+```
+
+### Next.js Webhooks (/api/paykit/webhooks/route.ts)
+
+```typescript
+import { paykit } from '@/lib/paykit';
+import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  console.log('Stripe webhook received');
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+  if (!webhookSecret) {
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+  }
 
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
+    .setup({ webhookSecret })
     .on('customer.created', async event => {
       console.log('Customer created:', event.data);
     });
@@ -80,83 +85,91 @@ export async function POST(request: NextRequest) {
       console.log('Invoice generated:', event.data);
     });
 
-  const headers = Object.fromEntries(request.headers.entries());
   const body = await request.text();
+  const headers = Object.fromEntries(request.headers.entries());
   await webhook.handle({ body, headers });
 
+  // Return immediately, processing happens in background
   return NextResponse.json({ success: true });
 }
 ```
 
-### Express.js Route
+### Express.js with Webhook Handler
 
 ```typescript
-import { paykit } from '@/lib/paykit';
+import { paykit, endpoints } from '@/lib/paykit';
+import { createEndpointHandlers, EndpointPath } from '@paykit-sdk/core';
 import express from 'express';
 
 const app = express();
-app.use(express.raw({ type: 'application/json' }));
 
-app.post('/api/webhooks/stripe', async (req, res) => {
-  console.log('Stripe webhook received');
+// IMPORTANT: Webhook route must come BEFORE express.json() middleware
+// This ensures we get the raw body for signature verification
+app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+  try {
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
- const webhook = paykit.webhooks
-  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('customer.created', async event => {
-    console.log('Customer created:', event.data);
-  });
-  .on('subscription.created', async event => {
-    console.log('Subscription created:', event.data);
-  });
-  .on('payment.created', async event => {
-    console.log('Payment created:', event.data);
-  });
-  .on('refund.created', async event => {
-    console.log('Refund created:', event.data);
-  });
-  .on('invoice.generated', async event => {
-    console.log('Invoice generated:', event.data);
-  });
+    if (!webhookSecret) {
+      return res.status(500).json({ error: 'Webhook secret not configured' });
+    }
 
-  const headers = req.headers;
-  const body = req.body;
-  await webhook.handle({ body, headers });
+    const webhook = paykit.webhooks
+      .setup({ webhookSecret })
+      .on('customer.created', async event => {
+        console.log('Customer created:', event.data);
+      })
+      .on('subscription.created', async event => {
+        console.log('Subscription created:', event.data);
+      })
+      .on('payment.created', async event => {
+        console.log('Payment created:', event.data);
+      })
+      .on('refund.created', async event => {
+        console.log('Refund created:', event.data);
+      })
+      .on('invoice.generated', async event => {
+        console.log('Invoice generated:', event.data);
+      });
 
-  res.json({ success: true });
+    const body = req.body; // Raw buffer from express.raw()
+    const headers = req.headers;
+    await webhook.handle({ body, headers });
+
+    // Return immediately, processing happens in background
+    res.json({ success: true });
+  } catch (error) {
+    console.error('Webhook error:', error);
+    res.status(500).json({
+      message: error instanceof Error ? error.message : 'Webhook processing failed',
+    });
+  }
 });
-```
 
-### Vite.js
+// Regular API routes use JSON middleware
+app.use(express.json());
 
-```typescript
-import { paykit } from '@/lib/paykit';
+app.post('/api/paykit/*', async (req, res) => {
+  try {
+    const endpoint = req.path.replace('/api/paykit', '') as EndpointPath;
+    const handler = endpoints[endpoint];
 
-export default defineEventHandler(async event => {
-  console.log('Stripe webhook received');
+    if (!handler) {
+      return res.status(404).json({ message: 'Endpoint not found' });
+    }
 
-  const webhook = paykit.webhooks
-  .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET })
-  .on('customer.created', async event => {
-    console.log('Customer created:', event.data);
-  });
-  .on('subscription.created', async event => {
-    console.log('Subscription created:', event.data);
-  });
-  .on('payment.created', async event => {
-    console.log('Payment created:', event.data);
-  });
-  .on('refund.created', async event => {
-    console.log('Refund created:', event.data);
-  });
-  .on('invoice.generated', async event => {
-    console.log('Invoice generated:', event.data);
-  });
+    const { args } = req.body;
+    const result = await handler(...args);
 
-  const headers = getHeaders(event);
-  const body = await readBody(event);
-  await webhook.handle({ body, headers });
+    res.json({ result });
+  } catch (error) {
+    res.status(500).json({
+      message: error instanceof Error ? error.message : 'Internal server error',
+    });
+  }
+});
 
-  return { success: true };
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
 });
 ```
 

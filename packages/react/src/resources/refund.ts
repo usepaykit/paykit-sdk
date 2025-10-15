@@ -1,14 +1,15 @@
-import { usePaykitContext } from '../core';
+import { EndpointArgs, EndpointReturn } from '@paykit-sdk/core';
+import { usePaykitContext } from '../context';
 import { useAsyncFn } from '../hooks/use-async-fn';
 
 export const useRefund = () => {
   const ctx = usePaykitContext();
 
-  if (!ctx) {
-    throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
-  }
-
-  const create = useAsyncFn(ctx.provider.createRefund);
+  const create = useAsyncFn<EndpointArgs<'/refund/create'>, EndpointReturn<'/refund/create'>>(
+    '/refund/create',
+    ctx.apiUrl,
+    ctx.headers,
+  );
 
   return { create };
 };

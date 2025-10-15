@@ -1,19 +1,21 @@
-# @paykit-sdk/polar
+# @paykit-sdk/paypal
 
-Polar provider for PayKit
+PayPal provider for PayKit
 
 ## Quick Start
 
 ```typescript
 import { createEndpointHandlers, PayKit } from '@paykit-sdk/core';
-import { polar, createPolar } from '@paykit-sdk/polar';
+import { paypal, createPayPal } from '@paykit-sdk/paypal';
 
 // Method 1: Using environment variables
-const provider = polar(); // Ensure POLAR_ACCESS_TOKEN environment variable is set
+const provider = paypal(); // Ensure PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET, PAYPAL_SANDBOX are set
 
 // Method 2: Direct configuration
-const provider = createPolar({
-  accessToken: process.env.POLAR_ACCESS_TOKEN,
+const provider = createPayPal({
+  clientId: process.env.PAYPAL_CLIENT_ID,
+  clientSecret: process.env.PAYPAL_CLIENT_SECRET,
+  isSandbox: true,
 });
 
 export const paykit = new PayKit(provider);
@@ -61,7 +63,7 @@ import { paykit } from '@/lib/paykit';
 import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+  const webhookSecret = process.env.PAYPAL_WEBHOOK_ID;
 
   if (!webhookSecret) {
     return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
@@ -102,9 +104,9 @@ const app = express();
 
 // IMPORTANT: Webhook route must come BEFORE express.json() middleware
 // This ensures we get the raw body for signature verification
-app.post('/api/webhooks/polar', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/api/webhooks/paypal', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
-    const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+    const webhookSecret = process.env.PAYPAL_WEBHOOK_ID;
 
     if (!webhookSecret) {
       return res.status(500).json({ error: 'Webhook secret not configured' });
@@ -182,13 +184,14 @@ await paykit.subscriptions.cancel('sub_123');
 ## Environment Variables
 
 ```bash
-POLAR_ACCESS_TOKEN=polar_at_...
-POLAR_WEBHOOK_SECRET=polar_wh_...
+PAYPAL_CLIENT_ID=your_client_id
+PAYPAL_CLIENT_SECRET=your_client_secret
+PAYPAL_WEBHOOK_ID=your_webhook_id
 ```
 
 ## Support
 
-- [Polar Documentation](https://docs.polar.sh/)
+- [PayPal Documentation](https://developer.paypal.com/docs/api/overview/)
 
 ## License
 

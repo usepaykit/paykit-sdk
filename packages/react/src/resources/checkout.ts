@@ -1,17 +1,33 @@
-import { usePaykitContext } from '../core';
+import { EndpointArgs, EndpointReturn } from '@paykit-sdk/core';
+import { usePaykitContext } from '../context';
 import { useAsyncFn } from '../hooks/use-async-fn';
 
 export const useCheckout = () => {
   const ctx = usePaykitContext();
 
-  if (!ctx) {
-    throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
-  }
+  const create = useAsyncFn<EndpointArgs<'/checkout/create'>, EndpointReturn<'/checkout/create'>>(
+    '/checkout/create',
+    ctx.apiUrl,
+    ctx.headers,
+  );
 
-  const create = useAsyncFn(ctx.provider.createCheckout);
-  const retrieve = useAsyncFn(ctx.provider.retrieveCheckout);
-  const update = useAsyncFn(ctx.provider.updateCheckout);
-  const remove = useAsyncFn(ctx.provider.deleteCheckout);
+  const retrieve = useAsyncFn<EndpointArgs<'/checkout/retrieve'>, EndpointReturn<'/checkout/retrieve'>>(
+    '/checkout/retrieve',
+    ctx.apiUrl,
+    ctx.headers,
+  );
+
+  const update = useAsyncFn<EndpointArgs<'/checkout/update'>, EndpointReturn<'/checkout/update'>>(
+    '/checkout/update',
+    ctx.apiUrl,
+    ctx.headers,
+  );
+
+  const remove = useAsyncFn<EndpointArgs<'/checkout/delete'>, EndpointReturn<'/checkout/delete'>>(
+    '/checkout/delete',
+    ctx.apiUrl,
+    ctx.headers,
+  );
 
   return { create, retrieve, update, remove };
 };

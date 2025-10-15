@@ -7,10 +7,14 @@ export const POST = async (request: NextRequest) => {
   try {
     const webhook = paykit.webhooks
       .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
-      .on('$customerCreated', async customer => {
+      .on('customer.created', async customer => {
         console.log({ customer });
       })
-      .on('$invoicePaid', async invoice => {
+      .on('invoice.generated', async invoice => {
+        const isPaid = invoice.data.status === 'paid';
+
+        if (!isPaid) return;
+
         const email = invoice.data.custom_fields?.['account-email'] as string;
 
         const { error } = await resend.emails.send({
@@ -25,7 +29,7 @@ export const POST = async (request: NextRequest) => {
 
     const headers = Object.fromEntries(request.headers.entries());
     const body = await request.text();
-    await webhook.handle({ body, headers });
+    await webhook.handle({ body, headers, fullUrl: request.url });
 
     return NextResponse.json({ success: true });
   } catch (error) {

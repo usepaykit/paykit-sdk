@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/react",
-  "version": "1.1.9",
+  "version": "1.1.91",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
@@ -15,7 +15,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts --clean",
+    "build": "tsup",
     "dev": "tsup src/index.ts --format cjs,esm --dts --watch",
     "prepublishOnly": "rm -rf dist && npm run build",
     "typecheck": "tsc --noEmit"
@@ -26,7 +26,7 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "@paykit-sdk/core": ">=1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@swc/core": "^1.12.9",
@@ -50,6 +50,6 @@
     "checkout"
   ],
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
   "homepage": "https://usepaykit.dev"
 }

@@ -1,19 +1,21 @@
-# @paykit-sdk/polar
+# @paykit-sdk/comgate
 
-Polar provider for PayKit
+Comgate provider for PayKit
 
 ## Quick Start
 
 ```typescript
 import { createEndpointHandlers, PayKit } from '@paykit-sdk/core';
-import { polar, createPolar } from '@paykit-sdk/polar';
+import { comgate, createComgate } from '@paykit-sdk/comgate';
 
 // Method 1: Using environment variables
-const provider = polar(); // Ensure POLAR_ACCESS_TOKEN environment variable is set
+const provider = comgate(); // Ensure COMGATE_MERCHANT, COMGATE_SECRET, COMGATE_SANDBOX environment variables are set
 
 // Method 2: Direct configuration
-const provider = createPolar({
-  accessToken: process.env.POLAR_ACCESS_TOKEN,
+const provider = createComgate({
+  merchant: 'mer_',
+  isSandbox: true,
+  secret: 'xxx'
 });
 
 export const paykit = new PayKit(provider);
@@ -23,9 +25,8 @@ export const endpoints = createEndpointHandlers(paykit);
 ### Next.js Catch All API Route (/api/paykit/[...endpoint]/route.ts)
 
 ```typescript
-import { endpoints } from '@/lib/paykit';
+import { paykit } from '@/lib/paykit';
 import { EndpointPath } from '@paykit-sdk/core';
-import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {
   try {
@@ -58,33 +59,31 @@ export async function POST(request: NextRequest, { params }: { params: { endpoin
 
 ```typescript
 import { paykit } from '@/lib/paykit';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
-
-  if (!webhookSecret) {
-    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
-  }
-
   const webhook = paykit.webhooks
-    .setup({ webhookSecret })
+    .setup({ webhookSecret: process.env.COMGATE_SECRET })
     .on('customer.created', async event => {
       console.log('Customer created:', event.data);
-    })
+    });
     .on('subscription.created', async event => {
       console.log('Subscription created:', event.data);
-    })
+    });
     .on('payment.created', async event => {
       console.log('Payment created:', event.data);
-    })
+    });
     .on('refund.created', async event => {
-      console.log('Refund created:', event.data);
+     console.log('Refund created:', event.data);
+    });
+    .on('invoice.generated', async event => {
+      console.log('Invoice generated:', event.data);
     });
 
   const body = await request.text();
   const headers = Object.fromEntries(request.headers.entries());
-  await webhook.handle({ body, headers, fullUrl: request.url });
+  const url = request.url
+  await webhook.handle({ body, headers, fullUrl: url });
 
   // Return immediately, processing happens in background
   return NextResponse.json({ success: true });
@@ -94,17 +93,17 @@ export async function POST(request: NextRequest) {
 ### Express.js with Webhook Handler
 
 ```typescript
-import { endpoints, paykit } from '@/lib/paykit';
-import { EndpointPath } from '@paykit-sdk/core';
+import { paykit, endpoints } from '@/lib/paykit';
+import { createEndpointHandlers, EndpointPath } from '@paykit-sdk/core';
 import express from 'express';
 
 const app = express();
 
 // IMPORTANT: Webhook route must come BEFORE express.json() middleware
 // This ensures we get the raw body for signature verification
-app.post('/api/webhooks/polar', express.raw({ type: 'application/json' }), async (req, res) => {
+app.post('/api/webhooks/comgate', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
-    const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+    const webhookSecret = process.env.COMGATE_SECRET;
 
     if (!webhookSecret) {
       return res.status(500).json({ error: 'Webhook secret not configured' });
@@ -123,11 +122,15 @@ app.post('/api/webhooks/polar', express.raw({ type: 'application/json' }), async
       })
       .on('refund.created', async event => {
         console.log('Refund created:', event.data);
+      })
+      .on('invoice.generated', async event => {
+        console.log('Invoice generated:', event.data);
       });
 
     const body = req.body; // Raw buffer from express.raw()
     const headers = req.headers;
-    await webhook.handle({ body, headers });
+    const url = request.url;
+    await webhook.handle({ body, headers, fullUrl: url });
 
     // Return immediately, processing happens in background
     res.json({ success: true });
@@ -182,13 +185,14 @@ await paykit.subscriptions.cancel('sub_123');
 ## Environment Variables
 
 ```bash
-POLAR_ACCESS_TOKEN=polar_at_...
-POLAR_WEBHOOK_SECRET=polar_wh_...
+COMGATE_MERCHANT=mer_...
+COMGATE_SECRET=xxx...
+COMGATE_SANDBOX=false
 ```
 
 ## Support
 
-- [Polar Documentation](https://docs.polar.sh/)
+- [Congate Documentation](https://apidoc.comgate.cz/)
 
 ## License
 

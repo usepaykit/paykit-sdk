@@ -59,16 +59,24 @@ const Index = () => {
           <h1 className="text-4xl font-bold tracking-tight md:text-6xl lg:text-7xl">
             Build payments
             <br />
-            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">without vendor lock-in</span>
+            <span className="bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              without vendor lock-in
+            </span>
           </h1>
 
           <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl">
-            PayKit lets you build billing systems that work locally, then deploy anywhere. Switch providers with a single line of code.
+            PayKit lets you build billing systems that work locally, then deploy anywhere. Switch providers with a
+            single line of code.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
-            <CopyButton value="npx @paykit-sdk/cli@latest init" variant="outline" size="lg">
-              npx @paykit-sdk/cli@latest init
+            <CopyButton
+              className="min-h-fit max-w-full overflow-hidden px-4 py-3 text-left break-words whitespace-pre-wrap"
+              value="npx shadcn@latest add https://usepaykit.dev/r/stripe-nextjs"
+              variant="outline"
+              size="lg"
+            >
+              npx shadcn@latest add https://usepaykit.dev/r/stripe-nextjs
             </CopyButton>
           </div>
         </div>
@@ -84,9 +92,18 @@ const Index = () => {
               ].map((provider, index) => (
                 <div
                   key={provider.name}
-                  className={cn(`border-background-foreground size-12 overflow-hidden rounded-full border-2`, index > 0 && '-ml-3')}
+                  className={cn(
+                    `border-background-foreground size-12 overflow-hidden rounded-full border-2`,
+                    index > 0 && '-ml-3',
+                  )}
                 >
-                  <Image src={provider.logo} alt={provider.name} width={50} height={50} className="h-full w-full object-cover" />
+                  <Image
+                    src={provider.logo}
+                    alt={provider.name}
+                    width={50}
+                    height={50}
+                    className="h-full w-full object-cover"
+                  />
                 </div>
               ))}
             </div>
@@ -192,11 +209,19 @@ const Index = () => {
               </div>
               <p className="text-muted-foreground text-sm">
                 Hey Curious 👋 I’m
-                <Link href="https://odii.vercel.app" target="_blank" className="text-foreground ml-1 font-medium hover:underline">
+                <Link
+                  href="https://odii.vercel.app"
+                  target="_blank"
+                  className="text-foreground ml-1 font-medium hover:underline"
+                >
                   Emmanuel
                 </Link>
                 , the creator of PayKit. You can follow my work on
-                <Link href="https://x.com/devodii_" target="_blank" className="text-foreground ml-1 font-medium hover:underline">
+                <Link
+                  href="https://x.com/devodii_"
+                  target="_blank"
+                  className="text-foreground ml-1 font-medium hover:underline"
+                >
                   Twitter.
                 </Link>
               </p>

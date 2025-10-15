@@ -1,5 +1,5 @@
 {
-  "name": "@paykit-sdk/medusajs-adapter",
+  "name": "@paykit-sdk/medusajs",
   "version": "1.0.0",
   "description": "MedusaJS Integrations for Paykit",
   "main": "dist/index.js",
@@ -16,16 +16,21 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "medusajs",
+    "paykit",
+    "typescript",
+    "payment"
+  ],
+  "author": "Emmanuel Odii",
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "peerDependencies": {
     "@medusajs/framework": ">=2.10.3",
-    "@paykit-sdk/core": ">=1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@medusajs/framework": "^2.10.3",
@@ -35,5 +40,15 @@
   },
   "dependencies": {
     "zod": "^3.25.76"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
   }
 }

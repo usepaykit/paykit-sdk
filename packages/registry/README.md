@@ -106,7 +106,7 @@ The registry follows the [shadcn/ui registry schema](https://ui.shadcn.com/docs/
 
 ## License
 
-GPL-3.0
+ISC
 
 ## Links
 

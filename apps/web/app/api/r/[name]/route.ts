@@ -1,9 +1,6 @@
 import registryIndex from '@paykit-sdk/registry';
 import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * Forever cached route
- */
 export const revalidate = false;
 
 export async function GET(request: NextRequest, { params }: { params: { name: string } }) {

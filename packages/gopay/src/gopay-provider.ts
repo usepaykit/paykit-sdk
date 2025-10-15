@@ -37,7 +37,7 @@ import {
   PAYKIT_METADATA_KEY,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
-import crypto from 'crypto';
+import * as crypto from 'crypto';
 import { z } from 'zod';
 import { AuthController } from './controllers/auth';
 import { GoPayPaymentRequest, GoPayPaymentResponse } from './schema';
@@ -82,6 +82,7 @@ const gopayOptionsSchema = schema<GoPayOptions>()(
     goId: z.string(),
     isSandbox: z.boolean(),
     webhookUrl: z.string(),
+    debug: z.boolean().optional(),
   }),
 );
 
@@ -100,7 +101,11 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const debug = opts.debug ?? true;
 
     this.baseUrl = opts.isSandbox ? 'https://gate.gopay.cz/api' : 'https://gw.sandbox.gopay.com/api';
-    this._client = new HTTPClient({ baseUrl: this.baseUrl, headers: {}, retryOptions: { max: 3, baseDelay: 1000, debug } });
+    this._client = new HTTPClient({
+      baseUrl: this.baseUrl,
+      headers: {},
+      retryOptions: { max: 3, baseDelay: 1000, debug },
+    });
     this.authController = new AuthController({ ...opts, baseUrl: this.baseUrl });
   }
 
@@ -127,7 +132,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     );
 
     if (this.opts.debug) {
-      console.info('Specify `lang` in the provider_metadata of createCheckout to set the language of the checkout, default is `EN`');
+      console.info(
+        'Specify `lang` in the provider_metadata of createCheckout to set the language of the checkout, default is `EN`',
+      );
       console.info('Creating checkout with metadata:', data.metadata);
     }
 
@@ -305,9 +312,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    const response = await this._client.post<{ id: number; result: string }>(`/payments/payment/${id}/void-recurrence`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.post<{ id: number; result: string }>(
+      `/payments/payment/${id}/void-recurrence`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     console.dir({ response }, { depth: 100 });
 
@@ -440,8 +450,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const productId = JSON.parse(payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').itemId;
-    const quantity = JSON.parse(payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}').qty;
+    const productId = JSON.parse(
+      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    ).itemId;
+    const quantity = JSON.parse(
+      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    ).qty;
 
     if (!payment) {
       throw new OperationFailedError('capturePayment', this.providerName, {
@@ -510,10 +524,16 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const response = await this._client.post<{ id: number; result: string }>(`/payments/payment/${data.payment_id}/refund`, {
-      body: new URLSearchParams({ amount: String(data.amount) }).toString(),
-      headers: { ...(await this.authController.getAuthHeaders()), 'Content-Type': 'application/x-www-form-urlencoded' },
-    });
+    const response = await this._client.post<{ id: number; result: string }>(
+      `/payments/payment/${data.payment_id}/refund`,
+      {
+        body: new URLSearchParams({ amount: String(data.amount) }).toString(),
+        headers: {
+          ...(await this.authController.getAuthHeaders()),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('createRefund', this.providerName, {
@@ -575,7 +595,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const status = statusMap[payment.value.state];
 
-    const webhookHandlers: Record<(typeof statusMap)[keyof typeof statusMap], (data: GoPayPaymentResponse) => Array<WebhookEventPayload>> = {
+    const webhookHandlers: Record<
+      (typeof statusMap)[keyof typeof statusMap],
+      (data: GoPayPaymentResponse) => Array<WebhookEventPayload>
+    > = {
       __INDETERMINATE: data => {
         const isRefundEvent = data.state === 'REFUNDED' || data.state === 'PARTIALLY_REFUNDED';
 
@@ -645,7 +668,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
         };
 
         return [
-          ...(isCancellingSubscription ? [paykitEvent$InboundSchema<Subscription>(subscriptionCanceledWebhookEvent)] : []),
+          ...(isCancellingSubscription
+            ? [paykitEvent$InboundSchema<Subscription>(subscriptionCanceledWebhookEvent)]
+            : []),
           paykitEvent$InboundSchema<Payment>({
             type: 'payment.canceled',
             created: new Date().getTime(),
@@ -711,9 +736,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const handler = webhookHandlers[status];
 
     if (!handler) {
-      throw new WebhookError(`Invalid webhook status: ${status}, expected one of ${Object.keys(webhookHandlers).join(', ')}`, {
-        provider: this.providerName,
-      });
+      throw new WebhookError(
+        `Invalid webhook status: ${status}, expected one of ${Object.keys(webhookHandlers).join(', ')}`,
+        {
+          provider: this.providerName,
+        },
+      );
     }
 
     const results = handler(payment.value);

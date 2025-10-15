@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/core",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "The Payment Toolkit for Typescript",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -16,7 +16,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup ",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "keywords": [
@@ -27,7 +27,7 @@
     "payment-processing"
   ],
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
   "devDependencies": {
     "tsup": "^8.0.0",
     "typescript": "^5.0.0"

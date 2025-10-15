@@ -86,7 +86,8 @@ export async function POST(request: NextRequest) {
 
   const body = await request.text();
   const headers = Object.fromEntries(request.headers.entries());
-  await webhook.handle({ body, headers });
+  const url = request.url;
+  await webhook.handle({ body, headers, fullUrl: url });
 
   // Return immediately, processing happens in background
   return NextResponse.json({ success: true });
@@ -129,7 +130,8 @@ app.post('/api/webhooks/paypal', express.raw({ type: 'application/json' }), asyn
 
     const body = req.body; // Raw buffer from express.raw()
     const headers = req.headers;
-    await webhook.handle({ body, headers });
+    const url = req.url;
+    await webhook.handle({ body, headers, fullUrl: url });
 
     // Return immediately, processing happens in background
     res.json({ success: true });
@@ -195,4 +197,4 @@ PAYPAL_WEBHOOK_ID=your_webhook_id
 
 ## License
 
-GPL-3.0
+ISC

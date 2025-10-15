@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/stripe",
-  "version": "1.1.7",
+  "version": "1.1.9",
   "description": "Stripe provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -9,7 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup src/index.ts --format cjs,esm --dts",
+    "build": "tsup",
     "prepublishOnly": "rm -rf dist && npm run build"
   },
   "keywords": [
@@ -19,12 +19,12 @@
     "typescript"
   ],
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
   "dependencies": {
     "stripe": "^18.2.1"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": "^1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

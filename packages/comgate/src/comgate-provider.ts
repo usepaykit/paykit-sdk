@@ -56,14 +56,14 @@ export interface ComgateOptions extends PaykitProviderOptions {
   /**
    * Whether to use the sandbox environment
    */
-  sandbox: boolean;
+  isSandbox: boolean;
 }
 
 const comgateOptionsSchema = schema<ComgateOptions>()(
   z.object({
     merchant: z.string(),
     secret: z.string(),
-    sandbox: z.boolean(),
+    isSandbox: z.boolean(),
   }),
 );
 
@@ -80,7 +80,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     const debug = opts.debug ?? true;
 
-    this.baseUrl = opts.sandbox ? 'https://sandbox.comgate.cz' : 'https://payments.comgate.cz';
+    this.baseUrl = opts.isSandbox ? 'https://sandbox.comgate.cz' : 'https://payments.comgate.cz';
 
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
@@ -129,7 +129,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     const requestBody = new URLSearchParams({
       code: '0',
-      test: this.opts.sandbox ? 'true' : 'false',
+      test: this.opts.isSandbox ? 'true' : 'false',
       refId: JSON.stringify(data.metadata ?? {}),
       email: data.customer.email,
       payerId: data.customer.email,
@@ -142,9 +142,12 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       console.log('Creating payment with data:', requestBody.toString());
     }
 
-    const response = await this._client.post<ComgatePaymentOperationResponse>(`/v2.0/paymentRedirect/merchant/${this.opts.merchant}`, {
-      body: requestBody.toString(),
-    });
+    const response = await this._client.post<ComgatePaymentOperationResponse>(
+      `/v2.0/paymentRedirect/merchant/${this.opts.merchant}`,
+      {
+        body: requestBody.toString(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError(`Failed to create payment`, this.providerName, {
@@ -233,7 +236,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     const requestBody = new URLSearchParams({
       code: '0',
-      test: this.opts.sandbox ? 'true' : 'false',
+      test: this.opts.isSandbox ? 'true' : 'false',
       refId: JSON.stringify(data.metadata ?? {}),
       payerId: customer,
       price: String(data.amount),
@@ -340,7 +343,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     const requestBody = new URLSearchParams({
       transId: data.payment_id,
       amount: String(data.amount),
-      test: this.opts.sandbox ? 'true' : 'false',
+      test: this.opts.isSandbox ? 'true' : 'false',
       refId: JSON.stringify(data.metadata ?? {}),
     });
 
@@ -454,7 +457,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     }
 
     if (comgateWebhookApiResponse.status !== webhookStatusOut) {
-      throw new WebhookError(`Webhook status mismatch: received ${webhookStatusOut}, verified ${comgateWebhookApiResponse.status}`);
+      throw new WebhookError(
+        `Webhook status mismatch: received ${webhookStatusOut}, verified ${comgateWebhookApiResponse.status}`,
+      );
     }
 
     const statusMap: Record<string, Payment['status']> = {
@@ -466,7 +471,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     const status = statusMap[comgateWebhookApiResponse.status];
 
-    const webhookHandlers: Partial<Record<Payment['status'], (data: ComgateWebhookStatusSuccessResponse) => Array<WebhookEventPayload>>> = {
+    const webhookHandlers: Partial<
+      Record<Payment['status'], (data: ComgateWebhookStatusSuccessResponse) => Array<WebhookEventPayload>>
+    > = {
       pending: data => {
         const payment = paykitPayment$InboundSchema(data, 'pending');
 
@@ -529,9 +536,12 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     const handler = webhookHandlers[status];
 
     if (!handler) {
-      throw new WebhookError(`Invalid webhook status: ${status}, expected one of ${Object.keys(webhookHandlers).join(', ')}`, {
-        provider: this.providerName,
-      });
+      throw new WebhookError(
+        `Invalid webhook status: ${status}, expected one of ${Object.keys(webhookHandlers).join(', ')}`,
+        {
+          provider: this.providerName,
+        },
+      );
     }
 
     const results = handler(comgateWebhookApiResponse);

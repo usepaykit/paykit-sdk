@@ -6,9 +6,9 @@
   "scripts": {},
   "keywords": [],
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": "^1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@types/node": "^24.2.0",

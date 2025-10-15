@@ -11,7 +11,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "peerDependencies": {
-    "@paykit-sdk/core": "1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*"

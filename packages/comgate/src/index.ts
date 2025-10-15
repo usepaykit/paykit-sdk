@@ -14,7 +14,7 @@ export const comgate = () => {
 
   const merchant = envVars.COMGATE_MERCHANT;
   const secret = envVars.COMGATE_SECRET;
-  const sandbox = envVars.COMGATE_SANDBOX === 'true';
+  const isSandbox = envVars.COMGATE_SANDBOX === 'true';
 
-  return createComgate({ merchant, secret, sandbox });
+  return createComgate({ merchant, secret, isSandbox });
 };

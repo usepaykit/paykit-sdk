@@ -134,7 +134,8 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       intent: CheckoutPaymentIntent.Capture,
       payer: {
         ...(typeof params.customer === 'string' && { payerId: params.customer }),
-        ...(typeof params.customer === 'object' && 'email' in params.customer && { emailAddress: params.customer.email }),
+        ...(typeof params.customer === 'object' &&
+          'email' in params.customer && { emailAddress: params.customer.email }),
       },
       purchaseUnits: [
         {
@@ -229,7 +230,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    const subscription = await this.subscriptionsController.cancelSubscription({ subscriptionId: id, reason: 'Customer requested cancellation' });
+    const subscription = await this.subscriptionsController.cancelSubscription({
+      subscriptionId: id,
+      reason: 'Customer requested cancellation',
+    });
 
     return subscription as unknown as Subscription;
   };
@@ -244,7 +248,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
         provider: this.providerName,
       });
     }
-    const subscription = await this.subscriptionsController.updateSubscription({ subscriptionId: id, metadata: params.metadata ?? {} });
+    const subscription = await this.subscriptionsController.updateSubscription({
+      subscriptionId: id,
+      metadata: params.metadata ?? {},
+    });
 
     return subscription as unknown as Subscription;
   };
@@ -278,7 +285,8 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       intent: CheckoutPaymentIntent.Capture,
       payer: {
         ...(typeof params.customer === 'string' && { payerId: params.customer }),
-        ...(typeof params.customer === 'object' && 'email' in params.customer && { emailAddress: params.customer.email }),
+        ...(typeof params.customer === 'object' &&
+          'email' in params.customer && { emailAddress: params.customer.email }),
       },
       purchaseUnits: [
         {
@@ -391,28 +399,56 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
         const orderData = event.resource as Order;
         const payment = paykitPayment$InboundSchema(orderData);
 
-        return [paykitEvent$InboundSchema<Payment>({ type: 'payment.created', created: Date.now() / 1000, id: event.id, data: payment })];
+        return [
+          paykitEvent$InboundSchema<Payment>({
+            type: 'payment.created',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: payment,
+          }),
+        ];
       },
 
       'CHECKOUT.ORDER.COMPLETED': async () => {
         const orderData = event.resource as Order;
         const payment = paykitPayment$InboundSchema(orderData);
 
-        return [paykitEvent$InboundSchema<Payment>({ type: 'payment.updated', created: Date.now() / 1000, id: event.id, data: payment })];
+        return [
+          paykitEvent$InboundSchema<Payment>({
+            type: 'payment.updated',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: payment,
+          }),
+        ];
       },
 
       'PAYMENT.CAPTURE.COMPLETED': async () => {
         const orderData = event.resource as Order;
         const payment = paykitPayment$InboundSchema(orderData);
 
-        return [paykitEvent$InboundSchema<Payment>({ type: 'payment.updated', created: Date.now() / 1000, id: event.id, data: payment })];
+        return [
+          paykitEvent$InboundSchema<Payment>({
+            type: 'payment.updated',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: payment,
+          }),
+        ];
       },
 
       'PAYMENT.CAPTURE.REFUNDED': async () => {
         const refundData = event.resource as PayPalRefund;
         const refund = paykitRefund$InboundSchema(refundData);
 
-        return [paykitEvent$InboundSchema<Refund>({ type: 'refund.created', created: Date.now() / 1000, id: event.id, data: refund })];
+        return [
+          paykitEvent$InboundSchema<Refund>({
+            type: 'refund.created',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: refund,
+          }),
+        ];
       },
     };
 

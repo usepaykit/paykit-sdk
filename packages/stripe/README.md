@@ -87,7 +87,8 @@ export async function POST(request: NextRequest) {
 
   const body = await request.text();
   const headers = Object.fromEntries(request.headers.entries());
-  await webhook.handle({ body, headers });
+  const url = request.url
+  await webhook.handle({ body, headers, fullUrl: url });
 
   // Return immediately, processing happens in background
   return NextResponse.json({ success: true });
@@ -133,7 +134,8 @@ app.post('/api/webhooks/stripe', express.raw({ type: 'application/json' }), asyn
 
     const body = req.body; // Raw buffer from express.raw()
     const headers = req.headers;
-    await webhook.handle({ body, headers });
+    const url = request.url;
+    await webhook.handle({ body, headers, fullUrl: url });
 
     // Return immediately, processing happens in background
     res.json({ success: true });
@@ -198,4 +200,4 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 
 ## License
 
-GPL-3.0
+ISC

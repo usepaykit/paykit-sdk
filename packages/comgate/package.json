@@ -1,21 +1,40 @@
 {
-  "name": "comgate",
+  "name": "@paykit-sdk/comgate",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Comgate provider for PayKit",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "tsup",
+    "prepublishOnly": "rm -rf dist && npm run build"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "paykit",
+    "comgate"
+  ],
+  "author": "Emmanuel Odii",
   "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": "^1.1.8"
+    "@paykit-sdk/core": ">=1.1.9"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",
     "tsup": "^8.5.0",
     "typescript": "^5.9.2",
     "zod": "^3.24.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
   }
 }

@@ -41,7 +41,7 @@
     ]
   },
   "author": "Emmanuel Odii",
-  "license": "GPL-3.0",
+  "license": "ISC",
   "bugs": {
     "url": "https://github.com/devodii/paykit/issues"
   },
@@ -53,6 +53,7 @@
     "@changesets/cli": "^2.29.5",
     "@trivago/prettier-plugin-sort-imports": "^4.3.0",
     "prettier-plugin-tailwindcss": "^0.6.12",
-    "tailwindcss": "^4.1.11"
+    "tailwindcss": "^4.1.11",
+    "tsup": "^8.5.0"
   }
 }

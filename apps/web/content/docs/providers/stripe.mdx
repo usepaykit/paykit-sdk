@@ -136,7 +136,8 @@ export async function POST(request: NextRequest) {
 
   const headers = Object.fromEntries(request.headers.entries());
   const body = await request.text();
-  await webhook.handle({ body, headers });
+  const url = request.url;
+  await webhook.handle({ body, headers, fullUrl: url });
 
   return NextResponse.json({ success: true });
 }
@@ -153,19 +154,20 @@ import { paykit } from '@/lib/paykit';
 export default defineEventHandler(async event => {
   const webhook = paykit.webhooks
     .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
+    .on('customer.created', async event => {
+      console.log('customer created:', event.data);
     })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
+    .on('subscription.created', async event => {
+      console.log('subscription created:', event.data);
     })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
+    .on('invoice.generated', async event => {
+      console.log('invoice generated:', event.data);
     });
 
   const headers = getHeaders(event);
   const body = await readBody(event);
-  await webhook.handle({ body, headers });
+  const url = event.url;
+  await webhook.handle({ body, headers, fullUrl: url });
 
   return { success: true };
 });

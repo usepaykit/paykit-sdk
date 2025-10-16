@@ -82,10 +82,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   private subscriptionsController: SubscriptionsController;
   private webhookController: WebhookController;
 
-  constructor(config: PayPalOptions) {
-    super(paypalOptionsSchema, config, providerName);
+  constructor(opts: PayPalOptions) {
+    super(paypalOptionsSchema, opts, providerName);
 
-    const { clientId, clientSecret, isSandbox = true, debug } = config;
+    const { clientId, clientSecret, isSandbox = true, debug } = opts;
 
     const environment = isSandbox ? Environment.Sandbox : Environment.Production;
 
@@ -130,7 +130,7 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     } = validateRequiredKeys(
       ['currency', 'amount', 'itemName'],
       params.provider_metadata as Record<string, string>,
-      'Missing required parameters: {keys}',
+      'Missing required parameters from `provider_metadata`: {keys}',
     );
 
     const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {

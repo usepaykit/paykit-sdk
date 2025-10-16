@@ -1,0 +1,43 @@
+{
+  "name": "@paykit-sdk/square",
+  "version": "1.0.0",
+  "description": "Square provider for PayKit",
+  "main": "dist/index.js",
+  "module": "dist/index.esm.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "prepublishOnly": "rm -rf dist && npm run build"
+  },
+  "keywords": [
+    "ayden",
+    "paykit",
+    "payment",
+    "typescript"
+  ],
+  "author": "Emmanuel Odii",
+  "license": "ISC",
+  "peerDependencies": {
+    "@paykit-sdk/core": ">=1.1.9"
+  },
+  "devDependencies": {
+    "@paykit-sdk/core": "workspace:*"
+  },
+  "dependencies": {
+    "square": "^43.1.0",
+    "zod": "^3.24.2"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
+  },
+  "bugs": {
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
+  }
+}

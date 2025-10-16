@@ -238,7 +238,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     const { email, paymentLabel = 'Order from Eshop' } = validateRequiredKeys(
       ['email', 'paymentLabel'],
       (data.provider_metadata as Record<string, string>) ?? {},
-      'Missing required provider metadata: {keys}',
+      'Missing required parameters from `provider_metadata`: {keys}',
     );
 
     if (this.opts.debug) {

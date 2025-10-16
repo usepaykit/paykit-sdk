@@ -6,7 +6,8 @@ import { LifetimeAccess } from '@/components/lifetime-access';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ReactHooksDemo } from '@/components/react-hooks-demo';
 import { ThemeToggle } from '@/components/theme-toggle';
-import GumroadLogo from '@/public/providers/gumroad.webp';
+import AydenLogo from '@/public/providers/ayden.png';
+import PaypalLogo from '@/public/providers/paypal.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
@@ -76,7 +77,7 @@ const Index = () => {
               variant="outline"
               size="lg"
             >
-              npx shadcn@latest add https://usepaykit.dev/r/stripe-nextjs
+              npx shadcn@latest add https://usepaykit.dev/api/r/stripe-nextjs
             </CopyButton>
           </div>
         </div>
@@ -88,13 +89,14 @@ const Index = () => {
               {[
                 { logo: StripeLogo, name: 'Stripe' },
                 { logo: PolarLogo, name: 'Polar' },
-                { logo: GumroadLogo, name: 'Gumroad' },
+                { logo: PaypalLogo, name: 'Paypal' },
+                { logo: AydenLogo, name: 'Ayden' },
               ].map((provider, index) => (
                 <div
                   key={provider.name}
                   className={cn(
                     `border-background-foreground size-12 overflow-hidden rounded-full border-2`,
-                    index > 0 && '-ml-3',
+                    index > 0 && '-ml-4',
                   )}
                 >
                   <Image

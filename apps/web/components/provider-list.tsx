@@ -19,6 +19,11 @@ const providers = [
     description: 'PayPal payments',
   },
   {
+    key: 'ayden' as const,
+    name: 'Ayden',
+    description: 'Ayden payments',
+  },
+  {
     key: 'gopay' as const,
     name: 'GoPay',
     description: 'Monetization in Czechia',

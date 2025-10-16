@@ -22,12 +22,17 @@ model Payment {
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt
 
-  customerId String   @map("customer_id")
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String?   @map("customer_id")
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  // Guest checkout
+  customerEmail String? @map("customer_email")
+
   refunds    Refund[]
 
   @@index([customerId])
   @@index([status])
+  @@index([customerEmail])
 }
 
 enum PaymentStatus {
@@ -54,12 +59,16 @@ model Subscription {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
 
-  customerId String   @map("customer_id")
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String?   @map("customer_id")
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  customerEmail String? @map("customer_email")
+
   invoices   Invoice[]
 
   @@index([customerId])
   @@index([status])
+  @@index([customerEmail])
 }
 
 enum SubscriptionStatus {
@@ -98,13 +107,16 @@ model Invoice {
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
 
-  customerId String   @map("customer_id")
-  customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  customerId String?   @map("customer_id")
+  customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
+
+  customerEmail String? @map("customer_email")
   subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
 
   @@index([customerId])
   @@index([subscriptionId])
   @@index([status])
+  @@index([customerEmail])
 }
 
 enum InvoiceStatus {

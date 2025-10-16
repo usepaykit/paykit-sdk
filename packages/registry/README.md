@@ -46,7 +46,7 @@ Configure the PayKit registry once in your `components.json`:
     "utils": "@/lib/utils"
   },
   "registries": {
-    "@paykit": "https://usepaykit.dev/r/{name}"
+    "@paykit": "https://usepaykit.dev/api/r/{name}"
   }
 }
 ```
@@ -57,6 +57,64 @@ Then install integrations using the namespace:
 npx shadcn@latest add @paykit/stripe-nextjs
 npx shadcn@latest add @paykit/stripe-hono
 npx shadcn@latest add @paykit/paypal-nextjs
+```
+
+## Naming Convention
+
+Registry items follow a structured naming pattern:
+
+```
+{provider}-{backend}[-{orm}][-{feature}]
+```
+
+| Component  | Required    | Options                                     | Example  |
+| ---------- | ----------- | ------------------------------------------- | -------- |
+| `Provider` | ✅ Yes      | `stripe`, `paypal`, `polar`, `lemonsqueezy` | `stripe` |
+| `Backend`  | ✅ Yes      | `nextjs`, `hono`, `express`, `fastify`      | `nextjs` |
+| `ORM`      | ❌ Optional | `prisma`, `drizzle`, `mongoose`             | `prisma` |
+| `Feature`  | ❌ Optional | `hooks`, `embedded`, `full`                 | `hooks`  |
+
+### Examples
+
+| Pattern            | Registry Name               | Description                                     |
+| ------------------ | --------------------------- | ----------------------------------------------- |
+| Provider + Backend | `stripe-nextjs`             | Basic Stripe integration for Next.js            |
+| + ORM              | `stripe-nextjs-prisma`      | Stripe with Prisma database support             |
+| + Feature          | `stripe-nextjs-hooks`       | Stripe with React hooks (useCheckout, etc.)     |
+| Full Stack         | `stripe-nextjs-prisma-full` | Complete integration with DB + hooks + embedded |
+
+### Real-World Examples
+
+```
+stripe-nextjs                    → Stripe × Next.js
+stripe-nextjs-prisma             → Stripe × Next.js × Prisma
+stripe-nextjs-prisma-hooks       → Stripe × Next.js × Prisma × React Hooks
+stripe-hono-drizzle              → Stripe × Hono × Drizzle
+paypal-nextjs-prisma-embedded    → PayPal × Next.js × Prisma × Embedded Checkout
+```
+
+## ⚠️ Important: Use Full Names
+
+You **must** provide the full registry name including the backend framework. Partial names will fail with helpful suggestions:
+
+```bash
+# ❌ This will fail
+npx shadcn@latest add @paykit/stripe-prisma
+
+Error: Registry item "stripe-prisma" not found.
+
+Did you mean one of these?
+  • stripe-nextjs-prisma
+  • stripe-hono-prisma
+  • stripe-express-prisma
+  • stripe-fastify-prisma
+
+Tip: Full pattern is {provider}-{backend}[-{orm}][-{feature}]
+```
+
+```bash
+# ✅ This will work
+npx shadcn@latest add @paykit/stripe-nextjs-prisma
 ```
 
 ## Available Integrations
@@ -81,7 +139,7 @@ Coming soon...
 
 ```bash
 # List all available integrations
-curl https://usepaykit.dev/r
+curl https://usepaykit.dev//api/r
 ```
 
 ## Registry Structure

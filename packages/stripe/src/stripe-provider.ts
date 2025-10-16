@@ -88,10 +88,10 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
     );
 
     const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
-      ...(typeof params.customer === 'string' && { customer: params.customer }),
-      ...(typeof params.customer === 'object' && { customer: params.customer.email }),
       mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
       line_items: [{ price: params.item_id, quantity: params.quantity }],
+      ...(typeof params.customer === 'string' && { customer: params.customer }),
+      ...(typeof params.customer === 'object' && { customer_email: params.customer.email }),
       ...(params.session_type == 'one_time' && { metadata }),
       ...(params.session_type == 'recurring' && { subscription_data: { metadata } }),
       ...params.provider_metadata,

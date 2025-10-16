@@ -25,7 +25,7 @@ model Payment {
   customerId String?   @map("customer_id")
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
-  // Guest checkout
+  // Guest checkout for when the customer is not yet determined
   customerEmail String? @map("customer_email")
 
   refunds    Refund[]
@@ -62,6 +62,7 @@ model Subscription {
   customerId String?   @map("customer_id")
   customer   Customer? @relation(fields: [customerId], references: [id], onDelete: Cascade)
 
+  // Guest checkout for when the customer is not yet determined
   customerEmail String? @map("customer_email")
 
   invoices   Invoice[]

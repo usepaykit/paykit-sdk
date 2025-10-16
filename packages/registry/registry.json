@@ -1,0 +1,246 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "paykit",
+  "homepage": "https://usepaykit.dev",
+  "items": [
+    {
+      "name": "stripe-nextjs",
+      "type": "registry:block",
+      "description": "Stripe payment integration for Next.js App Router with type-safe API routes and webhook handling",
+      "dependencies": ["@paykit-sdk/core", "@paykit-sdk/stripe"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "packages/registry/stripe/core/paykit.ts",
+          "type": "registry:lib",
+          "target": "lib/paykit.ts"
+        },
+        {
+          "path": "packages/registry/stripe/nextjs/catch-all.ts",
+          "type": "registry:page",
+          "target": "app/api/paykit/[...endpoint]/route.ts"
+        },
+        {
+          "path": "packages/registry/stripe/nextjs/webhook.ts",
+          "type": "registry:page",
+          "target": "app/api/paykit/webhooks/route.ts"
+        }
+      ],
+      "envVars": {
+        "STRIPE_API_KEY": "sk_test_...",
+        "STRIPE_WEBHOOK_SECRET": "whsec_..."
+      },
+      "docs": "Get your Stripe API key from https://dashboard.stripe.com/apikeys \n Create a webhook endpoint at https://dashboard.stripe.com/webhooks to get your webhook secret.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "none",
+        "database": "none",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono",
+      "type": "registry:block",
+      "description": "Stripe payment integration for Hono backend with unified routes and webhook handling",
+      "dependencies": ["@paykit-sdk/core", "@paykit-sdk/stripe", "hono"],
+      "devDependencies": [],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "packages/registry/stripe/core/paykit.ts",
+          "type": "registry:lib",
+          "target": "src/lib/paykit.ts"
+        },
+        {
+          "path": "packages/registry/stripe/hono/router.ts",
+          "type": "registry:page",
+          "target": "src/routes/paykit.ts"
+        }
+      ],
+      "envVars": {
+        "STRIPE_SECRET_KEY": "sk_test_...",
+        "STRIPE_WEBHOOK_SECRET": "whsec_..."
+      },
+      "docs": "Get your Stripe API keys from https://dashboard.stripe.com/apikeys \n Create a webhook endpoint at https://dashboard.stripe.com/webhooks to get your webhook secret.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "none",
+        "database": "none",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express",
+      "type": "registry:block",
+      "description": "Stripe payment integration for Express backend with unified routes and webhook handling",
+      "dependencies": ["@paykit-sdk/core", "@paykit-sdk/stripe", "express"],
+      "devDependencies": ["@types/express"],
+      "registryDependencies": [],
+      "files": [
+        {
+          "path": "packages/registry/stripe/core/paykit.ts",
+          "type": "registry:lib",
+          "target": "src/lib/paykit.ts"
+        },
+        {
+          "path": "packages/registry/stripe/express/router.ts",
+          "type": "registry:page",
+          "target": "src/routes/paykit.ts"
+        }
+      ],
+      "envVars": {
+        "STRIPE_SECRET_KEY": "sk_test_...",
+        "STRIPE_WEBHOOK_SECRET": "whsec_..."
+      },
+      "docs": "Get your Stripe API keys from https://dashboard.stripe.com/apikeys\nCreate a webhook endpoint at https://dashboard.stripe.com/webhooks to get your webhook secret\nMake sure to read the integration guide completely in `src/routes/paykit.ts` file for the proper setup.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "none",
+        "database": "none",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-nextjs-prisma",
+      "type": "registry:block",
+      "description": "Stripe payment integration for Next.js App Router with Prisma ORM",
+      "dependencies": ["@prisma/client"],
+      "devDependencies": ["prisma"],
+      "registryDependencies": ["stripe-nextjs"],
+      "files": [
+        {
+          "path": "packages/registry/stripe/nextjs/prisma/schema.prisma",
+          "type": "registry:file",
+          "target": "prisma/schema-payments.prisma"
+        }
+      ],
+      "docs": "Move the content from prisma/schema-payments.prisma to your main schema.prisma file. \n Run 'npx prisma migrate dev' to create the tables.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "prisma",
+        "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-nextjs-drizzle",
+      "type": "registry:block",
+      "description": "Stripe integration for Next.js with Drizzle ORM schemas for payments and subscriptions",
+      "dependencies": ["drizzle-orm"],
+      "devDependencies": ["drizzle-kit"],
+      "registryDependencies": ["stripe-nextjs"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "drizzle",
+        "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono-prisma",
+      "type": "registry:block",
+      "description": "Stripe integration for Hono with Prisma ORM schemas for payments and subscriptions",
+      "dependencies": ["prisma"],
+      "devDependencies": ["prisma"],
+      "registryDependencies": ["stripe-hono"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "prisma/schema-payments.prisma",
+          "path": "packages/registry/stripe/shared/prisma/schema.prisma"
+        }
+      ],
+      "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "prisma",
+        "database": "sqlite",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono-drizzle",
+      "type": "registry:block",
+      "description": "Stripe integration for Hono with Drizzle ORM schemas for payments and subscriptions",
+      "dependencies": ["drizzle-orm"],
+      "devDependencies": ["drizzle-kit"],
+      "registryDependencies": ["stripe-hono"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "drizzle",
+        "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express-prisma",
+      "type": "registry:block",
+      "description": "Stripe integration for Express with Prisma ORM schemas for payments and subscriptions",
+      "dependencies": ["prisma"],
+      "devDependencies": ["prisma"],
+      "registryDependencies": ["stripe-express"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "prisma/schema-payments.prisma",
+          "path": "packages/registry/stripe/shared/prisma/schema.prisma"
+        }
+      ],
+      "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "prisma",
+        "database": "sqlite",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express-drizzle",
+      "type": "registry:block",
+      "description": "Stripe integration for Express with Drizzle ORM schemas for payments and subscriptions",
+      "dependencies": ["drizzle-orm"],
+      "devDependencies": ["drizzle-kit"],
+      "registryDependencies": ["stripe-express"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "drizzle",
+        "database": "postgres",
+        "auth": "none"
+      }
+    }
+  ]
+}

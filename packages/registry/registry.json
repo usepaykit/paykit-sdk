@@ -28,10 +28,10 @@
         }
       ],
       "envVars": {
-        "STRIPE_API_KEY": "sk_test_...",
+        "STRIPE_SECRET_KEY": "sk_test_...",
         "STRIPE_WEBHOOK_SECRET": "whsec_..."
       },
-      "docs": "Get your Stripe API key from https://dashboard.stripe.com/apikeys \n Create a webhook endpoint at https://dashboard.stripe.com/webhooks to get your webhook secret.",
+      "docs": "Get your Stripe Secret Key from https://dashboard.stripe.com/apikeys \n Create a webhook endpoint at https://dashboard.stripe.com/webhooks to get your webhook secret.",
       "meta": {
         "backend": "nextjs",
         "provider": "stripe",

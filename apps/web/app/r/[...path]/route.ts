@@ -12,7 +12,7 @@ export async function GET(
   const { path } = await params;
   const fullPath = path.join('/');
 
-  // If it's a simple name (no slashes), return registry metadata
+  // If it's a simple name (no slashes), return registry metadata with file contents
   if (path.length === 1) {
     const item = registryIndex.items.find(i => i.name === fullPath);
 
@@ -26,12 +26,32 @@ export async function GET(
       );
     }
 
-    return NextResponse.json(item, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+    // Fetch file contents for all files in the registry item
+    const registryDir = join(process.cwd(), '../../packages/registry');
+    const filesWithContent = await Promise.all(
+      item.files.map(async file => {
+        try {
+          const filePath = join(registryDir, file.path);
+          const content = await readFile(filePath, 'utf-8');
+
+          return { ...file, content };
+        } catch (error) {
+          console.error(`Failed to read file ${file.path}:`, error);
+
+          return { ...file, content: '' };
+        }
+      }),
+    );
+
+    return NextResponse.json(
+      { ...item, files: filesWithContent },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, s-maxage=3600, stale-while-revalidate=86400',
+        },
       },
-    });
+    );
   }
 
   // Otherwise, serve the actual file

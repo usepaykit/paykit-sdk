@@ -1,6 +1,7 @@
 import '@/app/globals.css';
 import { AppProviders } from '@/providers';
 import { cn } from '@paykit-sdk/ui';
+import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
 
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning>
       <body className={cn(ptSans.variable, 'antialiased')}>
         <AppProviders>{children}</AppProviders>
+        <Analytics />
       </body>
     </html>
   );

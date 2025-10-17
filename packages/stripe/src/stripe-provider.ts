@@ -91,16 +91,28 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
     );
 
     const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
+      ...params.provider_metadata,
       mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
       line_items: [{ price: params.item_id, quantity: params.quantity }],
-      ...(typeof params.customer === 'string' && { customer: params.customer }),
-      ...(typeof params.customer === 'object' && {
-        customer_email: params.customer.email,
-      }),
       ...(params.session_type == 'one_time' && { metadata }),
       ...(params.session_type == 'recurring' && { subscription_data: { metadata } }),
-      ...params.provider_metadata,
     };
+
+    if (typeof params.customer === 'string') {
+      checkoutOptions.customer = params.customer;
+    } else if (typeof params.customer === 'object' && 'email' in params.customer) {
+      checkoutOptions.customer_email = params.customer.email;
+    } else {
+      throw new InvalidTypeError(
+        'customer',
+        'string (customer ID) or object (customer) with email',
+        'object',
+        {
+          provider: this.providerName,
+          method: 'createCheckout',
+        },
+      );
+    }
 
     if (params.billing) {
       checkoutOptions.shipping_address_collection = {

@@ -2,7 +2,7 @@ import * as React from 'react';
 
 interface PaykitProviderProps extends React.PropsWithChildren {
   apiUrl: string;
-  headers: Record<string, string> | (() => Record<string, string>);
+  headers?: Record<string, string> | (() => Record<string, string>);
 }
 
 const PaykitContext = React.createContext<PaykitProviderProps | undefined>(undefined);

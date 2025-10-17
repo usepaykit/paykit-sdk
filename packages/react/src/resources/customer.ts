@@ -5,11 +5,10 @@ import { useAsyncFn } from '../hooks/use-async-fn';
 export const useCustomer = () => {
   const ctx = usePaykitContext();
 
-  const retrieve = useAsyncFn<EndpointArgs<'/customer/retrieve'>, EndpointReturn<'/customer/retrieve'>>(
-    '/customer/retrieve',
-    ctx.apiUrl,
-    ctx.headers,
-  );
+  const retrieve = useAsyncFn<
+    EndpointArgs<'/customer/retrieve'>,
+    EndpointReturn<'/customer/retrieve'>
+  >('/customer/retrieve', ctx.apiUrl, ctx.headers);
 
   const create = useAsyncFn<EndpointArgs<'/customer/create'>, EndpointReturn<'/customer/create'>>(
     '/customer/create',

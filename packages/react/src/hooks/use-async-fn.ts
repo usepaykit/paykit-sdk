@@ -6,7 +6,7 @@ type AsyncResult<T> = [data: T, error: undefined] | [data: undefined, error: Err
 export const useAsyncFn = <Args extends unknown[], Response>(
   path: EndpointPath,
   apiUrl: string,
-  headersEsque: Record<string, string> | (() => Record<string, string>),
+  headersEsque?: Record<string, string> | (() => Record<string, string>),
 ) => {
   const [loading, setLoading] = React.useState(false);
 

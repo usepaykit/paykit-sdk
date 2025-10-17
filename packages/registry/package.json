@@ -8,7 +8,9 @@
   },
   "files": [
     "registry.json",
-    "core"
+    "stripe",
+    "paypal",
+    "polar"
   ],
   "publishConfig": {
     "access": "public"
@@ -20,7 +22,7 @@
     "@paykit-sdk/core": "workspace:*",
     "@paykit-sdk/paypal": "workspace:*",
     "@paykit-sdk/polar": "workspace:*",
-    "@paykit-sdk/react": "1.1.91",
+    "@paykit-sdk/react": "workspace:*",
     "@paykit-sdk/stripe": "workspace:*",
     "@types/express": "^5.0.3",
     "@types/node": "^22.10.2",

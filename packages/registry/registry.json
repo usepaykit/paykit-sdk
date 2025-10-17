@@ -105,12 +105,43 @@
       }
     },
     {
+      "name": "stripe-nextjs-hooks",
+      "type": "registry:block",
+      "description": "Stripe payment integration for Next.js App Router with React hooks",
+      "dependencies": ["@paykit-sdk/react"],
+      "devDependencies": [],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
+      "files": [
+        {
+          "path": "packages/registry/stripe/nextjs/hooks/paykit-wrapper.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "packages/registry/stripe/nextjs/hooks/customer-manager.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "packages/registry/stripe/nextjs/hooks/checkout-form.tsx",
+          "type": "registry:component",
+          "target": "app/components/checkout-form.tsx"
+        }
+      ],
+      "docs": "Add the PaykitWrapper to your Next.js layout file to wrap your app in the PaykitProvider.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "none",
+        "database": "none",
+        "auth": "none"
+      }
+    },
+    {
       "name": "stripe-nextjs-prisma",
       "type": "registry:block",
       "description": "Stripe payment integration for Next.js App Router with Prisma ORM",
       "dependencies": ["@prisma/client"],
       "devDependencies": ["prisma"],
-      "registryDependencies": ["stripe-nextjs"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
           "path": "packages/registry/stripe/nextjs/prisma/schema.prisma",
@@ -133,7 +164,7 @@
       "description": "Stripe integration for Next.js with Drizzle ORM schemas for payments and subscriptions",
       "dependencies": ["drizzle-orm"],
       "devDependencies": ["drizzle-kit"],
-      "registryDependencies": ["stripe-nextjs"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
           "type": "registry:file",
@@ -156,7 +187,7 @@
       "description": "Stripe integration for Hono with Prisma ORM schemas for payments and subscriptions",
       "dependencies": ["prisma"],
       "devDependencies": ["prisma"],
-      "registryDependencies": ["stripe-hono"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-hono"],
       "files": [
         {
           "type": "registry:file",
@@ -179,7 +210,7 @@
       "description": "Stripe integration for Hono with Drizzle ORM schemas for payments and subscriptions",
       "dependencies": ["drizzle-orm"],
       "devDependencies": ["drizzle-kit"],
-      "registryDependencies": ["stripe-hono"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-hono"],
       "files": [
         {
           "type": "registry:file",
@@ -202,7 +233,7 @@
       "description": "Stripe integration for Express with Prisma ORM schemas for payments and subscriptions",
       "dependencies": ["prisma"],
       "devDependencies": ["prisma"],
-      "registryDependencies": ["stripe-express"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-express"],
       "files": [
         {
           "type": "registry:file",

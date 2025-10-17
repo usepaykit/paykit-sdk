@@ -7,7 +7,13 @@ export const subscriptionBillingIntervalSchema = z.enum(['day', 'week', 'month',
 
 export type SubscriptionBillingInterval = z.infer<typeof subscriptionBillingIntervalSchema>;
 
-export const subscriptionStatusSchema = z.enum(['active', 'past_due', 'canceled', 'expired', 'pending']);
+export const subscriptionStatusSchema = z.enum([
+  'active',
+  'past_due',
+  'canceled',
+  'expired',
+  'pending',
+]);
 
 export type SubscriptionStatus = z.infer<typeof subscriptionStatusSchema>;
 
@@ -123,7 +129,11 @@ export const deleteSubscriptionSchema = schema<DeleteSubscriptionSchema>()(
   }),
 );
 
-export interface CreateSubscriptionSchema extends Omit<Subscription, 'id'> {
+export interface CreateSubscriptionSchema
+  extends Omit<
+    Subscription,
+    'id' | 'status' | 'custom_fields' | 'current_period_start' | 'current_period_end'
+  > {
   /**
    * The provider metadata of the subscription.
    */
@@ -131,5 +141,13 @@ export interface CreateSubscriptionSchema extends Omit<Subscription, 'id'> {
 }
 
 export const createSubscriptionSchema = schema<CreateSubscriptionSchema>()(
-  subscriptionSchema.omit({ id: true }).extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
+  subscriptionSchema
+    .omit({
+      id: true,
+      status: true,
+      custom_fields: true,
+      current_period_start: true,
+      current_period_end: true,
+    })
+    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
 );

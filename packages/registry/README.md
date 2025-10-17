@@ -46,7 +46,7 @@ Configure the PayKit registry once in your `components.json`:
     "utils": "@/lib/utils"
   },
   "registries": {
-    "@paykit": "https://usepaykit.dev/api/r/{name}"
+    "@paykit": "https://usepaykit.dev/r/{name}"
   }
 }
 ```
@@ -71,8 +71,8 @@ Registry items follow a structured naming pattern:
 | ---------- | ----------- | ------------------------------------------- | -------- |
 | `Provider` | ✅ Yes      | `stripe`, `paypal`, `polar`, `lemonsqueezy` | `stripe` |
 | `Backend`  | ✅ Yes      | `nextjs`, `hono`, `express`, `fastify`      | `nextjs` |
+| `Feature`  | ❌ Optional | `hooks`                                     | `hooks`  |
 | `ORM`      | ❌ Optional | `prisma`, `drizzle`, `mongoose`             | `prisma` |
-| `Feature`  | ❌ Optional | `hooks`, `embedded`, `full`                 | `hooks`  |
 
 ### Examples
 
@@ -81,7 +81,6 @@ Registry items follow a structured naming pattern:
 | Provider + Backend | `stripe-nextjs`             | Basic Stripe integration for Next.js            |
 | + ORM              | `stripe-nextjs-prisma`      | Stripe with Prisma database support             |
 | + Feature          | `stripe-nextjs-hooks`       | Stripe with React hooks (useCheckout, etc.)     |
-| Full Stack         | `stripe-nextjs-prisma-full` | Complete integration with DB + hooks + embedded |
 
 ### Real-World Examples
 
@@ -139,7 +138,7 @@ Coming soon...
 
 ```bash
 # List all available integrations
-curl https://usepaykit.dev//api/r
+curl https://usepaykit.dev/r
 ```
 
 ## Registry Structure

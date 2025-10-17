@@ -66,18 +66,18 @@ const Index = () => {
           </h1>
 
           <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl">
-            PayKit lets you build billing systems that work locally, then deploy anywhere. Switch providers with a
-            single line of code.
+            PayKit lets you build billing systems that work locally, then deploy anywhere. Switch
+            providers with a single line of code.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <CopyButton
               className="min-h-fit max-w-full overflow-hidden px-4 py-3 text-left break-words whitespace-pre-wrap"
-              value="npx shadcn@latest add https://www.usepaykit.dev/api/r/stripe-nextjs"
+              value="npx shadcn@latest add https://www.usepaykit.dev/r/stripe-nextjs-hooks"
               variant="outline"
               size="lg"
             >
-              npx shadcn@latest add https://usepaykit.dev/api/r/stripe-nextjs
+              npx shadcn@latest add https://usepaykit.dev/r/stripe-nextjs-hooks
             </CopyButton>
           </div>
         </div>
@@ -150,7 +150,11 @@ const Index = () => {
                 </Button>
 
                 <Button asChild variant="ghost" size="sm">
-                  <Link href="https://github.com/usepaykit" target="_blank" rel="noopener noreferrer">
+                  <Link
+                    href="https://github.com/usepaykit"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
                     <Github className="size-4" />
                   </Link>
                 </Button>
@@ -167,12 +171,18 @@ const Index = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs/providers/overview" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/docs/providers/overview"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Providers
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs/providers/local" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/docs/providers/local"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Local Development
                   </Link>
                 </li>
@@ -189,12 +199,18 @@ const Index = () => {
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs/api-reference" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/docs/api-reference"
+                    className="hover:text-foreground transition-colors"
+                  >
                     API Reference
                   </Link>
                 </li>
                 <li>
-                  <Link href="/docs/framework-examples" className="hover:text-foreground transition-colors">
+                  <Link
+                    href="/docs/framework-examples"
+                    className="hover:text-foreground transition-colors"
+                  >
                     Framework Examples
                   </Link>
                 </li>

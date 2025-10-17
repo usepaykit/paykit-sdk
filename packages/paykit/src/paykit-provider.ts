@@ -1,10 +1,27 @@
 import { z } from 'zod';
 import { ConfigurationError } from './error';
-import { Checkout, CreateCheckoutSchema, UpdateCheckoutSchema } from './resources/checkout';
-import { CreateCustomerParams, Customer, UpdateCustomerParams } from './resources/customer';
-import { CapturePaymentSchema, CreatePaymentSchema, Payment, UpdatePaymentSchema } from './resources/payment';
+import {
+  Checkout,
+  CreateCheckoutSchema,
+  UpdateCheckoutSchema,
+} from './resources/checkout';
+import {
+  CreateCustomerParams,
+  Customer,
+  UpdateCustomerParams,
+} from './resources/customer';
+import {
+  CapturePaymentSchema,
+  CreatePaymentSchema,
+  Payment,
+  UpdatePaymentSchema,
+} from './resources/payment';
 import { CreateRefundSchema, Refund } from './resources/refund';
-import { CreateSubscriptionSchema, Subscription, UpdateSubscriptionSchema } from './resources/subscription';
+import {
+  CreateSubscriptionSchema,
+  Subscription,
+  UpdateSubscriptionSchema,
+} from './resources/subscription';
 import { WebhookEventPayload } from './resources/webhook';
 import { HandleWebhookParams } from './webhook-provider';
 
@@ -62,7 +79,11 @@ export interface PayKitProvider {
 }
 
 export class AbstractPayKitProvider {
-  protected constructor(schema: z.ZodType<Record<string, unknown>>, options: unknown, providerName: string) {
+  protected constructor(
+    schema: z.ZodType<Record<string, unknown>>,
+    options: unknown,
+    providerName: string,
+  ) {
     const { error } = schema.safeParse(options);
 
     if (error) {

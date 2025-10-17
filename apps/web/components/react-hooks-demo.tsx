@@ -46,7 +46,8 @@ export const ReactHooksDemo = () => {
               </span>
             </h2>
             <p className="text-muted-foreground mx-auto max-w-2xl text-xl">
-              Use familiar React patterns with PayKit’s hooks. Type-safe, async-first, and provider-agnostic.
+              Use familiar React patterns with PayKit’s hooks. Type-safe, async-first, and
+              provider-agnostic.
             </p>
           </div>
 

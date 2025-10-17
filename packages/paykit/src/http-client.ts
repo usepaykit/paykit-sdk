@@ -22,7 +22,11 @@ export class HTTPClient {
 
   private getRequestOptions(options?: Omit<RequestInit, 'method'>): RequestInit {
     return {
-      headers: { 'Content-Type': 'application/json', ...this.config.headers, ...options?.headers },
+      headers: {
+        'Content-Type': 'application/json',
+        ...this.config.headers,
+        ...options?.headers,
+      },
       ...options,
     };
   }
@@ -42,7 +46,9 @@ export class HTTPClient {
     const shouldRetry = retryableTypes.includes(errorType);
 
     if (this.config.retryOptions.debug) {
-      console.info(`[HTTPClient] Attempt ${attempt} failed: ${classifyError(error)} - Retry: ${shouldRetry}`);
+      console.info(
+        `[HTTPClient] Attempt ${attempt} failed: ${classifyError(error)} - Retry: ${shouldRetry}`,
+      );
     }
 
     return { retry: shouldRetry, data: null };
@@ -57,7 +63,10 @@ export class HTTPClient {
     );
   }
 
-  get = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+  get = async <T>(
+    endpoint: string,
+    options?: Omit<RequestInit, 'method'>,
+  ): Promise<Result<T>> => {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
@@ -67,7 +76,10 @@ export class HTTPClient {
     });
   };
 
-  post = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+  post = async <T>(
+    endpoint: string,
+    options?: Omit<RequestInit, 'method'>,
+  ): Promise<Result<T>> => {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
@@ -77,7 +89,10 @@ export class HTTPClient {
     });
   };
 
-  delete = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+  delete = async <T>(
+    endpoint: string,
+    options?: Omit<RequestInit, 'method'>,
+  ): Promise<Result<T>> => {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
@@ -87,7 +102,10 @@ export class HTTPClient {
     });
   };
 
-  put = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+  put = async <T>(
+    endpoint: string,
+    options?: Omit<RequestInit, 'method'>,
+  ): Promise<Result<T>> => {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
@@ -97,7 +115,10 @@ export class HTTPClient {
     });
   };
 
-  patch = async <T>(endpoint: string, options?: Omit<RequestInit, 'method'>): Promise<Result<T>> => {
+  patch = async <T>(
+    endpoint: string,
+    options?: Omit<RequestInit, 'method'>,
+  ): Promise<Result<T>> => {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);

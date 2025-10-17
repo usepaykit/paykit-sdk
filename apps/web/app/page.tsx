@@ -36,7 +36,11 @@ const Index = () => {
               </Link>
             </Button>
             <Button asChild variant="ghost" size="sm">
-              <Link href="https://github.com/usepaykit" target="_blank" rel="noopener noreferrer">
+              <Link
+                href="https://github.com/usepaykit"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 <Github className="mr-2 size-4" />
                 GitHub
               </Link>
@@ -66,8 +70,8 @@ const Index = () => {
           </h1>
 
           <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl">
-            PayKit lets you build billing systems that work locally, then deploy anywhere. Switch
-            providers with a single line of code.
+            PayKit lets you build billing systems that work locally, then deploy anywhere.
+            Switch providers with a single line of code.
           </p>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
@@ -83,7 +87,9 @@ const Index = () => {
         </div>
 
         <div className="mx-auto mb-16 text-center">
-          <h2 className="mb-8 text-3xl font-bold">Integrates with your favorite providers</h2>
+          <h2 className="mb-8 text-3xl font-bold">
+            Integrates with your favorite providers
+          </h2>
           <div className="mx-auto flex w-full max-w-sm items-center justify-center">
             <div className="flex items-center">
               {[
@@ -140,7 +146,8 @@ const Index = () => {
                 <span className="text-lg font-bold">PayKit</span>
               </div>
               <p className="text-muted-foreground text-sm leading-relaxed">
-                The payment toolkit for TypeScript developers. Build locally, deploy anywhere.
+                The payment toolkit for TypeScript developers. Build locally, deploy
+                anywhere.
               </p>
               <div className="flex items-center space-x-1">
                 <Button asChild variant="ghost" size="sm">
@@ -223,7 +230,12 @@ const Index = () => {
           <div className="flex flex-col items-center justify-between space-y-4 md:flex-row md:space-y-0">
             <div className="flex items-center space-x-3">
               <div className="relative h-8 w-8 overflow-hidden rounded-full">
-                <Image src="/odii.png" alt="Emmanuel Odii" fill className="object-cover" />
+                <Image
+                  src="/odii.png"
+                  alt="Emmanuel Odii"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <p className="text-muted-foreground text-sm">
                 Hey Curious 👋 I’m
@@ -245,7 +257,9 @@ const Index = () => {
               </p>
             </div>
 
-            <p className="text-muted-foreground text-sm">© 2024 PayKit. All rights reserved.</p>
+            <p className="text-muted-foreground text-sm">
+              © 2024 PayKit. All rights reserved.
+            </p>
           </div>
         </div>
       </footer>

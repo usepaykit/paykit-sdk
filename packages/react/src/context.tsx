@@ -16,7 +16,8 @@ export const PaykitProvider = ({ apiUrl, headers, children }: PaykitProviderProp
 export const usePaykitContext = () => {
   const ctx = React.useContext(PaykitContext);
 
-  if (!ctx) throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
+  if (!ctx)
+    throw new Error('Your app must be wrapped in PayKitProvider to use PayKit hooks.');
 
   return ctx;
 };

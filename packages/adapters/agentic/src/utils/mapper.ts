@@ -1,6 +1,9 @@
 import { Checkout, Customer } from '@paykit-sdk/core';
 import { AgenticBuyer } from '../schema/agentic-buyer';
-import { AgenticCheckoutSession, CreateAgenticCheckoutSessionParams } from '../schema/agentic-checkout';
+import {
+  AgenticCheckoutSession,
+  CreateAgenticCheckoutSessionParams,
+} from '../schema/agentic-checkout';
 
 export const customerToAgenticBuyer = (customer: Customer) => {
   return {
@@ -29,11 +32,15 @@ export const agenticCheckoutSession$InboundSchema = (
   return {
     id: checkout.id,
     buyer: agenticParams.buyer,
-    payment_provider: { provider: providerName.toLowerCase(), supported_payment_methods: ['card'] },
+    payment_provider: {
+      provider: providerName.toLowerCase(),
+      supported_payment_methods: ['card'],
+    },
     status: 'in_progress',
     currency: checkout.currency,
     line_items: checkout.products,
-    fulfillment_options: JSON.parse(JSON.stringify(checkout.metadata?.fulfillment_address ?? {})) ?? [],
+    fulfillment_options:
+      JSON.parse(JSON.stringify(checkout.metadata?.fulfillment_address ?? {})) ?? [],
     fulfillment_option_id: checkout.metadata?.fulfillment_option_id ?? null,
     totals: [],
     messages: [],

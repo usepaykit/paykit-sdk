@@ -17,7 +17,12 @@ export function MobileToc({ toc }: MobileTocProps) {
   return (
     <Sheet.Root open={open} onOpenChange={setOpen}>
       <Sheet.Trigger asChild>
-        <Button variant="ghost" size="sm" className="md:hidden" aria-label="Open table of contents">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="md:hidden"
+          aria-label="Open table of contents"
+        >
           <List className="h-5 w-5" />
         </Button>
       </Sheet.Trigger>

@@ -30,7 +30,10 @@ export const endpoints = createEndpointHandlers(paykit);
 import { paykit } from '@/lib/paykit';
 import { EndpointPath } from '@paykit-sdk/core';
 
-export async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { endpoint: string[] } },
+) {
   try {
     // Construct the endpoint path with full type safety
     const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;
@@ -103,40 +106,44 @@ const app = express();
 
 // IMPORTANT: Webhook route must come BEFORE express.json() middleware
 // This ensures we get the raw body for signature verification
-app.post('/api/webhooks/gopay', express.raw({ type: 'application/json' }), async (req, res) => {
-  try {
-    const webhook = paykit.webhooks
-      .setup({ webhookSecret: '' })
-      .on('customer.created', async event => {
-        console.log('Customer created:', event.data);
-      })
-      .on('subscription.created', async event => {
-        console.log('Subscription created:', event.data);
-      })
-      .on('payment.created', async event => {
-        console.log('Payment created:', event.data);
-      })
-      .on('refund.created', async event => {
-        console.log('Refund created:', event.data);
-      })
-      .on('invoice.generated', async event => {
-        console.log('Invoice generated:', event.data);
+app.post(
+  '/api/webhooks/gopay',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    try {
+      const webhook = paykit.webhooks
+        .setup({ webhookSecret: '' })
+        .on('customer.created', async event => {
+          console.log('Customer created:', event.data);
+        })
+        .on('subscription.created', async event => {
+          console.log('Subscription created:', event.data);
+        })
+        .on('payment.created', async event => {
+          console.log('Payment created:', event.data);
+        })
+        .on('refund.created', async event => {
+          console.log('Refund created:', event.data);
+        })
+        .on('invoice.generated', async event => {
+          console.log('Invoice generated:', event.data);
+        });
+
+      const body = req.body; // Raw buffer from express.raw()
+      const headers = req.headers;
+      const url = request.url;
+      await webhook.handle({ body, headers, fullUrl: url });
+
+      // Return immediately, processing happens in background
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Webhook error:', error);
+      res.status(500).json({
+        message: error instanceof Error ? error.message : 'Webhook processing failed',
       });
-
-    const body = req.body; // Raw buffer from express.raw()
-    const headers = req.headers;
-    const url = request.url;
-    await webhook.handle({ body, headers, fullUrl: url });
-
-    // Return immediately, processing happens in background
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(500).json({
-      message: error instanceof Error ? error.message : 'Webhook processing failed',
-    });
-  }
-});
+    }
+  },
+);
 
 // Regular API routes use JSON middleware
 app.use(express.json());

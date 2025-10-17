@@ -24,7 +24,9 @@ export class AuthController {
     }
 
     // Generate a new one
-    const credentials = Buffer.from(`${this.opts.clientId}:${this.opts.clientSecret}`).toString('base64');
+    const credentials = Buffer.from(
+      `${this.opts.clientId}:${this.opts.clientSecret}`,
+    ).toString('base64');
     const response = await this._client.post<GoPayTokenResponse>('/oauth2/token', {
       headers: {
         Authorization: `Basic ${credentials}`,

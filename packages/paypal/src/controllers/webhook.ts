@@ -15,7 +15,11 @@ export class WebhookController extends BaseController {
     const req = this.createRequest('POST', '/v1/notifications/verify-webhook-signature');
     req.header('Content-Type', 'application/json');
 
-    req.throwOn(400, CustomError, 'Request is not well-formed, syntactically incorrect, or violates schema.');
+    req.throwOn(
+      400,
+      CustomError,
+      'Request is not well-formed, syntactically incorrect, or violates schema.',
+    );
     req.throwOn(
       401,
       CustomError,

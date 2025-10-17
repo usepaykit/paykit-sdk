@@ -2,19 +2,49 @@
 
 export const Spinner = () => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" aria-hidden="true" width="2rem" height="2rem">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      width="2rem"
+      height="2rem"
+    >
       <path className="spinner-path-1" d="M3 7H1a1 1 0 0 0 0 2h2a1 1 0 0 0 0-2"></path>
       <path className="spinner-path-2" d="M15 7h-2a1 1 0 1 0 0 2h2a1 1 0 1 0 0-2"></path>
       <path className="spinner-path-3" d="M7 13v2a1 1 0 1 0 2 0v-2a1 1 0 1 0-2 0"></path>
       <path className="spinner-path-4" d="M7 1v2a1 1 0 0 0 2 0V1a1 1 0 0 0-2 0"></path>
-      <path className="spinner-path-5" d="m9.634 12.83 1 1.732a1 1 0 1 0 1.732-1l-1-1.732a1 1 0 0 0-1.732 1"></path>
-      <path className="spinner-path-6" d="m3.634 2.438 1 1.732a1 1 0 1 0 1.732-1l-1-1.732a1 1 0 1 0-1.732 1"></path>
-      <path className="spinner-path-7" d="m11.83 11.366 1.732 1a1 1 0 1 0 1-1.732l-1.732-1a1 1 0 1 0-1 1.732"></path>
-      <path className="spinner-path-8" d="m1.438 5.366 1.732 1a1 1 0 1 0 1-1.732l-1.732-1a1 1 0 1 0-1 1.732"></path>
-      <path className="spinner-path-9" d="m12.83 6.366 1.732-1a1 1 0 0 0-1-1.732l-1.732 1a1 1 0 0 0 1 1.732"></path>
-      <path className="spinner-path-10" d="m2.438 12.366 1.732-1a1 1 0 1 0-1-1.732l-1.732 1a1 1 0 1 0 1 1.732"></path>
-      <path className="spinner-path-11" d="m11.366 4.17 1-1.732a1 1 0 0 0-1.732-1l-1 1.732a1 1 0 0 0 1.732 1"></path>
-      <path className="spinner-path-12" d="m5.366 14.562 1-1.732a1 1 0 1 0-1.732-1l-1 1.732a1 1 0 0 0 1.732 1"></path>
+      <path
+        className="spinner-path-5"
+        d="m9.634 12.83 1 1.732a1 1 0 1 0 1.732-1l-1-1.732a1 1 0 0 0-1.732 1"
+      ></path>
+      <path
+        className="spinner-path-6"
+        d="m3.634 2.438 1 1.732a1 1 0 1 0 1.732-1l-1-1.732a1 1 0 1 0-1.732 1"
+      ></path>
+      <path
+        className="spinner-path-7"
+        d="m11.83 11.366 1.732 1a1 1 0 1 0 1-1.732l-1.732-1a1 1 0 1 0-1 1.732"
+      ></path>
+      <path
+        className="spinner-path-8"
+        d="m1.438 5.366 1.732 1a1 1 0 1 0 1-1.732l-1.732-1a1 1 0 1 0-1 1.732"
+      ></path>
+      <path
+        className="spinner-path-9"
+        d="m12.83 6.366 1.732-1a1 1 0 0 0-1-1.732l-1.732 1a1 1 0 0 0 1 1.732"
+      ></path>
+      <path
+        className="spinner-path-10"
+        d="m2.438 12.366 1.732-1a1 1 0 1 0-1-1.732l-1.732 1a1 1 0 1 0 1 1.732"
+      ></path>
+      <path
+        className="spinner-path-11"
+        d="m11.366 4.17 1-1.732a1 1 0 0 0-1.732-1l-1 1.732a1 1 0 0 0 1.732 1"
+      ></path>
+      <path
+        className="spinner-path-12"
+        d="m5.366 14.562 1-1.732a1 1 0 1 0-1.732-1l-1 1.732a1 1 0 0 0 1.732 1"
+      ></path>
 
       <style jsx>{`
         @keyframes spinnerFade {

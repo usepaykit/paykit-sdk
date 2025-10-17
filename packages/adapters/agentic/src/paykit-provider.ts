@@ -1,4 +1,9 @@
-import { ConfigurationError, PayKitProvider, parseJSON, providerSchema } from '@paykit-sdk/core';
+import {
+  ConfigurationError,
+  PayKitProvider,
+  parseJSON,
+  providerSchema,
+} from '@paykit-sdk/core';
 import { AgenticBuyer } from './schema/agentic-buyer';
 import {
   AgenticCheckoutSession,
@@ -6,7 +11,10 @@ import {
   createAgenticCheckoutSessionParamsSchema,
   UpdateAgenticCheckoutSessionParams,
 } from './schema/agentic-checkout';
-import { DelegatePaymentParams, DelegatePaymentResponse } from './schema/delegate-payment';
+import {
+  DelegatePaymentParams,
+  DelegatePaymentResponse,
+} from './schema/delegate-payment';
 import { agenticBuyerToCustomer } from './utils/mapper';
 import { agenticCheckoutSession$InboundSchema } from './utils/mapper';
 
@@ -25,7 +33,14 @@ export class PaykitAgenticAdapter {
   createAgenticCheckoutSession = async (
     params: CreateAgenticCheckoutSessionParams,
   ): Promise<AgenticCheckoutSession> => {
-    const { line2 = '', line1, city, state, country, postal_code } = params.fulfillment_address ?? {};
+    const {
+      line2 = '',
+      line1,
+      city,
+      state,
+      country,
+      postal_code,
+    } = params.fulfillment_address ?? {};
 
     const checkout = await this.provider.createCheckout({
       customer: agenticBuyerToCustomer(params.buyer).id,
@@ -71,7 +86,9 @@ export class PaykitAgenticAdapter {
     throw new Error('Not implemented');
   };
 
-  retrieveAgenticCheckoutSession = async (id: string): Promise<AgenticCheckoutSession> => {
+  retrieveAgenticCheckoutSession = async (
+    id: string,
+  ): Promise<AgenticCheckoutSession> => {
     const checkout = await this.provider.retrieveCheckout(id);
 
     if (!checkout) throw new Error('Checkout not found');

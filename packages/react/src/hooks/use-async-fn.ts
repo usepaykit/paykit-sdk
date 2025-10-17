@@ -15,7 +15,8 @@ export const useAsyncFn = <Args extends unknown[], Response>(
       setLoading(true);
 
       try {
-        const headers = typeof headersEsque === 'function' ? headersEsque() : (headersEsque ?? {});
+        const headers =
+          typeof headersEsque === 'function' ? headersEsque() : (headersEsque ?? {});
 
         const response = await fetch(`${apiUrl}${path}`, {
           method: 'POST',
@@ -25,7 +26,9 @@ export const useAsyncFn = <Args extends unknown[], Response>(
         });
 
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ message: 'Request failed' }));
+          const errorData = await response
+            .json()
+            .catch(() => ({ message: 'Request failed' }));
 
           throw new Error(errorData.message || `HTTP ${response.status}`);
         }

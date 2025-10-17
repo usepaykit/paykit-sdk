@@ -125,7 +125,10 @@ export const CustomerManager = () => {
           className="bg-background border-input rounded-md border p-2"
         />
 
-        <button onClick={handleCreateRefund} disabled={!paymentId || createRefund.loading}>
+        <button
+          onClick={handleCreateRefund}
+          disabled={!paymentId || createRefund.loading}
+        >
           {createRefund.loading ? 'Processing...' : 'Create $10 Refund'}
         </button>
       </section>

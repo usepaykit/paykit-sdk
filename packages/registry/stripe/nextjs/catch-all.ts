@@ -2,13 +2,17 @@ import { endpoints } from '@/lib/paykit';
 import type { EndpointArgs, EndpointHandler, EndpointPath } from '@paykit-sdk/core';
 import { NextResponse, NextRequest } from 'next/server';
 
-export async function POST(request: NextRequest, { params }: { params: Promise<{ endpoint: string[] }> }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ endpoint: string[] }> },
+) {
   const { endpoint: endpointArray } = await params;
   const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;
 
   const handler = endpoints[endpoint] as EndpointHandler<typeof endpoint>;
 
-  if (!handler) return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });
+  if (!handler)
+    return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });
 
   const body = await request.json();
 

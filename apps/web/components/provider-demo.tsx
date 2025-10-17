@@ -55,8 +55,8 @@ export function ProviderDemo() {
             </h2>
 
             <p className="text-muted-foreground mx-auto max-w-2xl text-lg leading-relaxed">
-              Watch the magic happen. Only the lines that change between providers will animate, showing you exactly
-              what needs to be modified.
+              Watch the magic happen. Only the lines that change between providers will
+              animate, showing you exactly what needs to be modified.
             </p>
           </div>
 
@@ -72,9 +72,14 @@ export function ProviderDemo() {
                   <div className="p-6">
                     <div className="mb-4 flex items-center space-x-2">
                       <PaykitIcon className="size-4 text-blue-500" />
-                      <span className="text-muted-foreground text-sm font-medium">Providers</span>
+                      <span className="text-muted-foreground text-sm font-medium">
+                        Providers
+                      </span>
                     </div>
-                    <ProviderList selectedProvider={selectedProvider} onProviderSelect={setSelectedProvider} />
+                    <ProviderList
+                      selectedProvider={selectedProvider}
+                      onProviderSelect={setSelectedProvider}
+                    />
                   </div>
                 </div>
 
@@ -88,7 +93,9 @@ export function ProviderDemo() {
                         </div>
                         <div>
                           <h3 className="text-lg font-semibold">
-                            {selectedProvider.charAt(0).toUpperCase() + selectedProvider.slice(1)} Implementation
+                            {selectedProvider.charAt(0).toUpperCase() +
+                              selectedProvider.slice(1)}{' '}
+                            Implementation
                           </h3>
                           <p className="text-muted-foreground text-sm">TypeScript</p>
                         </div>

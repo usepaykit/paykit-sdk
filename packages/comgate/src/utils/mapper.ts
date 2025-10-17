@@ -11,12 +11,16 @@ export const paykitPayment$InboundSchema = (
     currency: webhookResponse.curr,
     customer: webhookResponse.payerId ?? { email: webhookResponse.email },
     status,
-    metadata: omitInternalMetadata(JSON.parse(webhookResponse.refId) as Record<string, unknown>),
+    metadata: omitInternalMetadata(
+      JSON.parse(webhookResponse.refId) as Record<string, unknown>,
+    ),
     product_id: null,
   };
 };
 
-export const paykitInvoice$InboundSchema = (webhookResponse: ComgateWebhookStatusSuccessResponse): Invoice => {
+export const paykitInvoice$InboundSchema = (
+  webhookResponse: ComgateWebhookStatusSuccessResponse,
+): Invoice => {
   const status = ((): Invoice['status'] => {
     if (webhookResponse.status == 'PAID') return 'paid';
     return 'open';
@@ -33,6 +37,8 @@ export const paykitInvoice$InboundSchema = (webhookResponse: ComgateWebhookStatu
     subscription_id: null,
     billing_mode: 'one_time', // comgate does not support recurring payments
     line_items: webhookResponse.name ? [{ id: webhookResponse.name, quantity: 1 }] : [],
-    metadata: omitInternalMetadata(JSON.parse(webhookResponse.refId) as Record<string, unknown>),
+    metadata: omitInternalMetadata(
+      JSON.parse(webhookResponse.refId) as Record<string, unknown>,
+    ),
   };
 };

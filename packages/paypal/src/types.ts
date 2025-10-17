@@ -1,4 +1,10 @@
-export type SubscriptionStatus = 'APPROVAL_PENDING' | 'APPROVED' | 'ACTIVE' | 'SUSPENDED' | 'CANCELLED' | 'EXPIRED';
+export type SubscriptionStatus =
+  | 'APPROVAL_PENDING'
+  | 'APPROVED'
+  | 'ACTIVE'
+  | 'SUSPENDED'
+  | 'CANCELLED'
+  | 'EXPIRED';
 
 export interface PayPalSubscription {
   /**

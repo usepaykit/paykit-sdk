@@ -1,4 +1,10 @@
-import { Checkout, omitInternalMetadata, Payment, Refund, Subscription } from '@paykit-sdk/core';
+import {
+  Checkout,
+  omitInternalMetadata,
+  Payment,
+  Refund,
+  Subscription,
+} from '@paykit-sdk/core';
 import { Order, Refund as PayPalRefund } from '@paypal/paypal-server-sdk';
 import { PayPalSubscription } from '../types';
 
@@ -24,7 +30,9 @@ export const paykitCheckout$InboundSchema = (order: Order): Checkout => {
     payment_url: order.links?.find(l => l.rel === 'approve')?.href || '',
     amount: parseFloat(order.purchaseUnits?.[0]?.amount?.value || '0'),
     currency: order.purchaseUnits?.[0]?.amount?.currencyCode || 'USD',
-    customer: order.payer?.payerId ? order.payer?.payerId : { email: order.payer?.emailAddress ?? '' },
+    customer: order.payer?.payerId
+      ? order.payer?.payerId
+      : { email: order.payer?.emailAddress ?? '' },
     session_type: 'one_time',
     products: [{ id: order.purchaseUnits?.[0]?.items?.[0]?.sku || '', quantity: 1 }],
     metadata: order.purchaseUnits?.[0]?.customId
@@ -57,7 +65,9 @@ export const paykitPayment$InboundSchema = (order: Order): Payment => {
     metadata: order.purchaseUnits?.[0]?.customId
       ? omitInternalMetadata(JSON.parse(order.purchaseUnits?.[0]?.customId))
       : {},
-    customer: order.payer?.payerId ? order.payer?.payerId : { email: order.payer?.emailAddress ?? '' },
+    customer: order.payer?.payerId
+      ? order.payer?.payerId
+      : { email: order.payer?.emailAddress ?? '' },
     product_id: order.purchaseUnits?.[0]?.items?.[0]?.sku || '',
   };
 };
@@ -65,7 +75,9 @@ export const paykitPayment$InboundSchema = (order: Order): Payment => {
 /**
  * Subscription
  */
-export const paykitSubscription$InboundSchema = (subscription: PayPalSubscription): Subscription => {
+export const paykitSubscription$InboundSchema = (
+  subscription: PayPalSubscription,
+): Subscription => {
   const statusMap: Record<string, Subscription['status']> = {
     APPROVAL_PENDING: 'pending',
     APPROVED: 'active',
@@ -82,9 +94,15 @@ export const paykitSubscription$InboundSchema = (subscription: PayPalSubscriptio
     customer: { email: subscription.subscriber?.email_address ?? '' },
     status,
     item_id: subscription.plan_id,
-    current_period_start: subscription.start_time ? new Date(subscription.start_time) : new Date(),
-    current_period_end: subscription.status_update_time ? new Date(subscription.status_update_time) : new Date(), // todo: Would need to calculate based on billing cycle
-    metadata: subscription.customId ? omitInternalMetadata(JSON.parse(subscription.customId)) : {},
+    current_period_start: subscription.start_time
+      ? new Date(subscription.start_time)
+      : new Date(),
+    current_period_end: subscription.status_update_time
+      ? new Date(subscription.status_update_time)
+      : new Date(), // todo: Would need to calculate based on billing cycle
+    metadata: subscription.customId
+      ? omitInternalMetadata(JSON.parse(subscription.customId))
+      : {},
     billing_interval: 'month',
     amount: 0,
     currency: 'USD',

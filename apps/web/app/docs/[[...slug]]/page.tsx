@@ -96,7 +96,9 @@ export default async function DocPage({ params }: DocPageProps) {
           </div>
 
           <div className="mb-8 space-y-4">
-            <h1 className="text-foreground text-4xl font-bold tracking-tight">{doc.title}</h1>
+            <h1 className="text-foreground text-4xl font-bold tracking-tight">
+              {doc.title}
+            </h1>
             {doc.description && (
               <p className="text-muted-foreground text-lg leading-relaxed">
                 <Balancer>{doc.description}</Balancer>
@@ -152,7 +154,9 @@ export default async function DocPage({ params }: DocPageProps) {
           <div className="sticky top-20 p-6">
             <div className="space-y-6">
               <div className="space-y-4">
-                <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">On this page</h4>
+                <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">
+                  On this page
+                </h4>
                 <DashboardTableOfContents toc={toc} />
               </div>
               <DocsAd />

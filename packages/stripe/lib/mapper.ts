@@ -16,10 +16,15 @@ import Stripe from 'stripe';
 /**
  * Checkout
  */
-export const paykitCheckout$InboundSchema = (checkout: Stripe.Checkout.Session): Checkout => {
+export const paykitCheckout$InboundSchema = (
+  checkout: Stripe.Checkout.Session,
+): Checkout => {
   return {
     id: checkout.id,
-    customer: typeof checkout.customer === 'string' ? checkout.customer : (checkout.customer?.id ?? ''),
+    customer:
+      typeof checkout.customer === 'string'
+        ? checkout.customer
+        : (checkout.customer?.id ?? ''),
     session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time',
     payment_url: checkout.url!,
     products: checkout.line_items!.data.map(item => ({
@@ -49,10 +54,13 @@ export const paykitCustomer$InboundSchema = (customer: Stripe.Customer): Custome
 /**
  * Subscription
  */
-export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscription): Subscription => {
+export const paykitSubscription$InboundSchema = (
+  subscription: Stripe.Subscription,
+): Subscription => {
   const status = (() => {
     if (['active', 'trialing'].includes(subscription.status)) return 'active';
-    if (['incomplete_expired', 'incomplete', 'past_due'].includes(subscription.status)) return 'past_due';
+    if (['incomplete_expired', 'incomplete', 'past_due'].includes(subscription.status))
+      return 'past_due';
     if (['canceled'].includes(subscription.status)) return 'canceled';
     if (['expired'].includes(subscription.status)) return 'expired';
     throw new Error(`Unknown status: ${subscription.status}`);
@@ -63,11 +71,15 @@ export const paykitSubscription$InboundSchema = (subscription: Stripe.Subscripti
   return {
     id: subscription.id,
     status,
-    customer: typeof subscription.customer === 'string' ? subscription.customer : subscription.customer?.id,
+    customer:
+      typeof subscription.customer === 'string'
+        ? subscription.customer
+        : subscription.customer?.id,
     amount: subscription.items.data[0].price.unit_amount!,
     currency: subscription.items.data[0].price.currency!,
     item_id: subscription.items.data[0].id,
-    billing_interval: subscription.items.data[0].price.recurring?.interval as SubscriptionBillingInterval,
+    billing_interval: subscription.items.data[0].price.recurring
+      ?.interval as SubscriptionBillingInterval,
     current_period_start: new Date(subscription.start_date),
     current_period_end: new Date(subscription.cancel_at!),
     metadata,
@@ -83,7 +95,8 @@ type InvoicePayload = Stripe.Invoice & { billingMode: BillingMode };
 export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice => {
   const status = ((): InvoiceStatus => {
     if (invoice.status == 'paid') return 'paid';
-    if (['draft', 'open', 'uncollectible', 'void'].includes(invoice.status as string)) return 'open';
+    if (['draft', 'open', 'uncollectible', 'void'].includes(invoice.status as string))
+      return 'open';
     throw new Error(`Unknown status: ${invoice.status}`);
   })();
 
@@ -99,8 +112,12 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): Invoice =>
     customer: customerId,
     billing_mode: invoice.billingMode,
     amount_paid: invoice.amount_paid,
-    line_items: invoice.lines.data.map(line => ({ id: line.id!, quantity: line.quantity! })),
-    subscription_id: invoice.parent?.subscription_details?.subscription?.toString() ?? null,
+    line_items: invoice.lines.data.map(line => ({
+      id: line.id!,
+      quantity: line.quantity!,
+    })),
+    subscription_id:
+      invoice.parent?.subscription_details?.subscription?.toString() ?? null,
     status,
     paid_at: new Date(invoice.created * 1000).toISOString(),
     metadata: omitInternalMetadata(invoice.metadata ?? {}),

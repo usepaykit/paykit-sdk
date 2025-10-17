@@ -3,7 +3,10 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export const revalidate = false;
 
-export async function GET(_: NextRequest, { params }: { params: Promise<{ name: string }> }) {
+export async function GET(
+  _: NextRequest,
+  { params }: { params: Promise<{ name: string }> },
+) {
   const { name } = await params;
 
   const item = registryIndex.items.find(i => i.name === name);
@@ -37,7 +40,10 @@ export async function OPTIONS() {
   return NextResponse.json(
     { registry: registryIndex.name, homepage: registryIndex.homepage, items },
     {
-      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'public, s-maxage=3600' },
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'public, s-maxage=3600',
+      },
     },
   );
 }

@@ -152,7 +152,11 @@ export interface ComgateWebhookResponse {
   /**
    * The applied fee type of the payment
    */
-  appliedFeeType?: 'EU_UNREGULATED' | 'NON_EU_BUSINESS' | 'NON_EU_CONSUMER' | 'EU_CONSUMER';
+  appliedFeeType?:
+    | 'EU_UNREGULATED'
+    | 'NON_EU_BUSINESS'
+    | 'NON_EU_CONSUMER'
+    | 'EU_CONSUMER';
 }
 
 export interface ComgateWebhookStatusResponseBase {
@@ -164,7 +168,8 @@ export interface ComgateWebhookStatusResponseBase {
   message: string;
 }
 
-export interface ComgateWebhookStatusSuccessResponse extends ComgateWebhookStatusResponseBase {
+export interface ComgateWebhookStatusSuccessResponse
+  extends ComgateWebhookStatusResponseBase {
   /**
    * The code of the response
    */
@@ -283,7 +288,11 @@ export interface ComgateWebhookStatusSuccessResponse extends ComgateWebhookStatu
   /**
    * The applied fee type of the product
    */
-  appliedFeeType?: 'EU_UNREGULATED' | 'NON_EU_BUSINESS' | 'NON_EU_CONSUMER' | 'EU_CONSUMER';
+  appliedFeeType?:
+    | 'EU_UNREGULATED'
+    | 'NON_EU_BUSINESS'
+    | 'NON_EU_CONSUMER'
+    | 'EU_CONSUMER';
 
   /**
    * The payment error reason of the product

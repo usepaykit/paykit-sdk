@@ -48,7 +48,10 @@ const Root = ({
   children,
   ...props
 }: React.ComponentProps<'div'> & CarouselProps) => {
-  const [carouselRef, api] = useEmblaCarousel({ ...opts, axis: orientation === 'horizontal' ? 'x' : 'y' }, plugins);
+  const [carouselRef, api] = useEmblaCarousel(
+    { ...opts, axis: orientation === 'horizontal' ? 'x' : 'y' },
+    plugins,
+  );
   const [canScrollPrev, setCanScrollPrev] = React.useState(false);
   const [canScrollNext, setCanScrollNext] = React.useState(false);
 
@@ -127,7 +130,14 @@ const Content = ({ className, ...props }: React.ComponentProps<'div'>) => {
 
   return (
     <div ref={carouselRef} className="overflow-hidden" data-slot="carousel-content">
-      <div className={cn('flex', orientation === 'horizontal' ? '-ml-4' : '-mt-4 flex-col', className)} {...props} />
+      <div
+        className={cn(
+          'flex',
+          orientation === 'horizontal' ? '-ml-4' : '-mt-4 flex-col',
+          className,
+        )}
+        {...props}
+      />
     </div>
   );
 };
@@ -140,13 +150,22 @@ export const Item = ({ className, ...props }: React.ComponentProps<'div'>) => {
       role="group"
       aria-roledescription="slide"
       data-slot="carousel-item"
-      className={cn('min-w-0 shrink-0 grow-0 basis-full', orientation === 'horizontal' ? 'pl-4' : 'pt-4', className)}
+      className={cn(
+        'min-w-0 shrink-0 grow-0 basis-full',
+        orientation === 'horizontal' ? 'pl-4' : 'pt-4',
+        className,
+      )}
       {...props}
     />
   );
 };
 
-const Previous = ({ className, variant = 'outline', size = 'icon', ...props }: React.ComponentProps<typeof Button>) => {
+const Previous = ({
+  className,
+  variant = 'outline',
+  size = 'icon',
+  ...props
+}: React.ComponentProps<typeof Button>) => {
   const { orientation, scrollPrev, canScrollPrev } = useCarousel();
 
   return (
@@ -171,7 +190,12 @@ const Previous = ({ className, variant = 'outline', size = 'icon', ...props }: R
   );
 };
 
-const Next = ({ className, variant = 'outline', size = 'icon', ...props }: React.ComponentProps<typeof Button>) => {
+const Next = ({
+  className,
+  variant = 'outline',
+  size = 'icon',
+  ...props
+}: React.ComponentProps<typeof Button>) => {
   const { orientation, scrollNext, canScrollNext } = useCarousel();
 
   return (

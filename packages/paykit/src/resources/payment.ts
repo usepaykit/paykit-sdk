@@ -99,7 +99,9 @@ export interface UpdatePaymentSchema extends Partial<Omit<Payment, 'id' | 'statu
 }
 
 export const updatePaymentSchema = schema<UpdatePaymentSchema>()(
-  paymentSchema.partial().extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
+  paymentSchema
+    .partial()
+    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
 );
 
 export interface RetrievePaymentSchema {
@@ -109,7 +111,9 @@ export interface RetrievePaymentSchema {
   id: string;
 }
 
-export const retrievePaymentSchema = schema<RetrievePaymentSchema>()(paymentSchema.pick({ id: true }));
+export const retrievePaymentSchema = schema<RetrievePaymentSchema>()(
+  paymentSchema.pick({ id: true }),
+);
 
 export interface DeletePaymentSchema {
   /**
@@ -118,7 +122,9 @@ export interface DeletePaymentSchema {
   id: string;
 }
 
-export const deletePaymentSchema = schema<DeletePaymentSchema>()(paymentSchema.pick({ id: true }));
+export const deletePaymentSchema = schema<DeletePaymentSchema>()(
+  paymentSchema.pick({ id: true }),
+);
 
 export interface CapturePaymentSchema {
   /**

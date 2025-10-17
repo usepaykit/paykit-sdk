@@ -73,7 +73,11 @@ interface TreeProps {
 
 function Tree({ tree, level = 1, activeItem }: TreeProps) {
   return tree?.length && level < 3 ? (
-    <ul className={cn('m-0 list-none space-y-1', { 'border-border/50 border-l pl-4': level !== 1 })}>
+    <ul
+      className={cn('m-0 list-none space-y-1', {
+        'border-border/50 border-l pl-4': level !== 1,
+      })}
+    >
       {tree.map((item, index) => {
         return (
           <li key={index}>
@@ -81,13 +85,17 @@ function Tree({ tree, level = 1, activeItem }: TreeProps) {
               href={`#${item.id}`}
               className={cn(
                 'hover:text-foreground block text-sm transition-colors',
-                item.id === activeItem ? 'text-primary font-medium' : 'text-muted-foreground',
+                item.id === activeItem
+                  ? 'text-primary font-medium'
+                  : 'text-muted-foreground',
                 level === 1 ? 'py-1' : 'py-0.5 text-xs',
               )}
             >
               {item.title}
             </a>
-            {item.children?.length && <Tree tree={item.children} level={level + 1} activeItem={activeItem} />}
+            {item.children?.length && (
+              <Tree tree={item.children} level={level + 1} activeItem={activeItem} />
+            )}
           </li>
         );
       })}

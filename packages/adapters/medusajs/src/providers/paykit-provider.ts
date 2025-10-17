@@ -20,7 +20,11 @@ import {
   ProviderWebhookPayload,
   WebhookActionResult,
 } from '@medusajs/framework/types';
-import { AbstractPaymentProvider, MedusaError, PaymentActions } from '@medusajs/framework/utils';
+import {
+  AbstractPaymentProvider,
+  MedusaError,
+  PaymentActions,
+} from '@medusajs/framework/utils';
 import {
   CreatePaymentSchema,
   PayKit,
@@ -103,7 +107,12 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     data,
   }: InitiatePaymentInput): Promise<InitiatePaymentOutput> => {
     if (this.options.debug) {
-      console.info('[PayKit] Initiating payment', { context, amount, currency_code, data });
+      console.info('[PayKit] Initiating payment', {
+        context,
+        amount,
+        currency_code,
+        data,
+      });
     }
 
     const intent: Record<string, unknown> = {
@@ -123,7 +132,10 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     }
 
     if (!customer) {
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Required: customer ID (account_holder) or email (data)');
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Required: customer ID (account_holder) or email (data)',
+      );
     }
 
     if (typeof customer === 'object' && 'email' in customer) {
@@ -131,7 +143,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
         this.paykit.customers.create({
           email: customer.email,
           phone: (data?.phone as string) ?? '',
-          name: data?.name ? (data.name as string) : (customer.email.split('@')[0] as string),
+          name: data?.name
+            ? (data.name as string)
+            : (customer.email.split('@')[0] as string),
           metadata: { PAYKIT_METADATA_KEY: JSON.stringify({ source: 'medusa' }) },
         }),
       );
@@ -147,7 +161,10 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
     return {
       id: paymentIntentResult.id,
@@ -166,21 +183,34 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       'Missing required payment ID',
     );
 
-    if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!id)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
-    if (!amount) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment amount');
+    if (!amount)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment amount',
+      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.capture(id, { amount: Number(amount) }),
     );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
     return { data: paymentIntentResult as unknown as Record<string, unknown> };
   };
 
-  authorizePayment = async (input: AuthorizePaymentInput): Promise<AuthorizePaymentOutput> => {
+  authorizePayment = async (
+    input: AuthorizePaymentInput,
+  ): Promise<AuthorizePaymentOutput> => {
     if (this.options.debug) {
       console.info('[PayKit] Authorizing payment', input);
     }
@@ -199,12 +229,21 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       'Missing required payment ID',
     );
 
-    if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!id)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
-    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.cancel(id));
+    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
+      this.paykit.payments.cancel(id),
+    );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
     return { data: paymentIntentResult as unknown as Record<string, unknown> };
   };
@@ -213,21 +252,36 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     return this.cancelPayment(input);
   };
 
-  getPaymentStatus = async (input: GetPaymentStatusInput): Promise<GetPaymentStatusOutput> => {
+  getPaymentStatus = async (
+    input: GetPaymentStatusInput,
+  ): Promise<GetPaymentStatusOutput> => {
     const { id } = validateRequiredKeys(
       ['id'],
       (input?.data ?? {}) as Record<string, string>,
       'Missing required payment ID',
     );
 
-    if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!id)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
-    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.retrieve(id));
+    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
+      this.paykit.payments.retrieve(id),
+    );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
-    if (!paymentIntentResult) throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, 'Payment not found');
+    if (!paymentIntentResult)
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        'Payment not found',
+      );
 
     return {
       status: medusaStatus$InboundSchema(paymentIntentResult.status),
@@ -246,26 +300,38 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       'Missing required payment ID',
     );
 
-    if (!paymentId) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!paymentId)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
     const [refundResult, refundError] = await tryCatchAsync(
       this.paykit.refunds.create({
         payment_id: paymentId,
         amount: Number(input.amount),
         reason: null,
-        metadata: input.data?.metadata ? (input.data.metadata as unknown as PaykitMetadata) : null,
+        metadata: input.data?.metadata
+          ? (input.data.metadata as unknown as PaykitMetadata)
+          : null,
         provider_metadata: input.data?.provider_metadata
           ? (input.data.provider_metadata as unknown as Record<string, unknown>)
           : undefined,
       }),
     );
 
-    if (refundError) throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, refundError.message);
+    if (refundError)
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        refundError.message,
+      );
 
     return { data: refundResult as unknown as Record<string, unknown> };
   };
 
-  retrievePayment = async (input: RetrievePaymentInput): Promise<RetrievePaymentOutput> => {
+  retrievePayment = async (
+    input: RetrievePaymentInput,
+  ): Promise<RetrievePaymentOutput> => {
     if (this.options.debug) {
       console.info('[PayKit] Retrieving payment', input);
     }
@@ -276,12 +342,21 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       'Missing required payment ID',
     );
 
-    if (!id) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!id)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
-    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(this.paykit.payments.retrieve(id));
+    const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
+      this.paykit.payments.retrieve(id),
+    );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
     return { data: paymentIntentResult as unknown as Record<string, unknown> };
   };
@@ -298,7 +373,10 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     );
 
     if (!amount || !currency_code)
-      throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required amount or currency code');
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required amount or currency code',
+      );
 
     const { id: paymentId } = validateRequiredKeys(
       ['id'],
@@ -306,13 +384,19 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       'Missing required payment ID',
     );
 
-    if (!paymentId) throw new MedusaError(MedusaError.Types.INVALID_DATA, 'Missing required payment ID');
+    if (!paymentId)
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Missing required payment ID',
+      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.update(paymentId, {
         amount: Number(amount),
         currency: currency_code,
-        metadata: input.data?.metadata ? (input.data.metadata as unknown as PaykitMetadata) : {},
+        metadata: input.data?.metadata
+          ? (input.data.metadata as unknown as PaykitMetadata)
+          : {},
         provider_metadata: input.data?.provider_metadata
           ? (input.data.provider_metadata as unknown as Record<string, unknown>)
           : undefined,
@@ -320,12 +404,17 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     );
 
     if (paymentIntentError)
-      throw new MedusaError(MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR, paymentIntentError.message);
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        paymentIntentError.message,
+      );
 
     return { data: paymentIntentResult as unknown as Record<string, unknown> };
   };
 
-  getWebhookActionAndData = async (payload: ProviderWebhookPayload['payload']): Promise<WebhookActionResult> => {
+  getWebhookActionAndData = async (
+    payload: ProviderWebhookPayload['payload'],
+  ): Promise<WebhookActionResult> => {
     if (this.options.debug) {
       console.info('[PayKit] Getting webhook action and data', payload);
     }
@@ -348,7 +437,8 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       // Local development (without a proxy)
       if (headers['host']) {
         const protocol =
-          headers['x-forwarded-proto'] || (String(headers['host']).includes('localhost') ? 'http' : 'https');
+          headers['x-forwarded-proto'] ||
+          (String(headers['host']).includes('localhost') ? 'http' : 'https');
         const host = headers['host'];
         const path = headers['x-original-url'] || headers['x-forwarded-path'] || '';
         return `${protocol}://${host}${path}`;
@@ -380,7 +470,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
         };
 
         return {
-          action: event.data?.status ? statusActionMap[event.data.status] : PaymentActions.PENDING,
+          action: event.data?.status
+            ? statusActionMap[event.data.status]
+            : PaymentActions.PENDING,
           data: {
             session_id: event.data?.metadata?.session_id as string,
             amount: event.data?.amount,

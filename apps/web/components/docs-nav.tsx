@@ -18,7 +18,9 @@ export function DocsNav({ config }: DocsNavProps) {
       <div className="space-y-6">
         {config.sidebarNav.map((group, index) => (
           <div key={index} className="space-y-3">
-            <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">{group.title}</h4>
+            <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">
+              {group.title}
+            </h4>
             {group.items?.length && (
               <div className="space-y-1">
                 {group.items.map((item, index) =>
@@ -36,7 +38,10 @@ export function DocsNav({ config }: DocsNavProps) {
                       {item.title}
                     </Link>
                   ) : (
-                    <div key={index} className="text-muted-foreground px-3 py-1 text-sm font-medium">
+                    <div
+                      key={index}
+                      className="text-muted-foreground px-3 py-1 text-sm font-medium"
+                    >
                       {item.title}
                     </div>
                   ),

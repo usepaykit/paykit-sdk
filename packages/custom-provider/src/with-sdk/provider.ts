@@ -150,7 +150,10 @@ export class WithProviderSDK extends AbstractPayKitProvider implements PayKitPro
     });
   }
 
-  updateSubscription(id: string, params: UpdateSubscriptionSchema): Promise<Subscription> {
+  updateSubscription(
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> {
     throw new NotImplementedError('Method not implemented.', this.providerName, {
       futureSupport: true,
     });

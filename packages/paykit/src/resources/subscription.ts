@@ -5,7 +5,9 @@ import { metadataSchema, PaykitMetadata } from './metadata';
 
 export const subscriptionBillingIntervalSchema = z.enum(['day', 'week', 'month', 'year']);
 
-export type SubscriptionBillingInterval = z.infer<typeof subscriptionBillingIntervalSchema>;
+export type SubscriptionBillingInterval = z.infer<
+  typeof subscriptionBillingIntervalSchema
+>;
 
 export const subscriptionStatusSchema = z.enum([
   'active',

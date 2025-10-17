@@ -25,7 +25,12 @@ export function MobileDocsNav({ config }: MobileDocsNavProps) {
   return (
     <Sheet.Root open={open} onOpenChange={setOpen}>
       <Sheet.Trigger asChild>
-        <Button variant="ghost" size="sm" className="md:hidden" aria-label="Open navigation menu">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="md:hidden"
+          aria-label="Open navigation menu"
+        >
           <Menu className="h-5 w-5" />
         </Button>
       </Sheet.Trigger>
@@ -37,7 +42,9 @@ export function MobileDocsNav({ config }: MobileDocsNavProps) {
           <div className="space-y-6">
             {config.sidebarNav.map((group, index) => (
               <div key={index} className="space-y-3">
-                <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">{group.title}</h4>
+                <h4 className="text-foreground/80 text-sm font-semibold tracking-wider uppercase">
+                  {group.title}
+                </h4>
                 {group.items?.length && (
                   <div className="space-y-1">
                     {group.items.map((item, index) =>
@@ -55,7 +62,10 @@ export function MobileDocsNav({ config }: MobileDocsNavProps) {
                           {item.title}
                         </Link>
                       ) : (
-                        <div key={index} className="text-muted-foreground px-3 py-1 text-sm font-medium">
+                        <div
+                          key={index}
+                          className="text-muted-foreground px-3 py-1 text-sm font-medium"
+                        >
                           {item.title}
                         </div>
                       ),

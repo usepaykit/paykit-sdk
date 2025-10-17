@@ -95,7 +95,11 @@ const Label = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Label>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Label>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.Label ref={ref} className={cn('py-1.5 pr-2 pl-8 text-sm font-semibold', className)} {...props} />
+  <SelectPrimitive.Label
+    ref={ref}
+    className={cn('py-1.5 pr-2 pl-8 text-sm font-semibold', className)}
+    {...props}
+  />
 ));
 Label.displayName = SelectPrimitive.Label.displayName;
 
@@ -126,7 +130,11 @@ const Separator = React.forwardRef<
   React.ElementRef<typeof SelectPrimitive.Separator>,
   React.ComponentPropsWithoutRef<typeof SelectPrimitive.Separator>
 >(({ className, ...props }, ref) => (
-  <SelectPrimitive.Separator ref={ref} className={cn('bg-muted -mx-1 my-1 h-px', className)} {...props} />
+  <SelectPrimitive.Separator
+    ref={ref}
+    className={cn('bg-muted -mx-1 my-1 h-px', className)}
+    {...props}
+  />
 ));
 Separator.displayName = SelectPrimitive.Separator.displayName;
 

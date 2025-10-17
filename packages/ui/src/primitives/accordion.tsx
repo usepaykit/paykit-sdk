@@ -9,7 +9,10 @@ const Root = ({ ...props }: React.ComponentProps<typeof AccordionPrimitive.Root>
   return <AccordionPrimitive.Root data-slot="accordion" {...props} />;
 };
 
-const Item = ({ className, ...props }: React.ComponentProps<typeof AccordionPrimitive.Item>) => {
+const Item = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Item>) => {
   return (
     <AccordionPrimitive.Item
       data-slot="accordion-item"
@@ -19,7 +22,11 @@ const Item = ({ className, ...props }: React.ComponentProps<typeof AccordionPrim
   );
 };
 
-const Trigger = ({ className, children, ...props }: React.ComponentProps<typeof AccordionPrimitive.Trigger>) => {
+const Trigger = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Trigger>) => {
   return (
     <AccordionPrimitive.Header className="flex">
       <AccordionPrimitive.Trigger
@@ -37,7 +44,11 @@ const Trigger = ({ className, children, ...props }: React.ComponentProps<typeof 
   );
 };
 
-const Content = ({ className, children, ...props }: React.ComponentProps<typeof AccordionPrimitive.Content>) => {
+const Content = ({
+  className,
+  children,
+  ...props
+}: React.ComponentProps<typeof AccordionPrimitive.Content>) => {
   return (
     <AccordionPrimitive.Content
       data-slot="accordion-content"

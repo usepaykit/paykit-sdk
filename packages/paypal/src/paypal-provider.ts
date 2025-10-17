@@ -42,7 +42,11 @@ import { z } from 'zod';
 import { SubscriptionsController } from './controllers/subscription';
 import { WebhookController } from './controllers/webhook';
 import { VerifyWebhookStatus } from './schema';
-import { paykitCheckout$InboundSchema, paykitPayment$InboundSchema, paykitRefund$InboundSchema } from './utils/mapper';
+import {
+  paykitCheckout$InboundSchema,
+  paykitPayment$InboundSchema,
+  paykitRefund$InboundSchema,
+} from './utils/mapper';
 
 const PAYPAL_METADATA_MAX_LENGTH = 127;
 
@@ -189,9 +193,13 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     return paykitCheckout$InboundSchema(order.result);
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
+  updateCheckout = async (
+    id: string,
+    params: UpdateCheckoutSchema,
+  ): Promise<Checkout> => {
     throw new ProviderNotSupportedError('updateCheckout', this.providerName, {
-      reason: 'PayPal does not support updating orders. Cancel and create a new order instead.',
+      reason:
+        'PayPal does not support updating orders. Cancel and create a new order instead.',
     });
   };
 
@@ -208,7 +216,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     });
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (
+    id: string,
+    params: UpdateCustomerParams,
+  ): Promise<Customer> => {
     throw new ProviderNotSupportedError('updateCustomer', this.providerName, {
       reason: 'PayPal does not support standalone customer management.',
     });
@@ -230,8 +241,12 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
    * Subscription management
    * Would need PayPal Subscriptions API - different from Orders
    */
-  createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
-    const subscription = await this.subscriptionsController.createSubscription({ body: params });
+  createSubscription = async (
+    params: CreateSubscriptionSchema,
+  ): Promise<Subscription> => {
+    const subscription = await this.subscriptionsController.createSubscription({
+      body: params,
+    });
     return subscription as unknown as Subscription;
   };
 
@@ -244,7 +259,10 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     return subscription as unknown as Subscription;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
+  updateSubscription = async (
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> => {
     const stringifiedMetadata = JSON.stringify(params.metadata);
 
     if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
@@ -271,7 +289,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   deleteSubscription = async (id: string): Promise<null> => {
-    throw new NotImplementedError('deleteSubscription', 'PayPal', { futureSupport: false });
+    throw new NotImplementedError('deleteSubscription', 'PayPal', {
+      futureSupport: false,
+    });
   };
 
   /**
@@ -355,7 +375,8 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   cancelPayment = async (id: string): Promise<Payment> => {
     // PayPal doesn't have explicit cancel, but you can void authorizations
     throw new ProviderNotSupportedError('cancelPayment', this.providerName, {
-      reason: 'PayPal order cancellation not directly supported. Orders expire automatically.',
+      reason:
+        'PayPal order cancellation not directly supported. Orders expire automatically.',
     });
   };
 
@@ -365,14 +386,17 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
     const order = await this.ordersController.getOrder({ id: params.payment_id });
 
-    const captureIds = order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
+    const captureIds =
+      order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
 
     if (captureIds.length === 0) {
       throw new ResourceNotFoundError('Capture', params.payment_id, this.providerName);
     }
 
     const currencyCode = order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD';
-    const amount = params.amount ? params.amount.toString() : order.result.purchaseUnits?.[0]?.amount?.value || '0';
+    const amount = params.amount
+      ? params.amount.toString()
+      : order.result.purchaseUnits?.[0]?.amount?.value || '0';
 
     const refund = await this.paymentsController.refundCapturedPayment({
       captureId: captureIds[0],
@@ -385,7 +409,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   /**
    * Webhook management
    */
-  handleWebhook = async (params: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
+  handleWebhook = async (
+    params: HandleWebhookParams,
+  ): Promise<Array<WebhookEventPayload>> => {
     const { body, headers, webhookSecret: webhookId } = params;
 
     const { result } = await this.webhookController.verifyWebhook({
@@ -399,7 +425,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     });
 
     if (result.verification_status !== VerifyWebhookStatus.SUCCESS) {
-      throw new WebhookError('Webhook verification failed', { provider: this.providerName });
+      throw new WebhookError('Webhook verification failed', {
+        provider: this.providerName,
+      });
     }
 
     const event = JSON.parse(body);
@@ -466,7 +494,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     const handler = webhookHandlers[eventType];
 
     if (!handler) {
-      throw new WebhookError(`Unhandled event type: ${eventType}`, { provider: this.providerName });
+      throw new WebhookError(`Unhandled event type: ${eventType}`, {
+        provider: this.providerName,
+      });
     }
 
     return await handler();

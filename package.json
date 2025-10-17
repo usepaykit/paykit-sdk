@@ -21,7 +21,7 @@
   ],
   "keywords": [],
   "prettier": {
-    "printWidth": 100,
+    "printWidth": 90,
     "tabWidth": 2,
     "useTabs": false,
     "singleQuote": true,

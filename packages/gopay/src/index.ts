@@ -7,7 +7,13 @@ export const createGopay = (config: GoPayOptions) => {
 
 export const gopay = () => {
   const envVars = validateRequiredKeys(
-    ['GOPAY_CLIENT_ID', 'GOPAY_CLIENT_SECRET', 'GOPAY_GO_ID', 'GOPAY_SANDBOX', 'GOPAY_WEBHOOK_URL'],
+    [
+      'GOPAY_CLIENT_ID',
+      'GOPAY_CLIENT_SECRET',
+      'GOPAY_GO_ID',
+      'GOPAY_SANDBOX',
+      'GOPAY_WEBHOOK_URL',
+    ],
     process.env as Record<string, string>,
     'Missing required environment variables: {keys}',
   );

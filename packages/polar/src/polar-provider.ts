@@ -120,7 +120,12 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { metadata, item_id, provider_metadata } = data;
 
     const checkoutCreateOptions: CheckoutCreate = {
-      metadata: Object.fromEntries(Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)])),
+      metadata: Object.fromEntries(
+        Object.entries(metadata ?? {}).map(([key, value]) => [
+          key,
+          JSON.stringify(value),
+        ]),
+      ),
       products: [item_id],
       ...provider_metadata,
     };
@@ -147,7 +152,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     return paykitCheckout$InboundSchema(response);
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
+  updateCheckout = async (
+    id: string,
+    params: UpdateCheckoutSchema,
+  ): Promise<Checkout> => {
     const { error, data } = updateCheckoutSchema.safeParse(params);
 
     if (error) {
@@ -161,7 +169,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       checkoutUpdate: {
         ...restData,
         ...(metadata && {
-          metadata: Object.fromEntries(Object.entries(metadata).map(([key, value]) => [key, JSON.stringify(value)])),
+          metadata: Object.fromEntries(
+            Object.entries(metadata).map(([key, value]) => [key, JSON.stringify(value)]),
+          ),
         }),
         ...(item_id && { products: [item_id] }),
         ...provider_metadata,
@@ -215,7 +225,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     return paykitCustomer$InboundSchema(response);
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (
+    id: string,
+    params: UpdateCustomerParams,
+  ): Promise<Customer> => {
     const { error, data } = updateCustomerSchema.safeParse(params);
 
     if (error) {
@@ -258,7 +271,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
   /**
    * Subscription management
    */
-  createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
+  createSubscription = async (
+    params: CreateSubscriptionSchema,
+  ): Promise<Subscription> => {
     throw new ProviderNotSupportedError('createSubscription', 'Polar', {
       reason: 'Subscriptions can only be created through checkouts',
     });
@@ -268,7 +283,11 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, this.providerName, 'retrieveSubscription');
+      throw ValidationError.fromZodError(
+        error,
+        this.providerName,
+        'retrieveSubscription',
+      );
     }
 
     const subscription = await this.polar.subscriptions.revoke({ id });
@@ -280,7 +299,11 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { error } = retrieveSubscriptionSchema.safeParse({ id });
 
     if (error) {
-      throw ValidationError.fromZodError(error, this.providerName, 'retrieveSubscription');
+      throw ValidationError.fromZodError(
+        error,
+        this.providerName,
+        'retrieveSubscription',
+      );
     }
 
     const response = await this.polar.subscriptions.get({ id });
@@ -288,7 +311,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     return paykitSubscription$InboundSchema(response);
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
+  updateSubscription = async (
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> => {
     const { error, data } = updateSubscriptionSchema.safeParse({ id, ...params });
 
     if (error) {
@@ -321,7 +347,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     }
 
     const metadataCore = Object.fromEntries(
-      Object.entries(data.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]),
+      Object.entries(data.metadata ?? {}).map(([key, value]) => [
+        key,
+        JSON.stringify(value),
+      ]),
     );
 
     const checkoutCreateOptions: CheckoutCreate = {
@@ -365,7 +394,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { provider_metadata, ...rest } = data;
 
     const metadata = Object.fromEntries(
-      Object.entries(rest.metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]),
+      Object.entries(rest.metadata ?? {}).map(([key, value]) => [
+        key,
+        JSON.stringify(value),
+      ]),
     );
 
     const checkoutResponse = await this.polar.checkouts.update({
@@ -424,7 +456,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const refund = await this.refunds.create({
       orderId: order.id,
-      reason: data.reason ? mapRefundReason(this.config.debug ?? true, data.reason) : 'other',
+      reason: data.reason
+        ? mapRefundReason(this.config.debug ?? true, data.reason)
+        : 'other',
       amount: data.amount,
       ...(data.provider_metadata && { ...data.provider_metadata }),
     });
@@ -439,10 +473,16 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
   /**
    * Webhook management
    */
-  handleWebhook = async (params: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
+  handleWebhook = async (
+    params: HandleWebhookParams,
+  ): Promise<Array<WebhookEventPayload>> => {
     const { body, headers, webhookSecret } = params;
 
-    const requiredHeaders = ['webhook-id', 'webhook-timestamp', 'webhook-signature'] as const;
+    const requiredHeaders = [
+      'webhook-id',
+      'webhook-timestamp',
+      'webhook-signature',
+    ] as const;
 
     const webhookHeaders = headersExtractor(headers, requiredHeaders).reduce(
       (acc, kv) => {
@@ -459,7 +499,9 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     type PolarEventLiteral = Exclude<typeof type, undefined>;
 
-    const webhookHandlers: Partial<Record<PolarEventLiteral, (data: any) => Array<WebhookEventPayload> | null>> = {
+    const webhookHandlers: Partial<
+      Record<PolarEventLiteral, (data: any) => Array<WebhookEventPayload> | null>
+    > = {
       /**
        * Invoice
        */
@@ -477,10 +519,15 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
+            customer: data.customerId
+              ? data.customerId
+              : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: Object.fromEntries(
-              Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]),
+              Object.entries(metadata ?? {}).map(([key, value]) => [
+                key,
+                JSON.stringify(value),
+              ]),
             ),
             product_id: data.product.id,
           };
@@ -508,7 +555,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       'order.created': (data: PolarOrder) => {
         const { billingReason, metadata, status } = data;
 
-        if (['subscription_create', 'subscription_cycle'].includes(billingReason) && status == 'paid') {
+        if (
+          ['subscription_create', 'subscription_cycle'].includes(billingReason) &&
+          status == 'paid'
+        ) {
           const invoice = paykitInvoice$InboundSchema({
             ...data,
             billingMode: billingModeSchema.parse('recurring'),
@@ -519,10 +569,15 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
             id: data.id,
             amount: data.totalAmount,
             currency: data.currency,
-            customer: data.customerId ? data.customerId : { email: data.customer.email ?? '' },
+            customer: data.customerId
+              ? data.customerId
+              : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
             metadata: Object.fromEntries(
-              Object.entries(metadata ?? {}).map(([key, value]) => [key, JSON.stringify(value)]),
+              Object.entries(metadata ?? {}).map(([key, value]) => [
+                key,
+                JSON.stringify(value),
+              ]),
             ),
             product_id: data.product.id,
           };
@@ -646,11 +701,13 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const handler = webhookHandlers[type as PolarEventLiteral];
 
-    if (!handler) throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
+    if (!handler)
+      throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
 
     const results = handler(data);
 
-    if (!results) throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
+    if (!results)
+      throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
 
     return results;
   };

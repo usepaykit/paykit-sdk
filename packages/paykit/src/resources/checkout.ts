@@ -3,7 +3,10 @@ import { schema } from '../tools/utils';
 import { billingSchema, BillingInfo } from './billing';
 import { Payee, payeeSchema } from './customer';
 import { metadataSchema, PaykitMetadata } from './metadata';
-import { SubscriptionBillingInterval, subscriptionBillingIntervalSchema } from './subscription';
+import {
+  SubscriptionBillingInterval,
+  subscriptionBillingIntervalSchema,
+} from './subscription';
 
 export interface CheckoutSubscription {
   /**
@@ -135,7 +138,9 @@ export interface CreateRecurringCheckoutSchema extends CreateCheckoutBaseSchema 
   subscription: CheckoutSubscription;
 }
 
-export type CreateCheckoutSchema = CreateOneTimeCheckoutSchema | CreateRecurringCheckoutSchema;
+export type CreateCheckoutSchema =
+  | CreateOneTimeCheckoutSchema
+  | CreateRecurringCheckoutSchema;
 
 export const createCheckoutSchema = schema<CreateCheckoutSchema>()(
   z.object({

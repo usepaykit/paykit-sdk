@@ -43,14 +43,23 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
     <div
       className={cn(
         'transition-all duration-200 ease-in-out',
-        isChangingLine && isAnimating ? 'translate-x-1 opacity-30' : 'translate-x-0 opacity-100',
-        isChangingLine ? 'bg-primary/5 border-primary/50 my-0.5 -ml-3 rounded-r border-l-2 pl-3' : '',
+        isChangingLine && isAnimating
+          ? 'translate-x-1 opacity-30'
+          : 'translate-x-0 opacity-100',
+        isChangingLine
+          ? 'bg-primary/5 border-primary/50 my-0.5 -ml-3 rounded-r border-l-2 pl-3'
+          : '',
       )}
     >
       <div className="[&_*]:!bg-transparent">
         <CodeBlock
           language="typescript"
-          customStyle={{ padding: 0, background: 'none', fontSize: '14px', border: 'none' }}
+          customStyle={{
+            padding: 0,
+            background: 'none',
+            fontSize: '14px',
+            border: 'none',
+          }}
         >
           {currentContent}
         </CodeBlock>
@@ -59,16 +68,23 @@ const AnimatedLine = ({ content, isChangingLine }: AnimatedLineProps) => {
   );
 };
 
-export function LineAnimatedCodeViewer({ className = '', lines = [] }: LineAnimatedCodeViewerProps) {
+export function LineAnimatedCodeViewer({
+  className = '',
+  lines = [],
+}: LineAnimatedCodeViewerProps) {
   return (
-    <div className={cn('bg-card border-border overflow-hidden rounded-lg border', className)}>
+    <div
+      className={cn('bg-card border-border overflow-hidden rounded-lg border', className)}
+    >
       <div className="overflow-x-auto">
         <div className="min-w-max p-6">
           {lines.map((line, index) => {
             // Only lines 1 and 3 (import and provider init) should be marked as changing
             const isChangingLine = index === 1 || index === 3;
 
-            return <AnimatedLine key={index} content={line} isChangingLine={isChangingLine} />;
+            return (
+              <AnimatedLine key={index} content={line} isChangingLine={isChangingLine} />
+            );
           })}
         </div>
       </div>

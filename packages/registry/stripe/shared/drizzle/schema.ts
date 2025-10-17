@@ -1,4 +1,12 @@
-import { pgTable, text, timestamp, integer, json, pgEnum, index } from 'drizzle-orm/pg-core';
+import {
+  pgTable,
+  text,
+  timestamp,
+  integer,
+  json,
+  pgEnum,
+  index,
+} from 'drizzle-orm/pg-core';
 
 // Enums
 export const paymentStatusEnum = pgEnum('payment_status', [
@@ -45,7 +53,9 @@ export const payments = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 
     // Optional customer relationship
-    customerId: text('customer_id').references(() => customers.id, { onDelete: 'cascade' }),
+    customerId: text('customer_id').references(() => customers.id, {
+      onDelete: 'cascade',
+    }),
 
     // Guest checkout for when the customer is not yet determined
     customerEmail: text('customer_email'),
@@ -74,7 +84,9 @@ export const subscriptions = pgTable(
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 
     // Optional customer relationship
-    customerId: text('customer_id').references(() => customers.id, { onDelete: 'cascade' }),
+    customerId: text('customer_id').references(() => customers.id, {
+      onDelete: 'cascade',
+    }),
 
     // Guest checkout for when the customer is not yet determined
     customerEmail: text('customer_email'),
@@ -109,7 +121,9 @@ export const invoices = pgTable(
   'invoices',
   {
     id: text('id').primaryKey(),
-    subscriptionId: text('subscription_id').references(() => subscriptions.id, { onDelete: 'set null' }),
+    subscriptionId: text('subscription_id').references(() => subscriptions.id, {
+      onDelete: 'set null',
+    }),
     billingMode: text('billing_mode').notNull(),
     amountPaid: integer('amount_paid').notNull(),
     currency: text('currency').notNull(),
@@ -121,7 +135,9 @@ export const invoices = pgTable(
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
 
-    customerId: text('customer_id').references(() => customers.id, { onDelete: 'cascade' }),
+    customerId: text('customer_id').references(() => customers.id, {
+      onDelete: 'cascade',
+    }),
 
     // Guest checkout for when the customer is not yet determined
     customerEmail: text('customer_email'),

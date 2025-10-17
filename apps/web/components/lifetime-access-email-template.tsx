@@ -1,5 +1,14 @@
 import React from 'react';
-import { Body, Container, Head, Heading, Html, Preview, Section, Text } from '@react-email/components';
+import {
+  Body,
+  Container,
+  Head,
+  Heading,
+  Html,
+  Preview,
+  Section,
+  Text,
+} from '@react-email/components';
 
 export const LifetimeAccessEmail = () => {
   return (
@@ -11,7 +20,9 @@ export const LifetimeAccessEmail = () => {
           <Section tw="bg-[oklch(0.9911 0 0)] rounded-lg border border-[oklch(0.9037 0 0)] p-8 shadow-lg">
             {/* Header */}
             <Section tw="text-center mb-8">
-              <Heading tw="text-[oklch(0.2046 0 0)] text-3xl font-bold mb-4">Thanks for supporting PayKit</Heading>
+              <Heading tw="text-[oklch(0.2046 0 0)] text-3xl font-bold mb-4">
+                Thanks for supporting PayKit
+              </Heading>
               <Text tw="text-[oklch(0.2435 0 0)] text-lg">
                 You now have lifetime access to everything we’re building, forever.
               </Text>
@@ -24,11 +35,13 @@ export const LifetimeAccessEmail = () => {
               </Text>
 
               <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed mb-6">
-                When V2 is launched, you’ll get a ping with your login link and full access to the cloud features.
+                When V2 is launched, you’ll get a ping with your login link and full
+                access to the cloud features.
               </Text>
 
               <Text tw="text-[oklch(0.2046 0 0)] text-base leading-relaxed">
-                If you ever need anything or have ideas, feel free to reply — we’re listening! 🙏
+                If you ever need anything or have ideas, feel free to reply — we’re
+                listening! 🙏
               </Text>
             </Section>
 

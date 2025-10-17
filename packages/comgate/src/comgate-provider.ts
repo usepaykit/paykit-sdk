@@ -80,7 +80,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     const debug = opts.debug ?? true;
 
-    this.baseUrl = opts.isSandbox ? 'https://sandbox.comgate.cz' : 'https://payments.comgate.cz';
+    this.baseUrl = opts.isSandbox
+      ? 'https://sandbox.comgate.cz'
+      : 'https://payments.comgate.cz';
 
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
@@ -93,7 +95,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     });
   }
 
-  private _throwOnError = <T>(req: Result<T extends { code: number } ? T : never>, message: string) => {
+  private _throwOnError = <T>(
+    req: Result<T extends { code: number } ? T : never>,
+    message: string,
+  ) => {
     if (!req.ok)
       throw new OperationFailedError(message, this.providerName, {
         cause: new Error(req.error as string),
@@ -146,7 +151,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       payerId: data.customer.email,
       price: String(data.amount),
       curr: String(data.currency),
-      label: data.provider_metadata?.label ? String(data.provider_metadata.label) : 'Order from Eshop',
+      label: data.provider_metadata?.label
+        ? String(data.provider_metadata.label)
+        : 'Order from Eshop',
     });
 
     if (this.opts.debug) {
@@ -172,7 +179,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     return null as unknown as Checkout;
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
+  updateCheckout = async (
+    id: string,
+    params: UpdateCheckoutSchema,
+  ): Promise<Checkout> => {
     throw new ProviderNotSupportedError('updateCheckout', 'Comgate', {
       reason: 'Comgate does not support updating checkouts',
       alternative: 'Create a new checkout instead',
@@ -188,7 +198,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
     throw new ProviderNotSupportedError('retrieveCheckout', 'Comgate', {
-      reason: 'Comgate does not support retrieving checkouts, use the payment API instead',
+      reason:
+        'Comgate does not support retrieving checkouts, use the payment API instead',
       alternative: 'Use the payment API instead',
     });
   };
@@ -207,7 +218,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     });
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (
+    id: string,
+    params: UpdateCustomerParams,
+  ): Promise<Customer> => {
     throw new ProviderNotSupportedError('updateCustomer', 'Comgate', {
       reason: 'Comgate does not support updating customers',
       alternative: 'Use the payment API instead',
@@ -224,7 +238,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
-    if (error) throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
+    if (error)
+      throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
 
     const { customer } = data;
 
@@ -256,9 +271,12 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       label: String(paymentLabel),
     });
 
-    const response = await this._client.post<ComgatePaymentOperationResponse>(`/v2.0/payment`, {
-      body: requestBody.toString(),
-    });
+    const response = await this._client.post<ComgatePaymentOperationResponse>(
+      `/v2.0/payment`,
+      {
+        body: requestBody.toString(),
+      },
+    );
 
     this._throwOnError(response, 'Failed to create payment');
 
@@ -298,7 +316,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     const { error } = createPaymentSchema.safeParse({ id });
     if (error) throw new Error(`Payment retrieval validation failed: ${error.message}`);
 
-    const response = await this._client.get<Record<string, any>>(`/v2.0/payment/${id}.json`);
+    const response = await this._client.get<Record<string, any>>(
+      `/v2.0/payment/${id}.json`,
+    );
 
     if (!response.ok) {
       throw new OperationFailedError(`Failed to retrieve payment`, this.providerName, {
@@ -316,9 +336,12 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       throw ValidationError.fromZodError(error, this.providerName, 'capturePayment');
     }
 
-    const response = await this._client.post<ComgatePaymentOperationResponse>(`/v2.0/preauth/${id}/confirm.json`, {
-      body: new URLSearchParams({ amount: String(data.amount) }).toString(),
-    });
+    const response = await this._client.post<ComgatePaymentOperationResponse>(
+      `/v2.0/preauth/${id}/confirm.json`,
+      {
+        body: new URLSearchParams({ amount: String(data.amount) }).toString(),
+      },
+    );
 
     this._throwOnError(response, 'Failed to capture payment');
 
@@ -336,7 +359,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    const response = await this._client.delete<ComgatePaymentOperationResponse>(`/v2.0/payment/transId/${id}.json`, {});
+    const response = await this._client.delete<ComgatePaymentOperationResponse>(
+      `/v2.0/payment/transId/${id}.json`,
+      {},
+    );
 
     this._throwOnError(response, 'Failed to cancel payment');
 
@@ -375,7 +401,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     return refundObject;
   };
 
-  createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
+  createSubscription = async (
+    params: CreateSubscriptionSchema,
+  ): Promise<Subscription> => {
     throw new ProviderNotSupportedError('createSubscription', 'Comgate', {
       reason: 'Comgate does not support creating subscriptions',
       alternative: 'Use the payment API instead and create a subscription manually',
@@ -389,7 +417,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     });
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
+  updateSubscription = async (
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> => {
     throw new ProviderNotSupportedError('updateSubscription', 'Comgate', {
       reason: 'Comgate does not support updating subscriptions',
       alternative: 'Use the payment API instead and update the subscription manually',
@@ -410,7 +441,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     });
   };
 
-  handleWebhook = async ({ body: rawBody, headers }: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
+  handleWebhook = async ({
+    body: rawBody,
+    headers,
+  }: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
     let body: Record<string, unknown>;
 
     const contentType = headers['content-type'];
@@ -447,24 +481,33 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     }
 
     if (merchant !== this.opts.merchant) {
-      throw new WebhookError('Webhook merchant mismatch', { provider: this.providerName });
+      throw new WebhookError('Webhook merchant mismatch', {
+        provider: this.providerName,
+      });
     }
 
     // Verify the webhook
-    const verifyResponse = await this._client.post<ComgateWebhookStatusResponseBase>('/v1.0/status', {
-      body: new URLSearchParams({
-        merchant: this.opts.merchant,
-        transId,
-        secret: this.opts.secret,
-      }).toString(),
-    });
+    const verifyResponse = await this._client.post<ComgateWebhookStatusResponseBase>(
+      '/v1.0/status',
+      {
+        body: new URLSearchParams({
+          merchant: this.opts.merchant,
+          transId,
+          secret: this.opts.secret,
+        }).toString(),
+      },
+    );
 
     this._throwOnError(verifyResponse, 'Failed to verify webhook');
 
-    const comgateWebhookApiResponse = verifyResponse.value as ComgateWebhookStatusSuccessResponse;
+    const comgateWebhookApiResponse =
+      verifyResponse.value as ComgateWebhookStatusSuccessResponse;
 
     if (this.opts.debug) {
-      console.info('Webhook verified successfully, status:', comgateWebhookApiResponse.status);
+      console.info(
+        'Webhook verified successfully, status:',
+        comgateWebhookApiResponse.status,
+      );
     }
 
     if (!comgateWebhookApiResponse.status) {
@@ -487,7 +530,10 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
     const status = statusMap[comgateWebhookApiResponse.status];
 
     const webhookHandlers: Partial<
-      Record<Payment['status'], (data: ComgateWebhookStatusSuccessResponse) => Array<WebhookEventPayload>>
+      Record<
+        Payment['status'],
+        (data: ComgateWebhookStatusSuccessResponse) => Array<WebhookEventPayload>
+      >
     > = {
       pending: data => {
         const payment = paykitPayment$InboundSchema(data, 'pending');

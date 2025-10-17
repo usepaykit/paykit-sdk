@@ -21,7 +21,10 @@ const Portal = ({ ...props }: React.ComponentProps<typeof SheetPrimitive.Portal>
   return <SheetPrimitive.Portal data-slot="sheet-portal" {...props} />;
 };
 
-const Overlay = ({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Overlay>) => {
+const Overlay = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Overlay>) => {
   return (
     <SheetPrimitive.Overlay
       data-slot="sheet-overlay"
@@ -72,14 +75,29 @@ const Content = ({
 };
 
 const Header = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  return <div data-slot="sheet-header" className={cn('flex flex-col gap-1.5 p-4', className)} {...props} />;
+  return (
+    <div
+      data-slot="sheet-header"
+      className={cn('flex flex-col gap-1.5 p-4', className)}
+      {...props}
+    />
+  );
 };
 
 const Footer = ({ className, ...props }: React.ComponentProps<'div'>) => {
-  return <div data-slot="sheet-footer" className={cn('mt-auto flex flex-col gap-2 p-4', className)} {...props} />;
+  return (
+    <div
+      data-slot="sheet-footer"
+      className={cn('mt-auto flex flex-col gap-2 p-4', className)}
+      {...props}
+    />
+  );
 };
 
-const Title = ({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Title>) => {
+const Title = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Title>) => {
   return (
     <SheetPrimitive.Title
       data-slot="sheet-title"
@@ -89,7 +107,10 @@ const Title = ({ className, ...props }: React.ComponentProps<typeof SheetPrimiti
   );
 };
 
-const Description = ({ className, ...props }: React.ComponentProps<typeof SheetPrimitive.Description>) => {
+const Description = ({
+  className,
+  ...props
+}: React.ComponentProps<typeof SheetPrimitive.Description>) => {
   return (
     <SheetPrimitive.Description
       data-slot="sheet-description"

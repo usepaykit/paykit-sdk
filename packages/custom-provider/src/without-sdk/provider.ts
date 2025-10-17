@@ -198,7 +198,10 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
     return customer.value as unknown as Customer;
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (
+    id: string,
+    params: UpdateCustomerParams,
+  ): Promise<Customer> => {
     const { error, data } = updateCustomerSchema.safeParse({ id, ...params });
 
     if (error) {
@@ -214,7 +217,10 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
     return customer.value as unknown as Customer;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
+  updateSubscription = async (
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> => {
     const { error, data } = updateSubscriptionSchema.safeParse({
       id,
       ...params,
@@ -224,9 +230,12 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'updateSubscription');
     }
 
-    const subscription = await this._client.put<Record<string, unknown>>(`/subscriptions/${id}`, {
-      body: JSON.stringify(data),
-    });
+    const subscription = await this._client.put<Record<string, unknown>>(
+      `/subscriptions/${id}`,
+      {
+        body: JSON.stringify(data),
+      },
+    );
 
     if (!subscription.ok) throw new Error('Failed to update subscription');
 
@@ -240,7 +249,9 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
       throw ValidationError.fromZodError(error, 'without-sdk', 'retrieveSubscription');
     }
 
-    const subscription = await this._client.get<Record<string, unknown>>(`/subscriptions/${id}`);
+    const subscription = await this._client.get<Record<string, unknown>>(
+      `/subscriptions/${id}`,
+    );
 
     if (!subscription.ok) throw new Error('Failed to retrieve subscription');
 
@@ -248,14 +259,18 @@ export class WithoutProviderSDK extends AbstractPayKitProvider implements PayKit
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    const subscription = await this._client.delete<Record<string, unknown>>(`/subscriptions/${id}`);
+    const subscription = await this._client.delete<Record<string, unknown>>(
+      `/subscriptions/${id}`,
+    );
 
     if (!subscription.ok) throw new Error('Failed to cancel subscription');
 
     return subscription.value as unknown as Subscription;
   };
 
-  handleWebhook = async (payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
+  handleWebhook = async (
+    payload: HandleWebhookParams,
+  ): Promise<Array<WebhookEventPayload>> => {
     throw new NotImplementedError('Method not implemented.', this.providerName, {
       futureSupport: true,
     });

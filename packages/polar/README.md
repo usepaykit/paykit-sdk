@@ -27,7 +27,10 @@ import { endpoints } from '@/lib/paykit';
 import { EndpointPath } from '@paykit-sdk/core';
 import { NextRequest, NextResponse } from 'next/server';
 
-export async function POST(request: NextRequest, { params }: { params: { endpoint: string[] } }) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { endpoint: string[] } },
+) {
   try {
     // Construct the endpoint path with full type safety
     const endpoint = ('/' + params.endpoint.join('/')) as EndpointPath;
@@ -102,42 +105,46 @@ const app = express();
 
 // IMPORTANT: Webhook route must come BEFORE express.json() middleware
 // This ensures we get the raw body for signature verification
-app.post('/api/webhooks/polar', express.raw({ type: 'application/json' }), async (req, res) => {
-  try {
-    const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
+app.post(
+  '/api/webhooks/polar',
+  express.raw({ type: 'application/json' }),
+  async (req, res) => {
+    try {
+      const webhookSecret = process.env.POLAR_WEBHOOK_SECRET;
 
-    if (!webhookSecret) {
-      return res.status(500).json({ error: 'Webhook secret not configured' });
-    }
+      if (!webhookSecret) {
+        return res.status(500).json({ error: 'Webhook secret not configured' });
+      }
 
-    const webhook = paykit.webhooks
-      .setup({ webhookSecret })
-      .on('customer.created', async event => {
-        console.log('Customer created:', event.data);
-      })
-      .on('subscription.created', async event => {
-        console.log('Subscription created:', event.data);
-      })
-      .on('payment.created', async event => {
-        console.log('Payment created:', event.data);
-      })
-      .on('refund.created', async event => {
-        console.log('Refund created:', event.data);
+      const webhook = paykit.webhooks
+        .setup({ webhookSecret })
+        .on('customer.created', async event => {
+          console.log('Customer created:', event.data);
+        })
+        .on('subscription.created', async event => {
+          console.log('Subscription created:', event.data);
+        })
+        .on('payment.created', async event => {
+          console.log('Payment created:', event.data);
+        })
+        .on('refund.created', async event => {
+          console.log('Refund created:', event.data);
+        });
+
+      const body = req.body; // Raw buffer from express.raw()
+      const headers = req.headers;
+      await webhook.handle({ body, headers });
+
+      // Return immediately, processing happens in background
+      res.json({ success: true });
+    } catch (error) {
+      console.error('Webhook error:', error);
+      res.status(500).json({
+        message: error instanceof Error ? error.message : 'Webhook processing failed',
       });
-
-    const body = req.body; // Raw buffer from express.raw()
-    const headers = req.headers;
-    await webhook.handle({ body, headers });
-
-    // Return immediately, processing happens in background
-    res.json({ success: true });
-  } catch (error) {
-    console.error('Webhook error:', error);
-    res.status(500).json({
-      message: error instanceof Error ? error.message : 'Webhook processing failed',
-    });
-  }
-});
+    }
+  },
+);
 
 // Regular API routes use JSON middleware
 app.use(express.json());

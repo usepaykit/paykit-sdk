@@ -5,12 +5,15 @@ export const providerSchema = z.custom<PayKitProvider>(
   (provider: PayKitProvider) => {
     if (!provider || typeof provider !== 'object') return false;
 
-    const isNamed = 'providerName' in provider && typeof provider.providerName === 'string';
+    const isNamed =
+      'providerName' in provider && typeof provider.providerName === 'string';
 
     if (!isNamed) return false;
 
     type MethodNames = {
-      [K in keyof PayKitProvider]: PayKitProvider[K] extends (...args: any[]) => any ? K : never;
+      [K in keyof PayKitProvider]: PayKitProvider[K] extends (...args: any[]) => any
+        ? K
+        : never;
     }[keyof PayKitProvider & string];
 
     // List of all required methods that must be implemented

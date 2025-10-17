@@ -8,7 +8,16 @@ export const agenticTotalsSchema = z.object({
   /**
    * The type of the totals.
    */
-  type: z.enum(['items_base_amount', 'items_discount', 'subtotal', 'discount', 'fulfillment', 'tax', 'fee', 'total']),
+  type: z.enum([
+    'items_base_amount',
+    'items_discount',
+    'subtotal',
+    'discount',
+    'fulfillment',
+    'tax',
+    'fee',
+    'total',
+  ]),
 
   /**
    * The display text of the totals.
@@ -88,7 +97,10 @@ export const agenticCheckoutSessionSchema = z.object({
   /**
    * The fulfillment address of the checkout.
    */
-  fulfillment_address: billingSchema.shape.address.omit({ phone: true }).optional().nullable(),
+  fulfillment_address: billingSchema.shape.address
+    .omit({ phone: true })
+    .optional()
+    .nullable(),
 
   /**
    * The fulfillment options of the checkout.
@@ -132,7 +144,10 @@ export const createAgenticCheckoutSessionParamsSchema = z.object({
   /**
    * The fulfillment address of the checkout.
    */
-  fulfillment_address: billingSchema.shape.address.omit({ phone: true }).optional().nullable(),
+  fulfillment_address: billingSchema.shape.address
+    .omit({ phone: true })
+    .optional()
+    .nullable(),
 
   /**
    * The checkout of the checkout.
@@ -140,8 +155,13 @@ export const createAgenticCheckoutSessionParamsSchema = z.object({
   checkout: createCheckoutSchema,
 });
 
-export type CreateAgenticCheckoutSessionParams = z.infer<typeof createAgenticCheckoutSessionParamsSchema>;
+export type CreateAgenticCheckoutSessionParams = z.infer<
+  typeof createAgenticCheckoutSessionParamsSchema
+>;
 
-export const updateAgenticCheckoutSessionParamsSchema = createAgenticCheckoutSessionParamsSchema.partial();
+export const updateAgenticCheckoutSessionParamsSchema =
+  createAgenticCheckoutSessionParamsSchema.partial();
 
-export type UpdateAgenticCheckoutSessionParams = z.infer<typeof updateAgenticCheckoutSessionParamsSchema>;
+export type UpdateAgenticCheckoutSessionParams = z.infer<
+  typeof updateAgenticCheckoutSessionParamsSchema
+>;

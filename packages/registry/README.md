@@ -76,11 +76,11 @@ Registry items follow a structured naming pattern:
 
 ### Examples
 
-| Pattern            | Registry Name               | Description                                     |
-| ------------------ | --------------------------- | ----------------------------------------------- |
-| Provider + Backend | `stripe-nextjs`             | Basic Stripe integration for Next.js            |
-| + ORM              | `stripe-nextjs-prisma`      | Stripe with Prisma database support             |
-| + Feature          | `stripe-nextjs-hooks`       | Stripe with React hooks (useCheckout, etc.)     |
+| Pattern            | Registry Name          | Description                                 |
+| ------------------ | ---------------------- | ------------------------------------------- |
+| Provider + Backend | `stripe-nextjs`        | Basic Stripe integration for Next.js        |
+| + ORM              | `stripe-nextjs-prisma` | Stripe with Prisma database support         |
+| + Feature          | `stripe-nextjs-hooks`  | Stripe with React hooks (useCheckout, etc.) |
 
 ### Real-World Examples
 

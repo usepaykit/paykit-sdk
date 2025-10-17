@@ -6,7 +6,12 @@ import { cn } from '../lib/utils';
 
 interface RootProps extends React.ComponentProps<typeof SeparatorPrimitive.Root> {}
 
-const Root = ({ className, orientation = 'horizontal', decorative = true, ...props }: RootProps) => {
+const Root = ({
+  className,
+  orientation = 'horizontal',
+  decorative = true,
+  ...props
+}: RootProps) => {
   return (
     <SeparatorPrimitive.Root
       data-slot="separator"

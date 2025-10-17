@@ -11,7 +11,12 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="light"
+      enableSystem
+      disableTransitionOnChange
+    >
       {children}
       <Toaster />
     </ThemeProvider>

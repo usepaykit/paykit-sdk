@@ -2,7 +2,11 @@
 
 import * as React from 'react';
 import { ChevronDownIcon, ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
-import { DayButton as DayButtonPrimitive, DayPicker, getDefaultClassNames } from 'react-day-picker';
+import {
+  DayButton as DayButtonPrimitive,
+  DayPicker,
+  getDefaultClassNames,
+} from 'react-day-picker';
 import { cn } from '../lib/utils';
 import { Button, buttonVariants } from './button';
 
@@ -38,7 +42,10 @@ const Root = ({
         root: cn('w-fit', defaultClassNames.root),
         months: cn('flex gap-4 flex-col md:flex-row relative', defaultClassNames.months),
         month: cn('flex flex-col w-full gap-4', defaultClassNames.month),
-        nav: cn('flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between', defaultClassNames.nav),
+        nav: cn(
+          'flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between',
+          defaultClassNames.nav,
+        ),
         button_previous: cn(
           buttonVariants({ variant: buttonVariant }),
           'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
@@ -76,8 +83,14 @@ const Root = ({
           defaultClassNames.weekday,
         ),
         week: cn('flex w-full mt-2', defaultClassNames.week),
-        week_number_header: cn('select-none w-(--cell-size)', defaultClassNames.week_number_header),
-        week_number: cn('text-[0.8rem] select-none text-muted-foreground', defaultClassNames.week_number),
+        week_number_header: cn(
+          'select-none w-(--cell-size)',
+          defaultClassNames.week_number_header,
+        ),
+        week_number: cn(
+          'text-[0.8rem] select-none text-muted-foreground',
+          defaultClassNames.week_number,
+        ),
         day: cn(
           'relative w-full h-full p-0 text-center [&:first-child[data-selected=true]_button]:rounded-l-md [&:last-child[data-selected=true]_button]:rounded-r-md group/day aspect-square select-none',
           defaultClassNames.day,
@@ -89,7 +102,10 @@ const Root = ({
           'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
           defaultClassNames.today,
         ),
-        outside: cn('text-muted-foreground aria-selected:text-muted-foreground', defaultClassNames.outside),
+        outside: cn(
+          'text-muted-foreground aria-selected:text-muted-foreground',
+          defaultClassNames.outside,
+        ),
         disabled: cn('text-muted-foreground opacity-50', defaultClassNames.disabled),
         hidden: cn('invisible', defaultClassNames.hidden),
         ...classNames,
@@ -97,7 +113,12 @@ const Root = ({
       components={{
         Root: ({ className, rootRef, ...props }) => {
           return (
-            <div data-slot="calendar" ref={rootRef as React.Ref<HTMLDivElement>} className={cn(className)} {...props} />
+            <div
+              data-slot="calendar"
+              ref={rootRef as React.Ref<HTMLDivElement>}
+              className={cn(className)}
+              {...props}
+            />
           );
         },
         Chevron: ({ className, orientation, ...props }) => {
@@ -115,7 +136,9 @@ const Root = ({
         WeekNumber: ({ children, ...props }) => {
           return (
             <td {...props}>
-              <div className="flex size-(--cell-size) items-center justify-center text-center">{children}</div>
+              <div className="flex size-(--cell-size) items-center justify-center text-center">
+                {children}
+              </div>
             </td>
           );
         },
@@ -126,7 +149,12 @@ const Root = ({
   );
 };
 
-const DayButton = ({ className, day, modifiers, ...props }: React.ComponentProps<typeof DayButtonPrimitive>) => {
+const DayButton = ({
+  className,
+  day,
+  modifiers,
+  ...props
+}: React.ComponentProps<typeof DayButtonPrimitive>) => {
   const defaultClassNames = getDefaultClassNames();
 
   const ref = React.useRef<HTMLButtonElement>(null);
@@ -141,7 +169,10 @@ const DayButton = ({ className, day, modifiers, ...props }: React.ComponentProps
       size="icon"
       data-day={day.date.toLocaleDateString()}
       data-selected-single={
-        modifiers.selected && !modifiers.range_start && !modifiers.range_end && !modifiers.range_middle
+        modifiers.selected &&
+        !modifiers.range_start &&
+        !modifiers.range_end &&
+        !modifiers.range_middle
       }
       data-range-start={modifiers.range_start}
       data-range-end={modifiers.range_end}

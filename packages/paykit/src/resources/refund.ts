@@ -43,7 +43,8 @@ export const refundSchema = schema<Refund>()(
   }),
 );
 
-export interface CreateRefundSchema extends Pick<Refund, 'amount' | 'reason' | 'metadata'> {
+export interface CreateRefundSchema
+  extends Pick<Refund, 'amount' | 'reason' | 'metadata'> {
   /**
    * The unique identifier of the payment.
    */

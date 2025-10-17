@@ -100,7 +100,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const debug = opts.debug ?? true;
 
-    this.baseUrl = opts.isSandbox ? 'https://gate.gopay.cz/api' : 'https://gw.sandbox.gopay.com/api';
+    this.baseUrl = opts.isSandbox
+      ? 'https://gate.gopay.cz/api'
+      : 'https://gw.sandbox.gopay.com/api';
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
       headers: {},
@@ -114,7 +116,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     if (error) throw ValidationError.fromZodError(error, 'gopay', 'createCheckout');
 
-    if (typeof data.customer == 'string' || (typeof data.customer === 'object' && !data.customer.email)) {
+    if (
+      typeof data.customer == 'string' ||
+      (typeof data.customer === 'object' && !data.customer.email)
+    ) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
         method: 'createCheckout',
@@ -155,12 +160,22 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       currency,
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
       order_description: data.metadata?.description || 'Checkout',
-      items: [{ name: data.item_id, amount: Number(amount), count: data.quantity, type: 'ITEM' }],
+      items: [
+        {
+          name: data.item_id,
+          amount: Number(amount),
+          count: data.quantity,
+          type: 'ITEM',
+        },
+      ],
       lang: data.provider_metadata?.lang ? (data.provider_metadata.lang as string) : 'EN',
       callback: { return_url: successUrl, notification_url: this.opts.webhookUrl },
       additional_params: Object.entries({
         ...data.metadata,
-        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id, qty: data.quantity }),
+        [PAYKIT_METADATA_KEY]: JSON.stringify({
+          itemId: data.item_id,
+          qty: data.quantity,
+        }),
       }).map(([name, value]) => ({
         name,
         value: String(value),
@@ -178,9 +193,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(`/payments/payment/${id}`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.get<GoPayPaymentResponse>(
+      `/payments/payment/${id}`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('retrieveCheckout', this.providerName, {
@@ -193,7 +211,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     return response.value as unknown as Checkout;
   };
 
-  updateCheckout = async (id: string, params: UpdateCheckoutSchema): Promise<Checkout> => {
+  updateCheckout = async (
+    id: string,
+    params: UpdateCheckoutSchema,
+  ): Promise<Checkout> => {
     if (this.opts.debug) {
       console.info("Gopay doesn't support updating checkouts");
     }
@@ -216,7 +237,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     });
   };
 
-  updateCustomer = async (id: string, params: UpdateCustomerParams): Promise<Customer> => {
+  updateCustomer = async (
+    id: string,
+    params: UpdateCustomerParams,
+  ): Promise<Customer> => {
     throw new ProviderNotSupportedError('updateCustomer', 'gopay', {
       reason: "Gopay doesn't support updating customers",
     });
@@ -234,12 +258,17 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     });
   };
 
-  createSubscription = async (params: CreateSubscriptionSchema): Promise<Subscription> => {
+  createSubscription = async (
+    params: CreateSubscriptionSchema,
+  ): Promise<Subscription> => {
     const { error, data } = createSubscriptionSchema.safeParse(params);
 
     if (error) throw ValidationError.fromZodError(error, 'gopay', 'createSubscription');
 
-    if (typeof data.customer == 'string' || (typeof data.customer === 'object' && !data.customer.email)) {
+    if (
+      typeof data.customer == 'string' ||
+      (typeof data.customer === 'object' && !data.customer.email)
+    ) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
         method: 'createCheckout',
@@ -252,7 +281,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
 
-    const intervalMap: Record<Subscription['billing_interval'], 'DAY' | 'WEEK' | 'MONTH' | 'ON_DEMAND'> = {
+    const intervalMap: Record<
+      Subscription['billing_interval'],
+      'DAY' | 'WEEK' | 'MONTH' | 'ON_DEMAND'
+    > = {
       day: 'DAY',
       week: 'WEEK',
       month: 'MONTH',
@@ -272,7 +304,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       currency: data.currency ?? 'CZK',
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
       order_description: data.metadata?.description || 'Subscription',
-      items: [{ name: data.item_id, amount: Number(data.amount), count: parseInt(quantity) }],
+      items: [
+        { name: data.item_id, amount: Number(data.amount), count: parseInt(quantity) },
+      ],
       recurrence: {
         recurrence_cycle: recurrenceCycle,
         recurrence_period: parseInt(quantity),
@@ -297,7 +331,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     return response.value as unknown as Subscription;
   };
 
-  updateSubscription = async (id: string, params: UpdateSubscriptionSchema): Promise<Subscription> => {
+  updateSubscription = async (
+    id: string,
+    params: UpdateSubscriptionSchema,
+  ): Promise<Subscription> => {
     console.info("Gopay doesn't support updating subscriptions");
 
     const subscription = await this.retrieveSubscription(id);
@@ -338,9 +375,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(`/payments/payment/${id}`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.get<GoPayPaymentResponse>(
+      `/payments/payment/${id}`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('retrieveSubscription', this.providerName, {
@@ -356,9 +396,13 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
-    if (error) throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
+    if (error)
+      throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
 
-    if (typeof data.customer == 'string' || (typeof data.customer === 'object' && !data.customer.email)) {
+    if (
+      typeof data.customer == 'string' ||
+      (typeof data.customer === 'object' && !data.customer.email)
+    ) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
         method: 'createPayment',
@@ -366,10 +410,13 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     }
 
     if (!data.product_id) {
-      throw new ConfigurationError('product_id is required, this is the name of the product in GoPay', {
-        provider: this.providerName,
-        missingKeys: ['product_id'],
-      });
+      throw new ConfigurationError(
+        'product_id is required, this is the name of the product in GoPay',
+        {
+          provider: this.providerName,
+          missingKeys: ['product_id'],
+        },
+      );
     }
 
     const { quantity } = validateRequiredKeys(
@@ -393,7 +440,10 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       preauthorization: false, // automatically captures the payment
       additional_params: Object.entries({
         ...data.metadata,
-        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.product_id, qty: parseInt(quantity) }),
+        [PAYKIT_METADATA_KEY]: JSON.stringify({
+          itemId: data.product_id,
+          qty: parseInt(quantity),
+        }),
       }).map(([name, value]) => ({
         name,
         value: String(value),
@@ -417,9 +467,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(`/payments/payment/${id}`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.get<GoPayPaymentResponse>(
+      `/payments/payment/${id}`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('retrievePayment', this.providerName, {
@@ -440,9 +493,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
-    const payment = await this._client.get<GoPayPaymentResponse>(`/payments/payment/${id}`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const payment = await this._client.get<GoPayPaymentResponse>(
+      `/payments/payment/${id}`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!payment.ok) {
       throw new OperationFailedError('capturePayment', this.providerName, {
@@ -451,10 +507,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     }
 
     const productId = JSON.parse(
-      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)
+        ?.value ?? '{}',
     ).itemId;
     const quantity = JSON.parse(
-      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)
+        ?.value ?? '{}',
     ).qty;
 
     if (!payment) {
@@ -477,9 +535,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    const response = await this._client.post<GoPayPaymentResponse>(`/payments/payment/${id}/void-authorization`, {
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.post<GoPayPaymentResponse>(
+      `/payments/payment/${id}/void-authorization`,
+      {
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     console.dir({ response }, { depth: 100 });
 
@@ -514,7 +575,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   async createRefund(params: CreateRefundSchema): Promise<Refund> {
     const { error, data } = createRefundSchema.safeParse(params);
 
-    if (error) throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
+    if (error)
+      throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
 
     const payment = await this.retrievePayment(data.payment_id);
 
@@ -550,7 +612,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     };
   }
 
-  handleWebhook = async (payload: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
+  handleWebhook = async (
+    payload: HandleWebhookParams,
+  ): Promise<Array<WebhookEventPayload>> => {
     const { fullUrl } = payload;
 
     const paymentId = new URL(fullUrl).searchParams.get('id');
@@ -571,7 +635,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     );
 
     if (error) {
-      throw new WebhookError('Failed to retrieve payment', { provider: this.providerName });
+      throw new WebhookError('Failed to retrieve payment', {
+        provider: this.providerName,
+      });
     }
 
     if (!payment.value) {
@@ -600,7 +666,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       (data: GoPayPaymentResponse) => Array<WebhookEventPayload>
     > = {
       __INDETERMINATE: data => {
-        const isRefundEvent = data.state === 'REFUNDED' || data.state === 'PARTIALLY_REFUNDED';
+        const isRefundEvent =
+          data.state === 'REFUNDED' || data.state === 'PARTIALLY_REFUNDED';
 
         if (isRefundEvent) {
           const refund = paykitRefund$InboundSchema(data);
@@ -657,7 +724,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       canceled: data => {
         const payment = paykitPayment$InboundSchema(data);
 
-        const isCancellingSubscription = parentId && data.recurrence?.recurrence_state == 'STOPPED';
+        const isCancellingSubscription =
+          parentId && data.recurrence?.recurrence_state == 'STOPPED';
         const subscription = paykitSubscription$InboundSchema(data);
 
         const subscriptionCanceledWebhookEvent = {
@@ -704,7 +772,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
         };
 
         return [
-          ...(parentId ? [paykitEvent$InboundSchema<Subscription>(subscriptionCreatedWebhookEvent)] : []),
+          ...(parentId
+            ? [paykitEvent$InboundSchema<Subscription>(subscriptionCreatedWebhookEvent)]
+            : []),
           paykitEvent$InboundSchema<Invoice>({
             type: 'invoice.generated',
             created: new Date().getTime(),

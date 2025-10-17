@@ -38,7 +38,9 @@ const providers = [
 export function ProviderList({ selectedProvider, onProviderSelect }: ProviderListProps) {
   return (
     <div className="space-y-1">
-      <h3 className="text-muted-foreground mb-4 text-sm font-medium">Payment Providers</h3>
+      <h3 className="text-muted-foreground mb-4 text-sm font-medium">
+        Payment Providers
+      </h3>
       {providers.map(provider => (
         <button
           key={provider.key}

@@ -27,7 +27,9 @@ export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout
   return {
     id: checkout.id,
     payment_url: checkout.url,
-    customer: checkout.customerId ? checkout.customerId : { email: checkout.customerEmail ?? '' },
+    customer: checkout.customerId
+      ? checkout.customerId
+      : { email: checkout.customerEmail ?? '' },
     session_type: checkout.subscriptionId ? 'recurring' : 'one_time',
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
     metadata: (checkout.metadata as PaykitMetadata) ?? null,
@@ -40,7 +42,8 @@ export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout
  * Customer
  */
 export const paykitCustomer$InboundSchema = (customer: Customer): PaykitCustomer => {
-  const phone = JSON.parse((customer.metadata?.[PAYKIT_METADATA_KEY] as string) ?? '{}').phone ?? '';
+  const phone =
+    JSON.parse((customer.metadata?.[PAYKIT_METADATA_KEY] as string) ?? '{}').phone ?? '';
 
   return {
     id: customer.id,
@@ -54,7 +57,9 @@ export const paykitCustomer$InboundSchema = (customer: Customer): PaykitCustomer
 /**
  * Subscription
  */
-const toPaykitSubscriptionStatus = (status: Subscription['status']): SubscriptionStatus => {
+const toPaykitSubscriptionStatus = (
+  status: Subscription['status'],
+): SubscriptionStatus => {
   if (status === 'active') return 'active';
   if (status === 'past_due' || status === 'incomplete') return 'past_due';
   if (status === 'canceled' || status === 'unpaid') return 'canceled';
@@ -65,10 +70,14 @@ const toPaykitSubscriptionStatus = (status: Subscription['status']): Subscriptio
 /**
  * Subscription
  */
-export const paykitSubscription$InboundSchema = (subscription: Subscription): PaykitSubscription => {
+export const paykitSubscription$InboundSchema = (
+  subscription: Subscription,
+): PaykitSubscription => {
   return {
     id: subscription.id,
-    customer: subscription.customerId ? subscription.customerId : { email: subscription.customer.email ?? '' },
+    customer: subscription.customerId
+      ? subscription.customerId
+      : { email: subscription.customer.email ?? '' },
     status: toPaykitSubscriptionStatus(subscription.status),
     current_period_start: new Date(subscription.currentPeriodStart),
     current_period_end: new Date(subscription.currentPeriodEnd!),
@@ -98,7 +107,9 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): PaykitInvo
     amount_paid: invoice.totalAmount,
     currency: invoice.currency,
     metadata: omitInternalMetadata(invoice.metadata ?? {}),
-    customer: invoice.customerId ? invoice.customerId : { email: invoice.customer.email ?? '' },
+    customer: invoice.customerId
+      ? invoice.customerId
+      : { email: invoice.customer.email ?? '' },
     billing_mode: invoice.billingMode,
     custom_fields: invoice.customFieldData ?? null,
     status,
@@ -124,7 +135,9 @@ export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
     id: checkout.id,
     amount: checkout.amount,
     currency: checkout.currency,
-    customer: checkout.customerId ? checkout.customerId : { email: checkout.customerEmail ?? '' },
+    customer: checkout.customerId
+      ? checkout.customerId
+      : { email: checkout.customerEmail ?? '' },
     status: statusMap[checkout.status],
     metadata: (checkout.metadata as PaykitMetadata) ?? {},
     product_id: checkout.products.length > 0 ? checkout.products[0].id : null,
@@ -145,7 +158,9 @@ export const mapRefundReason = (debug: boolean, reason: string): RefundReason =>
   const mapped = reasonMap[reason.toLowerCase()] ?? 'other';
 
   if (debug && mapped === 'other' && !reason.toLowerCase().includes('other')) {
-    console.warn(`[Polar Provider] Unmapped refund reason: "${reason}" -> defaulting to "other"`);
+    console.warn(
+      `[Polar Provider] Unmapped refund reason: "${reason}" -> defaulting to "other"`,
+    );
   }
 
   return mapped;

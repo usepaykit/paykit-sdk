@@ -51,7 +51,9 @@ export function CodeEditor({
     return {
       style: {
         backgroundColor: isHighlighted ? 'hsl(var(--primary) / 0.1)' : 'transparent',
-        borderLeft: isHighlighted ? '3px solid hsl(var(--primary))' : '3px solid transparent',
+        borderLeft: isHighlighted
+          ? '3px solid hsl(var(--primary))'
+          : '3px solid transparent',
         paddingLeft: '0.75rem',
         marginLeft: '-0.75rem',
         display: 'block',

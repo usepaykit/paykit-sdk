@@ -119,7 +119,11 @@ export class ValidationError extends PayKitError {
   /**
    * Helper to create ValidationError from Zod error
    */
-  static fromZodError(zodError: any, provider?: string, method?: string): ValidationError {
+  static fromZodError(
+    zodError: any,
+    provider?: string,
+    method?: string,
+  ): ValidationError {
     const message = zodError.message.split('\n').join(' ');
     return new ValidationError(message, {
       provider,
@@ -211,11 +215,15 @@ export class OperationFailedError extends PayKitError {
  */
 export class AuthenticationError extends PayKitError {
   constructor(provider: string, message?: string) {
-    super(message || `Authentication failed for ${provider}. Please check your API credentials.`, {
-      code: 'AUTHENTICATION_ERROR',
-      statusCode: 401,
-      provider,
-    });
+    super(
+      message ||
+        `Authentication failed for ${provider}. Please check your API credentials.`,
+      {
+        code: 'AUTHENTICATION_ERROR',
+        statusCode: 401,
+        provider,
+      },
+    );
   }
 }
 
@@ -257,13 +265,16 @@ export class InvalidTypeError extends PayKitError {
       method?: string;
     },
   ) {
-    super(`Invalid type for "${field}": expected ${expectedType}, received ${receivedType}`, {
-      code: 'INVALID_TYPE',
-      statusCode: 400,
-      provider: options?.provider,
-      method: options?.method,
-      context: { field, expectedType, receivedType },
-    });
+    super(
+      `Invalid type for "${field}": expected ${expectedType}, received ${receivedType}`,
+      {
+        code: 'INVALID_TYPE',
+        statusCode: 400,
+        provider: options?.provider,
+        method: options?.method,
+        context: { field, expectedType, receivedType },
+      },
+    );
   }
 }
 

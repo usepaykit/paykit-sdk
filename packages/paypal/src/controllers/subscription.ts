@@ -10,7 +10,11 @@ import {
 
 export class SubscriptionsController extends BaseController {
   private catchAllErrors(req: ReturnType<BaseController['createRequest']>) {
-    req.throwOn(400, CustomError, 'Request is not well-formed, syntactically incorrect, or violates schema.');
+    req.throwOn(
+      400,
+      CustomError,
+      'Request is not well-formed, syntactically incorrect, or violates schema.',
+    );
     req.throwOn(
       401,
       CustomError,
@@ -26,7 +30,11 @@ export class SubscriptionsController extends BaseController {
   /**
    * @return Response from the API call
    */
-  async createSubscription({ body }: { body: CreateSubscriptionSchema }): Promise<ApiResponse<any>> {
+  async createSubscription({
+    body,
+  }: {
+    body: CreateSubscriptionSchema;
+  }): Promise<ApiResponse<any>> {
     const req = this.createRequest('POST', '/v1/billing/subscriptions');
     const mapped = req.prepareArgs({ body: [body, createSubscriptionApticSchema] });
     req.header('Content-Type', 'application/json');
@@ -41,9 +49,20 @@ export class SubscriptionsController extends BaseController {
   /**
    * @returns Response from the API call
    */
-  async resumeSubscription({ body, subscriptionId }: { body: { reason: string }; subscriptionId: string }) {
-    const req = this.createRequest('POST', `v1/billing/subscriptions/${subscriptionId}/activate `);
-    const mapped = req.prepareArgs({ body: [body, resumeSubscriptionApticSchemaRequest] });
+  async resumeSubscription({
+    body,
+    subscriptionId,
+  }: {
+    body: { reason: string };
+    subscriptionId: string;
+  }) {
+    const req = this.createRequest(
+      'POST',
+      `v1/billing/subscriptions/${subscriptionId}/activate `,
+    );
+    const mapped = req.prepareArgs({
+      body: [body, resumeSubscriptionApticSchemaRequest],
+    });
     req.header('Content-Type', 'application/json');
     req.header('PayPal-Request-Id', Math.random().toString(36).substring(2, 15));
 
@@ -60,9 +79,20 @@ export class SubscriptionsController extends BaseController {
     return req.callAsJson(subscriptionApticSchema);
   }
 
-  async cancelSubscription({ subscriptionId, reason }: { subscriptionId: string; reason: string }) {
-    const req = this.createRequest('POST', `v1/billing/subscriptions/${subscriptionId}/cancel`);
-    const mapped = req.prepareArgs({ body: [reason, cancelSubscriptionApticSchemaRequest] });
+  async cancelSubscription({
+    subscriptionId,
+    reason,
+  }: {
+    subscriptionId: string;
+    reason: string;
+  }) {
+    const req = this.createRequest(
+      'POST',
+      `v1/billing/subscriptions/${subscriptionId}/cancel`,
+    );
+    const mapped = req.prepareArgs({
+      body: [reason, cancelSubscriptionApticSchemaRequest],
+    });
     req.header('PayPal-Request-Id', Math.random().toString(36).substring(2, 15));
     req.json(mapped.body);
     this.catchAllErrors(req);

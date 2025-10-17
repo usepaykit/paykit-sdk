@@ -5,7 +5,13 @@ import { cn } from '../lib/utils';
 
 interface ToasterProps {
   className?: string;
-  position?: 'top-left' | 'top-center' | 'top-right' | 'bottom-left' | 'bottom-center' | 'bottom-right';
+  position?:
+    | 'top-left'
+    | 'top-center'
+    | 'top-right'
+    | 'bottom-left'
+    | 'bottom-center'
+    | 'bottom-right';
   expand?: boolean;
   richColors?: boolean;
   closeButton?: boolean;
@@ -31,7 +37,12 @@ const Toaster = ({
       duration={duration}
       gap={12}
       toastOptions={{
-        style: { background: 'transparent', border: 'none', boxShadow: 'none', padding: 0 },
+        style: {
+          background: 'transparent',
+          border: 'none',
+          boxShadow: 'none',
+          padding: 0,
+        },
         className: 'toast-custom',
       }}
       {...props}
@@ -43,7 +54,8 @@ const Toaster = ({
 const toastVariants = {
   success: {
     icon: CheckCircle,
-    containerClass: 'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
+    containerClass:
+      'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
     iconContainerClass: 'bg-primary text-primary-foreground',
   },
   error: {
@@ -54,17 +66,20 @@ const toastVariants = {
   },
   warning: {
     icon: AlertCircle,
-    containerClass: 'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
+    containerClass:
+      'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
     iconContainerClass: 'bg-primary text-primary-foreground',
   },
   info: {
     icon: Info,
-    containerClass: 'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
+    containerClass:
+      'border-2 border-primary/30 bg-card/95 text-card-foreground ring-1 ring-primary/20 shadow-lg',
     iconContainerClass: 'bg-primary text-primary-foreground',
   },
   loading: {
     icon: Loader2,
-    containerClass: 'border-2 border-muted/50 bg-card/95 text-card-foreground ring-1 ring-muted/30 shadow-lg',
+    containerClass:
+      'border-2 border-muted/50 bg-card/95 text-card-foreground ring-1 ring-muted/30 shadow-lg',
     iconContainerClass: 'bg-muted-foreground text-muted',
   },
 };
@@ -117,10 +132,13 @@ const createToast = (
   description?: string,
   options?: ExternalToast,
 ) => {
-  return toast.custom(() => <ToastComponent variant={variant} title={title} description={description} />, {
-    duration: variant === 'loading' ? Infinity : 4000,
-    ...options,
-  });
+  return toast.custom(
+    () => <ToastComponent variant={variant} title={title} description={description} />,
+    {
+      duration: variant === 'loading' ? Infinity : 4000,
+      ...options,
+    },
+  );
 };
 
 const Toast = {
@@ -163,23 +181,27 @@ const Toast = {
     promise
       .then(data => {
         toast.dismiss(loadingToastId);
-        const message = typeof successMessage === 'function' ? successMessage(data) : successMessage;
+        const message =
+          typeof successMessage === 'function' ? successMessage(data) : successMessage;
         createToast('success', message, undefined, options);
       })
       .catch(err => {
         toast.dismiss(loadingToastId);
-        const message = typeof errorMessage === 'function' ? errorMessage(err) : errorMessage;
+        const message =
+          typeof errorMessage === 'function' ? errorMessage(err) : errorMessage;
         createToast('error', message, undefined, options);
       });
 
     return loadingToastId;
   },
 
-  custom: (jsx: React.ReactNode, options?: any) => toast.custom(() => jsx as any, options),
+  custom: (jsx: React.ReactNode, options?: any) =>
+    toast.custom(() => jsx as any, options),
 
   dismiss: (id?: string | number) => toast.dismiss(id),
 
-  message: (message: string, options?: any) => createToast('info', message, undefined, options),
+  message: (message: string, options?: any) =>
+    createToast('info', message, undefined, options),
 };
 
 export { Toaster, Toast, toast };

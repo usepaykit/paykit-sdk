@@ -36,7 +36,10 @@ const components = {
   AlertDescription: Alert.Description,
   Button: Button,
   h1: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h1 className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)} {...props} />
+    <h1
+      className={cn('font-heading mt-2 scroll-m-20 text-4xl font-bold', className)}
+      {...props}
+    />
   ),
   h2: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
     <h2
@@ -48,22 +51,43 @@ const components = {
     />
   ),
   h3: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h3 className={cn('font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)} {...props} />
+    <h3
+      className={cn(
+        'font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight',
+        className,
+      )}
+      {...props}
+    />
   ),
   h4: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h4 className={cn('font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)} {...props} />
+    <h4
+      className={cn(
+        'font-heading mt-8 scroll-m-20 text-lg font-semibold tracking-tight',
+        className,
+      )}
+      {...props}
+    />
   ),
   h5: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h5 className={cn('mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)} {...props} />
+    <h5
+      className={cn('mt-8 scroll-m-20 text-lg font-semibold tracking-tight', className)}
+      {...props}
+    />
   ),
   h6: ({ className, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
-    <h6 className={cn('mt-8 scroll-m-20 text-base font-semibold tracking-tight', className)} {...props} />
+    <h6
+      className={cn('mt-8 scroll-m-20 text-base font-semibold tracking-tight', className)}
+      {...props}
+    />
   ),
   a: ({ className, ...props }: React.HTMLAttributes<HTMLAnchorElement>) => (
     <a className={cn('font-medium underline underline-offset-4', className)} {...props} />
   ),
   p: ({ className, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
-    <p className={cn('leading-[1.65rem] [&:not(:first-child)]:mt-6', className)} {...props} />
+    <p
+      className={cn('leading-[1.65rem] [&:not(:first-child)]:mt-6', className)}
+      {...props}
+    />
   ),
   strong: ({ className, ...props }: React.HTMLAttributes<HTMLElement>) => (
     <strong className={cn('font-semibold', className)} {...props} />
@@ -84,10 +108,15 @@ const components = {
     // eslint-disable-next-line @next/next/no-img-element
     <img className={cn('rounded-md', className)} alt={alt} {...props} />
   ),
-  hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => <hr className="my-4 md:my-8" {...props} />,
+  hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => (
+    <hr className="my-4 md:my-8" {...props} />
+  ),
   table: ({ className, ...props }: React.HTMLAttributes<HTMLTableElement>) => (
     <div className="my-6 w-full overflow-y-auto">
-      <table className={cn('relative w-full overflow-hidden border-none text-sm', className)} {...props} />
+      <table
+        className={cn('relative w-full overflow-hidden border-none text-sm', className)}
+        {...props}
+      />
     </div>
   ),
   tr: ({ className, ...props }: React.HTMLAttributes<HTMLTableRowElement>) => (
@@ -104,15 +133,23 @@ const components = {
   ),
   td: ({ className, ...props }: React.HTMLAttributes<HTMLTableCellElement>) => (
     <td
-      className={cn('px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right', className)}
+      className={cn(
+        'px-4 py-2 text-left [&[align=center]]:text-center [&[align=right]]:text-right',
+        className,
+      )}
       {...props}
     />
   ),
-  Callout: ({ type, ...props }: React.HTMLAttributes<HTMLDivElement> & { type: 'warning' | 'info' }) => (
+  Callout: ({
+    type,
+    ...props
+  }: React.HTMLAttributes<HTMLDivElement> & { type: 'warning' | 'info' }) => (
     <Alert.Root
       className={cn('my-6', {
-        'bg-accent text-accent-foreground border-red-200 dark:border-red-200/30 dark:text-red-200': type === 'warning',
-        'bg-accent text-accent-foreground border-blue-200 dark:border-blue-200/30 dark:text-blue-200': type === 'info',
+        'bg-accent text-accent-foreground border-red-200 dark:border-red-200/30 dark:text-red-200':
+          type === 'warning',
+        'bg-accent text-accent-foreground border-blue-200 dark:border-blue-200/30 dark:text-blue-200':
+          type === 'info',
       })}
       {...props}
     />
@@ -139,7 +176,9 @@ const components = {
       target={target}
     >
       <Card.Root className="group relative overflow-hidden transition-all hover:shadow-md">
-        <Card.Content className="flex flex-col items-center justify-center p-6 text-center">{children}</Card.Content>
+        <Card.Content className="flex flex-col items-center justify-center p-6 text-center">
+          {children}
+        </Card.Content>
       </Card.Root>
     </Link>
   ),
@@ -154,7 +193,8 @@ const components = {
       let codeString = extractCodeString(children);
 
       const firstLine = codeString.split('\n')[0];
-      const commentMatch = firstLine.match(/^\/\/\s*(.+)$/) || firstLine.match(/^#\s*(.+)$/);
+      const commentMatch =
+        firstLine.match(/^\/\/\s*(.+)$/) || firstLine.match(/^#\s*(.+)$/);
 
       if (commentMatch) {
         filename = commentMatch[1].trim();

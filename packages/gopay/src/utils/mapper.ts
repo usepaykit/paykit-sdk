@@ -1,9 +1,17 @@
-import { Invoice, Payment, Refund, Subscription, PAYKIT_METADATA_KEY, omitInternalMetadata } from '@paykit-sdk/core';
+import {
+  Invoice,
+  Payment,
+  Refund,
+  Subscription,
+  PAYKIT_METADATA_KEY,
+  omitInternalMetadata,
+} from '@paykit-sdk/core';
 import { GoPayPaymentResponse } from '../schema';
 
 export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment => {
   const itemId = JSON.parse(
-    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ??
+      '{}',
   ).itemId;
 
   const metadata = omitInternalMetadata(
@@ -27,12 +35,17 @@ export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment
   };
 };
 
-export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscription: boolean): Invoice => {
+export const paykitInvoice$InboundSchema = (
+  data: GoPayPaymentResponse,
+  isSubscription: boolean,
+): Invoice => {
   const quantity = JSON.parse(
-    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ??
+      '{}',
   ).qty;
   const itemId = JSON.parse(
-    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ??
+      '{}',
   ).itemId;
 
   const status = (() => {
@@ -41,7 +54,9 @@ export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscr
   })();
 
   // Calculate paid at based on start of subscription or payment
-  const paidAt = isSubscription ? new Date(data.recurrence?.recurrence_date_from ?? '') : new Date();
+  const paidAt = isSubscription
+    ? new Date(data.recurrence?.recurrence_date_from ?? '')
+    : new Date();
 
   const metadata = omitInternalMetadata(
     data.additional_params?.reduce(
@@ -68,9 +83,12 @@ export const paykitInvoice$InboundSchema = (data: GoPayPaymentResponse, isSubscr
   };
 };
 
-export const paykitSubscription$InboundSchema = (data: GoPayPaymentResponse): Subscription => {
+export const paykitSubscription$InboundSchema = (
+  data: GoPayPaymentResponse,
+): Subscription => {
   const itemId = JSON.parse(
-    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ?? '{}',
+    data.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)?.value ??
+      '{}',
   ).itemId;
 
   const billingIntervalMap: Record<string, Subscription['billing_interval']> = {
@@ -80,7 +98,8 @@ export const paykitSubscription$InboundSchema = (data: GoPayPaymentResponse): Su
     ON_DEMAND: 'month',
   };
 
-  const billingInterval = billingIntervalMap[data.recurrence?.recurrence_cycle ?? 'ON_DEMAND'];
+  const billingInterval =
+    billingIntervalMap[data.recurrence?.recurrence_cycle ?? 'ON_DEMAND'];
 
   const currentPeriodStart = new Date(data.recurrence?.recurrence_date_from ?? '');
   const currentPeriodEnd = new Date(data.recurrence?.recurrence_date_to ?? '');

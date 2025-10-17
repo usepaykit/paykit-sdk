@@ -1,4 +1,12 @@
-import { lazy, object, Schema, number, string, stringEnum, boolean } from '@paypal/paypal-server-sdk/dist/types/schema';
+import {
+  lazy,
+  object,
+  Schema,
+  number,
+  string,
+  stringEnum,
+  boolean,
+} from '@paypal/paypal-server-sdk/dist/types/schema';
 
 export interface ShippingAmount {
   /**
@@ -58,8 +66,19 @@ export const createSubscriptionApticSchema: Schema<CreateSubscriptionSchema> = o
     lazy(() =>
       object({
         email_address: ['email_address', string()],
-        name: ['name', lazy(() => object({ given_name: ['given_name', string()], surname: ['surname', string()] }))],
-        phone: ['phone', lazy(() => object({ phone_number: ['phone_number', string()] }))],
+        name: [
+          'name',
+          lazy(() =>
+            object({
+              given_name: ['given_name', string()],
+              surname: ['surname', string()],
+            }),
+          ),
+        ],
+        phone: [
+          'phone',
+          lazy(() => object({ phone_number: ['phone_number', string()] })),
+        ],
       }),
     ),
   ],
@@ -162,7 +181,15 @@ export const subscriptionApticSchema: Schema<Subscription> = object({
     lazy(() =>
       object({
         email_address: ['email_address', string()],
-        name: ['name', lazy(() => object({ given_name: ['given_name', string()], surname: ['surname', string()] }))],
+        name: [
+          'name',
+          lazy(() =>
+            object({
+              given_name: ['given_name', string()],
+              surname: ['surname', string()],
+            }),
+          ),
+        ],
         payer_id: ['payer_id', string()],
       }),
     ),
@@ -179,9 +206,10 @@ interface ResumeSubscriptionSchema {
   reason: string;
 }
 
-export const resumeSubscriptionApticSchemaRequest: Schema<ResumeSubscriptionSchema> = object({
-  reason: ['reason', string()],
-});
+export const resumeSubscriptionApticSchemaRequest: Schema<ResumeSubscriptionSchema> =
+  object({
+    reason: ['reason', string()],
+  });
 
 // WEBHOOK
 

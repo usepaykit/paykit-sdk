@@ -56,4 +56,5 @@ export type WebhookEventPayload =
   | RefundCreated
   | InvoiceGenerated;
 
-export const paykitEvent$InboundSchema = <Resource>(event: WebhookEvent<Resource>) => event;
+export const paykitEvent$InboundSchema = <Resource>(event: WebhookEvent<Resource>) =>
+  event;

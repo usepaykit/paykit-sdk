@@ -60,10 +60,15 @@ export type WebhookHandlerConfig = {
   fullUrl: string;
 };
 
-export interface HandleWebhookParams extends WebhookHandlerConfig, Pick<WebhookSetupConfig, 'webhookSecret'> {}
+export interface HandleWebhookParams
+  extends WebhookHandlerConfig,
+    Pick<WebhookSetupConfig, 'webhookSecret'> {}
 
 export class Webhook {
-  private handlers: Map<WebhookEventType, ((event: WebhookEventPayload) => Promise<void>)[]> = new Map();
+  private handlers: Map<
+    WebhookEventType,
+    ((event: WebhookEventPayload) => Promise<void>)[]
+  > = new Map();
   private config: WebhookSetupConfig | null = null;
 
   setup(config: WebhookSetupConfig): Webhook {
@@ -71,14 +76,19 @@ export class Webhook {
     return this;
   }
 
-  on<T extends WebhookEventType>(eventType: T, handler: NonNullable<WebhookEventHandlers[T]>): Webhook {
+  on<T extends WebhookEventType>(
+    eventType: T,
+    handler: NonNullable<WebhookEventHandlers[T]>,
+  ): Webhook {
     if (!this.config) {
       throw new WebhookError('Webhook not configured. Call setup() first.');
     }
 
     if (!this.handlers.has(eventType)) this.handlers.set(eventType, []);
 
-    this.handlers.get(eventType)?.push(handler as (event: WebhookEventPayload) => Promise<any>);
+    this.handlers
+      .get(eventType)
+      ?.push(handler as (event: WebhookEventPayload) => Promise<any>);
     return this;
   }
 

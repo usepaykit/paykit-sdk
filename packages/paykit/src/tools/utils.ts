@@ -3,7 +3,9 @@ import { z } from 'zod';
 import { PAYKIT_METADATA_KEY, PaykitMetadata } from '..';
 import { tryCatchSync } from './try-catch';
 
-export type Result<T, E = unknown> = { ok: true; value: T; error?: never } | { ok: false; value?: never; error: E };
+export type Result<T, E = unknown> =
+  | { ok: true; value: T; error?: never }
+  | { ok: false; value?: never; error: E };
 
 export const OK = <V>(value: V): Result<V, never> => ({ ok: true, value });
 
@@ -17,7 +19,11 @@ export const unwrapAsync = async <T>(pr: Promise<Result<T, unknown>>): Promise<T
   return r.value;
 };
 
-export function safeParse<Inp, Out>(rawValue: Inp, fn: (value: Inp) => Out, errorMessage: string): Result<Out, Error> {
+export function safeParse<Inp, Out>(
+  rawValue: Inp,
+  fn: (value: Inp) => Out,
+  errorMessage: string,
+): Result<Out, Error> {
   const [result, error] = tryCatchSync(() => fn(rawValue));
 
   if (error) return ERR(buildError(errorMessage, error));
@@ -26,7 +32,11 @@ export function safeParse<Inp, Out>(rawValue: Inp, fn: (value: Inp) => Out, erro
 }
 
 export const safeEncode = <T>(value: T) => {
-  return safeParse(value, value => Buffer.from(JSON.stringify(value)).toString('base64'), 'Failed to encode value');
+  return safeParse(
+    value,
+    value => Buffer.from(JSON.stringify(value)).toString('base64'),
+    'Failed to encode value',
+  );
 };
 
 export const safeDecode = <T>(value: string) => {
@@ -52,11 +62,18 @@ export async function executeWithRetryWithHandler<T>(
     if (!handledError.retry) return handledError.data as T;
 
     if (handledError.retry && currentAttempt <= maxRetries) {
-      const delay = baseDelay * Math.pow(2, currentAttempt - 1) * (0.5 + Math.random() * 0.5);
+      const delay =
+        baseDelay * Math.pow(2, currentAttempt - 1) * (0.5 + Math.random() * 0.5);
 
       await setTimeout(delay);
 
-      return executeWithRetryWithHandler(apiCall, errorHandler, maxRetries, baseDelay, currentAttempt + 1);
+      return executeWithRetryWithHandler(
+        apiCall,
+        errorHandler,
+        maxRetries,
+        baseDelay,
+        currentAttempt + 1,
+      );
     }
 
     return handledError.data as T;
@@ -91,7 +108,9 @@ export const validateRequiredKeys = <K extends string>(
   if (missingKeys.length > 0) {
     const missingKeysList = missingKeys.join(', ');
     const error =
-      typeof errorMessage === 'function' ? errorMessage(missingKeys) : errorMessage.replace('{keys}', missingKeysList);
+      typeof errorMessage === 'function'
+        ? errorMessage(missingKeys)
+        : errorMessage.replace('{keys}', missingKeysList);
     throw new Error(error);
   }
 
@@ -113,7 +132,11 @@ export const parseJSON = <T>(str: string, schema: z.ZodSchema<T>): T => {
 export const schema = <TInterface>() => {
   return <TSchema extends z.ZodType<any>>(
     schema: TSchema &
-      (z.infer<TSchema> extends TInterface ? (TInterface extends z.infer<TSchema> ? unknown : never) : never),
+      (z.infer<TSchema> extends TInterface
+        ? TInterface extends z.infer<TSchema>
+          ? unknown
+          : never
+        : never),
   ): TSchema => schema;
 };
 

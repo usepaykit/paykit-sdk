@@ -46,9 +46,12 @@ type EmailPayee = Pick<Customer, 'email'>;
 
 export type Payee = CustomerIdPayee | EmailPayee;
 
-export const payeeSchema = schema<Payee>()(z.union([z.string(), customerSchema.pick({ email: true })]));
+export const payeeSchema = schema<Payee>()(
+  z.union([z.string(), customerSchema.pick({ email: true })]),
+);
 
-export interface CreateCustomerParams extends OverrideProps<Omit<Customer, 'id'>, { name?: string }> {}
+export interface CreateCustomerParams
+  extends OverrideProps<Omit<Customer, 'id'>, { name?: string }> {}
 
 export const createCustomerSchema = schema<CreateCustomerParams>()(
   z.object({

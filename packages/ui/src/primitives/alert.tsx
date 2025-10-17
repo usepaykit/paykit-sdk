@@ -18,17 +18,29 @@ const alertVariants = cva(
   },
 );
 
-interface RootProps extends React.ComponentProps<'div'>, VariantProps<typeof alertVariants> {}
+interface RootProps
+  extends React.ComponentProps<'div'>,
+    VariantProps<typeof alertVariants> {}
 
 const Root = ({ className, variant, ...props }: RootProps) => {
-  return <div data-slot="alert" role="alert" className={cn(alertVariants({ variant }), className)} {...props} />;
+  return (
+    <div
+      data-slot="alert"
+      role="alert"
+      className={cn(alertVariants({ variant }), className)}
+      {...props}
+    />
+  );
 };
 
 const Title = ({ className, ...props }: React.ComponentProps<'div'>) => {
   return (
     <div
       data-slot="alert-title"
-      className={cn('col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight', className)}
+      className={cn(
+        'col-start-2 line-clamp-1 min-h-4 font-medium tracking-tight',
+        className,
+      )}
       {...props}
     />
   );

@@ -24,7 +24,11 @@ export function CopyButton({ value, ...props }: CopyButtonProps) {
         setHasCopied(true);
         Toast.success({
           title: 'Copied to clipboard',
-          options: { duration: 4000, position: 'bottom-right', className: 'font-pt-sans' },
+          options: {
+            duration: 4000,
+            position: 'bottom-right',
+            className: 'font-pt-sans',
+          },
         });
       }}
       {...props}

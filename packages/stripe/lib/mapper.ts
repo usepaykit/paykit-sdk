@@ -5,6 +5,7 @@ import {
   Invoice,
   InvoiceStatus,
   omitInternalMetadata,
+  OverrideProps,
   PaymentStatus,
   Refund,
   Subscription,
@@ -18,6 +19,9 @@ import Stripe from 'stripe';
  */
 export const paykitCheckout$InboundSchema = (
   checkout: Stripe.Checkout.Session,
+  lineItems: Array<
+    OverrideProps<Pick<Stripe.LineItem, 'id' | 'quantity'>, { quantity: number }>
+  >,
 ): Checkout => {
   return {
     id: checkout.id,
@@ -27,9 +31,9 @@ export const paykitCheckout$InboundSchema = (
         : (checkout.customer?.id ?? ''),
     session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time',
     payment_url: checkout.url!,
-    products: checkout.line_items!.data.map(item => ({
-      id: item.price!.id,
-      quantity: item.quantity!,
+    products: lineItems.map(item => ({
+      id: item.id,
+      quantity: item.quantity,
     })),
     currency: checkout.currency!,
     amount: checkout.amount_total!,

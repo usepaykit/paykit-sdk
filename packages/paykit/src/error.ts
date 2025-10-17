@@ -1,3 +1,5 @@
+import { inspect } from 'util';
+
 /**
  * Base PayKit error class
  */
@@ -300,5 +302,13 @@ export class ConstraintViolationError extends PayKitError {
         context: { constraint, value: options?.value, limit: options?.limit },
       },
     );
+  }
+}
+
+export class UnTraceableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = this.constructor.name;
+    this.stack = undefined;
   }
 }

@@ -1,6 +1,6 @@
 import { setTimeout } from 'timers/promises';
 import { z } from 'zod';
-import { PAYKIT_METADATA_KEY, PaykitMetadata } from '..';
+import { UnTraceableError, PAYKIT_METADATA_KEY, PaykitMetadata } from '..';
 import { tryCatchSync } from './try-catch';
 
 export type Result<T, E = unknown> =
@@ -111,7 +111,8 @@ export const validateRequiredKeys = <K extends string>(
       typeof errorMessage === 'function'
         ? errorMessage(missingKeys)
         : errorMessage.replace('{keys}', missingKeysList);
-    throw new Error(error);
+
+    throw new UnTraceableError(error);
   }
 
   return result as Record<K, string>;

@@ -39,6 +39,8 @@ import {
   schema,
   createCustomerSchema,
   WebhookError,
+  updateCheckoutSchema,
+  ResourceNotFoundError,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -135,26 +137,66 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const checkout = await this.stripe.checkout.sessions.create(checkoutOptions);
 
-    return paykitCheckout$InboundSchema(checkout);
+    return paykitCheckout$InboundSchema(checkout, [
+      { id: params.item_id, quantity: params.quantity },
+    ]);
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    const checkout = await this.stripe.checkout.sessions.retrieve(id);
+    const checkout = await this.stripe.checkout.sessions.retrieve(id, {
+      expand: ['line_items'],
+    });
 
-    return paykitCheckout$InboundSchema(checkout);
+    return paykitCheckout$InboundSchema(
+      checkout,
+      checkout.line_items?.data.map(item => ({
+        id: item.price?.id ?? '',
+        quantity: item.quantity ?? 0,
+      })) ?? [],
+    );
   };
 
   updateCheckout = async (
     id: string,
     params: UpdateCheckoutSchema,
   ): Promise<Checkout> => {
-    const checkout = await this.stripe.checkout.sessions.update(id, params);
+    const { error, data } = updateCheckoutSchema.safeParse(params);
 
-    return paykitCheckout$InboundSchema(checkout);
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'updateCheckout');
+    }
+
+    const originalCheckout = await this.stripe.checkout.sessions.retrieve(id, {
+      expand: ['line_items'],
+    });
+
+    if (!originalCheckout) {
+      throw new ResourceNotFoundError('checkout', id, this.providerName);
+    }
+
+    const updatedCheckout = await this.stripe.checkout.sessions.update(id, {
+      ...data,
+      metadata: Object.fromEntries(
+        Object.entries(data.metadata ?? {}).map(([key, value]) => [
+          key,
+          JSON.stringify(value),
+        ]),
+      ),
+    });
+
+    return paykitCheckout$InboundSchema(
+      updatedCheckout,
+      updatedCheckout.line_items?.data.map(item => ({
+        id: item.price?.id ?? '',
+        quantity: item.quantity ?? 0,
+      })) ?? [],
+    );
   };
 
   deleteCheckout = async (id: string): Promise<null> => {
-    throw new NotImplementedError('deleteCheckout', 'stripe', { futureSupport: false });
+    await this.stripe.checkout.sessions.expire(id);
+
+    return null;
   };
 
   /**

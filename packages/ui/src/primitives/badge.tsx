@@ -24,21 +24,27 @@ const badgeVariants = cva(
 );
 
 interface RootProps
-  extends React.ComponentProps<'span'>,
+  extends React.ComponentPropsWithoutRef<'span'>,
     VariantProps<typeof badgeVariants> {
   asChild?: boolean;
+  children?: React.ReactNode;
 }
 
-const Root = ({ className, variant, asChild = false, ...props }: RootProps) => {
-  const Comp = asChild ? Slot : 'span';
+const Root = React.forwardRef<HTMLSpanElement, RootProps>(
+  ({ className, variant, asChild = false, ...props }, ref) => {
+    const Comp = asChild ? Slot : 'span';
 
-  return (
-    <Comp
-      data-slot="badge"
-      className={cn(badgeVariants({ variant }), className)}
-      {...props}
-    />
-  );
-};
+    return (
+      <Comp
+        ref={ref}
+        data-slot="badge"
+        className={cn(badgeVariants({ variant }), className)}
+        {...props}
+      />
+    );
+  },
+);
+
+Root.displayName = 'Badge';
 
 export { Root as Badge, badgeVariants };

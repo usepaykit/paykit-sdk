@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '../lib/utils';
 
-interface RootProps extends React.InputHTMLAttributes<HTMLInputElement> {}
+type RootProps = React.InputHTMLAttributes<HTMLInputElement>;
 
 const Root = React.forwardRef<HTMLInputElement, RootProps>(
   ({ className, type, ...props }, ref) => {

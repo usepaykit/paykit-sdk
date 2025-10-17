@@ -8,7 +8,7 @@ import { Alert } from '@paykit-sdk/ui';
 import { useMDXComponent } from 'next-contentlayer/hooks';
 import Link from 'next/link';
 
-type MDXComponents = Parameters<ReturnType<typeof useMDXComponent>>['0']['components'];
+type MDXComponents = Record<string, React.ComponentType<any>>;
 
 function hasChildrenProp(props: unknown): props is { children: React.ReactNode } {
   return !!props && typeof props === 'object' && 'children' in props;

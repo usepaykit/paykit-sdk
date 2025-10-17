@@ -1,13 +1,15 @@
 'use client';
 
 import * as React from 'react';
+import { OverrideProps } from '@paykit-sdk/core';
 import { Button, Toast } from '@paykit-sdk/ui';
 
-interface CopyButtonProps extends React.ComponentProps<typeof Button> {
-  value: string;
-}
+type CopyButtonProps = OverrideProps<
+  Omit<React.ComponentProps<typeof Button>, 'onClick'>,
+  { value: string }
+>;
 
-export function CopyButton({ value, ...props }: CopyButtonProps) {
+export function CopyButton({ value, children, ...props }: CopyButtonProps) {
   const [hasCopied, setHasCopied] = React.useState(false);
 
   React.useEffect(() => {
@@ -32,6 +34,8 @@ export function CopyButton({ value, ...props }: CopyButtonProps) {
         });
       }}
       {...props}
-    />
+    >
+      {children}
+    </Button>
   );
 }

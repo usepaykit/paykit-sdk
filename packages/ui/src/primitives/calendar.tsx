@@ -164,7 +164,7 @@ const DayButton = ({
 
   return (
     <Button
-      ref={ref}
+      ref={ref as unknown as React.RefObject<HTMLButtonElement>}
       variant="ghost"
       size="icon"
       data-day={day.date.toLocaleDateString()}

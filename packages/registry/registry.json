@@ -12,17 +12,17 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "packages/registry/stripe/shared/paykit.ts",
+          "path": "stripe/shared/paykit.ts",
           "type": "registry:lib",
           "target": "lib/paykit.ts"
         },
         {
-          "path": "packages/registry/stripe/nextjs/catch-all.ts",
+          "path": "stripe/nextjs/catch-all.ts",
           "type": "registry:page",
           "target": "app/api/paykit/[...endpoint]/route.ts"
         },
         {
-          "path": "packages/registry/stripe/nextjs/webhook.ts",
+          "path": "stripe/nextjs/webhook.ts",
           "type": "registry:page",
           "target": "app/api/paykit/webhooks/route.ts"
         }
@@ -49,12 +49,12 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "packages/registry/stripe/shared/paykit.ts",
+          "path": "stripe/shared/paykit.ts",
           "type": "registry:lib",
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "packages/registry/stripe/hono/router.ts",
+          "path": "stripe/hono/router.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }
@@ -81,12 +81,12 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "packages/registry/stripe/shared/paykit.ts",
+          "path": "stripe/shared/paykit.ts",
           "type": "registry:lib",
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "packages/registry/stripe/express/router.ts",
+          "path": "stripe/express/router.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }
@@ -113,15 +113,15 @@
       "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
-          "path": "packages/registry/stripe/hooks/paykit-wrapper.tsx",
+          "path": "stripe/hooks/paykit-wrapper.tsx",
           "type": "registry:component"
         },
         {
-          "path": "packages/registry/stripe/hooks/customer-manager.tsx",
+          "path": "stripe/hooks/customer-manager.tsx",
           "type": "registry:component"
         },
         {
-          "path": "packages/registry/stripe/hooks/checkout-form.tsx",
+          "path": "stripe/hooks/checkout-form.tsx",
           "type": "registry:component"
         }
       ],
@@ -143,7 +143,7 @@
       "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
-          "path": "packages/registry/stripe/nextjs/prisma/schema.prisma",
+          "path": "stripe/nextjs/prisma/schema.prisma",
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma"
         }
@@ -168,7 +168,7 @@
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+          "path": "stripe/shared/drizzle/schema.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
@@ -191,7 +191,7 @@
         {
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma",
-          "path": "packages/registry/stripe/shared/prisma/schema.prisma"
+          "path": "stripe/shared/prisma/schema.prisma"
         }
       ],
       "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
@@ -214,7 +214,7 @@
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+          "path": "stripe/shared/drizzle/schema.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
@@ -237,7 +237,7 @@
         {
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma",
-          "path": "packages/registry/stripe/shared/prisma/schema.prisma"
+          "path": "stripe/shared/prisma/schema.prisma"
         }
       ],
       "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
@@ -260,7 +260,7 @@
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "packages/registry/stripe/shared/drizzle/schema.ts"
+          "path": "stripe/shared/drizzle/schema.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",

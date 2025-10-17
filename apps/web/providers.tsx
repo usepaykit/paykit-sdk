@@ -10,8 +10,10 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
     initMixpanel();
   }, []);
 
+  const Provider = ThemeProvider as React.ComponentType<any>;
+
   return (
-    <ThemeProvider
+    <Provider
       attribute="class"
       defaultTheme="light"
       enableSystem
@@ -19,6 +21,6 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
     >
       {children}
       <Toaster />
-    </ThemeProvider>
+    </Provider>
   );
 };

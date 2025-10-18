@@ -26,7 +26,7 @@
   "peerDependencies": {
     "react": ">=16.8.0",
     "react-dom": ">=16.8.0",
-    "@paykit-sdk/core": ">=1.1.9"
+    "@paykit-sdk/core": ">=1.1.92"
   },
   "devDependencies": {
     "@swc/core": "^1.12.9",

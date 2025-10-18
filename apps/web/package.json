@@ -15,7 +15,7 @@
     "@mdx-js/react": "^3.1.0",
     "@monaco-editor/react": "^4.7.0",
     "@next/mdx": "^15.3.4",
-    "@paykit-sdk/core": "1.1.9",
+    "@paykit-sdk/core": "1.1.92",
     "@paykit-sdk/polar": "1.1.92",
     "@paykit-sdk/react": "1.1.91",
     "@paykit-sdk/registry": "workspace:*",

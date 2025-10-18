@@ -25,7 +25,6 @@ import {
   createSubscriptionSchema,
   createPaymentSchema,
   updatePaymentSchema,
-  NotImplementedError,
   ValidationError,
   InvalidTypeError,
   updateSubscriptionSchema,
@@ -41,6 +40,7 @@ import {
   WebhookError,
   updateCheckoutSchema,
   ResourceNotFoundError,
+  validateRequiredKeys,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -50,6 +50,7 @@ import {
   paykitInvoice$InboundSchema,
   paykitPayment$InboundSchema,
   paykitRefund$InboundSchema,
+  paykitRefundReason$OutboundSchema,
   paykitSubscription$InboundSchema,
 } from '../lib/mapper';
 
@@ -70,13 +71,15 @@ const providerName = 'stripe';
 
 export class StripeProvider extends AbstractPayKitProvider implements PayKitProvider {
   private stripe: Stripe;
+  private opts: StripeOptions;
 
-  constructor(config: StripeOptions) {
-    super(stripeOptionsSchema, config, providerName);
+  constructor(opts: StripeOptions) {
+    super(stripeOptionsSchema, opts, providerName);
 
-    const { debug, apiKey, ...rest } = config;
+    const { debug = true, apiKey, ...rest } = opts;
 
     this.stripe = new Stripe(apiKey, rest);
+    this.opts = opts;
   }
 
   readonly providerName = providerName;
@@ -222,9 +225,17 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   ): Promise<Customer> => {
     const { provider_metadata, ...rest } = params;
 
+    const metadata = Object.fromEntries(
+      Object.entries(rest.metadata ?? {}).map(([key, value]) => [
+        key,
+        JSON.stringify(value),
+      ]),
+    );
+
     const customer = await this.stripe.customers.update(id, {
-      ...rest,
       ...provider_metadata,
+      ...rest,
+      metadata,
     });
 
     return paykitCustomer$InboundSchema(customer);
@@ -263,7 +274,19 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       });
     }
 
+    if (this.opts.debug) {
+      console.info(
+        'Creating subscription with default payment method, this can be overridden by passing `default_payment_method` in the provider_metadata e.g pm_xxx',
+      );
+    }
+
+    const defaultPaymentMethod = data.provider_metadata?.default_payment_method as
+      | string
+      | undefined;
+
     const subscription = await this.stripe.subscriptions.create({
+      ...data.provider_metadata,
+      ...(defaultPaymentMethod && { default_payment_method: defaultPaymentMethod }),
       customer: data.customer,
       items: [{ price: data.item_id }],
       metadata: Object.fromEntries(
@@ -272,7 +295,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
           JSON.stringify(value),
         ]),
       ),
-      ...data.provider_metadata,
+      payment_behavior: 'default_incomplete', // customer's default payment method will be used if available
     });
 
     return paykitSubscription$InboundSchema(subscription);
@@ -474,13 +497,27 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
     }
 
-    const { provider_metadata, ...rest } = params;
+    const { provider_metadata, ...rest } = data;
 
-    const refund = await this.stripe.refunds.create({
-      ...rest,
-      reason: rest.reason as any,
+    const stripeRefundOptions: Stripe.RefundCreateParams = {
       ...provider_metadata,
-    });
+      reason: paykitRefundReason$OutboundSchema(rest.reason),
+      amount: rest.amount,
+      metadata: Object.fromEntries(
+        Object.entries(rest.metadata ?? {}).map(([key, value]) => [
+          key,
+          JSON.stringify(value),
+        ]),
+      ),
+    };
+
+    if (data.payment_id.startsWith('pi_')) {
+      stripeRefundOptions.payment_intent = data.payment_id; // payment intent ID (modern API)
+    } else {
+      stripeRefundOptions.charge = data.payment_id; // charge ID (legacy API)
+    }
+
+    const refund = await this.stripe.refunds.create(stripeRefundOptions);
 
     return paykitRefund$InboundSchema(refund);
   };

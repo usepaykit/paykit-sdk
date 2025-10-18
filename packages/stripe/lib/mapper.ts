@@ -8,6 +8,7 @@ import {
   OverrideProps,
   PaymentStatus,
   Refund,
+  RefundReason,
   Subscription,
   SubscriptionBillingInterval,
 } from '@paykit-sdk/core';
@@ -182,4 +183,36 @@ export const paykitRefund$InboundSchema = (refund: Stripe.Refund): Refund => {
     reason: refund.reason,
     metadata: omitInternalMetadata(refund.metadata ?? {}),
   };
+};
+
+export const paykitRefundReason$OutboundSchema = (
+  reason: RefundReason,
+): Stripe.RefundCreateParams.Reason | undefined => {
+  if (!reason) return undefined;
+
+  const normalized = reason.toLowerCase().trim();
+
+  // Match "duplicate" patterns
+  if (/duplicate|duplicated|double.*charge|charged.*twice/i.test(normalized)) {
+    return 'duplicate';
+  }
+
+  // Match "fraudulent" patterns
+  if (
+    /fraud|fraudulent|unauthorized|scam|stolen.*card|not.*authorized/i.test(normalized)
+  ) {
+    return 'fraudulent';
+  }
+
+  // Match "requested_by_customer" patterns
+  if (
+    /customer.*request|requested.*customer|customer.*want|cancel|refund.*request|changed.*mind/i.test(
+      normalized,
+    )
+  ) {
+    return 'requested_by_customer';
+  }
+
+  // Default fallback, most generic case
+  return 'requested_by_customer';
 };

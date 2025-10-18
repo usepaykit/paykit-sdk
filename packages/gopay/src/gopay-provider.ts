@@ -126,12 +126,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const {
-      amount,
-      currency = 'CZK',
-      successUrl,
-    } = validateRequiredKeys(
-      ['amount', 'currency', 'successUrl'],
+    const { amount, currency = 'CZK' } = validateRequiredKeys(
+      ['amount', 'currency'],
       data.provider_metadata as Record<string, string>,
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
@@ -169,7 +165,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
         },
       ],
       lang: data.provider_metadata?.lang ? (data.provider_metadata.lang as string) : 'EN',
-      callback: { return_url: successUrl, notification_url: this.opts.webhookUrl },
+      callback: { return_url: data.success_url, notification_url: this.opts.webhookUrl },
       additional_params: Object.entries({
         ...data.metadata,
         [PAYKIT_METADATA_KEY]: JSON.stringify({
@@ -275,8 +271,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const { successUrl, quantity } = validateRequiredKeys(
-      ['successUrl', 'quantity'],
+    const { quantity, success_url } = validateRequiredKeys(
+      ['quantity', 'success_url'],
       data.provider_metadata as Record<string, string>,
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
@@ -290,6 +286,19 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       month: 'MONTH',
       year: 'MONTH',
     } as const;
+
+    const currentPeriodEnd = (() => {
+      if (data.billing_interval === 'day') {
+        return new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
+      }
+      if (data.billing_interval === 'week') {
+        return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
+      }
+      if (data.billing_interval === 'month') {
+        return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
+      }
+      return new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toISOString();
+    })();
 
     const recurrenceCycle = intervalMap[data.billing_interval] ?? 'ON_DEMAND';
 
@@ -310,9 +319,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       recurrence: {
         recurrence_cycle: recurrenceCycle,
         recurrence_period: parseInt(quantity),
-        recurrence_date_to: new Date(data.current_period_end).toISOString(),
+        recurrence_date_to: currentPeriodEnd,
       },
-      callback: { return_url: successUrl, notification_url: this.opts.webhookUrl },
+      callback: { return_url: success_url, notification_url: this.opts.webhookUrl },
     };
 
     const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
@@ -409,21 +418,15 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    if (!data.product_id) {
+    if (!data.item_id) {
       throw new ConfigurationError(
-        'product_id is required, this is the name of the product in GoPay',
+        'item_id is required, this is the name of the item in GoPay',
         {
           provider: this.providerName,
-          missingKeys: ['product_id'],
+          missingKeys: ['item_id'],
         },
       );
     }
-
-    const { quantity } = validateRequiredKeys(
-      ['quantity'],
-      data.provider_metadata as Record<string, string>,
-      'The following fields must be present in the provider_metadata of createPayment: {keys}',
-    );
 
     const goPayRequest: GoPayPaymentRequest = {
       payer: {
@@ -435,15 +438,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       amount: data.amount,
       currency: data.currency ?? 'CZK',
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
-      order_description: data.metadata?.description || 'Payment',
-      items: [{ name: data.product_id, amount: data.amount, count: parseInt(quantity) }],
+      order_description: `Payment for ${data.item_id} by ${data.customer.email}`,
+      items: [{ name: data.item_id, amount: data.amount, count: 1 }],
       preauthorization: false, // automatically captures the payment
       additional_params: Object.entries({
         ...data.metadata,
-        [PAYKIT_METADATA_KEY]: JSON.stringify({
-          itemId: data.product_id,
-          qty: parseInt(quantity),
-        }),
+        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id, qty: 1 }),
       }).map(([name, value]) => ({
         name,
         value: String(value),

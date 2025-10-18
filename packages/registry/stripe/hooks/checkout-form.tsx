@@ -14,10 +14,9 @@ export const CheckoutForm = () => {
       quantity: 1,
       customer: 'cus_123', // or { email: 'test@example.com' }
       metadata: { source: 'web_app' },
-      provider_metadata: {
-        success_url: 'https://example.com/success',
-        cancel_url: 'https://example.com/cancel',
-      },
+      cancel_url: 'https://example.com/cancel',
+      success_url: 'https://example.com/success',
+      provider_metadata: {},
     });
 
     if (error) {

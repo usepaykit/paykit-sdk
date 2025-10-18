@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { schema } from '../tools';
+import { OverrideProps } from '../types';
 import { BillingInfo, billingSchema } from './billing';
 import { Payee, payeeSchema } from './customer';
 import { metadataSchema, PaykitMetadata } from './metadata';
@@ -58,9 +59,9 @@ export interface Payment {
   metadata: PaykitMetadata;
 
   /**
-   * The product ID of the payment.
+   * The item ID of the payment.
    */
-  product_id: string | null;
+  item_id: string | null;
 }
 
 export const paymentSchema = schema<Payment>()(
@@ -71,11 +72,15 @@ export const paymentSchema = schema<Payment>()(
     customer: payeeSchema,
     status: paymentStatusSchema,
     metadata: metadataSchema,
-    product_id: z.string().nullable(),
+    item_id: z.string().nullable(),
   }),
 );
 
-export interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
+export interface CreatePaymentSchema
+  extends OverrideProps<
+    Omit<Payment, 'id' | 'status'>,
+    { metadata?: Record<string, unknown> }
+  > {
   /**
    * The provider specific params of the payment.
    */
@@ -85,16 +90,24 @@ export interface CreatePaymentSchema extends Omit<Payment, 'id' | 'status'> {
    * The shipping info of the payment.
    */
   billing?: BillingInfo;
+
+  /**
+   * The capture method of the payment.
+   */
+  capture_method: 'automatic' | 'manual';
 }
 
 export const createPaymentSchema = schema<CreatePaymentSchema>()(
-  paymentSchema.omit({ id: true, status: true }).extend({
+  paymentSchema.omit({ id: true, status: true, metadata: true }).extend({
+    metadata: z.record(z.string(), z.unknown()).optional(),
     provider_metadata: z.record(z.string(), z.unknown()).optional(),
     billing: billingSchema.optional(),
+    capture_method: z.enum(['automatic', 'manual']),
   }),
 );
 
-export interface UpdatePaymentSchema extends Partial<Omit<Payment, 'id' | 'status'>> {
+export interface UpdatePaymentSchema
+  extends Partial<Omit<Payment, 'id' | 'status' | 'item_id'>> {
   provider_metadata?: Record<string, unknown>;
 }
 

@@ -152,3 +152,25 @@ export const omitInternalMetadata = (
     return acc;
   }, {} as PaykitMetadata);
 };
+
+/**
+ * Safely converts metadata values to strings for provider storage.
+ * Only stringifies non-string values to prevent nested JSON escaping.
+ *
+ * @example
+ * stringifyMetadataValues({ count: 5, name: "John" })
+ * // => { count: "5", name: "John" }
+ *
+ * stringifyMetadataValues({ data: { nested: true } })
+ * // => { data: "{\"nested\":true}" }
+ */
+export const stringifyMetadataValues = (
+  metadata: Record<string, any>,
+): Record<string, string> => {
+  return Object.fromEntries(
+    Object.entries(metadata).map(([key, value]) => [
+      key,
+      typeof value === 'string' ? value : JSON.stringify(value),
+    ]),
+  );
+};

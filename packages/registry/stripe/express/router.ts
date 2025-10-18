@@ -52,7 +52,9 @@ paykitRouter.post('/webhooks', async (req: Request, res: Response) => {
 
   // Express stores raw body in req.body when using express.raw()
   const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
-  const headers = req.headers as Record<string, string | string[]>;
+  const headers = Object.fromEntries(
+    Object.entries(req.headers).map(([key, value]) => [key, String(value)]),
+  );
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
   await webhook.handle({ body, headers, fullUrl });

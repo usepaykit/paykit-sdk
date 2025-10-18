@@ -10,7 +10,6 @@ import {
   paykitEvent$InboundSchema,
   WebhookEventPayload,
   PaykitProviderOptions,
-  headersExtractor,
   Invoice,
   HandleWebhookParams,
   invoiceStatusSchema,
@@ -40,7 +39,11 @@ import {
   WebhookError,
   updateCheckoutSchema,
   ResourceNotFoundError,
-  validateRequiredKeys,
+  stringifyMetadataValues,
+  tryCatchAsync,
+  PAYKIT_METADATA_KEY,
+  createCheckoutSchema,
+  omitInternalMetadata,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -88,20 +91,30 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
    * Checkout management
    */
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    const metadata = Object.fromEntries(
-      Object.entries(params.metadata ?? {}).map(([key, value]) => [
-        key,
-        JSON.stringify(value),
-      ]),
-    );
+    const { error, data } = createCheckoutSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
+    }
+
+    const checkoutMetadata = stringifyMetadataValues(data.metadata ?? {});
 
     const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
-      ...params.provider_metadata,
-      mode: params.session_type === 'one_time' ? 'payment' : 'subscription',
-      line_items: [{ price: params.item_id, quantity: params.quantity }],
-      ...(params.session_type == 'one_time' && { metadata }),
-      ...(params.session_type == 'recurring' && { subscription_data: { metadata } }),
+      ...data.provider_metadata,
+      mode: data.session_type === 'one_time' ? 'payment' : 'subscription',
+      line_items: [{ price: data.item_id, quantity: data.quantity }],
+      success_url: data.success_url,
+      cancel_url: data.cancel_url,
     };
+
+    if (params.session_type == 'recurring') {
+      checkoutOptions.subscription_data = { metadata: checkoutMetadata };
+    } else if (params.session_type == 'one_time') {
+      checkoutOptions.metadata = checkoutMetadata;
+      checkoutOptions.payment_intent_data = {
+        setup_future_usage: 'off_session',
+      };
+    }
 
     if (typeof params.customer === 'string') {
       checkoutOptions.customer = params.customer;
@@ -179,12 +192,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const updatedCheckout = await this.stripe.checkout.sessions.update(id, {
       ...data,
-      metadata: Object.fromEntries(
-        Object.entries(data.metadata ?? {}).map(([key, value]) => [
-          key,
-          JSON.stringify(value),
-        ]),
-      ),
+      metadata: stringifyMetadataValues(data.metadata ?? {}),
     });
 
     return paykitCheckout$InboundSchema(
@@ -225,17 +233,10 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   ): Promise<Customer> => {
     const { provider_metadata, ...rest } = params;
 
-    const metadata = Object.fromEntries(
-      Object.entries(rest.metadata ?? {}).map(([key, value]) => [
-        key,
-        JSON.stringify(value),
-      ]),
-    );
-
     const customer = await this.stripe.customers.update(id, {
       ...provider_metadata,
       ...rest,
-      metadata,
+      metadata: stringifyMetadataValues(rest.metadata ?? {}),
     });
 
     return paykitCustomer$InboundSchema(customer);
@@ -289,12 +290,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       ...(defaultPaymentMethod && { default_payment_method: defaultPaymentMethod }),
       customer: data.customer,
       items: [{ price: data.item_id }],
-      metadata: Object.fromEntries(
-        Object.entries(data.metadata ?? {}).map(([key, value]) => [
-          key,
-          JSON.stringify(value),
-        ]),
-      ),
+      metadata: stringifyMetadataValues(data.metadata ?? {}),
       payment_behavior: 'default_incomplete', // customer's default payment method will be used if available
     });
 
@@ -317,16 +313,8 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       throw ValidationError.fromZodError(error, this.providerName, 'updateSubscription');
     }
 
-    const subscription = await this.stripe.subscriptions.retrieve(id);
-
-    const metadata = Object.fromEntries(
-      Object.entries({ ...(subscription.metadata ?? {}), ...(data.metadata ?? {}) }).map(
-        ([key, value]) => [key, JSON.stringify(value)],
-      ),
-    );
-
     const updatedSubscription = await this.stripe.subscriptions.update(id, {
-      metadata,
+      metadata: stringifyMetadataValues(data.metadata ?? {}),
     });
 
     return paykitSubscription$InboundSchema(updatedSubscription);
@@ -372,7 +360,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
         method: 'createPayment',
       });
 
-    const { provider_metadata, customer, ...rest } = data;
+    const { provider_metadata, customer, capture_method, ...rest } = data;
 
     if (typeof customer === 'object') {
       throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
@@ -380,20 +368,49 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
         method: 'createPayment',
       });
     }
+    const paymentMetadata = stringifyMetadataValues({
+      ...rest.metadata,
+      ...(provider_metadata?.metadata ?? {}),
+      [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id ?? null }),
+    });
 
-    const metadata = Object.fromEntries(
-      Object.entries({
-        ...(rest.metadata ?? {}),
-        ...(provider_metadata?.metadata ?? {}),
-        product_id: params.product_id ?? null,
-      }).map(([key, value]) => [key, JSON.stringify(value)]),
+    const customerWithDefaultPaymentMethod = await this.stripe.customers.retrieve(
+      customer,
+      { expand: ['invoice_settings.default_payment_method'] },
     );
 
+    if ('deleted' in customerWithDefaultPaymentMethod) {
+      throw new ValidationError('Customer has been deleted', {
+        provider: this.providerName,
+        method: 'createPayment',
+      });
+    }
+
+    let defaultPaymentMethod = customerWithDefaultPaymentMethod.invoice_settings
+      ?.default_payment_method as string | undefined;
+
+    if (!defaultPaymentMethod) {
+      const paymentMethods = await this.stripe.paymentMethods.list({ customer });
+
+      if (paymentMethods.data.length === 0) {
+        throw new ValidationError(
+          `Customer ${customer} has no payment methods. Add a payment method for the customer before creating a payment intent`,
+          { provider: this.providerName, method: 'createPayment' },
+        );
+      }
+
+      defaultPaymentMethod = paymentMethods.data[0].id;
+    }
+
     const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
-      ...provider_metadata,
-      ...rest,
-      metadata,
+      currency: rest.currency,
+      amount: rest.amount,
+      metadata: paymentMetadata,
       customer,
+      capture_method: capture_method as Stripe.PaymentIntentCreateParams.CaptureMethod,
+      confirm: true, // automatically confirms the payment
+      payment_method: defaultPaymentMethod,
+      off_session: true, // uses customer's default payment method, avoids 3Ds/authentication
     };
 
     if (data.billing) {
@@ -425,20 +442,34 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const { provider_metadata, customer, ...rest } = data;
 
-    if (typeof customer === 'object') {
-      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
-        provider: this.providerName,
-        method: 'updatePayment',
-      });
+    const payment = await this.stripe.paymentIntents.retrieve(id);
+
+    const paymentOptions: Stripe.PaymentIntentUpdateParams = {
+      ...provider_metadata,
+      metadata: stringifyMetadataValues({
+        ...rest.metadata,
+        ...(provider_metadata?.metadata ?? {}),
+      }),
+    };
+
+    if (
+      ['requires_payment_method', 'requires_confirmation', 'requires_action'].includes(
+        payment.status,
+      )
+    ) {
+      paymentOptions.amount = rest.amount;
+      paymentOptions.currency = rest.currency;
     }
 
-    const payment = await this.stripe.paymentIntents.update(id, {
-      ...rest,
-      ...provider_metadata,
-      customer,
-    });
+    if (typeof customer === 'string') {
+      paymentOptions.customer = customer;
+    } else if (typeof customer == 'object' && 'email' in customer) {
+      paymentOptions.receipt_email = customer.email;
+    }
 
-    return paykitPayment$InboundSchema(payment);
+    const updatedPayment = await this.stripe.paymentIntents.update(id, paymentOptions);
+
+    return paykitPayment$InboundSchema(updatedPayment);
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
@@ -448,7 +479,15 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       throw ValidationError.fromZodError(error, this.providerName, 'retrievePayment');
     }
 
-    const payment = await this.stripe.paymentIntents.retrieve(data.id);
+    const [payment, paymentError] = await tryCatchAsync(
+      this.stripe.paymentIntents.retrieve(data.id),
+    );
+
+    if (
+      !payment ||
+      (paymentError as unknown as Stripe.errors.StripeError)?.code === 'resource_missing'
+    )
+      return null;
 
     return paykitPayment$InboundSchema(payment);
   };
@@ -468,11 +507,9 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
     const { error, data } = capturePaymentSchema.safeParse(params);
 
-    if (error)
-      throw new ValidationError(error.message, {
-        provider: this.providerName,
-        method: 'capturePayment',
-      });
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'capturePayment');
+    }
 
     const payment = await this.stripe.paymentIntents.capture(id, {
       amount_to_capture: data.amount,
@@ -482,9 +519,9 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    const payment = await this.stripe.paymentIntents.cancel(id);
+    const canceledPayment = await this.stripe.paymentIntents.cancel(id);
 
-    return paykitPayment$InboundSchema(payment);
+    return paykitPayment$InboundSchema(canceledPayment);
   };
 
   /**
@@ -503,12 +540,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       ...provider_metadata,
       reason: paykitRefundReason$OutboundSchema(rest.reason),
       amount: rest.amount,
-      metadata: Object.fromEntries(
-        Object.entries(rest.metadata ?? {}).map(([key, value]) => [
-          key,
-          JSON.stringify(value),
-        ]),
-      ),
+      metadata: stringifyMetadataValues(rest.metadata ?? {}),
     };
 
     if (data.payment_id.startsWith('pi_')) {
@@ -530,10 +562,19 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
   ): Promise<Array<WebhookEventPayload>> => {
     const { body, headers, webhookSecret } = params;
 
-    const stripeHeaders = headersExtractor(headers, ['x-stripe-signature']);
-    const signature = stripeHeaders[0].value;
+    const stripeSignature = headers.get('stripe-signature') as string;
 
-    const event = this.stripe.webhooks.constructEvent(body, signature, webhookSecret);
+    if (!stripeSignature) {
+      throw new WebhookError('Missing Stripe signature', {
+        provider: this.providerName,
+      });
+    }
+
+    const event = this.stripe.webhooks.constructEvent(
+      body,
+      stripeSignature,
+      webhookSecret,
+    );
 
     type StripeEventLiteral = typeof event.type;
 
@@ -580,12 +621,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
           paid_at: new Date(event.created * 1000).toISOString(),
           amount_paid: data.amount_total ?? 0,
           currency: data.currency ?? '',
-          metadata: Object.fromEntries(
-            Object.entries(data.metadata ?? {}).map(([key, value]) => [
-              key,
-              JSON.stringify(value),
-            ]),
-          ),
+          metadata: omitInternalMetadata(data.metadata ?? {}),
           customer:
             typeof data.customer === 'string' ? data.customer : (data.customer?.id ?? ''),
           billing_mode: billingModeSchema.parse('one_time'),

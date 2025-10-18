@@ -116,11 +116,12 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     }
 
     const intent: Record<string, unknown> = {
-      status: 'pending',
       amount: Number(amount),
       currency: currency_code,
-      metadata: { ...(data?.metadata ?? {}), session_id: data?.session_id ?? '' },
-      provider_metadata: data?.provider_metadata ?? undefined,
+      metadata: { ...(data?.metadata ?? {}), session_id: data?.session_id ?? null },
+      provider_metadata: data?.provider_metadata as Record<string, unknown> | undefined,
+      capture_method: 'manual',
+      item_id: data?.item_id as string | null,
     };
 
     let customer: Payee | undefined;
@@ -489,9 +490,13 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
         };
       });
 
+    const stringifiedHeaders = Object.fromEntries(
+      Object.entries(headers).map(([key, value]) => [key, String(value)]),
+    );
+
     const webhookEvents = await webhook.handle({
       body: rawData as string,
-      headers: headers as Record<string, string | string[]>,
+      headers: new Headers(stringifiedHeaders),
       fullUrl,
     });
 

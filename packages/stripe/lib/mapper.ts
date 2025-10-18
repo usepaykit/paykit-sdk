@@ -6,6 +6,7 @@ import {
   InvoiceStatus,
   omitInternalMetadata,
   OverrideProps,
+  PAYKIT_METADATA_KEY,
   PaymentStatus,
   Refund,
   RefundReason,
@@ -62,13 +63,16 @@ export const paykitCustomer$InboundSchema = (customer: Stripe.Customer): Custome
 export const paykitSubscription$InboundSchema = (
   subscription: Stripe.Subscription,
 ): Subscription => {
-  const status = (() => {
+  const status = ((): Subscription['status'] => {
     if (['active', 'trialing'].includes(subscription.status)) return 'active';
-    if (['incomplete_expired', 'incomplete', 'past_due'].includes(subscription.status))
+    if (['incomplete_expired', 'incomplete', 'past_due'].includes(subscription.status)) {
       return 'past_due';
+    }
     if (['canceled'].includes(subscription.status)) return 'canceled';
     if (['expired'].includes(subscription.status)) return 'expired';
-    throw new Error(`Unknown status: ${subscription.status}`);
+
+    console.log(`Unknown subscription status: ${subscription.status}`);
+    return 'pending';
   })();
 
   const metadata = omitInternalMetadata(subscription.metadata ?? {});
@@ -161,6 +165,8 @@ const stripeToPaykitStatus = (status: Stripe.PaymentIntent.Status): PaymentStatu
 };
 
 export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payment => {
+  const itemId = JSON.parse(intent.metadata?.[PAYKIT_METADATA_KEY] ?? '{}').itemId;
+
   return {
     id: intent.id,
     amount: intent.amount,
@@ -168,7 +174,7 @@ export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payme
     customer: (intent.customer as string) ?? '',
     status: stripeToPaykitStatus(intent.status),
     metadata: omitInternalMetadata(intent.metadata ?? {}),
-    product_id: intent.metadata?.product_id as string | null,
+    item_id: itemId,
   };
 };
 

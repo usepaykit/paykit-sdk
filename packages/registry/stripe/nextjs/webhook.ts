@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     });
 
   const body = await request.text();
-  const headers = Object.fromEntries(request.headers.entries());
+  const headers = request.headers;
   const url = request.url;
   await webhook.handle({ body, headers, fullUrl: url });
 

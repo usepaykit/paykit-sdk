@@ -140,7 +140,7 @@ export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
       : { email: checkout.customerEmail ?? '' },
     status: statusMap[checkout.status],
     metadata: (checkout.metadata as PaykitMetadata) ?? {},
-    product_id: checkout.products.length > 0 ? checkout.products[0].id : null,
+    item_id: checkout.products.length > 0 ? checkout.products[0].id : null,
   };
 };
 

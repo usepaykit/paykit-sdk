@@ -30,7 +30,7 @@ export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment
     currency: data.currency,
     customer: data.payer ?? { email: data.payer?.email ?? '' },
     status: data.state as Payment['status'],
-    product_id: itemId,
+    item_id: itemId,
     metadata,
   };
 };

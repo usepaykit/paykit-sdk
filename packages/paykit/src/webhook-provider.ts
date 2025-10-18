@@ -52,7 +52,7 @@ export type WebhookHandlerConfig = {
   /**
    * The headers of the webhook.
    */
-  headers: Record<string, string | string[]>;
+  headers: Headers;
 
   /**
    * The full URL of the webhook.

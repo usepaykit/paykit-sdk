@@ -415,11 +415,11 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     const { body, headers, webhookSecret: webhookId } = params;
 
     const { result } = await this.webhookController.verifyWebhook({
-      authAlgo: headers['paypal-auth-algo'] as string,
-      certUrl: headers['paypal-cert-url'] as string,
-      transmissionId: headers['paypal-transmission-id'] as string,
-      transmissionSig: headers['paypal-transmission-sig'] as string,
-      transmissionTime: headers['paypal-transmission-time'] as string,
+      authAlgo: headers.get('paypal-auth-algo') as string,
+      certUrl: headers.get('paypal-cert-url') as string,
+      transmissionId: headers.get('paypal-transmission-id') as string,
+      transmissionSig: headers.get('paypal-transmission-sig') as string,
+      transmissionTime: headers.get('paypal-transmission-time') as string,
       webhookId,
       webhookEvent: JSON.parse(body),
     });

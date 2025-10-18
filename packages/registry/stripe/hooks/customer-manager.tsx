@@ -18,7 +18,7 @@ export const CustomerManager = () => {
       email: 'customer@example.com',
       phone: '+1234567890',
       name: 'John Doe',
-      metadata: { isPowerUser: 'true' },
+      metadata: { source: 'web_app' },
     });
 
     if (error) {
@@ -39,7 +39,7 @@ export const CustomerManager = () => {
       amount: 2999,
       currency: 'USD',
       billing_interval: 'month',
-      metadata: { isPowerUser: 'true' },
+      metadata: { plan: 'pro' },
     });
 
     if (error) {

@@ -112,7 +112,30 @@ interface CreateCheckoutBaseSchema extends Pick<Checkout, 'customer' | 'metadata
    * The shipping information of the checkout.
    */
   billing?: BillingInfo;
+
+  /**
+   * The success URL of the checkout.
+   */
+  success_url: string;
+
+  /**
+   * The cancel URL of the checkout.
+   */
+  cancel_url: string;
 }
+
+export const createCheckoutBaseSchema = schema<CreateCheckoutBaseSchema>()(
+  z.object({
+    customer: payeeSchema,
+    metadata: metadataSchema.nullable(),
+    item_id: z.string(),
+    quantity: z.number(),
+    provider_metadata: z.record(z.string(), z.unknown()).optional(),
+    billing: billingSchema.optional(),
+    success_url: z.string(),
+    cancel_url: z.string(),
+  }),
+);
 
 export interface CreateOneTimeCheckoutSchema extends CreateCheckoutBaseSchema {
   /**
@@ -152,6 +175,8 @@ export const createCheckoutSchema = schema<CreateCheckoutSchema>()(
     subscription: checkoutSubscriptionSchema.optional(),
     provider_metadata: z.record(z.string(), z.unknown()).optional(),
     billing: billingSchema.optional(),
+    success_url: z.string(),
+    cancel_url: z.string(),
   }),
 );
 

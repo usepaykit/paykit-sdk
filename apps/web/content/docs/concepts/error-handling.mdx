@@ -66,7 +66,7 @@ const [checkout, error] = await paykit.checkouts.create({
   customer_id: 'cus_123',
   item_id: 'price_123',
   session_type: 'one_time',
-  metadata: { lifeTimeAccess: 'true' },
+  metadata: { source: 'web_app' },
 });
 
 if (error) {
@@ -137,7 +137,7 @@ export function CheckoutForm() {
       customer_id: 'cus_123',
       item_id: 'price_123',
       session_type: 'one_time',
-      metadata: { lifeTimeAccess: 'true' },
+      metadata: { source: 'web_app' },
     });
 
     if (error) {

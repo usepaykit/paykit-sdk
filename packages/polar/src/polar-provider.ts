@@ -9,7 +9,6 @@ import {
   Subscription,
   UpdateSubscriptionSchema,
   HandleWebhookParams,
-  headersExtractor,
   PayKitProvider,
   PaykitProviderOptions,
   Invoice,
@@ -42,6 +41,7 @@ import {
   OverrideProps,
   AbstractPayKitProvider,
   PAYKIT_METADATA_KEY,
+  stringifyMetadataValues,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
@@ -119,13 +119,10 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const { metadata, item_id, provider_metadata } = data;
 
+    const checkoutMetadata = stringifyMetadataValues(metadata ?? {});
+
     const checkoutCreateOptions: CheckoutCreate = {
-      metadata: Object.fromEntries(
-        Object.entries(metadata ?? {}).map(([key, value]) => [
-          key,
-          JSON.stringify(value),
-        ]),
-      ),
+      metadata: checkoutMetadata,
       products: [item_id],
       ...provider_metadata,
     };
@@ -141,7 +138,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       };
 
       checkoutCreateOptions.metadata = {
-        ...metadata,
+        ...checkoutMetadata,
         _shipping_phone: data.billing.address.phone ?? '',
         _shipping_carrier: data.billing.carrier ?? '',
       };
@@ -168,11 +165,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       id,
       checkoutUpdate: {
         ...restData,
-        ...(metadata && {
-          metadata: Object.fromEntries(
-            Object.entries(metadata).map(([key, value]) => [key, JSON.stringify(value)]),
-          ),
-        }),
+        ...(metadata && { metadata: stringifyMetadataValues(metadata ?? {}) }),
         ...(item_id && { products: [item_id] }),
         ...provider_metadata,
       },
@@ -343,24 +336,23 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { error, data } = createPaymentSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'createPayment');
+      throw ValidationError.fromZodError(error, this.providerName, 'createPayment');
     }
 
-    const metadataCore = Object.fromEntries(
-      Object.entries(data.metadata ?? {}).map(([key, value]) => [
-        key,
-        JSON.stringify(value),
-      ]),
-    );
+    const paymentMetadata = stringifyMetadataValues(data.metadata ?? {});
 
     const checkoutCreateOptions: CheckoutCreate = {
-      amount: data.amount,
-      ...(typeof data.customer === 'string' && { customerId: data.customer }),
-      ...(typeof data.customer === 'object' && { customerEmail: data.customer.email }),
-      metadata: metadataCore,
-      products: data.product_id ? [data.product_id] : [],
       ...(data.provider_metadata && { ...data.provider_metadata }),
+      amount: data.amount,
+      metadata: paymentMetadata,
+      products: data.item_id ? [data.item_id] : [],
     };
+
+    if (typeof data.customer === 'string') {
+      checkoutCreateOptions.customerId = data.customer;
+    } else if (typeof data.customer === 'object') {
+      checkoutCreateOptions.customerEmail = data.customer.email;
+    }
 
     if (data.billing) {
       checkoutCreateOptions.customerBillingAddress = {
@@ -373,9 +365,11 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       };
 
       checkoutCreateOptions.metadata = {
-        ...metadataCore,
-        _shipping_phone: data.billing.address.phone ?? '',
-        _shipping_carrier: data.billing.carrier ?? '',
+        ...paymentMetadata,
+        [PAYKIT_METADATA_KEY]: JSON.stringify({
+          _shipping_phone: data.billing.address.phone ?? '',
+          _shipping_carrier: data.billing.carrier ?? '',
+        }),
       };
     }
 
@@ -388,24 +382,19 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const { error, data } = updatePaymentSchema.safeParse(params);
 
     if (error) {
-      throw ValidationError.fromZodError(error, 'polar', 'updatePayment');
+      throw ValidationError.fromZodError(error, this.providerName, 'updatePayment');
     }
 
     const { provider_metadata, ...rest } = data;
 
-    const metadata = Object.fromEntries(
-      Object.entries(rest.metadata ?? {}).map(([key, value]) => [
-        key,
-        JSON.stringify(value),
-      ]),
-    );
+    const paymentMetadata = stringifyMetadataValues(rest.metadata ?? {});
 
     const checkoutResponse = await this.polar.checkouts.update({
       id,
       checkoutUpdate: {
         ...rest,
-        ...(rest.metadata && { metadata }),
-        ...(rest.product_id && { products: [rest.product_id] }),
+        ...(rest.metadata && { metadata: paymentMetadata }),
+        ...(rest.item_id && { products: [rest.item_id] }),
         ...provider_metadata,
       },
     });
@@ -478,24 +467,12 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
   ): Promise<Array<WebhookEventPayload>> => {
     const { body, headers, webhookSecret } = params;
 
-    const requiredHeaders = [
-      'webhook-id',
-      'webhook-timestamp',
-      'webhook-signature',
-    ] as const;
+    const webhookId = headers.get('webhook-id') as string;
+    const webhookTimestamp = headers.get('webhook-timestamp') as string;
 
-    const webhookHeaders = headersExtractor(headers, requiredHeaders).reduce(
-      (acc, kv) => {
-        (acc as any)[kv.key] = Array.isArray(kv.value) ? kv.value.join(',') : kv.value;
-        return acc;
-      },
-      {} as Record<(typeof requiredHeaders)[number], string>,
-    );
+    const plainHeaders = Object.fromEntries(headers.entries());
 
-    const { data, type } = validateEvent(body, webhookHeaders, webhookSecret);
-
-    const id = webhookHeaders['webhook-id'];
-    const timestamp = webhookHeaders['webhook-timestamp'];
+    const { data, type } = validateEvent(body, plainHeaders, webhookSecret);
 
     type PolarEventLiteral = Exclude<typeof type, undefined>;
 
@@ -523,27 +500,22 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
               ? data.customerId
               : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: Object.fromEntries(
-              Object.entries(metadata ?? {}).map(([key, value]) => [
-                key,
-                JSON.stringify(value),
-              ]),
-            ),
-            product_id: data.product.id,
+            metadata: stringifyMetadataValues(metadata ?? {}),
+            item_id: data.product.id,
           };
 
           // Consumable purchase
           return [
             paykitEvent$InboundSchema<Payment>({
               type: 'payment.updated',
-              created: parseInt(timestamp),
-              id,
+              created: parseInt(webhookTimestamp),
+              id: webhookId,
               data: payment,
             }),
             paykitEvent$InboundSchema<Invoice>({
               type: 'invoice.generated',
-              created: parseInt(timestamp),
-              id,
+              created: parseInt(webhookTimestamp),
+              id: webhookId,
               data: invoice,
             }),
           ];
@@ -573,26 +545,21 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
               ? data.customerId
               : { email: data.customer.email ?? '' },
             status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: Object.fromEntries(
-              Object.entries(metadata ?? {}).map(([key, value]) => [
-                key,
-                JSON.stringify(value),
-              ]),
-            ),
-            product_id: data.product.id,
+            metadata: stringifyMetadataValues(metadata ?? {}),
+            item_id: data.product.id,
           };
 
           return [
             paykitEvent$InboundSchema<Payment>({
               type: 'payment.created',
-              created: parseInt(timestamp),
-              id,
+              created: parseInt(webhookTimestamp),
+              id: webhookId,
               data: payment,
             }),
             paykitEvent$InboundSchema<Invoice>({
               type: 'invoice.generated',
-              created: parseInt(timestamp),
-              id,
+              created: parseInt(webhookTimestamp),
+              id: webhookId,
               data: invoice,
             }),
           ];
@@ -610,8 +577,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Customer>({
             type: 'customer.created',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: customer,
           }),
         ];
@@ -623,8 +590,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Customer>({
             type: 'customer.updated',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: customer,
           }),
         ];
@@ -636,8 +603,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Customer | null>({
             type: 'customer.deleted',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: customer,
           }),
         ];
@@ -652,8 +619,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Subscription>({
             type: 'subscription.updated',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: subscription,
           }),
         ];
@@ -665,8 +632,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Subscription>({
             type: 'subscription.created',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: subscription,
           }),
         ];
@@ -678,8 +645,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Subscription>({
             type: 'subscription.canceled',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: subscription,
           }),
         ];
@@ -691,8 +658,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         return [
           paykitEvent$InboundSchema<Refund>({
             type: 'refund.created',
-            created: parseInt(timestamp),
-            id,
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
             data: refund,
           }),
         ];

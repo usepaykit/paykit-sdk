@@ -52,7 +52,7 @@ paykitRouter.post('/webhooks', async c => {
     });
 
   const body = await c.req.text();
-  const headers = c.req.header();
+  const headers = new Headers(c.req.raw.headers);
   const url = c.req.raw.url;
   await webhook.handle({ body, headers, fullUrl: url });
 

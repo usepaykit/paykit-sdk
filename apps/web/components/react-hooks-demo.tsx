@@ -9,14 +9,14 @@ export function PaymentForm() {
 
   const handlePayment = async () => {
     const [checkout, error] = await create.run({
-      customer_id: 'cus_123',
+      customer: 'cus_123',
       item_id: 'price_123',
+      quantity: 1,
       session_type: 'one_time',
-      metadata: { lifeTimeAccess: 'true' },
-      provider_metadata: {
-        success_url: 'https://example.com/success',
-        cancel_url: 'https://example.com/cancel'
-      }
+      metadata: { source: 'web_app' },
+      success_url: 'https://example.com/success',
+      cancel_url: 'https://example.com/cancel',
+      provider_metadata: {},
     });
 
     if (error) return;

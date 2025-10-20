@@ -11,9 +11,27 @@ import PaypalLogo from '@/public/providers/paypal.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
 import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
-import { BookOpen, Zap, Github } from 'lucide-react';
+import { BookOpen, Zap, Github, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+
+const TwitterIcon = ({ className }: { className?: string }) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    strokeWidth="2"
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+  >
+    <path d="M4 4l11.733 16h4.267l-11.733 -16z" />
+    <path d="M4 20l6.768 -6.768m2.46 -2.46l6.772 -6.772" />
+  </svg>
+);
 
 export const dynamic = 'force-dynamic';
 
@@ -43,6 +61,27 @@ const Index = () => {
               >
                 <Github className="mr-2 size-4" />
                 GitHub
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link
+                href="https://x.com/usepaykit"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <TwitterIcon className="mr-2 size-4" />
+                Twitter
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" size="sm">
+              <Link
+                href="#"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Coming soon"
+              >
+                <MessageCircle className="mr-2 size-4" />
+                Discord
               </Link>
             </Button>
             <ThemeToggle />
@@ -163,6 +202,27 @@ const Index = () => {
                     rel="noopener noreferrer"
                   >
                     <Github className="size-4" />
+                  </Link>
+                </Button>
+
+                <Button asChild variant="ghost" size="sm">
+                  <Link
+                    href="https://x.com/usepaykit"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <TwitterIcon className="size-4" />
+                  </Link>
+                </Button>
+
+                <Button asChild variant="ghost" size="sm">
+                  <Link
+                    href="#"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    title="Coming soon"
+                  >
+                    <MessageCircle className="size-4" />
                   </Link>
                 </Button>
               </div>

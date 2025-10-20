@@ -1,0 +1,10 @@
+# Allow all crawlers
+User-agent: *
+Allow: /
+
+# Allow OG image routes
+Allow: /api/og/*
+
+# Sitemap
+Sitemap: https://usepaykit.dev/sitemap.xml
+

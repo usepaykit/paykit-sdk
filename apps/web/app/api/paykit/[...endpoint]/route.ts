@@ -7,7 +7,6 @@ export async function POST(
   { params }: { params: Promise<{ endpoint: string[] }> },
 ) {
   const { endpoint: endpointArray } = await params;
-
   const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;
 
   const handler = endpoints[endpoint] as EndpointHandler<typeof endpoint>;

@@ -1,4 +1,4 @@
-import { PayKit } from '@paykit-sdk/core';
+import { PayKit, createEndpointHandlers } from '@paykit-sdk/core';
 import { createPolar } from '@paykit-sdk/polar';
 
 if (!process.env.POLAR_ACCESS_TOKEN) {
@@ -11,5 +11,6 @@ const provider = createPolar({
 });
 
 const paykit = new PayKit(provider);
+export const endpoints = createEndpointHandlers(paykit);
 
 export { paykit, provider };

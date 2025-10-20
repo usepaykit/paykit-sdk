@@ -27,9 +27,11 @@ export const POST = async (request: NextRequest) => {
         if (error) throw error;
       });
 
-    const headers = Object.fromEntries(request.headers.entries());
+    const headers = request.headers;
     const body = await request.text();
-    await webhook.handle({ body, headers, fullUrl: request.url });
+    const url = request.url;
+
+    await webhook.handle({ body, headers, fullUrl: url });
 
     return NextResponse.json({ success: true });
   } catch (error) {

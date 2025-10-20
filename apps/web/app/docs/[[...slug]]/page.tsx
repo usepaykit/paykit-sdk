@@ -4,9 +4,11 @@ import { MobileToc } from '@/components/mobile-toc';
 import { DocsPager } from '@/components/pager';
 import { DashboardTableOfContents } from '@/components/toc';
 import { getTableOfContents } from '@/lib/toc';
+import { absoluteUrl } from '@/lib/utils';
 import { badgeVariants, cn } from '@paykit-sdk/ui';
 import { allDocs } from 'contentlayer/generated';
 import { ChevronRight, ExternalLink } from 'lucide-react';
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { notFound, redirect } from 'next/navigation';
 import Balancer from 'react-wrap-balancer';
@@ -29,33 +31,40 @@ async function getDocFromParams({ params }: DocPageProps) {
   return doc;
 }
 
-/**
- * todo:
- */
-// export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
-//   const doc = await getDocFromParams({ params });
+export async function generateMetadata({ params }: DocPageProps): Promise<Metadata> {
+  const doc = await getDocFromParams({ params });
 
-//   if (!doc) return {};
+  if (!doc) return {};
 
-//   return {
-//     title: doc.title,
-//     description: doc.description,
-//     openGraph: {
-//       title: doc.title,
-//       description: doc.description,
-//       type: 'article',
-//       url: absoluteUrl(doc.slug),
-//       images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
-//     },
-//     twitter: {
-//       card: 'summary_large_image',
-//       title: doc.title,
-//       description: doc.description,
-//       images: [`/og?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description)}`],
-//       creator: '@devodii',
-//     },
-//   };
-// }
+  const ogImage = `/api/og/docs?title=${encodeURIComponent(doc.title)}&description=${encodeURIComponent(doc.description || '')}`;
+
+  return {
+    title: doc.title,
+    description: doc.description,
+    openGraph: {
+      title: doc.title,
+      description: doc.description,
+      type: 'article',
+      url: absoluteUrl(doc.slug),
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: doc.title,
+        },
+      ],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: doc.title,
+      description: doc.description,
+      images: [ogImage],
+      creator: '@usepaykit',
+      site: '@usepaykit',
+    },
+  };
+}
 
 export async function generateStaticParams() {
   return allDocs.map(doc => ({ slug: doc.slugAsParams.split('/') }));

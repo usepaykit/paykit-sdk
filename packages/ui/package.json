@@ -18,8 +18,7 @@
   "scripts": {
     "build": "npm run clean && tsc && mv dist/index.js dist/index.mjs && npm run build:css",
     "clean": "rm -rf dist",
-    "build:css": "tailwindcss -i ./src/global.css -o ./dist/output.css --minify",
-    "prepublishOnly": "npm run clean && npm run build && npm run build:css"
+    "build:css": "tailwindcss -i ./src/global.css -o ./dist/output.css --minify"
   },
   "peerDependencies": {
     "react": "^19.1.0",

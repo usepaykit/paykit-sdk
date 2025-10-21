@@ -8,7 +8,8 @@
     "web:dev": "pnpm --filter web dev",
     "build:packages": "pnpm --filter='./packages/*' build",
     "changeset": "changeset",
-    "version:packages": "changeset version && pnpm install --no-frozen-lockfile"
+    "changeset:publish": "pnpm changeset publish",
+    "changeset:version": "changeset version && pnpm install --no-frozen-lockfile"
   },
   "workspaces": [
     "apps/*",

@@ -9,8 +9,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup",
-    "prepublishOnly": "rm -rf dist && npm run build"
+    "build": "tsup"
   },
   "keywords": [
     "paykit",

@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/comgate",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Comgate provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -18,7 +18,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.95"
+    "@paykit-sdk/core": ">=1.1.96"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

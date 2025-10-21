@@ -1,5 +1,13 @@
 # @paykit-sdk/stripe
 
+## 1.1.96
+
+### Patch Changes
+
+- a470047: chore: fifth attempt of testing automated publishing
+- Updated dependencies [a470047]
+  - @paykit-sdk/core@1.1.96
+
 ## 1.1.95
 
 ### Patch Changes

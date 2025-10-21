@@ -1,7 +1,6 @@
 {
   "name": "@paykit-sdk/registry",
   "version": "1.0.0",
-  "private": true,
   "description": "PayKit component registry for shadcn-compatible integrations",
   "type": "module",
   "exports": {

@@ -14,7 +14,7 @@ export const paykitPayment$InboundSchema = (
     metadata: omitInternalMetadata(
       JSON.parse(webhookResponse.refId) as Record<string, unknown>,
     ),
-    item_id: null,
+    product_id: null,
   };
 };
 

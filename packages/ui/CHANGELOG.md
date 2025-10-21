@@ -1,5 +1,11 @@
 # @paykit-sdk/ui
 
+## 0.1.11
+
+### Patch Changes
+
+- a470047: chore: fifth attempt of testing automated publishing
+
 ## 0.1.10
 
 ### Patch Changes

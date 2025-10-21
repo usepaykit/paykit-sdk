@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/paypal",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "PayPal provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.esm.js",
@@ -29,7 +29,7 @@
     "@paypal/paypal-server-sdk": "^1.1.0"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.95"
+    "@paykit-sdk/core": ">=1.1.96"
   },
   "publishConfig": {
     "access": "public"

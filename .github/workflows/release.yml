@@ -1,10 +1,10 @@
-name: Release
+name: Release Web App
 
 on:
   push:
     branches:
       - main
-      
+
 jobs:
   release:
     runs-on: ubuntu-latest

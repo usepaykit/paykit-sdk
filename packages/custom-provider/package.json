@@ -1,6 +1,6 @@
 {
   "name": "custom-provider",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "",
   "main": "index.js",
   "scripts": {},
@@ -8,7 +8,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.92"
+    "@paykit-sdk/core": ">=1.1.93"
   },
   "devDependencies": {
     "@types/node": "^24.2.0",

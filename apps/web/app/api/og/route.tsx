@@ -3,15 +3,6 @@ import { ImageResponse } from 'next/og';
 export const runtime = 'edge';
 
 export async function GET() {
-  // Load PT Sans fonts
-  const fontRegular = fetch(
-    new URL('../../../public/fonts/PTSans-Regular.ttf', import.meta.url),
-  ).then(res => res.arrayBuffer());
-
-  const fontBold = fetch(
-    new URL('../../../public/fonts/PTSans-Bold.ttf', import.meta.url),
-  ).then(res => res.arrayBuffer());
-
   return new ImageResponse(
     (
       <div
@@ -60,7 +51,6 @@ export async function GET() {
               style={{
                 fontSize: '28px',
                 fontWeight: 700,
-                fontFamily: 'PT Sans',
                 color: 'white',
                 marginLeft: '12px',
               }}
@@ -79,7 +69,6 @@ export async function GET() {
             <span
               style={{
                 fontSize: '16px',
-                fontFamily: 'PT Sans',
                 fontWeight: 700,
                 color: '#000',
               }}
@@ -112,7 +101,6 @@ export async function GET() {
               style={{
                 fontSize: '48px',
                 fontWeight: 700,
-                fontFamily: 'PT Sans',
                 color: '#71717a',
                 textDecoration: 'line-through',
                 textDecorationColor: '#ef4444',
@@ -128,7 +116,6 @@ export async function GET() {
             style={{
               fontSize: '80px',
               fontWeight: 700,
-              fontFamily: 'PT Sans',
               color: 'white',
               marginBottom: '32px',
               lineHeight: 1.1,
@@ -152,7 +139,6 @@ export async function GET() {
           <p
             style={{
               fontSize: '28px',
-              fontFamily: 'PT Sans',
               color: '#a1a1aa',
               maxWidth: '800px',
               lineHeight: 1.5,
@@ -184,33 +170,17 @@ export async function GET() {
               border: '1px solid rgba(255, 255, 255, 0.2)',
             }}
           >
-            <span style={{ fontSize: '18px', fontFamily: 'PT Sans', color: '#a1a1aa' }}>
+            <span style={{ fontSize: '18px', color: '#a1a1aa' }}>
               TypeScript • React • Node.js
             </span>
           </div>
-          <span style={{ fontSize: '18px', fontFamily: 'PT Sans', color: '#52525b' }}>
-            usepaykit.dev
-          </span>
+          <span style={{ fontSize: '18px', color: '#52525b' }}>usepaykit.dev</span>
         </div>
       </div>
     ),
     {
       width: 1200,
       height: 630,
-      fonts: [
-        {
-          name: 'PT Sans',
-          data: await fontRegular,
-          weight: 400,
-          style: 'normal',
-        },
-        {
-          name: 'PT Sans',
-          data: await fontBold,
-          weight: 700,
-          style: 'normal',
-        },
-      ],
     },
   );
 }

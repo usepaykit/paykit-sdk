@@ -1,5 +1,11 @@
 # @paykit-sdk/ui
 
+## 0.1.10
+
+### Patch Changes
+
+- 13c1a4d: chore: fourth attempt of testing automated publishing
+
 ## 0.1.9
 
 ### Patch Changes

@@ -9,7 +9,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.94"
+    "@paykit-sdk/core": ">=1.1.95"
   },
   "devDependencies": {
     "@types/node": "^24.2.0",

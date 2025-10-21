@@ -1,5 +1,13 @@
 # @paykit-sdk/gopay
 
+## 1.0.3
+
+### Patch Changes
+
+- 13c1a4d: chore: fourth attempt of testing automated publishing
+- Updated dependencies [13c1a4d]
+  - @paykit-sdk/core@1.1.95
+
 ## 1.0.2
 
 ### Patch Changes

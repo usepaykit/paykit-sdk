@@ -1,5 +1,13 @@
 # @paykit-sdk/gopay
 
+## 1.0.5
+
+### Patch Changes
+
+- c9d4656: chore: sixth attempt of testing automated publishing
+- Updated dependencies [c9d4656]
+  - @paykit-sdk/core@1.1.97
+
 ## 1.0.4
 
 ### Patch Changes

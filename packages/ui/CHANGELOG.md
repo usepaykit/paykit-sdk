@@ -1,5 +1,11 @@
 # @paykit-sdk/ui
 
+## 0.1.12
+
+### Patch Changes
+
+- c9d4656: chore: sixth attempt of testing automated publishing
+
 ## 0.1.11
 
 ### Patch Changes

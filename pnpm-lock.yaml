@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@changesets/cli':
+        specifier: ^2.29.7
+        version: 2.29.7(@types/node@20.19.9)
       '@types/node':
         specifier: ^20
         version: 20.19.9
@@ -15,9 +18,6 @@ importers:
         specifier: ^3.5.3
         version: 3.6.2
     devDependencies:
-      '@changesets/cli':
-        specifier: ^2.29.5
-        version: 2.29.5
       '@trivago/prettier-plugin-sort-imports':
         specifier: ^4.3.0
         version: 4.3.0(prettier@3.6.2)
@@ -57,12 +57,9 @@ importers:
       '@paykit-sdk/react':
         specifier: 1.1.91
         version: 1.1.91(@paykit-sdk/core@1.1.92(@types/node@20.19.9))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
-      '@paykit-sdk/registry':
-        specifier: workspace:*
-        version: link:../../packages/registry
       '@paykit-sdk/stripe':
-        specifier: 1.1.9
-        version: 1.1.9(@paykit-sdk/core@1.1.92(@types/node@20.19.9))(@types/node@20.19.9)
+        specifier: 1.1.92
+        version: 1.1.92(@paykit-sdk/core@1.1.92(@types/node@20.19.9))(@types/node@20.19.9)
       '@paykit-sdk/ui':
         specifier: ^0.1.7
         version: 0.1.7(@types/react-dom@19.2.2(@types/react@19.2.2))(@types/react@19.2.2)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)
@@ -148,6 +145,9 @@ importers:
       '@eslint/eslintrc':
         specifier: ^3
         version: 3.3.1
+      '@paykit-sdk/registry':
+        specifier: workspace:*
+        version: link:../../packages/registry
       '@tailwindcss/postcss':
         specifier: ^4
         version: 4.1.11
@@ -1225,8 +1225,8 @@ packages:
     resolution: {integrity: sha512-ruv7Ae4J5dUYULmeXw1gmb7rYRz57OWCPM57pHojnLq/3Z1CK2lNSLTCVjxVk1F/TZHwOZZrOWi0ur95BbLxNQ==}
     engines: {node: '>=6.9.0'}
 
-  '@changesets/apply-release-plan@7.0.12':
-    resolution: {integrity: sha512-EaET7As5CeuhTzvXTQCRZeBUcisoYPDDcXvgTE/2jmmypKp0RC7LxKj/yzqeh/1qFTZI7oDGFcL1PHRuQuketQ==}
+  '@changesets/apply-release-plan@7.0.13':
+    resolution: {integrity: sha512-BIW7bofD2yAWoE8H4V40FikC+1nNFEKBisMECccS16W1rt6qqhNTBDmIw5HaqmMgtLNz9e7oiALiEUuKrQ4oHg==}
 
   '@changesets/assemble-release-plan@6.0.9':
     resolution: {integrity: sha512-tPgeeqCHIwNo8sypKlS3gOPmsS3wP0zHt67JDuL20P4QcXiw/O4Hl7oXiuLnP9yg+rXLQ2sScdV1Kkzde61iSQ==}
@@ -1234,8 +1234,8 @@ packages:
   '@changesets/changelog-git@0.2.1':
     resolution: {integrity: sha512-x/xEleCFLH28c3bQeQIyeZf8lFXyDFVn1SgcBiR2Tw/r4IAWlk1fzxCEZ6NxQAjF2Nwtczoen3OA2qR+UawQ8Q==}
 
-  '@changesets/cli@2.29.5':
-    resolution: {integrity: sha512-0j0cPq3fgxt2dPdFsg4XvO+6L66RC0pZybT9F4dG5TBrLA3jA/1pNkdTXH9IBBVHkgsKrNKenI3n1mPyPlIydg==}
+  '@changesets/cli@2.29.7':
+    resolution: {integrity: sha512-R7RqWoaksyyKXbKXBTbT4REdy22yH81mcFK6sWtqSanxUCbUi9Uf+6aqxZtDQouIqPdem2W56CdxXgsxdq7FLQ==}
     hasBin: true
 
   '@changesets/config@3.1.1':
@@ -2555,10 +2555,10 @@ packages:
       react: '>=16.8.0'
       react-dom: '>=16.8.0'
 
-  '@paykit-sdk/stripe@1.1.9':
-    resolution: {integrity: sha512-N3yz5cXa3wj6XhF0fqZ1l9uMyiqWGJDasoAQlNUzGV0+4ue94Ezx2vHvqXgSbMVRqtt8Hcc+hDfVwjClRIs20Q==}
+  '@paykit-sdk/stripe@1.1.92':
+    resolution: {integrity: sha512-OufdJWPQbtqz9y4Kv+1IqKJqiM+9ng7kuD5uv+aY+6wpS4c6oKxD6cTAXHos8HhkxTOrNApNiRlUECBiAkZA2A==}
     peerDependencies:
-      '@paykit-sdk/core': '>=1.1.9'
+      '@paykit-sdk/core': '>=1.1.92'
 
   '@paykit-sdk/ui@0.1.7':
     resolution: {integrity: sha512-WQB1pVLJh0HAMCGGfGxUqnZvjjNsBFzhIQ2hq3mfyb5w+Vz/dYLvSjRajcx6os+X4YRsxAngcdpJryjRx1sCIw==}
@@ -5564,8 +5564,8 @@ packages:
     resolution: {integrity: sha512-vK9P5/iUfdl95AI+JVyUuIcVtd4ofvtrOr3HNtM2yxC9bnMbEdp3x01OhQNnjb8IJYi38VlTE3mBXwcfvywuSw==}
     engines: {node: '>= 14'}
 
-  human-id@4.1.1:
-    resolution: {integrity: sha512-3gKm/gCSUipeLsRYZbbdA1BD83lBoWUkZ7G9VFrhWPAU76KwYo5KR8V28bpoPm/ygy0x5/GCbpRQdY7VLYCoIg==}
+  human-id@4.1.2:
+    resolution: {integrity: sha512-v/J+4Z/1eIJovEBdlV5TYj1IR+ZiohcYGRY+qN/oC9dAfKzVT023N/Bgw37hrKCoVRBvk3bqyzpr2PP5YeTMSg==}
     hasBin: true
 
   human-signals@2.1.0:
@@ -7327,8 +7327,8 @@ packages:
     resolution: {integrity: sha512-YWWTjgABSKcvs/nWBi9PycY/JiPJqOD4JA6o9Sej2AtvSGarXxKC3OQSk4pAarbdQlKAh5D4FCQkJNkW+GAn3w==}
     engines: {node: '>=0.6'}
 
-  quansync@0.2.10:
-    resolution: {integrity: sha512-t41VRkMYbkHyCYmOvx/6URnN80H7k4X0lLdBMGsz+maAwrJQYB1djpV6vHrQIBE0WBSGqhtEHrK9U3DWWH8v7A==}
+  quansync@0.2.11:
+    resolution: {integrity: sha512-AifT7QEbW9Nri4tAwR5M/uzpBuqfZf+zwaEM/QkzEjj7NBuFD2rBuy0K3dE+8wltbezDV7JMA0WfnCPYRSYbXA==}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -9537,7 +9537,7 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@changesets/apply-release-plan@7.0.12':
+  '@changesets/apply-release-plan@7.0.13':
     dependencies:
       '@changesets/config': 3.1.1
       '@changesets/get-version-range-type': 0.4.0
@@ -9566,9 +9566,9 @@ snapshots:
     dependencies:
       '@changesets/types': 6.1.0
 
-  '@changesets/cli@2.29.5':
+  '@changesets/cli@2.29.7(@types/node@20.19.9)':
     dependencies:
-      '@changesets/apply-release-plan': 7.0.12
+      '@changesets/apply-release-plan': 7.0.13
       '@changesets/assemble-release-plan': 6.0.9
       '@changesets/changelog-git': 0.2.1
       '@changesets/config': 3.1.1
@@ -9582,11 +9582,11 @@ snapshots:
       '@changesets/should-skip-package': 0.1.2
       '@changesets/types': 6.1.0
       '@changesets/write': 0.4.0
+      '@inquirer/external-editor': 1.0.2(@types/node@20.19.9)
       '@manypkg/get-packages': 1.1.3
       ansi-colors: 4.1.3
       ci-info: 3.9.0
       enquirer: 2.4.1
-      external-editor: 3.1.0
       fs-extra: 7.0.1
       mri: 1.2.0
       p-limit: 2.3.0
@@ -9596,6 +9596,8 @@ snapshots:
       semver: 7.7.2
       spawndamnit: 3.0.1
       term-size: 2.2.1
+    transitivePeerDependencies:
+      - '@types/node'
 
   '@changesets/config@3.1.1':
     dependencies:
@@ -9676,7 +9678,7 @@ snapshots:
     dependencies:
       '@changesets/types': 6.1.0
       fs-extra: 7.0.1
-      human-id: 4.1.1
+      human-id: 4.1.2
       prettier: 2.8.8
 
   '@colors/colors@1.6.0': {}
@@ -10285,6 +10287,13 @@ snapshots:
       yoctocolors-cjs: 2.1.2
     optionalDependencies:
       '@types/node': 24.2.0
+
+  '@inquirer/external-editor@1.0.2(@types/node@20.19.9)':
+    dependencies:
+      chardet: 2.1.0
+      iconv-lite: 0.7.0
+    optionalDependencies:
+      '@types/node': 20.19.9
 
   '@inquirer/external-editor@1.0.2(@types/node@24.2.0)':
     dependencies:
@@ -11275,7 +11284,7 @@ snapshots:
       react: 19.2.0
       react-dom: 19.2.0(react@19.2.0)
 
-  '@paykit-sdk/stripe@1.1.9(@paykit-sdk/core@1.1.92(@types/node@20.19.9))(@types/node@20.19.9)':
+  '@paykit-sdk/stripe@1.1.92(@paykit-sdk/core@1.1.92(@types/node@20.19.9))(@types/node@20.19.9)':
     dependencies:
       '@paykit-sdk/core': 1.1.92(@types/node@20.19.9)
       stripe: 18.4.0(@types/node@20.19.9)
@@ -15106,7 +15115,7 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  human-id@4.1.1: {}
+  human-id@4.1.2: {}
 
   human-signals@2.1.0: {}
 
@@ -16882,7 +16891,7 @@ snapshots:
 
   package-manager-detector@0.2.11:
     dependencies:
-      quansync: 0.2.10
+      quansync: 0.2.11
 
   param-case@3.0.4:
     dependencies:
@@ -17190,7 +17199,7 @@ snapshots:
     dependencies:
       side-channel: 1.1.0
 
-  quansync@0.2.10: {}
+  quansync@0.2.11: {}
 
   queue-microtask@1.2.3: {}
 

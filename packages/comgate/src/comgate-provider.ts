@@ -285,9 +285,11 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       amount: data.amount,
       currency: data.currency,
       status: 'pending',
-      metadata: data.metadata ?? {},
+      metadata: Object.fromEntries(
+        Object.entries(data.metadata ?? {}).map(([key, value]) => [key, String(value)]),
+      ),
       customer: customer,
-      product_id: data.product_id ?? null,
+      item_id: data.item_id ?? null,
     };
 
     return paymentObject;
@@ -352,7 +354,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       status: 'succeeded',
       metadata: {},
       customer: '',
-      product_id: null,
+      item_id: null,
     };
 
     return paymentObject;
@@ -395,7 +397,9 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       amount: data.amount,
       currency: 'CZK',
       reason: data.reason,
-      metadata: data.metadata ?? {},
+      metadata: Object.fromEntries(
+        Object.entries(data.metadata ?? {}).map(([key, value]) => [key, String(value)]),
+      ),
     };
 
     return refundObject;
@@ -447,7 +451,7 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
   }: HandleWebhookParams): Promise<Array<WebhookEventPayload>> => {
     let body: Record<string, unknown>;
 
-    const contentType = headers['content-type'];
+    const contentType = headers.get('content-type');
 
     if (contentType === 'application/json') {
       // REST API (v2.0) - JSON format

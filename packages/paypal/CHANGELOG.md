@@ -1,5 +1,13 @@
 # @paykit-sdk/paypal
 
+## 1.0.2
+
+### Patch Changes
+
+- 084f946: chore: third attempt of testing automated publishing
+- Updated dependencies [084f946]
+  - @paykit-sdk/core@1.1.94
+
 ## 1.0.1
 
 ### Patch Changes

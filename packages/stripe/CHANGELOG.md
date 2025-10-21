@@ -1,5 +1,13 @@
 # @paykit-sdk/stripe
 
+## 1.1.94
+
+### Patch Changes
+
+- 84f41d9: second attempt to test automated publishing
+- Updated dependencies [84f41d9]
+  - @paykit-sdk/core@1.1.94
+
 ## 1.1.93
 
 ### Patch Changes

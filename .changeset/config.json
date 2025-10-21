@@ -9,6 +9,7 @@
   "updateInternalDependencies": "patch",
   "ignore": [
     "@paykit-sdk/registry",
-    "web"
+    "web",
+    "@paykit-sdk/custom-provider"
   ]
 }

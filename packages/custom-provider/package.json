@@ -1,8 +1,9 @@
 {
-  "name": "custom-provider",
+  "name": "@paykit-sdk/custom-provider",
   "version": "1.0.1",
-  "description": "",
+  "description": "Custom provider for PayKit",
   "main": "index.js",
+  "private": true,
   "scripts": {},
   "keywords": [],
   "author": "Emmanuel Odii",

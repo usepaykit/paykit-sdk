@@ -1,6 +1,5 @@
 ---
 '@paykit-sdk/comgate': patch
-'custom-provider': patch
 '@paykit-sdk/gopay': patch
 '@paykit-sdk/core': patch
 '@paykit-sdk/paypal': patch
@@ -10,4 +9,4 @@
 '@paykit-sdk/ui': patch
 ---
 
-second attempt to test automated publishing
+chore: third attempt of testing automated publishing

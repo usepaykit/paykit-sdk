@@ -29,6 +29,7 @@ export const usePayment = () => {
     EndpointArgs<'/payment/capture'>,
     EndpointReturn<'/payment/capture'>
   >('/payment/capture', ctx.apiUrl, ctx.headers);
+  
   const cancel = useAsyncFn<[string], Payment>(
     '/payment/cancel',
     ctx.apiUrl,

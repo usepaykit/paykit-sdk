@@ -13,9 +13,11 @@
     "forceConsistentCasingInFileNames": true,
     "jsx": "preserve",
     "incremental": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
       "@/*": ["./*"],
-      "@/lib/*": ["./stripe/shared/*"]
+      "@/lib/paykit": ["./providers/stripe", "./providers/polar"]
     },
     "types": ["node"]
   },

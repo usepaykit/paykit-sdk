@@ -12,17 +12,17 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "stripe/shared/paykit.ts",
+          "path": "providers/stripe.ts",
           "type": "registry:lib",
           "target": "lib/paykit.ts"
         },
         {
-          "path": "stripe/nextjs/catch-all.ts",
+          "path": "shared/routers/nextjs/catch-all.ts",
           "type": "registry:page",
           "target": "app/api/paykit/[...endpoint]/route.ts"
         },
         {
-          "path": "stripe/nextjs/webhook.ts",
+          "path": "shared/routers/nextjs/webhook.ts",
           "type": "registry:page",
           "target": "app/api/paykit/webhooks/route.ts"
         }
@@ -49,12 +49,12 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "stripe/shared/paykit.ts",
+          "path": "providers/stripe.ts",
           "type": "registry:lib",
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "stripe/hono/router.ts",
+          "path": "shared/routers/hono/router.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }
@@ -81,12 +81,12 @@
       "registryDependencies": [],
       "files": [
         {
-          "path": "stripe/shared/paykit.ts",
+          "path": "providers/stripe.ts",
           "type": "registry:lib",
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "stripe/express/router.ts",
+          "path": "shared/routers/express/router.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }
@@ -113,15 +113,15 @@
       "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
-          "path": "stripe/hooks/paykit-wrapper.tsx",
+          "path": "shared/hooks/paykit-wrapper.tsx",
           "type": "registry:component"
         },
         {
-          "path": "stripe/hooks/customer-manager.tsx",
+          "path": "shared/hooks/customer-manager.tsx",
           "type": "registry:component"
         },
         {
-          "path": "stripe/hooks/checkout-form.tsx",
+          "path": "shared/hooks/checkout-form.tsx",
           "type": "registry:component"
         }
       ],
@@ -143,7 +143,7 @@
       "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
       "files": [
         {
-          "path": "stripe/nextjs/prisma/schema.prisma",
+          "path": "shared/schema/prisma.prisma",
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma"
         }
@@ -168,7 +168,7 @@
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "stripe/shared/drizzle/schema.ts"
+          "path": "shared/schema/drizzle.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
@@ -177,6 +177,75 @@
         "provider": "stripe",
         "orm": "drizzle",
         "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-nextjs-typeorm",
+      "type": "registry:block",
+      "description": "Stripe integration for Next.js with TypeORM schemas for payments and subscriptions",
+      "dependencies": ["typeorm"],
+      "devDependencies": ["typeorm"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
+      "files": [
+        {
+          "path": "shared/schema/typeorm.ts",
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'npx typeorm migration:generate' to create the migrations.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "typeorm",
+        "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-nextjs-mongoose",
+      "type": "registry:block",
+      "description": "Stripe integration for Next.js with Mongoose schemas for payments and subscriptions",
+      "dependencies": ["mongoose"],
+      "devDependencies": ["mongoose"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
+      "files": [
+        {
+          "path": "shared/schema/mongoose.ts",
+          "type": "registry:file",
+          "target": "models/payments.ts"
+        }
+      ],
+      "docs": "Copy the content from models/payments.ts to your own models/payments.ts file.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "mongoose",
+        "database": "mongodb",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-nextjs-sequelize",
+      "type": "registry:block",
+      "description": "Stripe integration for Next.js with Sequelize schemas for payments and subscriptions",
+      "dependencies": ["sequelize"],
+      "devDependencies": ["sequelize"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-nextjs"],
+      "files": [
+        {
+          "path": "shared/schema/sequelize.ts",
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema folder.",
+      "meta": {
+        "backend": "nextjs",
+        "provider": "stripe",
+        "orm": "sequelize",
+        "database": "mysql",
         "auth": "none"
       }
     },
@@ -191,7 +260,7 @@
         {
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma",
-          "path": "stripe/shared/prisma/schema.prisma"
+          "path": "shared/schema/prisma.prisma"
         }
       ],
       "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
@@ -214,7 +283,7 @@
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "stripe/shared/drizzle/schema.ts"
+          "path": "shared/schema/drizzle.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
@@ -222,6 +291,75 @@
         "backend": "hono",
         "provider": "stripe",
         "orm": "drizzle",
+        "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono-sequelize",
+      "type": "registry:block",
+      "description": "Stripe integration for Hono with Sequelize schemas for payments and subscriptions",
+      "dependencies": ["sequelize"],
+      "devDependencies": ["sequelize"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-hono"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "shared/schema/sequelize.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'sequelize migration:generate' to create the migrations.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "sequelize",
+        "database": "sqlite",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono-mongoose",
+      "type": "registry:block",
+      "description": "Stripe integration for Hono with Mongoose schemas for payments and subscriptions",
+      "dependencies": ["mongoose"],
+      "devDependencies": ["mongoose"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-hono"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "models/payments.ts",
+          "path": "shared/schema/mongoose.ts"
+        }
+      ],
+      "docs": "Copy the content from models/payments.ts to your own models/payments.ts file.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "mongoose",
+        "database": "mongodb",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-hono-typeorm",
+      "type": "registry:block",
+      "description": "Stripe integration for Hono with TypeORM schemas for payments and subscriptions",
+      "dependencies": ["typeorm"],
+      "devDependencies": ["typeorm"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-hono"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "shared/schema/typeorm.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'npx typeorm migration:generate' to create the migrations.",
+      "meta": {
+        "backend": "hono",
+        "provider": "stripe",
+        "orm": "typeorm",
         "database": "postgres",
         "auth": "none"
       }
@@ -237,7 +375,7 @@
         {
           "type": "registry:file",
           "target": "prisma/schema-payments.prisma",
-          "path": "stripe/shared/prisma/schema.prisma"
+          "path": "shared/schema/prisma.prisma"
         }
       ],
       "docs": "Copy the content from prisma/schema-payments.prisma to your own schema.prisma file.\nRun 'prisma migrate dev' to create the tables.",
@@ -245,7 +383,7 @@
         "backend": "express",
         "provider": "stripe",
         "orm": "prisma",
-        "database": "sqlite",
+        "database": "postgres",
         "auth": "none"
       }
     },
@@ -255,12 +393,12 @@
       "description": "Stripe integration for Express with Drizzle ORM schemas for payments and subscriptions",
       "dependencies": ["drizzle-orm"],
       "devDependencies": ["drizzle-kit"],
-      "registryDependencies": ["stripe-express"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-express"],
       "files": [
         {
           "type": "registry:file",
           "target": "src/db/schema/payments.ts",
-          "path": "stripe/shared/drizzle/schema.ts"
+          "path": "shared/schema/drizzle.ts"
         }
       ],
       "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'drizzle-kit push' to sync with your database.",
@@ -269,6 +407,75 @@
         "provider": "stripe",
         "orm": "drizzle",
         "database": "postgres",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express-sequelize",
+      "type": "registry:block",
+      "description": "Stripe integration for Express with Sequelize schemas for payments and subscriptions",
+      "dependencies": ["sequelize"],
+      "devDependencies": ["sequelize"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-express"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "shared/schema/sequelize.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'sequelize migration:generate' to create the migrations.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "sequelize",
+        "database": "mysql",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express-mongoose",
+      "type": "registry:block",
+      "description": "Stripe integration for Express with Mongoose schemas for payments and subscriptions",
+      "dependencies": ["mongoose"],
+      "devDependencies": ["mongoose"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-express"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "models/payments.ts",
+          "path": "shared/schema/mongoose.ts"
+        }
+      ],
+      "docs": "Copy the content from models/payments.ts to your own models/payments.ts file.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "mongoose",
+        "database": "mongodb",
+        "auth": "none"
+      }
+    },
+    {
+      "name": "stripe-express-typeorm",
+      "type": "registry:block",
+      "description": "Stripe integration for Express with TypeORM schemas for payments and subscriptions",
+      "dependencies": ["typeorm"],
+      "devDependencies": ["typeorm"],
+      "registryDependencies": ["https://usepaykit.dev/r/stripe-express"],
+      "files": [
+        {
+          "type": "registry:file",
+          "target": "src/db/schema/payments.ts",
+          "path": "shared/schema/typeorm.ts"
+        }
+      ],
+      "docs": "Copy the content from src/db/schema/payments.ts to your own schema.ts file. \n Run 'npx typeorm migration:generate' to create the migrations.",
+      "meta": {
+        "backend": "express",
+        "provider": "stripe",
+        "orm": "typeorm",
+        "database": "mysql",
         "auth": "none"
       }
     }

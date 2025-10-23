@@ -18,7 +18,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.98"
+    "@paykit-sdk/core": ">=1.1.99"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

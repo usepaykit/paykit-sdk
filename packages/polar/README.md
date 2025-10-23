@@ -86,10 +86,11 @@ export async function POST(request: NextRequest) {
     });
 
   const body = await request.text();
-  const headers = Object.fromEntries(request.headers.entries());
-  await webhook.handle({ body, headers, fullUrl: request.url });
+  const headers = request.headers;
+  const fullUrl = request.url;
 
-  // Return immediately, processing happens in background
+  await webhook.handle({ body, headers, fullUrl });
+
   return NextResponse.json({ success: true });
 }
 ```
@@ -131,11 +132,12 @@ app.post(
           console.log('Refund created:', event.data);
         });
 
-      const body = req.body; // Raw buffer from express.raw()
-      const headers = req.headers;
-      await webhook.handle({ body, headers });
+      const body = typeof req.body === 'string' ? req.body : JSON.stringify(req.body);
+      const headers = new Headers(Object.entries(req.headers) as [string, string][]);
+      const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
-      // Return immediately, processing happens in background
+      await webhook.handle({ body, headers, fullUrl });
+
       res.json({ success: true });
     } catch (error) {
       console.error('Webhook error:', error);
@@ -174,17 +176,17 @@ app.listen(3000, () => {
 });
 ```
 
-## Subscription Management
+## Webhook Events
 
-```typescript
-// Update subscription
-await paykit.subscriptions.update('sub_123', {
-  metadata: { plan: 'enterprise' },
-});
-
-// Cancel subscription
-await paykit.subscriptions.cancel('sub_123');
-```
+- order.paid
+- order.created
+- customer.created
+- customer.updated
+- customer.deleted
+- subscription.updated
+- subscription.created
+- subscription.revoked
+- refund.created
 
 ## Environment Variables
 

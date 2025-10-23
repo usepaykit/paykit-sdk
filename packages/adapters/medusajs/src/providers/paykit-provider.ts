@@ -24,6 +24,7 @@ import {
   AbstractPaymentProvider,
   MedusaError,
   PaymentActions,
+  PaymentSessionStatus,
 } from '@medusajs/framework/utils';
 import {
   CreatePaymentSchema,
@@ -147,7 +148,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
           name: data?.name
             ? (data.name as string)
             : (customer.email.split('@')[0] as string),
-          metadata: { PAYKIT_METADATA_KEY: JSON.stringify({ source: 'medusa' }) },
+          metadata: {
+            PAYKIT_METADATA_KEY: JSON.stringify({ source: 'medusa-paykit-adapter' }),
+          },
         }),
       );
       // todo: update account_holder with the new customer ID
@@ -161,11 +164,22 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
       this.paykit.payments.create(intent as unknown as CreatePaymentSchema),
     );
 
-    if (paymentIntentError)
+    if (paymentIntentError) {
       throw new MedusaError(
         MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
         paymentIntentError.message,
       );
+    }
+
+    if (paymentIntentResult.requires_action && paymentIntentResult.payment_url) {
+      return {
+        id: paymentIntentResult.id,
+        status: PaymentSessionStatus.REQUIRES_MORE,
+        data: {
+          payment_url: paymentIntentResult.payment_url,
+        },
+      };
+    }
 
     return {
       id: paymentIntentResult.id,

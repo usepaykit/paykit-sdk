@@ -56,6 +56,8 @@ export const initializeSequelize = (sequelize: Sequelize) => {
     declare metadata: Record<string, any>;
     declare customerId?: string;
     declare customerEmail?: string;
+    declare paymentUrl?: string;
+    declare requiresAction?: boolean;
     declare createdAt: Date;
     declare updatedAt: Date;
   }
@@ -109,6 +111,17 @@ export const initializeSequelize = (sequelize: Sequelize) => {
         type: DataTypes.STRING,
         allowNull: true,
         field: 'customer_email',
+      },
+      paymentUrl: {
+        type: DataTypes.STRING,
+        allowNull: true,
+        field: 'payment_url',
+      },
+      requiresAction: {
+        type: DataTypes.BOOLEAN,
+        allowNull: true,
+        field: 'requires_action',
+        defaultValue: false,
       },
     },
     {

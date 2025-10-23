@@ -303,8 +303,8 @@ importers:
   packages/polar:
     dependencies:
       '@polar-sh/sdk':
-        specifier: ^0.33.0
-        version: 0.33.2(zod@3.25.76)
+        specifier: 0.37.0
+        version: 0.37.0
     devDependencies:
       '@paykit-sdk/core':
         specifier: workspace:*
@@ -2566,15 +2566,8 @@ packages:
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
 
-  '@polar-sh/sdk@0.33.2':
-    resolution: {integrity: sha512-k/YDcwuPKlQdgJXEQkRBQY2ZFxzJHdSNE+Pqz3FMiWTC9hWk7eyfTI6fzJeYfMuhQnY801oujiOg3ZbYHxW8nw==}
-    hasBin: true
-    peerDependencies:
-      '@modelcontextprotocol/sdk': '>=1.5.0 <1.10.0'
-      zod: '>= 3'
-    peerDependenciesMeta:
-      '@modelcontextprotocol/sdk':
-        optional: true
+  '@polar-sh/sdk@0.37.0':
+    resolution: {integrity: sha512-sNAZjHurF3Teew+YKGudXqWvWvaSAkMAttdQUDDBvHfGm6KA7Dkyjoo83n8TmpTMuQVM5sycTUrrfPlPMNDXoQ==}
 
   '@prisma/config@6.17.1':
     resolution: {integrity: sha512-fs8wY6DsvOCzuiyWVckrVs1LOcbY4LZNz8ki4uUIQ28jCCzojTGqdLhN2Jl5lDnC1yI8/gNIKpsWDM8pLhOdwA==}
@@ -11391,7 +11384,7 @@ snapshots:
   '@pkgjs/parseargs@0.11.0':
     optional: true
 
-  '@polar-sh/sdk@0.33.2(zod@3.25.76)':
+  '@polar-sh/sdk@0.37.0':
     dependencies:
       standardwebhooks: 1.0.0
       zod: 3.25.76

@@ -175,6 +175,9 @@ export const paykitPayment$InboundSchema = (intent: Stripe.PaymentIntent): Payme
     status: stripeToPaykitStatus(intent.status),
     metadata: omitInternalMetadata(intent.metadata ?? {}),
     item_id: itemId,
+    requires_action:
+      intent.status === 'requires_action' || intent.status === 'requires_confirmation',
+    payment_url: intent.next_action?.redirect_to_url?.url ?? null,
   };
 };
 

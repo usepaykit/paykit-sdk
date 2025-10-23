@@ -44,11 +44,16 @@ import {
   stringifyMetadataValues,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
+import { CountryAlpha2Input } from '@polar-sh/sdk/models/components/addressinput.js';
 import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.js';
 import { Customer as PolarCustomer } from '@polar-sh/sdk/models/components/customer.js';
 import { Order as PolarOrder } from '@polar-sh/sdk/models/components/order.js';
 import { Refund as PolarRefund } from '@polar-sh/sdk/models/components/refund.js';
 import { Subscription as PolarSubscription } from '@polar-sh/sdk/models/components/subscription.js';
+import { SubscriptionUpdate } from '@polar-sh/sdk/models/components/subscriptionupdate.js';
+import { SubscriptionUpdateDiscount } from '@polar-sh/sdk/models/components/subscriptionupdatediscount.js';
+import { SubscriptionUpdateProduct } from '@polar-sh/sdk/models/components/subscriptionupdateproduct.js';
+import { SubscriptionUpdateTrial } from '@polar-sh/sdk/models/components/subscriptionupdatetrial.js';
 import { Refunds } from '@polar-sh/sdk/sdk/refunds.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
 import { z } from 'zod';
@@ -122,10 +127,17 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const checkoutMetadata = stringifyMetadataValues(metadata ?? {});
 
     const checkoutCreateOptions: CheckoutCreate = {
+      ...provider_metadata,
       metadata: checkoutMetadata,
       products: [item_id],
-      ...provider_metadata,
+      successUrl: data.success_url,
     };
+
+    if (typeof data.customer === 'object' && 'email' in data.customer) {
+      checkoutCreateOptions.customerEmail = data.customer.email;
+    } else if (typeof data.customer === 'string') {
+      checkoutCreateOptions.customerId = data.customer;
+    }
 
     if (data.billing) {
       checkoutCreateOptions.customerBillingAddress = {
@@ -133,7 +145,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         line2: data.billing.address.line2,
         postalCode: data.billing.address.postal_code,
         city: data.billing.address.city,
-        country: data.billing.address.country,
+        country: data.billing.address.country as CountryAlpha2Input,
         state: data.billing.address.state,
       };
 
@@ -314,9 +326,21 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       throw ValidationError.fromZodError(error, this.providerName, 'updateSubscription');
     }
 
+    // Polar requires specific update types via provider_metadata
+    if (!data.provider_metadata || Object.keys(data.provider_metadata).length === 0) {
+      throw new ValidationError(
+        'Polar requires specific update type via provider_metadata. ' +
+          'Use one of: { productId: string } | { discountId: string } | { trialEnd: Date }',
+        { provider: this.providerName, method: 'updateSubscription' },
+      );
+    }
+
     const response = await this.polar.subscriptions.update({
       id,
-      subscriptionUpdate: { ...(data.metadata ?? {}) },
+      subscriptionUpdate: data.provider_metadata as Extract<
+        SubscriptionUpdate,
+        SubscriptionUpdateProduct | SubscriptionUpdateDiscount | SubscriptionUpdateTrial
+      >,
     });
 
     return paykitSubscription$InboundSchema(response);
@@ -360,7 +384,7 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         line2: data.billing.address.line2,
         postalCode: data.billing.address.postal_code,
         city: data.billing.address.city,
-        country: data.billing.address.country,
+        country: data.billing.address.country as CountryAlpha2Input,
         state: data.billing.address.state,
       };
 
@@ -392,10 +416,11 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
     const checkoutResponse = await this.polar.checkouts.update({
       id,
       checkoutUpdate: {
-        ...rest,
+        ...provider_metadata,
         ...(rest.metadata && { metadata: paymentMetadata }),
         ...(rest.item_id && { products: [rest.item_id] }),
-        ...provider_metadata,
+        ...(rest.amount && { amount: rest.amount }),
+        ...(rest.currency && { currency: rest.currency }),
       },
     });
 
@@ -485,87 +510,80 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       'order.paid': (data: PolarOrder) => {
         const { status, metadata } = data;
 
-        if (status == 'paid') {
-          const invoice = paykitInvoice$InboundSchema({
-            ...data,
-            billingMode: billingModeSchema.parse('one_time'),
-            metadata: { ...(metadata ?? {}) },
-          });
-
-          const payment: Payment = {
-            id: data.id,
-            amount: data.totalAmount,
-            currency: data.currency,
-            customer: data.customerId
-              ? data.customerId
-              : { email: data.customer.email ?? '' },
-            status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: stringifyMetadataValues(metadata ?? {}),
-            item_id: data.product.id,
-          };
-
-          // Consumable purchase
-          return [
-            paykitEvent$InboundSchema<Payment>({
-              type: 'payment.updated',
-              created: parseInt(webhookTimestamp),
-              id: webhookId,
-              data: payment,
-            }),
-            paykitEvent$InboundSchema<Invoice>({
-              type: 'invoice.generated',
-              created: parseInt(webhookTimestamp),
-              id: webhookId,
-              data: invoice,
-            }),
-          ];
+        if (status !== 'paid') {
+          return null;
         }
 
-        return null;
+        const isSubscription = ['subscription_create', 'subscription_cycle'].includes(
+          data.billingReason,
+        );
+
+        const invoice = paykitInvoice$InboundSchema({
+          ...data,
+          billingMode: billingModeSchema.parse(isSubscription ? 'recurring' : 'one_time'),
+          metadata: { ...(metadata ?? {}) },
+        });
+
+        const payment: Payment = {
+          id: data.id,
+          amount: data.totalAmount,
+          currency: data.currency,
+          customer: data.customerId
+            ? data.customerId
+            : { email: data.customer.email ?? '' },
+          status: data.status === 'paid' ? 'succeeded' : 'pending',
+          metadata: stringifyMetadataValues(metadata ?? {}),
+          item_id: data.product.id,
+          requires_action: false,
+          payment_url: null,
+        };
+
+        // Consumable purchase
+        return [
+          paykitEvent$InboundSchema<Payment>({
+            type: 'payment.updated',
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
+            data: payment,
+          }),
+          paykitEvent$InboundSchema<Invoice>({
+            type: 'invoice.generated',
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
+            data: invoice,
+          }),
+        ];
       },
 
       'order.created': (data: PolarOrder) => {
         const { billingReason, metadata, status } = data;
 
-        if (
-          ['subscription_create', 'subscription_cycle'].includes(billingReason) &&
-          status == 'paid'
-        ) {
-          const invoice = paykitInvoice$InboundSchema({
-            ...data,
-            billingMode: billingModeSchema.parse('recurring'),
-            metadata: { ...(metadata ?? {}) },
-          });
-
-          const payment: Payment = {
-            id: data.id,
-            amount: data.totalAmount,
-            currency: data.currency,
-            customer: data.customerId
-              ? data.customerId
-              : { email: data.customer.email ?? '' },
-            status: data.status === 'paid' ? 'succeeded' : 'pending',
-            metadata: stringifyMetadataValues(metadata ?? {}),
-            item_id: data.product.id,
-          };
-
-          return [
-            paykitEvent$InboundSchema<Payment>({
-              type: 'payment.created',
-              created: parseInt(webhookTimestamp),
-              id: webhookId,
-              data: payment,
-            }),
-            paykitEvent$InboundSchema<Invoice>({
-              type: 'invoice.generated',
-              created: parseInt(webhookTimestamp),
-              id: webhookId,
-              data: invoice,
-            }),
-          ];
+        if (status !== 'paid') {
+          return null;
         }
 
-        return null;
+        const payment: Payment = {
+          id: data.id,
+          amount: data.totalAmount,
+          currency: data.currency,
+          customer: data.customerId
+            ? data.customerId
+            : { email: data.customer.email ?? '' },
+          status: data.status === 'paid' ? 'succeeded' : 'pending',
+          metadata: stringifyMetadataValues(metadata ?? {}),
+          item_id: data.product.id,
+          requires_action: data.status === 'paid' ? false : true,
+          payment_url: null,
+        };
+
+        return [
+          paykitEvent$InboundSchema<Payment>({
+            type: 'payment.created',
+            created: parseInt(webhookTimestamp),
+            id: webhookId,
+            data: payment,
+          }),
+        ];
       },
 
       /**
@@ -673,8 +691,13 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const results = handler(data);
 
-    if (!results)
-      throw new Error(`Unhandled event type: ${type} for provider: ${this.providerName}`);
+    if (!results) {
+      console.log(
+        `Skipping event ${type} for provider: ${this.providerName} as no action needed`,
+      );
+
+      return [];
+    }
 
     return results;
   };

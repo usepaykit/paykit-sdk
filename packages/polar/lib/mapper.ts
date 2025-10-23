@@ -32,7 +32,7 @@ export const paykitCheckout$InboundSchema = (checkout: Checkout): PaykitCheckout
       : { email: checkout.customerEmail ?? '' },
     session_type: checkout.subscriptionId ? 'recurring' : 'one_time',
     products: checkout.products.map(product => ({ id: product.id, quantity: 1 })),
-    metadata: (checkout.metadata as PaykitMetadata) ?? null,
+    metadata: omitInternalMetadata(checkout.metadata as PaykitMetadata) ?? null,
     currency: checkout.currency,
     amount: checkout.amount,
   };
@@ -115,7 +115,10 @@ export const paykitInvoice$InboundSchema = (invoice: InvoicePayload): PaykitInvo
     status,
     subscription_id: invoice.subscription?.id ?? null,
     paid_at: new Date(invoice.createdAt).toISOString(),
-    line_items: [],
+    line_items: invoice.items.map(({ productPriceId }) => ({
+      id: productPriceId ?? '',
+      quantity: invoice.items.length,
+    })),
   };
 };
 
@@ -139,8 +142,10 @@ export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
       ? checkout.customerId
       : { email: checkout.customerEmail ?? '' },
     status: statusMap[checkout.status],
-    metadata: (checkout.metadata as PaykitMetadata) ?? {},
+    metadata: omitInternalMetadata(checkout.metadata as PaykitMetadata) ?? {},
     item_id: checkout.products.length > 0 ? checkout.products[0].id : null,
+    requires_action: checkout.status === 'open' ? true : false,
+    payment_url: checkout.status === 'open' ? checkout.url : null,
   };
 };
 

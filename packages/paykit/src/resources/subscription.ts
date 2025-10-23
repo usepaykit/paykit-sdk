@@ -97,11 +97,17 @@ export interface UpdateSubscriptionSchema {
    * The metadata of the subscription.
    */
   metadata: PaykitMetadata;
+
+  /**
+   * The provider metadata of the subscription.
+   */
+  provider_metadata?: Record<string, unknown>;
 }
 
 export const updateSubscriptionSchema = schema<UpdateSubscriptionSchema>()(
   z.object({
     metadata: metadataSchema,
+    provider_metadata: z.record(z.string(), z.unknown()).optional(),
   }),
 );
 

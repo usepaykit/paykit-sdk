@@ -20,7 +20,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "dependencies": {
-    "@polar-sh/sdk": "^0.33.0"
+    "@polar-sh/sdk": "0.37.0"
   },
   "peerDependencies": {
     "@paykit-sdk/core": ">=1.1.97"

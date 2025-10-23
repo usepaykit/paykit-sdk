@@ -290,6 +290,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       ),
       customer: customer,
       item_id: data.item_id ?? null,
+      requires_action: false,
+      payment_url: '',
     };
 
     return paymentObject;
@@ -355,6 +357,8 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
       metadata: {},
       customer: '',
       item_id: null,
+      requires_action: false,
+      payment_url: '',
     };
 
     return paymentObject;

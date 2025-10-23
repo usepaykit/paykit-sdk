@@ -314,6 +314,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
     }
 
     const updatedSubscription = await this.stripe.subscriptions.update(id, {
+      ...(data.provider_metadata && { ...data.provider_metadata }),
       metadata: stringifyMetadataValues(data.metadata ?? {}),
     });
 
@@ -827,10 +828,13 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const result = await handler(event);
 
-    if (!result)
-      throw new WebhookError(`Unhandled event type: ${event.type}`, {
-        provider: this.providerName,
-      });
+    if (!result) {
+      console.log(
+        `Skipping event ${event.type} for provider: ${this.providerName} as no action needed`,
+      );
+
+      return [];
+    }
 
     return result;
   };

@@ -44,6 +44,8 @@ export interface IPayment extends Document {
   metadata: Record<string, any>;
   customerId?: Types.ObjectId | ICustomer;
   customerEmail?: string;
+  paymentUrl?: string;
+  requiresAction?: boolean;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -122,6 +124,8 @@ const PaymentSchema = new Schema<IPayment>(
     metadata: { type: Schema.Types.Mixed, required: true },
     customerId: { type: String, ref: 'Customer', index: true },
     customerEmail: { type: String, index: true },
+    paymentUrl: { type: String },
+    requiresAction: { type: Boolean, default: false },
   },
   {
     timestamps: true,

@@ -62,6 +62,17 @@ export interface Payment {
    * The item ID of the payment.
    */
   item_id: string | null;
+
+  /**
+   *
+   * Whether the payment requires action.
+   */
+  requires_action: boolean;
+
+  /**
+   * Whether the payment requires capture.
+   */
+  payment_url: string | null;
 }
 
 export const paymentSchema = schema<Payment>()(
@@ -73,12 +84,14 @@ export const paymentSchema = schema<Payment>()(
     status: paymentStatusSchema,
     metadata: metadataSchema,
     item_id: z.string().nullable(),
+    requires_action: z.boolean(),
+    payment_url: z.string().nullable(),
   }),
 );
 
 export interface CreatePaymentSchema
   extends OverrideProps<
-    Omit<Payment, 'id' | 'status'>,
+    Omit<Payment, 'id' | 'status' | 'requires_action' | 'payment_url'>,
     { metadata?: Record<string, unknown> }
   > {
   /**
@@ -98,12 +111,20 @@ export interface CreatePaymentSchema
 }
 
 export const createPaymentSchema = schema<CreatePaymentSchema>()(
-  paymentSchema.omit({ id: true, status: true, metadata: true }).extend({
-    metadata: z.record(z.string(), z.unknown()).optional(),
-    provider_metadata: z.record(z.string(), z.unknown()).optional(),
-    billing: billingSchema.optional(),
-    capture_method: z.enum(['automatic', 'manual']),
-  }),
+  paymentSchema
+    .omit({
+      id: true,
+      status: true,
+      metadata: true,
+      requires_action: true,
+      payment_url: true,
+    })
+    .extend({
+      metadata: z.record(z.string(), z.unknown()).optional(),
+      provider_metadata: z.record(z.string(), z.unknown()).optional(),
+      billing: billingSchema.optional(),
+      capture_method: z.enum(['automatic', 'manual']),
+    }),
 );
 
 export interface UpdatePaymentSchema

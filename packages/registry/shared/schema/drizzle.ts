@@ -6,6 +6,7 @@ import {
   json,
   pgEnum,
   index,
+  boolean,
 } from 'drizzle-orm/pg-core';
 
 // Enums
@@ -59,6 +60,9 @@ export const payments = pgTable(
 
     // Guest checkout for when the customer is not yet determined
     customerEmail: text('customer_email'),
+
+    paymentUrl: text('payment_url'),
+    requiresAction: boolean('requires_action').default(false),
   },
   table => ({
     customerIdIdx: index('payments_customer_id_idx').on(table.customerId),

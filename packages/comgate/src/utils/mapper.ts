@@ -15,6 +15,8 @@ export const paykitPayment$InboundSchema = (
       JSON.parse(webhookResponse.refId) as Record<string, unknown>,
     ),
     item_id: null,
+    requires_action: false,
+    payment_url: '',
   };
 };
 

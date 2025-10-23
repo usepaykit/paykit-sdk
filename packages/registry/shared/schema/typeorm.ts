@@ -95,6 +95,12 @@ import {
     @Index()
     customerEmail?: string;
   
+    @Column({ type: 'text', nullable: true, name: 'payment_url' })
+    paymentUrl?: string;
+
+    @Column({ type: 'boolean', nullable: true, name: 'requires_action' })
+    requiresAction?: boolean;
+
     @CreateDateColumn({ type: 'timestamp', name: 'created_at' })
     createdAt!: Date;
   

@@ -30,6 +30,9 @@ model Payment {
 
   refunds    Refund[]
 
+  paymentUrl String? @map("payment_url")
+  requiresAction Boolean? @map("requires_action")
+
   @@index([customerId])
   @@index([status])
   @@index([customerEmail])

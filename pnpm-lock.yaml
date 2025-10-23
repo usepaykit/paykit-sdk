@@ -258,9 +258,6 @@ importers:
 
   packages/paykit:
     dependencies:
-      '@sindresorhus/is':
-        specifier: ^7.1.0
-        version: 7.1.0
       commander:
         specifier: ^14.0.0
         version: 14.0.0

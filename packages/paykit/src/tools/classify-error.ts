@@ -1,7 +1,5 @@
-import is from '@sindresorhus/is';
-
 export function classifyError(err: unknown) {
-  if (is.error(err)) {
+  if (err instanceof Error) {
     if (err.message.includes('429')) return 'rate_limit';
     if (['ECONNREFUSED', 'ECONNRESET', 'ENOTFOUND'].includes(err.message.toUpperCase()))
       return 'connection';

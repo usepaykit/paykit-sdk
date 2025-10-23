@@ -42,7 +42,6 @@
     "url": "https://github.com/devodii/paykit/issues"
   },
   "dependencies": {
-    "@sindresorhus/is": "^7.1.0",
     "commander": "^14.0.0",
     "inquirer": "^12.7.0",
     "zod": "^3.25.76"

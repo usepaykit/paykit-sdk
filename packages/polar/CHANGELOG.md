@@ -1,5 +1,13 @@
 # @paykit-sdk/polar
 
+## 1.1.98
+
+### Patch Changes
+
+- 66e4462: chore: stabilized polar provider
+- Updated dependencies [66e4462]
+  - @paykit-sdk/core@1.1.98
+
 ## 1.1.97
 
 ### Patch Changes

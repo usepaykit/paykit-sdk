@@ -192,8 +192,8 @@ importers:
   packages/adapters/medusajs:
     dependencies:
       '@paykit-sdk/core':
-        specifier: '>=1.1.99'
-        version: 1.1.99(@types/node@24.2.0)
+        specifier: '>=1.1.100'
+        version: 1.1.100(@types/node@24.2.0)
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -2552,8 +2552,8 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@paykit-sdk/core@1.1.99':
-    resolution: {integrity: sha512-N+FoeNwkDLw93bjIHP9YSpn76MTw364WGEtatoqoloZKum3MUjFgVCeYPp2Dsq6gYfFSnM6kGT6RM6w9U2jg2g==}
+  '@paykit-sdk/core@1.1.100':
+    resolution: {integrity: sha512-3UH3rxlEUWThdEfmUq2/8ZL/ysS1p0WakPjwF7hUMikoEt+Ro4MajJREcJ3GDM7u/HIhx26Z5W3OuXURQWFQYQ==}
 
   '@paypal/paypal-server-sdk@1.1.0':
     resolution: {integrity: sha512-MaJQmSVpQb5nEeZWZDTtGRxeaHj6O51G9Olmm3zQ5E4XNgR4emAI08CKC2ZPhBldVoxAoBVjLyvKjGV5lC1n2Q==}
@@ -3335,10 +3335,6 @@ packages:
 
   '@selderee/plugin-htmlparser2@0.11.0':
     resolution: {integrity: sha512-P33hHGdldxGabLFjPPpaTxVolMrzrcegejx+0GxjrIb9Zv48D8yAIA/QTDR2dFl7Uz7urX8aX6+5bCZslr+gWQ==}
-
-  '@sindresorhus/is@7.1.0':
-    resolution: {integrity: sha512-7F/yz2IphV39hiS2zB4QYVkivrptHHh0K8qJJd9HhuWSdvf8AN7NpebW3CcDZDBQsUPMoDKWsY2WWgW7bqOcfA==}
-    engines: {node: '>=18'}
 
   '@so-ric/colorspace@1.1.6':
     resolution: {integrity: sha512-/KiKkpHNOBgkFJwu9sh48LkHSMYGyuTcSFK/qMBdnOAlrRJzRSXAOFB5qwzaVQuDl8wAvHVMkaASQDReTahxuw==}
@@ -11363,9 +11359,8 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paykit-sdk/core@1.1.99(@types/node@24.2.0)':
+  '@paykit-sdk/core@1.1.100(@types/node@24.2.0)':
     dependencies:
-      '@sindresorhus/is': 7.1.0
       commander: 14.0.0
       inquirer: 12.9.0(@types/node@24.2.0)
       zod: 3.25.76
@@ -12324,8 +12319,6 @@ snapshots:
     dependencies:
       domhandler: 5.0.3
       selderee: 0.11.0
-
-  '@sindresorhus/is@7.1.0': {}
 
   '@so-ric/colorspace@1.1.6':
     dependencies:

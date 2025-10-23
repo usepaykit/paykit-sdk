@@ -1,5 +1,11 @@
 # @paykit-sdk/core
 
+## 1.1.100
+
+### Patch Changes
+
+- d0ab08a: chore: removed `@sindresorhus/is` from deps
+
 ## 1.1.99
 
 ### Patch Changes

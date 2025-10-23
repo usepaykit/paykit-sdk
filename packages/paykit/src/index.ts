@@ -70,7 +70,6 @@ export { PayKit, PayKitProvider };
 export * from './resources';
 export * from './types';
 export * from './tools';
-export * from './logger';
 export * from './webhook-provider';
 export * from './http-client';
 export * from './error';

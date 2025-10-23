@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/medusajs",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "MedusaJS Integrations for Paykit",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -38,7 +38,7 @@
   },
   "dependencies": {
     "zod": "^3.25.76",
-    "@paykit-sdk/core": ">=1.1.92"
+    "@paykit-sdk/core": ">=1.1.98"
   },
   "publishConfig": {
     "access": "public"

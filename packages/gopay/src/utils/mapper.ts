@@ -32,6 +32,8 @@ export const paykitPayment$InboundSchema = (data: GoPayPaymentResponse): Payment
     status: data.state as Payment['status'],
     item_id: itemId,
     metadata,
+    requires_action: false,
+    payment_url: '',
   };
 };
 

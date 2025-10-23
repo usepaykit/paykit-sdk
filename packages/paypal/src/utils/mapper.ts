@@ -69,6 +69,10 @@ export const paykitPayment$InboundSchema = (order: Order): Payment => {
       ? order.payer?.payerId
       : { email: order.payer?.emailAddress ?? '' },
     item_id: order.purchaseUnits?.[0]?.items?.[0]?.sku || '',
+
+    // todo: Add requires_action and payment_url
+    requires_action: false,
+    payment_url: '',
   };
 };
 

@@ -5,7 +5,7 @@ Universal payment provider adapter for Medusa v2+ using PayKit. Compatible with 
 ## Installation
 
 ```bash
-npm install @paykit-sdk/medusajs @paykit-sdk/core
+npm install @paykit-sdk/medusajs
 ```
 
 ## Install your provider
@@ -25,7 +25,7 @@ import { createStripe } from '@paykit-sdk/stripe';
 export default defineConfig({
   modules: [
     {
-      resolve: '@paykit-sdk/medusa-adapter',
+      resolve: '@paykit-sdk/medusajs',
       options: {
         provider: createStripe({ apiKey: process.env.STRIPE_API_KEY }),
         webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,

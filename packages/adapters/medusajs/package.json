@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/medusajs",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "MedusaJS Integrations for Paykit",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -28,8 +28,7 @@
   "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "peerDependencies": {
-    "@medusajs/framework": ">=2.10.3",
-    "@paykit-sdk/core": ">=1.1.92"
+    "@medusajs/framework": ">=2.10.3"
   },
   "devDependencies": {
     "@medusajs/framework": "^2.10.3",
@@ -38,7 +37,8 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "zod": "^3.25.76"
+    "zod": "^3.25.76",
+    "@paykit-sdk/core": ">=1.1.92"
   },
   "publishConfig": {
     "access": "public"

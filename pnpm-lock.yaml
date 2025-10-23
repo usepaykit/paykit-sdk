@@ -192,8 +192,8 @@ importers:
   packages/adapters/medusajs:
     dependencies:
       '@paykit-sdk/core':
-        specifier: '>=1.1.98'
-        version: 1.1.98(@types/node@24.2.0)
+        specifier: '>=1.1.99'
+        version: 1.1.99(@types/node@24.2.0)
       zod:
         specifier: ^3.25.76
         version: 3.25.76
@@ -2555,8 +2555,8 @@ packages:
     resolution: {integrity: sha512-dfUnCxiN9H4ap84DvD2ubjw+3vUNpstxa0TneY/Paat8a3R4uQZDLSvWjmznAY/DoahqTHl9V46HF/Zs3F29pg==}
     engines: {node: '>= 10.0.0'}
 
-  '@paykit-sdk/core@1.1.98':
-    resolution: {integrity: sha512-7b5n5cMazzLe8ZlrGOhRFZWZbiQ+afjieHTaTOil1G1q0K6ADf5xAlx/b5MXkP/M9NmRKtuaKsnijpmbBPK/TA==}
+  '@paykit-sdk/core@1.1.99':
+    resolution: {integrity: sha512-N+FoeNwkDLw93bjIHP9YSpn76MTw364WGEtatoqoloZKum3MUjFgVCeYPp2Dsq6gYfFSnM6kGT6RM6w9U2jg2g==}
 
   '@paypal/paypal-server-sdk@1.1.0':
     resolution: {integrity: sha512-MaJQmSVpQb5nEeZWZDTtGRxeaHj6O51G9Olmm3zQ5E4XNgR4emAI08CKC2ZPhBldVoxAoBVjLyvKjGV5lC1n2Q==}
@@ -4242,10 +4242,6 @@ packages:
   chalk@4.1.2:
     resolution: {integrity: sha512-oKnbhFyRIXpUuez8iBMmyEa4nbj4IOQyuhc/wy9kY7/WVPcwIO9VA668Pu8RkO7+0G76SLROeyw9CpQ061i4mA==}
     engines: {node: '>=10'}
-
-  chalk@5.4.1:
-    resolution: {integrity: sha512-zgVZuo2WcZgfUEmsn6eO3kINexW8RAE4maiQ8QNs8CtpPCSyMiYsULR3HQYkm3w8FIA3SberyMJMSldGsW+U3w==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
 
   change-case-all@1.0.15:
     resolution: {integrity: sha512-3+GIFhk3sNuvFAJKU46o26OdzudQlPNBCu1ZQi3cMeMHhty1bhDxu2WrEilVNYaGvqUtR1VSigFcJOiS13dRhQ==}
@@ -11370,10 +11366,9 @@ snapshots:
       '@parcel/watcher-win32-ia32': 2.5.1
       '@parcel/watcher-win32-x64': 2.5.1
 
-  '@paykit-sdk/core@1.1.98(@types/node@24.2.0)':
+  '@paykit-sdk/core@1.1.99(@types/node@24.2.0)':
     dependencies:
       '@sindresorhus/is': 7.1.0
-      chalk: 5.4.1
       commander: 14.0.0
       inquirer: 12.9.0(@types/node@24.2.0)
       zod: 3.25.76
@@ -13248,8 +13243,6 @@ snapshots:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-
-  chalk@5.4.1: {}
 
   change-case-all@1.0.15:
     dependencies:

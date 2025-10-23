@@ -1,5 +1,11 @@
 # @paykit-sdk/core
 
+## 1.1.99
+
+### Patch Changes
+
+- 6ed7b03: chore: removed chalk from core deps
+
 ## 1.1.98
 
 ### Patch Changes

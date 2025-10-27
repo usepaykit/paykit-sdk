@@ -1,5 +1,11 @@
 # @paykit-sdk/core
 
+## 1.1.101
+
+### Patch Changes
+
+- 97cf16c: chore: add error instance to validator function
+
 ## 1.1.100
 
 ### Patch Changes

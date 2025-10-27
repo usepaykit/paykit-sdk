@@ -23,7 +23,7 @@
     "stripe": "^18.2.1"
   },
   "peerDependencies": {
-    "@paykit-sdk/core": ">=1.1.100"
+    "@paykit-sdk/core": ">=1.1.101"
   },
   "devDependencies": {
     "@paykit-sdk/core": "workspace:*",

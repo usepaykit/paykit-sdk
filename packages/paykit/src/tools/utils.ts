@@ -92,6 +92,7 @@ export const validateRequiredKeys = <K extends string>(
   requiredKeys: readonly K[],
   source: Record<K, string>,
   errorMessage: string | ((missingKeys: K[]) => string),
+  errorInstance?: (message: string) => Error,
 ): Record<K, string> => {
   const missingKeys: K[] = [];
   const result: Partial<Record<K, string>> = {};
@@ -112,7 +113,7 @@ export const validateRequiredKeys = <K extends string>(
         ? errorMessage(missingKeys)
         : errorMessage.replace('{keys}', missingKeysList);
 
-    throw new UnTraceableError(error);
+    throw errorInstance?.(error) ?? new UnTraceableError(error);
   }
 
   return result as Record<K, string>;

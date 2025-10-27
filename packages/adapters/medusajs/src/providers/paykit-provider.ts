@@ -36,6 +36,7 @@ import {
   validateRequiredKeys,
   providerSchema,
   Payee,
+  stringifyMetadataValues,
 } from '@paykit-sdk/core';
 import { z } from 'zod';
 import { medusaStatus$InboundSchema } from '../utils/mapper';
@@ -141,19 +142,20 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     }
 
     if (typeof customer === 'object' && 'email' in customer) {
+      const customerName = data?.name
+        ? (data.name as string)
+        : (customer.email.split('@')[0] as string);
+
       await tryCatchAsync(
         this.paykit.customers.create({
           email: customer.email,
           phone: (data?.phone as string) ?? '',
-          name: data?.name
-            ? (data.name as string)
-            : (customer.email.split('@')[0] as string),
+          name: customerName,
           metadata: {
             PAYKIT_METADATA_KEY: JSON.stringify({ source: 'medusa-paykit-adapter' }),
           },
         }),
       );
-      // todo: update account_holder with the new customer ID
     } else {
       customer = customer as string;
     }
@@ -195,20 +197,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { id, amount } = validateRequiredKeys(
       ['id', 'amount'],
       (input?.data ?? {}) as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!id)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
-
-    if (!amount)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment amount',
-      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.capture(id, { amount: Number(amount) }),
@@ -241,14 +232,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { id } = validateRequiredKeys(
       ['id'],
       (input?.data ?? {}) as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!id)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.cancel(id),
@@ -273,14 +259,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { id } = validateRequiredKeys(
       ['id'],
       (input?.data ?? {}) as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!id)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.retrieve(id),
@@ -312,14 +293,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { id: paymentId } = validateRequiredKeys(
       ['id'],
       (input?.data ?? {}) as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!paymentId)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
 
     const [refundResult, refundError] = await tryCatchAsync(
       this.paykit.refunds.create({
@@ -354,14 +330,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { id } = validateRequiredKeys(
       ['id'],
       (input?.data ?? {}) as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!id)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.retrieve(id),
@@ -384,34 +355,24 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     const { amount, currency_code } = validateRequiredKeys(
       ['amount', 'currency_code'],
       input as unknown as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
-
-    if (!amount || !currency_code)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required amount or currency code',
-      );
 
     const { id: paymentId } = validateRequiredKeys(
       ['id'],
       input.data as Record<string, string>,
-      'Missing required payment ID',
+      'Missing required fields: {keys}',
+      message => new MedusaError(MedusaError.Types.INVALID_DATA, message),
     );
 
-    if (!paymentId)
-      throw new MedusaError(
-        MedusaError.Types.INVALID_DATA,
-        'Missing required payment ID',
-      );
+    const metadata = input.data?.metadata ?? ({} as PaykitMetadata);
 
     const [paymentIntentResult, paymentIntentError] = await tryCatchAsync(
       this.paykit.payments.update(paymentId, {
         amount: Number(amount),
         currency: currency_code,
-        metadata: input.data?.metadata
-          ? (input.data.metadata as unknown as PaykitMetadata)
-          : {},
+        metadata: stringifyMetadataValues(metadata),
         provider_metadata: input.data?.provider_metadata
           ? (input.data.provider_metadata as unknown as Record<string, unknown>)
           : undefined,

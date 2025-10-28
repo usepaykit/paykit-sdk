@@ -19,6 +19,12 @@ import {
   UpdatePaymentOutput,
   ProviderWebhookPayload,
   WebhookActionResult,
+  CreateAccountHolderInput,
+  CreateAccountHolderOutput,
+  UpdateAccountHolderInput,
+  UpdateAccountHolderOutput,
+  DeleteAccountHolderInput,
+  DeleteAccountHolderOutput,
 } from '@medusajs/framework/types';
 import {
   AbstractPaymentProvider,
@@ -472,5 +478,130 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     });
 
     return webhookEvents as unknown as WebhookActionResult;
+  };
+
+  createAccountHolder = async ({
+    context,
+    data,
+  }: CreateAccountHolderInput): Promise<CreateAccountHolderOutput> => {
+    if (this.options.debug) {
+      console.info('[PayKit] Creating account holder', context, data);
+    }
+
+    const { customer, account_holder } = context;
+
+    if (account_holder?.data?.id) {
+      return { id: account_holder.data.id as string };
+    }
+
+    if (!customer) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Customer not found in context',
+      );
+    }
+
+    const [accountHolderResult, accountHolderError] = await tryCatchAsync(
+      this.paykit.customers.create({
+        email: customer.email as string,
+        name: customer.email.split('@')[0] as string,
+        phone: customer.phone as string,
+        metadata: {
+          PAYKIT_METADATA_KEY: JSON.stringify({ source: 'medusa-paykit-adapter' }),
+        },
+      }),
+    );
+
+    if (accountHolderError) {
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        accountHolderError.message,
+      );
+    }
+
+    return {
+      id: accountHolderResult.id,
+      data: accountHolderResult as unknown as Record<string, unknown>,
+    };
+  };
+
+  updateAccountHolder = async ({
+    context,
+    data,
+  }: UpdateAccountHolderInput): Promise<UpdateAccountHolderOutput> => {
+    if (this.options.debug) {
+      console.info('[PayKit] Updating account holder', context, data);
+    }
+
+    const { account_holder, customer, idempotency_key } = context;
+
+    if (!account_holder.data?.id) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Account holder not found in context',
+      );
+    }
+
+    // If no customer context was provided, we simply don't update anything within the provider
+    if (!customer) {
+      return {};
+    }
+
+    const accountHolderId = account_holder.data.id as string;
+
+    const [accountHolderResult, accountHolderError] = await tryCatchAsync(
+      this.paykit.customers.update(accountHolderId, {
+        email: customer.email as string,
+        name: customer.email.split('@')[0] as string,
+        phone: customer.phone as string,
+        ...((data?.metadata as unknown as PaykitMetadata) && {
+          metadata: stringifyMetadataValues(
+            (data?.metadata as unknown as PaykitMetadata) ?? {},
+          ),
+        }),
+      }),
+    );
+
+    if (accountHolderError) {
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        accountHolderError.message,
+      );
+    }
+
+    return { data: accountHolderResult as unknown as Record<string, unknown> };
+  };
+
+  deleteAccountHolder = async ({
+    context,
+    data,
+  }: DeleteAccountHolderInput): Promise<DeleteAccountHolderOutput> => {
+    if (this.options.debug) {
+      console.info('[PayKit] Deleting account holder', context, data);
+    }
+
+    const { account_holder } = context;
+
+    if (!account_holder.data?.id) {
+      throw new MedusaError(
+        MedusaError.Types.INVALID_DATA,
+        'Account holder not found in context',
+      );
+    }
+
+    const accountHolderId = account_holder.data.id as string;
+
+    const [accountHolderResult, accountHolderError] = await tryCatchAsync(
+      this.paykit.customers.delete(accountHolderId),
+    );
+
+    if (accountHolderError) {
+      throw new MedusaError(
+        MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+        accountHolderError.message,
+      );
+    }
+
+    return { data: accountHolderResult as unknown as Record<string, unknown> };
   };
 }

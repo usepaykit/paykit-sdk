@@ -354,8 +354,6 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
    * Payment management
    * Create a payment intent or checkout session for a payment
    */
-  // In packages/stripe/src/stripe-provider.ts
-
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 

@@ -175,3 +175,25 @@ export const stringifyMetadataValues = (
     ]),
   );
 };
+
+export const getURLFromHeaders = (headers: Record<string, string>) => {
+  if (headers['origin']) return headers['origin'];
+
+  // Behind a proxy (most common in production)
+  if (headers['x-forwarded-host']) {
+    const protocol = headers['x-forwarded-proto'] ?? 'https';
+    const host = headers['x-forwarded-host'];
+    const path = headers['x-forwarded-path'] ?? '';
+    return `${protocol}://${host}${path}`;
+  }
+
+  // Local development (without a proxy)
+  if (headers['host']) {
+    const protocol = (headers['x-forwarded-proto'] ?? 'https') as string;
+    const host = headers['host'];
+    const path = headers['x-original-url'] ?? headers['x-forwarded-path'] ?? '';
+    return `${protocol}://${host}${path}`;
+  }
+
+  return '';
+};

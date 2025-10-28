@@ -37,6 +37,7 @@ import {
   providerSchema,
   Payee,
   stringifyMetadataValues,
+  getURLFromHeaders,
 } from '@paykit-sdk/core';
 import { z } from 'zod';
 import { medusaStatus$InboundSchema } from '../utils/mapper';
@@ -130,7 +131,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
 
     if (context?.account_holder?.data?.id) {
       customer = context.account_holder.data.id as Payee;
-    } else if (data?.email) {
+    }
+
+    if (data?.email) {
       customer = { email: data.email } as Payee;
     }
 
@@ -146,7 +149,7 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
         ? (data.name as string)
         : (customer.email.split('@')[0] as string);
 
-      await tryCatchAsync(
+      const [createdCustomer, createError] = await tryCatchAsync(
         this.paykit.customers.create({
           email: customer.email,
           phone: (data?.phone as string) ?? '',
@@ -156,6 +159,23 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
           },
         }),
       );
+
+      if (createError) {
+        if (createError.name === 'ProviderNotSupportedError') {
+          if (this.options.debug) {
+            console.info(
+              `[PayKit] Provider ${this.provider.providerName} doesn't support customer creation, using email object`,
+            );
+          }
+        } else {
+          throw new MedusaError(
+            MedusaError.Types.PAYMENT_AUTHORIZATION_ERROR,
+            `Failed to create customer: ${createError.message}`,
+          );
+        }
+      } else {
+        customer = createdCustomer.id;
+      }
     } else {
       customer = customer as string;
     }
@@ -397,31 +417,7 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
 
     const { rawData, headers } = payload;
 
-    const fullUrl = ((): string => {
-      if (headers['origin']) {
-        return headers['origin'] as string;
-      }
-
-      // Behind a proxy (most common in production)
-      if (headers['x-forwarded-host']) {
-        const protocol = headers['x-forwarded-proto'] || 'https';
-        const host = headers['x-forwarded-host'];
-        const path = headers['x-forwarded-path'] || '';
-        return `${protocol}://${host}${path}`;
-      }
-
-      // Local development (without a proxy)
-      if (headers['host']) {
-        const protocol =
-          headers['x-forwarded-proto'] ||
-          (String(headers['host']).includes('localhost') ? 'http' : 'https');
-        const host = headers['host'];
-        const path = headers['x-original-url'] || headers['x-forwarded-path'] || '';
-        return `${protocol}://${host}${path}`;
-      }
-
-      return '';
-    })();
+    const bodyString = Buffer.isBuffer(rawData) ? rawData.toString('utf8') : rawData;
 
     const webhook = this.paykit.webhooks
       .setup({ webhookSecret: this.options.webhookSecret })
@@ -470,9 +466,9 @@ export class PaykitMedusaJSAdapter extends AbstractPaymentProvider<PaykitMedusaJ
     );
 
     const webhookEvents = await webhook.handle({
-      body: rawData as string,
+      body: bodyString,
       headers: new Headers(stringifiedHeaders),
-      fullUrl,
+      fullUrl: getURLFromHeaders(stringifiedHeaders),
     });
 
     return webhookEvents as unknown as WebhookActionResult;

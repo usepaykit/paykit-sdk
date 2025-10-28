@@ -44,6 +44,7 @@ import {
   PAYKIT_METADATA_KEY,
   createCheckoutSchema,
   omitInternalMetadata,
+  validateRequiredKeys,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -351,7 +352,10 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
   /**
    * Payment management
+   * Create a payment intent or checkout session for a payment
    */
+  // In packages/stripe/src/stripe-provider.ts
+
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
     const { error, data } = createPaymentSchema.safeParse(params);
 
@@ -363,20 +367,84 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const { provider_metadata, customer, capture_method, ...rest } = data;
 
-    if (typeof customer === 'object') {
-      throw new InvalidTypeError('customer', 'string (customer ID)', 'object', {
-        provider: this.providerName,
-        method: 'createPayment',
+    const createCheckoutSession = async (customerEmail?: string, customerId?: string) => {
+      const checkoutMetadata = stringifyMetadataValues({
+        ...rest.metadata,
+        ...(provider_metadata?.metadata ?? {}),
+        [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id ?? null }),
       });
-    }
-    const paymentMetadata = stringifyMetadataValues({
-      ...rest.metadata,
-      ...(provider_metadata?.metadata ?? {}),
-      [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id ?? null }),
-    });
 
+      const { success_url } = validateRequiredKeys(
+        ['success_url'],
+        provider_metadata as Record<string, string>,
+        'The following fields must be present in the provider_metadata of createPayment: {keys}',
+      );
+
+      const checkoutOptions: Stripe.Checkout.SessionCreateParams = {
+        mode: 'payment',
+        line_items: [
+          {
+            price_data: {
+              currency: rest.currency,
+              product_data: { name: `Payment for ${data.item_id || 'item'}` },
+              unit_amount: rest.amount,
+            },
+            quantity: 1,
+          },
+        ],
+        metadata: checkoutMetadata,
+        payment_intent_data: {
+          capture_method:
+            capture_method as Stripe.PaymentIntentCreateParams.CaptureMethod,
+          setup_future_usage: 'off_session',
+        },
+        success_url: success_url,
+      };
+
+      if (customerId) checkoutOptions.customer = customerId;
+      else if (customerEmail) checkoutOptions.customer_email = customerEmail;
+
+      const checkoutSession = await this.stripe.checkout.sessions.create(checkoutOptions);
+
+      return {
+        id: checkoutSession.id,
+        amount: rest.amount,
+        currency: rest.currency,
+        customer: customerId ? customerId : customerEmail ? { email: customerEmail } : '',
+        status: 'pending' as const,
+        metadata: omitInternalMetadata(checkoutMetadata),
+        item_id: data.item_id ?? null,
+        requires_action: true,
+        payment_url: checkoutSession.url,
+      };
+    };
+
+    let customerId: string;
+
+    if (typeof customer === 'object' && 'email' in customer) {
+      const existingCustomers = await this.stripe.customers.list({
+        email: customer.email,
+        limit: 1,
+      });
+
+      if (existingCustomers.data.length > 0) customerId = existingCustomers.data[0].id;
+      else return createCheckoutSession(customer.email);
+    } else if (typeof customer === 'string') {
+      customerId = customer;
+    } else
+      throw new InvalidTypeError(
+        'customer',
+        'string (customer ID) or object with email',
+        typeof customer,
+        {
+          provider: this.providerName,
+          method: 'createPayment',
+        },
+      );
+
+    // For existing customers, check if they have payment methods
     const customerWithDefaultPaymentMethod = await this.stripe.customers.retrieve(
-      customer,
+      customerId,
       { expand: ['invoice_settings.default_payment_method'] },
     );
 
@@ -391,27 +459,34 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       ?.default_payment_method as string | undefined;
 
     if (!defaultPaymentMethod) {
-      const paymentMethods = await this.stripe.paymentMethods.list({ customer });
+      const paymentMethods = await this.stripe.paymentMethods.list({
+        customer: customerId,
+      });
 
       if (paymentMethods.data.length === 0) {
-        throw new ValidationError(
-          `Customer ${customer} has no payment methods. Add a payment method for the customer before creating a payment intent`,
-          { provider: this.providerName, method: 'createPayment' },
-        );
+        // Customer exists but has no payment methods, use checkout session
+        return createCheckoutSession(undefined, customerId);
       }
 
       defaultPaymentMethod = paymentMethods.data[0].id;
     }
 
+    // Customer has payment methods - create payment intent
+    const paymentMetadata = stringifyMetadataValues({
+      ...rest.metadata,
+      ...(provider_metadata?.metadata ?? {}),
+      [PAYKIT_METADATA_KEY]: JSON.stringify({ itemId: data.item_id ?? null }),
+    });
+
     const paymentIntentOptions: Stripe.PaymentIntentCreateParams = {
       currency: rest.currency,
       amount: rest.amount,
       metadata: paymentMetadata,
-      customer,
+      customer: customerId,
       capture_method: capture_method as Stripe.PaymentIntentCreateParams.CaptureMethod,
-      confirm: true, // automatically confirms the payment
+      confirm: true,
       payment_method: defaultPaymentMethod,
-      off_session: true, // uses customer's default payment method, avoids 3Ds/authentication
+      off_session: true,
     };
 
     if (data.billing) {
@@ -430,7 +505,6 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
     }
 
     const payment = await this.stripe.paymentIntents.create(paymentIntentOptions);
-
     return paykitPayment$InboundSchema(payment);
   };
 

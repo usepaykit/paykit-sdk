@@ -20,16 +20,23 @@ Configure in `medusa-config.ts`:
 
 ```typescript
 import { defineConfig } from '@medusajs/framework/utils';
-import { createStripe } from '@paykit-sdk/stripe';
+import { stripe } from '@paykit-sdk/stripe';
 
 export default defineConfig({
   modules: [
     {
-      resolve: '@paykit-sdk/medusajs',
+      resolve: '@medusajs/payment',
       options: {
-        provider: createStripe({ apiKey: process.env.STRIPE_API_KEY }),
-        webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
-        debug: process.env.NODE_ENV === 'development',
+        providers: [
+          {
+            resolve: '@paykit-sdk/medusajs',
+            options: {
+              provider: stripe(),
+              webhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
+              debug: process.env.NODE_ENV === 'development',
+            },
+          },
+        ],
       },
     },
   ],

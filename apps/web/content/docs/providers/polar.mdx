@@ -1,7 +1,7 @@
 ---
 title: 'Polar'
 description: 'Integrate Polar payments with PayKit.'
-date: '2025-08-02'
+date: '2025-10-30'
 published: true
 toc: true
 ---
@@ -46,8 +46,8 @@ import { PayKit } from '@paykit-sdk/core';
 import { createPolar } from '@paykit-sdk/polar';
 
 const provider = createPolar({
-  accessToken: process.env.POLAR_ACCESS_TOKEN,
-  server: 'sandbox', // or 'production'
+  accessToken: 'oat..',
+  isSandbox: true,
   debug: true,
 });
 
@@ -60,27 +60,39 @@ export { paykit };
 
 <br />
 
+Next.js catch‑all route. This forwards calls to the generated handlers.
+
+<br />
+
 ```typescript
-// api/checkouts/route.ts
-import { paykit } from '@/lib/paykit';
+// app/api/paykit/[...endpoint]/route.ts
+import { endpoints } from '@/lib/paykit';
+import type { EndpointArgs, EndpointHandler, EndpointPath } from '@paykit-sdk/core';
+import { NextResponse, NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
-  const { customer_id, item_id, session_type, metadata } = await request.json();
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ endpoint: string[] }> },
+) {
+  const { endpoint: endpointArray } = await params;
+  const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;
+  const handler = endpoints[endpoint] as EndpointHandler<typeof endpoint>;
 
-  const [checkout, error] = await paykit.checkouts.create({
-    customer_id,
-    item_id,
-    session_type,
-    metadata,
-    provider_metadata: {
-      successUrl: 'https://yourdomain.com/success',
-      cancelUrl: 'https://yourdomain.com/cancel',
-    },
-  });
+  if (!handler) {
+    return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });
+  }
 
-  if (error) return Response.json({ error: error.message }, { status: 400 });
-
-  return Response.json(checkout);
+  const body = await request.json();
+  const { args } = body as { args: EndpointArgs<typeof endpoint> };
+  try {
+    const result = await handler(...args);
+    return NextResponse.json({ result });
+  } catch (error) {
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 },
+    );
+  }
 }
 ```
 
@@ -91,51 +103,48 @@ export async function POST(request: Request) {
 In your Polar dashboard, enable the following webhook events:
 
 - `order.paid`
+- `order.created`
 - `customer.created`
 - `customer.updated`
-- `subscription.created`
+- `customer.deleted`
 - `subscription.updated`
-- `subscription.canceled`
+- `subscription.created`
+- `subscription.revoked`
+- `refund.created`
 
 ### Next.js API Route
 
 <br />
 
+Webhook route. This validates and dispatches events.
+
+<br />
+
 ```typescript
-// api/webhook/polar/route.ts
+// app/api/paykit/webhook/route.ts
 import { paykit } from '@/lib/paykit';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+  }
+
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-      // Handle checkout creation
-    })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
-      // Handle customer creation
-    })
-    .on('$customerUpdated', async event => {
-      console.log('Customer updated:', event.data);
-      // Handle customer updates
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
+    .setup({ webhookSecret })
+    .on('customer.created', async event => {})
+    .on('subscription.created', async event => {})
+    .on('payment.created', async event => {})
+    .on('refund.created', async event => {})
+    .on('invoice.generated', async event => {});
 
-      // Access custom field data filled by users
-      const customFieldData = event.data.custom_fields;
-      if (customFieldData) {
-        console.log('Custom fields:', customFieldData);
-      }
-
-      // Handle successful payment
-    });
-
-  const headers = Object.fromEntries(request.headers.entries());
   const body = await request.text();
-  await webhook.handle({ body, headers, fullUrl: request.url });
+  const headers = request.headers;
+  const url = request.url;
+
+  await webhook.handle({ body, headers, fullUrl: url });
 
   return NextResponse.json({ success: true });
 }
@@ -146,12 +155,12 @@ export async function POST(request: NextRequest) {
 <br />
 
 ```typescript
-// server/api/webhook/polar.ts
+// server/api/webhook/stripe.ts
 import { paykit } from '@/lib/paykit';
 
 export default defineEventHandler(async event => {
   const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.POLAR_WEBHOOK_SECRET! })
+    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
     .on('customer.created', async event => {
       console.log('customer created:', event.data);
     })
@@ -165,6 +174,7 @@ export default defineEventHandler(async event => {
   const headers = getHeaders(event);
   const body = await readBody(event);
   const url = event.url;
+
   await webhook.handle({ body, headers, fullUrl: url });
 
   return { success: true };
@@ -184,4 +194,4 @@ POLAR_WEBHOOK_SECRET=your-webhook-secret
 ## Support
 
 - [Polar Documentation](https://docs.polar.sh/)
-- [PayKit Issues](https://github.com/devodii/paykit/issues)
+- [PayKit Issues](https://github.com/usepaykit/paykit-sdk/issues)

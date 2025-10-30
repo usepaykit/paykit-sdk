@@ -12,11 +12,10 @@ export const CheckoutForm = () => {
       session_type: 'one_time',
       item_id: 'price_123',
       quantity: 1,
-      customer: 'cus_123', // or { email: 'test@example.com' }
+      customer: 'cus_z123', // or { email: 'odii@gmail.com' }
       metadata: { source: 'web_app' },
-      cancel_url: 'https://example.com/cancel',
-      success_url: 'https://example.com/success',
-      provider_metadata: {},
+      cancel_url: 'http://localhost:3000/dashboard',
+      success_url: 'http://localhost:3000/success',
     });
 
     if (error) {

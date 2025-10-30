@@ -40,7 +40,7 @@ export interface IPayment extends Document {
   amount: number;
   currency: string;
   status: PaymentStatus;
-  productId?: string;
+  itemId?: string;
   metadata: Record<string, any>;
   customerId?: Types.ObjectId | ICustomer;
   customerEmail?: string;
@@ -120,7 +120,7 @@ const PaymentSchema = new Schema<IPayment>(
       required: true,
       index: true,
     },
-    productId: { type: String },
+    itemId: { type: String, index: true },
     metadata: { type: Schema.Types.Mixed, required: true },
     customerId: { type: String, ref: 'Customer', index: true },
     customerEmail: { type: String, index: true },

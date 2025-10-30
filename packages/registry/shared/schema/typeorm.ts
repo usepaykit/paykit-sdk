@@ -77,8 +77,8 @@ import {
     @Index()
     status!: PaymentStatus;
   
-    @Column({ type: 'text', nullable: true, name: 'product_id' })
-    productId?: string;
+    @Column({ type: 'text', nullable: true, name: 'item_id' })
+    itemId?: string;
   
     @Column({ type: 'jsonb' })
     metadata!: Record<string, any>;

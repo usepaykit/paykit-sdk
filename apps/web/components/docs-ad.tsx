@@ -21,10 +21,10 @@ export const DocsAd = () => {
             with Supabase, Vercel, and more.
           </p>
           <div className="text-xs font-medium text-green-600 dark:text-green-400">
-            🎁 First 100 persons - 95 left
+            🎁 First 50 persons - left
           </div>
           <Button className="w-full" size="sm">
-            Get Lifetime Access - $99
+            Get Lifetime Access - $49
           </Button>
         </Card.Content>
       </Card.Root>

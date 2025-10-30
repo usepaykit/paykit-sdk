@@ -1,7 +1,7 @@
 ---
 title: 'Payment Providers'
 description: 'Supported payment providers and their integration guides.'
-date: '2025-08-03'
+date: '2025-10-30'
 published: true
 toc: true
 ---
@@ -11,15 +11,6 @@ toc: true
 PayKit supports multiple payment providers, allowing you to switch between them seamlessly.
 
 <div className="mt-8 grid gap-4 grid-cols-1 md:grid-cols-3 md:gap-6">
-  <LinkedCard href="/docs/providers/local">
-   <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-foreground size-8" aria-hidden="true">
-    <path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z" />
-    <path d="M20 3v4"></path><path d="M22 5h-4"></path><path d="M4 17v2"></path><path d="M5 18H3" />
-  </svg>
-    <p className="mt-2 font-medium">Local Provider</p>
-    <p className="mt-1 text-sm text-muted-foreground">For development and testing</p>
-  </LinkedCard>
-
 <LinkedCard href="/docs/providers/stripe">
   <div className="flex h-10 w-10 items-center justify-center rounded-lg">
     <img
@@ -32,11 +23,23 @@ PayKit supports multiple payment providers, allowing you to switch between them 
   <p className="text-muted-foreground mt-1 text-sm">Global payment processing</p>
 </LinkedCard>
 
-  <LinkedCard href="/docs/providers/polar">
+<LinkedCard href="/docs/providers/polar">
+  <div className="flex h-10 w-10 items-center justify-center rounded-lg">
+    <img
+      src="/providers/polar.jpg"
+      alt="Polar"
+      className="border-background size-8 rounded-full"
+    />
+  </div>
+  <p className="mt-2 font-medium">Polar</p>
+  <p className="text-muted-foreground mt-1 text-sm">Open source monetization</p>
+</LinkedCard>
+
+  <LinkedCard href="/docs/providers/paypal">
     <div className="flex h-10 w-10 items-center justify-center rounded-lg">
-      <img src="/providers/polar.jpg" alt="Polar" className="size-8 rounded-full border-background" />
+      <img src="/providers/paypal.webp" alt="PayPal" className="size-8 rounded-full border-background" />
     </div>
-    <p className="mt-2 font-medium">Polar</p>
+    <p className="mt-2 font-medium">PayPal</p>
     <p className="mt-1 text-sm text-muted-foreground">Open source monetization</p>
   </LinkedCard>
 </div>

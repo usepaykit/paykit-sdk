@@ -48,7 +48,7 @@ export const payments = pgTable(
     amount: integer('amount').notNull(),
     currency: text('currency').notNull(),
     status: paymentStatusEnum('status').notNull(),
-    productId: text('product_id'),
+    itemId: text('item_id'),
     metadata: json('metadata').notNull(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),

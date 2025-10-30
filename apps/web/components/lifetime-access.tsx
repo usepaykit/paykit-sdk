@@ -30,13 +30,11 @@ export const LifetimeAccess = () => {
                       <h3 className="text-2xl font-bold">What’s included</h3>
                       <div className="space-y-3">
                         {[
-                          'Stellar crypto payments integration',
                           'Invoice builder',
-                          'See total income across all providers',
                           'Manage all customers in one place',
-                          "Add billing portals to providers that don't offer them",
                           'Invite team members with permissions',
-                          'Auto-organize customers and sales',
+                          'Billing portal included, even if your provider doesn’t offer it',
+                          'And many more...',
                         ].map(feature => (
                           <div key={feature} className="flex items-center space-x-3">
                             <div className="flex h-6 w-6 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
@@ -65,18 +63,16 @@ export const LifetimeAccess = () => {
                       </Card.Header>
                       <Card.Content className="text-center">
                         <div className="mb-4">
-                          <span className="text-4xl font-bold">$99</span>
+                          <span className="text-4xl font-bold">$49</span>
                           <span className="text-muted-foreground text-sm"> USD</span>
                         </div>
                         <div className="space-y-2">
                           <div className="text-muted-foreground text-sm">
                             Launching in v2
                           </div>
-                          <div className="text-muted-foreground text-sm">
-                            Never break your MRR streak
-                          </div>
-                          <div className="text-sm font-medium text-green-600 dark:text-green-400">
-                            🎁 First 100 persons - 95 left
+
+                          <div className="text-sm font-medium text-green-600/80 dark:text-green-400/80">
+                            🎁 First 50 persons - 47 left
                           </div>
                         </div>
                         <Button className="mt-6 w-full" size="lg" asChild>

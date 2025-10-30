@@ -195,8 +195,4 @@ body {
   .font-pt-sans {
     font-family: var(--font-pt-sans);
   }
-
-  .font-geist-mono {
-    font-family: var(--font-geist-mono);
-  }
 }

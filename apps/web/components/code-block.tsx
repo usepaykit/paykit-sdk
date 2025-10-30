@@ -135,6 +135,7 @@ function CodeBlockContent({
   if (language === 'bash') {
     customStyleObj.background = resolvedTheme === 'dark' ? '#1f1f1f' : '#f5f5f5';
     customStyleObj.color = resolvedTheme === 'dark' ? '#a1a1aa' : '#71717a';
+    customStyleObj.borderRadius = '8px';
   }
 
   const theme =
@@ -172,6 +173,9 @@ function CodeBlockContent({
       resolvedTheme === 'dark' ? '#1f1f1f' : '#f5f5f5';
     theme['code[class*="language-"]'].background =
       resolvedTheme === 'dark' ? '#1f1f1f' : '#f5f5f5';
+    // unify corner radius for shell blocks
+    theme['pre[class*="language-"]'].borderRadius = '8px';
+    theme['code[class*="language-"]'].borderRadius = '8px';
   }
 
   return (
@@ -198,6 +202,10 @@ export const CodeBlock = ({
   const mounted = useMounted();
   const [copied, setCopied] = useState(false);
 
+  const lang = (props.language || '').toLowerCase();
+  const isShell = lang === 'bash' || lang === 'sh' || lang === 'shell';
+  const shouldShowHeader = !isShell && (showCopyButton || !!filename);
+
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(children);
     setCopied(true);
@@ -206,7 +214,34 @@ export const CodeBlock = ({
 
   if (!mounted) return <div className="bg-muted/20 h-6 animate-pulse rounded" />;
 
-  if (!showCopyButton && !filename) {
+  // Shell variant: inline copy button inside the same block, no header
+  if (!shouldShowHeader) {
+    if (isShell && showCopyButton) {
+      return (
+        <div className="relative">
+          <CodeBlockContent {...props}>{children}</CodeBlockContent>
+          <Tooltip.Root>
+            <Tooltip.Trigger className="absolute top-2 right-2">
+              <Button
+                variant="ghost"
+                size="sm"
+                className="h-7 w-7 p-0"
+                onClick={copyToClipboard}
+                aria-label="Copy code"
+                title={copied ? 'Copied' : 'Copy'}
+              >
+                {copied ? (
+                  <Check className="h-3.5 w-3.5" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content side="left">{copied ? 'Copied' : 'Copy'}</Tooltip.Content>
+          </Tooltip.Root>
+        </div>
+      );
+    }
     return <CodeBlockContent {...props}>{children}</CodeBlockContent>;
   }
 
@@ -222,7 +257,7 @@ export const CodeBlock = ({
           <div />
         )}
 
-        {showCopyButton && (
+        {showCopyButton && !isShell && (
           <Tooltip.Root>
             <Tooltip.Trigger className="max-h-8">
               <Button

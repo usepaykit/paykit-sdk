@@ -17,7 +17,7 @@ model Payment {
   amount     Int
   currency   String
   status     PaymentStatus
-  productId  String?       @map("product_id")
+  itemId  String?       @map("item_id")
   metadata   Json
   createdAt  DateTime      @default(now())
   updatedAt  DateTime      @updatedAt

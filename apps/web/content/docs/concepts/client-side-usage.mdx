@@ -1,7 +1,7 @@
 ---
 title: 'Client-Side Usage'
 description: 'Learn how to use PayKit in React applications.'
-date: '2025-08-02'
+date: '2025-10-30'
 published: true
 toc: true
 ---
@@ -10,36 +10,20 @@ PayKit provides React hooks for seamless client-side integration. The React SDK 
 
 ## Basic Setup
 
-Initialize PayKit
-
-<br />
-
-```typescript
-// lib/paykit.ts
-import { PayKit } from '@paykit-sdk/core';
-import { local } from '@paykit-sdk/local';
-
-const provider = local();
-
-const paykit = new PayKit(provider);
-
-export { paykit, provider };
-```
-
 Wrap your app with the PayKit provider:
 
 <br />
 
 ```typescript
-// app/providers.tsx
-import { PayKitProvider } from '@paykit-sdk/react';
-import { provider } from '@/lib/paykit';
+// app/layout.tsx
+import * as React from "react"
+import { PaykitProvider } from '@paykit-sdk/react';
 
-export function Providers({ children }: { children: React.ReactNode }) {
+export default function Layout({ children }: React.PropsWithChildren) {
   return (
-    <PayKitProvider provider={provider}>
+    <PaykitProvider apiUrl="/api/paykit" headers={{ xApiKey: "12345"}}>
       {children}
-    </PayKitProvider>
+    </PaykitProvider>
   );
 }
 ```
@@ -165,14 +149,14 @@ export function CheckoutButton() {
 
   const handleCheckout = async () => {
     const [checkout, error] = await create.run({
-      customer_id: 'cus_123',
+      customer_id: 'cus_123', // or { email: 'odii@gmail.com' }
       item_id: 'price_123',
+      quantity: 1,
       session_type: 'one_time',
       metadata: { source: 'web_app' },
-      provider_metadata: {
-        amount: 200,
-        currency: 'GBP'
-      },
+      provider_metadata: {},
+      cancel_url: 'http://localhost:3000/dashboard',
+      success_url: 'http://localhost:3000/success'
     });
 
     if (error) {
@@ -322,14 +306,17 @@ export function SubscriptionUpdate({ subscriptionId }: { subscriptionId: string 
 ### Canceling a Subscription
 
 <br />
-```typescript // components/subscription-cancel.tsx import {useSubscription} from
-'@paykit-sdk/react';
+
+```typescript
+// components/subscription-cancel.tsx
+
+import {useSubscription} from '@paykit-sdk/react';
 
 export function SubscriptionCancel({ subscriptionId }: { subscriptionId: string }) {
   const { cancel } = useSubscription();
 
-const handleCancel = async () => {
-const [subscription, error] = await cancel.run(subscriptionId);
+  const handleCancel = async () => {
+    const [subscription, error] = await cancel.run(subscriptionId);
 
     if (error) {
       console.error('Failed to cancel subscription:', error.message);
@@ -341,21 +328,23 @@ const [subscription, error] = await cancel.run(subscriptionId);
 };
 
 return (
+  <button onClick={handleCancel} disabled={cancel.loading}>
+    {cancel.loading ? 'Cancelling...' : 'Cancel Subscription'}
+  </button>
+ );
+}
 
-<button onClick={handleCancel} disabled={cancel.loading}>
-  {cancel.loading ? 'Cancelling...' : 'Cancel Subscription'}
-</button>
-); }
-
-````
+```
 
 ## Hook Methods
 
 All PayKit hooks provide consistent methods with `.run` and `.loading` to perform the action and give a loading state
 
+<br />
+
 ```typescript
 const { create, retrieve, update, cancel } = useResource();
-````
+```
 
 - `create` - Function to create a resource
 - `retrieve` - Function to retrieve resource

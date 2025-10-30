@@ -4,6 +4,7 @@ import { cn } from '@paykit-sdk/ui';
 import { Analytics } from '@vercel/analytics/next';
 import type { Metadata } from 'next';
 import { PT_Sans } from 'next/font/google';
+import NextTopLoader from 'nextjs-toploader';
 
 const ptSans = PT_Sans({
   subsets: ['latin'],
@@ -72,6 +73,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={cn(ptSans.variable, 'antialiased')}>
+        <NextTopLoader color={'hsl(var(--primary))'} height={2} showSpinner={false} />
         <AppProviders>{children}</AppProviders>
         <Analytics />
       </body>

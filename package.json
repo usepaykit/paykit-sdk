@@ -39,7 +39,7 @@
   "author": "Emmanuel Odii",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/devodii/paykit/issues"
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
   },
   "dependencies": {
     "@changesets/cli": "^2.29.7",

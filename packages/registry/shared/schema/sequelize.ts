@@ -52,7 +52,7 @@ export const initializeSequelize = (sequelize: Sequelize) => {
     declare amount: number;
     declare currency: string;
     declare status: string;
-    declare productId?: string;
+    declare itemId?: string;
     declare metadata: Record<string, any>;
     declare customerId?: string;
     declare customerEmail?: string;
@@ -88,10 +88,10 @@ export const initializeSequelize = (sequelize: Sequelize) => {
         ),
         allowNull: false,
       },
-      productId: {
+      itemId: {
         type: DataTypes.STRING,
         allowNull: true,
-        field: 'product_id',
+        field: 'item_id',
       },
       metadata: {
         type: DataTypes.JSONB,

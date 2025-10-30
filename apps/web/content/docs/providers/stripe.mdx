@@ -1,7 +1,7 @@
 ---
 title: 'Stripe'
 description: 'Integrate Stripe payments with PayKit.'
-date: '2025-08-02'
+date: '2025-10-30'
 published: true
 toc: true
 ---
@@ -10,7 +10,7 @@ PayKit provides seamless Stripe integration with a unified API that works across
 
 ## Quick Start
 
-Install the Stripe provider:
+Install the configure Stripe provider:
 
 <br />
 
@@ -23,6 +23,8 @@ npm install @paykit-sdk/stripe
 
 ### Method 1: Environment Variables
 
+<br />
+
 ```typescript
 // lib/paykit.ts
 import { PayKit } from '@paykit-sdk/core';
@@ -30,11 +32,14 @@ import { stripe } from '@paykit-sdk/stripe';
 
 const provider = stripe(); // Ensure STRIPE_API_KEY environment variable is set
 const paykit = new PayKit(provider);
+const endpoints = createEndpointHandlers(paykit);
 
-export { paykit };
+export { paykit, endpoints };
 ```
 
 ### Method 2: Direct Configuration
+
+<br />
 
 ```typescript
 // lib/paykit.ts
@@ -42,40 +47,53 @@ import { PayKit } from '@paykit-sdk/core';
 import { createStripe } from '@paykit-sdk/stripe';
 
 const provider = createStripe({
-  apiKey: process.env.STRIPE_API_KEY,
-  apiVersion: '2025-07-30.basil',
+  apiKey: 'sk_...',
+  debug: true,
 });
 
 const paykit = new PayKit(provider);
+const endpoints = createEndpointHandlers(paykit);
 
-export { paykit };
+export { paykit, endpoints };
 ```
 
 ## Basic Usage
 
 <br />
 
+Next.js catch‑all route. This forwards calls to the generated handlers.
+
+<br />
+
 ```typescript
-// api/checkouts/route.ts
-import { paykit } from '@/lib/paykit';
+// app/api/paykit/[...endpoint]/route.ts
+import { endpoints } from '@/lib/paykit';
+import type { EndpointArgs, EndpointHandler, EndpointPath } from '@paykit-sdk/core';
+import { NextResponse, NextRequest } from 'next/server';
 
-export async function POST(request: Request) {
-  const { customer_id, item_id, session_type, metadata } = await request.json();
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ endpoint: string[] }> },
+) {
+  const { endpoint: endpointArray } = await params;
+  const endpoint = ('/' + endpointArray.join('/')) as EndpointPath;
+  const handler = endpoints[endpoint] as EndpointHandler<typeof endpoint>;
 
-  const [checkout, error] = await paykit.checkouts.create({
-    customer_id,
-    item_id,
-    session_type,
-    metadata,
-    provider_metadata: {
-      ui_mode: 'hosted',
-      success_url: 'https://yourdomain.com/success',
-      cancel_url: 'https://yourdomain.com/cancel',
-    },
-  });
+  if (!handler) {
+    return NextResponse.json({ message: 'Endpoint not found' }, { status: 404 });
+  }
 
-  if (error) return Response.json({ error: error.message }, { status: 400 });
-  return Response.json(checkout);
+  const body = await request.json();
+  const { args } = body as { args: EndpointArgs<typeof endpoint> };
+  try {
+    const result = await handler(...args);
+    return NextResponse.json({ result });
+  } catch (error) {
+    return NextResponse.json(
+      { message: error instanceof Error ? error.message : 'Internal server error' },
+      { status: 500 },
+    );
+  }
 }
 ```
 
@@ -97,46 +115,34 @@ In your Stripe dashboard, enable the following webhook events:
 
 <br />
 
+Webhook route. This validates and dispatches events.
+
+<br />
+
 ```typescript
-// api/webhook/stripe/route.ts
+// app/api/paykit/webhook/route.ts
 import { paykit } from '@/lib/paykit';
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
-  const webhook = paykit.webhooks
-    .setup({ webhookSecret: process.env.STRIPE_WEBHOOK_SECRET! })
-    .on('$checkoutCreated', async event => {
-      console.log('Checkout created:', event.data);
-      // Handle checkout creation
-    })
-    .on('$customerCreated', async event => {
-      console.log('Customer created:', event.data);
-      // Handle customer creation
-    })
-    .on('$customerUpdated', async event => {
-      console.log('Customer updated:', event.data);
-      // Handle customer updates
-    })
-    .on('$subscriptionCreated', async event => {
-      console.log('Subscription created:', event.data);
-      // Handle subscription creation
-    })
-    .on('$subscriptionUpdated', async event => {
-      console.log('Subscription updated:', event.data);
-      // Handle subscription updates
-    })
-    .on('$subscriptionCancelled', async event => {
-      console.log('Subscription cancelled:', event.data);
-      // Handle subscription cancellation
-    })
-    .on('$invoicePaid', async event => {
-      console.log('Payment received:', event.data);
-      // Handle successful payment
-    });
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!webhookSecret) {
+    return NextResponse.json({ error: 'Webhook secret not configured' }, { status: 500 });
+  }
 
-  const headers = Object.fromEntries(request.headers.entries());
+  const webhook = paykit.webhooks
+    .setup({ webhookSecret })
+    .on('customer.created', async event => {})
+    .on('subscription.created', async event => {})
+    .on('payment.created', async event => {})
+    .on('refund.created', async event => {})
+    .on('invoice.generated', async event => {});
+
   const body = await request.text();
+  const headers = request.headers;
   const url = request.url;
+
   await webhook.handle({ body, headers, fullUrl: url });
 
   return NextResponse.json({ success: true });
@@ -167,6 +173,7 @@ export default defineEventHandler(async event => {
   const headers = getHeaders(event);
   const body = await readBody(event);
   const url = event.url;
+
   await webhook.handle({ body, headers, fullUrl: url });
 
   return { success: true };
@@ -190,15 +197,15 @@ Stripe supports additional configuration through `provider_metadata`:
 <br />
 
 ```typescript
-const [checkout, error] = await paykit.checkouts.create({
-  customer_id: 'cus_123',
+const checkout = await paykit.checkouts.create({
+  customer_id: 'cus_123', //  or { email: 'odii@test.com' }
   item_id: 'price_123',
   session_type: 'one_time',
+  quantity: 1,
   metadata: { plan: 'pro' },
+  success_url: 'http://localhost:3000/success',
+  cancel_url: 'http://localhost:3000/dashboard',
   provider_metadata: {
-    ui_mode: 'hosted',
-    success_url: 'https://yourdomain.com/success',
-    cancel_url: 'https://yourdomain.com/cancel',
     tax_id_collection: { enabled: true },
     payment_method_collection: 'always',
   },
@@ -208,3 +215,4 @@ const [checkout, error] = await paykit.checkouts.create({
 ## Support
 
 - [Stripe Documentation](https://stripe.com/docs)
+- [PayKit Issues](https://github.com/usepaykit/paykit-sdk/issues)

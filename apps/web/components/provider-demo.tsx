@@ -88,9 +88,6 @@ export function ProviderDemo() {
                   <div className="p-6">
                     <div className="mb-6 flex items-center justify-between">
                       <div className="flex items-center space-x-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-blue-500 to-purple-600">
-                          <Code2 className="h-4 w-4 text-white" />
-                        </div>
                         <div>
                           <h3 className="text-lg font-semibold">
                             {selectedProvider.charAt(0).toUpperCase() +

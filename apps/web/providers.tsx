@@ -15,7 +15,7 @@ export const AppProviders = ({ children }: { children: React.ReactNode }) => {
   return (
     <Provider
       attribute="class"
-      defaultTheme="light"
+      defaultTheme="dark"
       enableSystem
       disableTransitionOnChange
     >

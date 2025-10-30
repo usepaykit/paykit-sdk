@@ -36,10 +36,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/devodii/paykit.git"
+    "url": "git+https://github.com/usepaykit/paykit-sdk.git"
   },
   "bugs": {
-    "url": "https://github.com/devodii/paykit/issues"
+    "url": "https://github.com/usepaykit/paykit-sdk/issues"
   },
   "dependencies": {
     "commander": "^14.0.0",

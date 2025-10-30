@@ -5,12 +5,12 @@ import { Paykit as PaykitIcon } from '@/components/icons';
 import { LifetimeAccess } from '@/components/lifetime-access';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ReactHooksDemo } from '@/components/react-hooks-demo';
+import { SiteHeader } from '@/components/site-header';
 import { ThemeToggle } from '@/components/theme-toggle';
-import AydenLogo from '@/public/providers/ayden.png';
 import PaypalLogo from '@/public/providers/paypal.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
-import { Separator, Button, Badge, cn } from '@paykit-sdk/ui';
+import { Separator, Button, Badge, cn, Sheet } from '@paykit-sdk/ui';
 import { BookOpen, Zap, Github, MessageCircle } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -45,47 +45,7 @@ const Index = () => {
             <span className="text-xl font-bold tracking-tight">PayKit</span>
           </Link>
 
-          {/* Desktop Navigation */}
-          <div className="flex items-center space-x-1 md:flex">
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/docs/introduction">
-                <BookOpen className="mr-2 size-4" />
-                Docs
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link
-                href="https://github.com/usepaykit"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <Github className="mr-2 size-4" />
-                GitHub
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link
-                href="https://x.com/usepaykit"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <TwitterIcon className="mr-2 size-4" />
-                Twitter
-              </Link>
-            </Button>
-            <Button asChild variant="ghost" size="sm">
-              <Link
-                href="#"
-                target="_blank"
-                rel="noopener noreferrer"
-                title="Coming soon"
-              >
-                <MessageCircle className="mr-2 size-4" />
-                Discord
-              </Link>
-            </Button>
-            <ThemeToggle />
-          </div>
+          <SiteHeader />
         </nav>
       </header>
 
@@ -108,10 +68,14 @@ const Index = () => {
             </span>
           </h1>
 
-          <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl">
-            PayKit lets you build billing systems that work locally, then deploy anywhere.
-            Switch providers with a single line of code.
-          </p>
+          <div className="flex flex-col items-center">
+            <p className="text-muted-foreground mx-auto max-w-3xl text-xl leading-relaxed md:text-2xl">
+              PayKit lets you build payments with a consistent Typescript API.
+            </p>
+            <p className="text-muted-foreground mx-auto -mt-2 max-w-3xl text-xl leading-relaxed md:text-2xl">
+              Switch providers later by swapping the adapter.
+            </p>
+          </div>
 
           <div className="flex flex-col items-center justify-center gap-4 pt-4 sm:flex-row">
             <CopyButton
@@ -135,7 +99,6 @@ const Index = () => {
                 { logo: StripeLogo, name: 'Stripe' },
                 { logo: PolarLogo, name: 'Polar' },
                 { logo: PaypalLogo, name: 'Paypal' },
-                { logo: AydenLogo, name: 'Ayden' },
               ].map((provider, index) => (
                 <div
                   key={provider.name}
@@ -247,10 +210,10 @@ const Index = () => {
                 </li>
                 <li>
                   <Link
-                    href="/docs/providers/local"
+                    href="/docs/providers/adapters"
                     className="hover:text-foreground transition-colors"
                   >
-                    Local Development
+                    Adapters
                   </Link>
                 </li>
               </ul>
@@ -318,7 +281,7 @@ const Index = () => {
             </div>
 
             <p className="text-muted-foreground text-sm">
-              © 2024 PayKit. All rights reserved.
+              © {new Date().getFullYear()} PayKit. All rights reserved.
             </p>
           </div>
         </div>

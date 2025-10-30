@@ -31,8 +31,9 @@ export const docsConfig = {
           title: 'Installation',
           href: '/docs/installation-root',
           items: [
-            { title: 'React', href: '/docs/vitejs-installation', items: [] },
-            { title: 'Next.js', href: '/docs/nextjs-installation', items: [] },
+            { title: 'Next.js Guide', href: '/docs/nextjs-installation', items: [] },
+            { title: 'Hono Guide', href: '/docs/hono-installation', items: [] },
+            { title: 'Express Guide', href: '/docs/express-installation', items: [] },
           ],
         },
         { title: 'Quick Start', href: '/docs/getting-started', items: [] },
@@ -42,9 +43,9 @@ export const docsConfig = {
       title: 'Payment Providers',
       items: [
         { title: 'Overview', href: '/docs/providers/overview', items: [] },
-        { title: 'Local', href: '/docs/providers/local', items: [] },
         { title: 'Stripe', href: '/docs/providers/stripe', items: [] },
         { title: 'Polar', href: '/docs/providers/polar', items: [] },
+        { title: 'PayPal', href: '/docs/providers/paypal', items: [] },
       ],
     },
     {
@@ -57,8 +58,11 @@ export const docsConfig = {
           href: '/docs/concepts/client-side-usage',
           items: [],
         },
-        { title: 'Framework Examples', href: '/docs/framework-examples', items: [] },
       ],
+    },
+    {
+      title: 'Adapters',
+      items: [{ title: 'MedusaJS', href: '/docs/adapters/medusajs', items: [] }],
     },
   ],
 } satisfies {

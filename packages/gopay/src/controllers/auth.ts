@@ -23,14 +23,18 @@ export class AuthController {
       if (expiry > Date.now()) return token;
     }
 
+    console.log({ opts: this.opts });
+
     // Generate a new one
     const credentials = Buffer.from(
       `${this.opts.clientId}:${this.opts.clientSecret}`,
     ).toString('base64');
+
     const response = await this._client.post<GoPayTokenResponse>('/oauth2/token', {
       headers: {
         Authorization: `Basic ${credentials}`,
         'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
       },
       body: new URLSearchParams({
         grant_type: 'client_credentials',
@@ -38,9 +42,21 @@ export class AuthController {
       }).toString(),
     });
 
-    if (!response.ok || !response.value.access_token) {
+    // Log the actual response for debugging
+    console.log('GoPay Auth Response:', JSON.stringify(response, null, 2));
+
+    if (!response.ok || !response.value?.access_token) {
+      // Log the actual error response
+      console.error('GoPay Auth Error:', {
+        ok: response.ok,
+        error: response.error,
+        value: response.value,
+      });
+
       throw new OperationFailedError('getAccessToken', 'gopay', {
-        cause: new Error('Failed to obtain GoPay access token'),
+        cause: new Error(
+          `Failed to obtain GoPay access token: ${JSON.stringify(response.value || response.error)}`,
+        ),
       });
     }
 

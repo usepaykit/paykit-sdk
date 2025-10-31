@@ -70,9 +70,20 @@ export class HTTPClient {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
-      return await fetch(url, { method: 'GET', ...requestOptions })
-        .then(res => OK(res.json() as T))
-        .catch(err => this.errorHandler(err));
+
+      const res = await fetch(url, { method: 'GET', ...requestOptions });
+
+      const data = (await res.json()) as T;
+
+      if (!res.ok) {
+        return ERR(
+          buildError(
+            classifyError(new Error(`${res.status}: ${JSON.stringify(data)}`)),
+            data,
+          ),
+        );
+      }
+      return OK(data);
     });
   };
 
@@ -83,9 +94,20 @@ export class HTTPClient {
     return this.withRetry(async () => {
       const url = this.getFullUrl(endpoint);
       const requestOptions = this.getRequestOptions(options);
-      return await fetch(url, { method: 'POST', ...requestOptions })
-        .then(res => OK(res.json() as T))
-        .catch(err => this.errorHandler(err));
+      const res = await fetch(url, { method: 'POST', ...requestOptions });
+
+      const data = (await res.json()) as T;
+
+      if (!res.ok) {
+        return ERR(
+          buildError(
+            classifyError(new Error(`${res.status}: ${JSON.stringify(data)}`)),
+            data,
+          ),
+        );
+      }
+
+      return OK(data);
     });
   };
 

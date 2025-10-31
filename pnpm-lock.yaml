@@ -537,6 +537,9 @@ importers:
       '@paykit-sdk/core':
         specifier: workspace:*
         version: link:../../packages/paykit
+      '@paykit-sdk/gopay':
+        specifier: workspace:*
+        version: link:../../packages/gopay
       '@paykit-sdk/paypal':
         specifier: workspace:*
         version: link:../../packages/paypal

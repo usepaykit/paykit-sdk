@@ -96,6 +96,20 @@ export async function POST(
 
 ## Webhook Setup
 
+### Enable Events
+
+In your PayPal Application, enable the following webhook events:
+
+- `CHECKOUT.ORDER.APPROVED`
+- `CHECKOUT.ORDER.COMPLETED`
+- `PAYMENT.CAPTURE.COMPLETED`
+- `PAYMENT.CAPTURE.REFUNDED`
+- `BILLING.SUBSCRIPTION.CREATED`
+- `BILLING.SUBSCRIPTION.UPDATED`
+- `BILLING.SUBSCRIPTION.CANCELLED`
+- `BILLING.SUBSCRIPTION.EXPIRED`
+- `BILLING.SUBSCRIPTION.SUSPENDED`
+
 <br />
 
 Webhook route. This validates and dispatches events.
@@ -128,9 +142,14 @@ export async function POST(request: NextRequest) {
   const headers = request.headers;
   const url = request.url;
 
-  await webhook.handle({ body, headers, fullUrl: url });
-
-  return NextResponse.json({ success: true });
+  try {
+    await webhook.handle({ body, headers, fullUrl: url });
+    console.log('Webhook handled');
+    return NextResponse.json({ success: true });
+  } catch {
+    console.error('Webhook error:', error);
+    return NextResponse.json({ success: false }, { status: 500 });
+  }
 }
 ```
 

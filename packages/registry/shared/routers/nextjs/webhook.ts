@@ -30,7 +30,12 @@ export async function POST(request: NextRequest) {
   const body = await request.text();
   const headers = request.headers;
   const url = request.url;
-  await webhook.handle({ body, headers, fullUrl: url });
 
-  return NextResponse.json({ success: true });
+  try {
+    await webhook.handle({ body, headers, fullUrl: url });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.log('Webhook Error', error);
+    return NextResponse.json({ success: false });
+  }
 }

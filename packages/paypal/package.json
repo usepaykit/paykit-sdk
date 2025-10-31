@@ -26,7 +26,8 @@
     "zod": "^3.24.2"
   },
   "dependencies": {
-    "@paypal/paypal-server-sdk": "^1.1.0"
+    "@paypal/paypal-server-sdk": "^1.1.0",
+    "esbuild": "^0.25.11"
   },
   "peerDependencies": {
     "@paykit-sdk/core": ">=1.1.101"

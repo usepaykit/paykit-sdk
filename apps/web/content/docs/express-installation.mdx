@@ -106,9 +106,14 @@ router.post('/webhook', express.text({ type: '*/*' }), async (req, res) => {
   const headers = new Headers(Object.entries(req.headers) as [string, string][]);
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
-  await webhook.handle({ body, headers, fullUrl });
-
-  return res.json({ success: true });
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl });
+    return res.json({ success: true });
+  } catch {
+    console.error('Webhook error:', error);
+    return res.json({ success: false });
+  }
 });
 
 export default router;

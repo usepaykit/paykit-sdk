@@ -98,9 +98,15 @@ export async function POST(request: NextRequest) {
   const body = await request.text();
   const headers = request.headers;
   const url = request.url;
-  await webhook.handle({ body, headers, fullUrl: url });
 
-  return NextResponse.json({ success: true });
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl: url });
+    return NextResponse.json({ success: true });
+  } catch {
+    console.error('Webhook error:', error);
+    return NextResponse.json({ success: false });
+  }
 }
 ```
 

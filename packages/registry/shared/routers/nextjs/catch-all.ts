@@ -25,9 +25,7 @@ export async function POST(
     return NextResponse.json({ result });
   } catch (error) {
     console.error('PayKit API Error:', error);
-    return NextResponse.json(
-      { message: error instanceof Error ? error.message : 'Internal server error' },
-      { status: 500 },
-    );
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return NextResponse.json({ message }, { status: 500 });
   }
 }

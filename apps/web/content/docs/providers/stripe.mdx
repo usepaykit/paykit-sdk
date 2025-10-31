@@ -143,9 +143,14 @@ export async function POST(request: NextRequest) {
   const headers = request.headers;
   const url = request.url;
 
-  await webhook.handle({ body, headers, fullUrl: url });
-
-  return NextResponse.json({ success: true });
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl: url });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.log('Webhook Error', error);
+    return NextResponse.json({ success: false });
+  }
 }
 ```
 
@@ -174,9 +179,14 @@ export default defineEventHandler(async event => {
   const body = await readBody(event);
   const url = event.url;
 
-  await webhook.handle({ body, headers, fullUrl: url });
-
-  return { success: true };
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl: url });
+    return { success: true };
+  } catch (error) {
+    console.log('Webhook Error', error);
+    return { success: false };
+  }
 });
 ```
 

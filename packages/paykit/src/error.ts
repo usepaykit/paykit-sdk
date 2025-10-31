@@ -1,5 +1,3 @@
-import { inspect } from 'util';
-
 /**
  * Base PayKit error class
  */
@@ -57,6 +55,7 @@ export class NotImplementedError extends PayKitError {
       provider,
       method,
     });
+    this.stack = undefined;
   }
 }
 
@@ -162,6 +161,7 @@ export class WebhookError extends PayKitError {
       provider: options?.provider,
       context: { provider: options?.provider },
     });
+    this.stack = undefined;
   }
 }
 
@@ -183,6 +183,7 @@ export class ConfigurationError extends PayKitError {
       provider: options?.provider,
       context: { missingKeys: options?.missingKeys },
     });
+    this.stack = undefined;
   }
 }
 
@@ -200,7 +201,6 @@ export class OperationFailedError extends PayKitError {
     },
   ) {
     const message = `Failed to ${operation}${provider ? ` with ${provider}` : ''}${options?.reason ? `: ${options.reason}` : ''}`;
-
     super(message, {
       code: 'OPERATION_FAILED',
       statusCode: 500,
@@ -208,6 +208,7 @@ export class OperationFailedError extends PayKitError {
       method: operation,
       cause: options?.cause,
     });
+    this.stack = undefined;
   }
 }
 

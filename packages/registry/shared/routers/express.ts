@@ -20,7 +20,8 @@ paykitRouter.post('/*', async (req: Request, res: Response) => {
     return res.json({ result });
   } catch (error) {
     console.error('PayKit API Error:', error);
-    return res.status(500).json({ message: 'Internal server error' });
+    const message = error instanceof Error ? error.message : 'Internal server error';
+    return res.status(500).json({ message });
   }
 });
 
@@ -55,9 +56,14 @@ paykitRouter.post('/webhooks', async (req: Request, res: Response) => {
   const headers = new Headers(Object.entries(req.headers) as [string, string][]);
   const fullUrl = `${req.protocol}://${req.get('host')}${req.originalUrl}`;
 
-  await webhook.handle({ body, headers, fullUrl });
-
-  return res.json({ success: true });
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl });
+    return res.json({ success: true });
+  } catch (error) {
+    console.log('Webhook Error', error);
+    return res.json({ success: false });
+  }
 });
 
 /**

@@ -26,6 +26,8 @@ import {
   NotImplementedError,
   schema,
   AbstractPayKitProvider,
+  OperationFailedError,
+  Invoice,
 } from '@paykit-sdk/core';
 import {
   CheckoutPaymentIntent,
@@ -42,10 +44,16 @@ import { z } from 'zod';
 import { SubscriptionsController } from './controllers/subscription';
 import { WebhookController } from './controllers/webhook';
 import { VerifyWebhookStatus } from './schema';
+import type { PayPalSubscription } from './types';
 import {
   paykitCheckout$InboundSchema,
   paykitPayment$InboundSchema,
   paykitRefund$InboundSchema,
+  paykitSubscription$InboundSchema,
+  paykitPaymentWebhook$InboundSchema,
+  paykitPaymentCaptureWebhook$InboundSchema,
+  paykitRefundWebhook$InboundSchema,
+  paykitSubscriptionWebhook$InboundSchema,
 } from './utils/mapper';
 
 const PAYPAL_METADATA_MAX_LENGTH = 127;
@@ -127,6 +135,7 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
         provider: this.providerName,
       });
     }
+
     const {
       currency = 'USD',
       amount = '0',
@@ -134,8 +143,13 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
     } = validateRequiredKeys(
       ['currency', 'amount', 'itemName'],
       params.provider_metadata as Record<string, string>,
-      'Missing required parameters: {keys}',
+      'Missing required parameters in provider_metadata: {keys}',
     );
+
+    // Calculate unit amount from total amount and quantity
+    const totalAmount = parseFloat(amount);
+    const quantity = params.quantity || 1;
+    const unitAmount = (totalAmount / quantity).toFixed(2);
 
     const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
       intent: CheckoutPaymentIntent.Capture,
@@ -146,14 +160,18 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       },
       purchaseUnits: [
         {
-          amount: { currencyCode: currency, value: amount },
+          amount: {
+            currencyCode: currency,
+            value: amount,
+            breakdown: { itemTotal: { currencyCode: currency, value: amount } },
+          },
           customId: stringifiedMetadata,
           items: [
             {
               sku: params.item_id,
-              quantity: params.quantity.toString(),
+              quantity: quantity.toString(),
               name: itemName,
-              unitAmount: { currencyCode: currency, value: amount },
+              unitAmount: { currencyCode: currency, value: unitAmount },
             },
           ],
         },
@@ -186,15 +204,29 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       };
     }
 
-    const order = await this.ordersController.createOrder({ body: orderOptionsBody });
+    try {
+      const order = await this.ordersController.createOrder({ body: orderOptionsBody });
 
-    return paykitCheckout$InboundSchema(order.result);
+      return paykitCheckout$InboundSchema(order.result);
+    } catch (error) {
+      throw new OperationFailedError('createCheckout', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
+    }
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    const order = await this.ordersController.getOrder({ id });
+    try {
+      const order = await this.ordersController.getOrder({ id });
 
-    return paykitCheckout$InboundSchema(order.result);
+      if (!order.result) throw new ResourceNotFoundError('Order', id);
+
+      return paykitCheckout$InboundSchema(order.result);
+    } catch (error) {
+      throw new OperationFailedError('retrieveCheckout', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
+    }
   };
 
   updateCheckout = async (
@@ -348,9 +380,15 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       };
     }
 
-    const order = await this.ordersController.createOrder({ body: orderOptionsBody });
+    try {
+      const order = await this.ordersController.createOrder({ body: orderOptionsBody });
 
-    return paykitPayment$InboundSchema(order.result);
+      return paykitPayment$InboundSchema(order.result);
+    } catch (error) {
+      throw new OperationFailedError('createPayment', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
+    }
   };
 
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
@@ -360,9 +398,17 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
-    const order = await this.ordersController.getOrder({ id });
+    try {
+      const order = await this.ordersController.getOrder({ id });
 
-    return paykitPayment$InboundSchema(order.result);
+      if (!order.result) throw new ResourceNotFoundError('Order', id);
+
+      return paykitPayment$InboundSchema(order.result);
+    } catch (error) {
+      throw new OperationFailedError('retrievePayment', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
+    }
   };
 
   deletePayment = async (id: string): Promise<null> => {
@@ -372,8 +418,17 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
   };
 
   capturePayment = async (id: string): Promise<Payment> => {
-    const captured = await this.ordersController.captureOrder({ id });
-    return paykitPayment$InboundSchema(captured.result);
+    try {
+      const captured = await this.ordersController.captureOrder({ id });
+
+      if (!captured.result) throw new ResourceNotFoundError('Order', id);
+
+      return paykitPayment$InboundSchema(captured.result);
+    } catch (error) {
+      throw new OperationFailedError('capturePayment', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
+    }
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
@@ -388,26 +443,36 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
    * Refund management
    */
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
-    const order = await this.ordersController.getOrder({ id: params.payment_id });
+    try {
+      const order = await this.ordersController.getOrder({ id: params.payment_id });
 
-    const captureIds =
-      order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
+      if (!order.result) throw new ResourceNotFoundError('Order', params.payment_id);
 
-    if (captureIds.length === 0) {
-      throw new ResourceNotFoundError('Capture', params.payment_id, this.providerName);
+      const captureIds =
+        order.result.purchaseUnits?.[0]?.payments?.captures?.map(c => c.id!) || [];
+
+      if (captureIds.length === 0) {
+        throw new ResourceNotFoundError('Capture', params.payment_id, this.providerName);
+      }
+
+      const currencyCode = order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD';
+      const amount = params.amount
+        ? params.amount.toString()
+        : order.result.purchaseUnits?.[0]?.amount?.value || '0';
+
+      const refund = await this.paymentsController.refundCapturedPayment({
+        captureId: captureIds[0],
+        body: { amount: { currencyCode, value: amount } },
+      });
+
+      if (!refund.result) throw new ResourceNotFoundError('Refund', params.payment_id);
+
+      return paykitRefund$InboundSchema(refund.result);
+    } catch (error) {
+      throw new OperationFailedError('createRefund', this.providerName, {
+        cause: error instanceof Error ? error : new Error('Unknown error'),
+      });
     }
-
-    const currencyCode = order.result.purchaseUnits?.[0]?.amount?.currencyCode || 'USD';
-    const amount = params.amount
-      ? params.amount.toString()
-      : order.result.purchaseUnits?.[0]?.amount?.value || '0';
-
-    const refund = await this.paymentsController.refundCapturedPayment({
-      captureId: captureIds[0],
-      body: { amount: { currencyCode, value: amount } },
-    });
-
-    return paykitRefund$InboundSchema(refund.result);
   };
 
   /**
@@ -439,8 +504,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
 
     const webhookHandlers: Record<string, () => Promise<Array<WebhookEventPayload>>> = {
       'CHECKOUT.ORDER.APPROVED': async () => {
-        const orderData = event.resource as Order;
-        const payment = paykitPayment$InboundSchema(orderData);
+        const payment = paykitPaymentWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
 
         return [
           paykitEvent$InboundSchema<Payment>({
@@ -453,8 +519,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       },
 
       'CHECKOUT.ORDER.COMPLETED': async () => {
-        const orderData = event.resource as Order;
-        const payment = paykitPayment$InboundSchema(orderData);
+        const payment = paykitPaymentWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
 
         return [
           paykitEvent$InboundSchema<Payment>({
@@ -467,8 +534,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       },
 
       'PAYMENT.CAPTURE.COMPLETED': async () => {
-        const orderData = event.resource as Order;
-        const payment = paykitPayment$InboundSchema(orderData);
+        const payment = paykitPaymentCaptureWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
 
         return [
           paykitEvent$InboundSchema<Payment>({
@@ -481,8 +549,9 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       },
 
       'PAYMENT.CAPTURE.REFUNDED': async () => {
-        const refundData = event.resource as PayPalRefund;
-        const refund = paykitRefund$InboundSchema(refundData);
+        const refund = paykitRefundWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
 
         return [
           paykitEvent$InboundSchema<Refund>({
@@ -490,6 +559,81 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
             created: Date.now() / 1000,
             id: event.id,
             data: refund,
+          }),
+        ];
+      },
+
+      'BILLING.SUBSCRIPTION.CREATED': async () => {
+        const subscription = paykitSubscriptionWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
+
+        return [
+          paykitEvent$InboundSchema<Subscription>({
+            type: 'subscription.created',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: subscription,
+          }),
+        ];
+      },
+
+      'BILLING.SUBSCRIPTION.UPDATED': async () => {
+        const subscription = paykitSubscriptionWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
+
+        return [
+          paykitEvent$InboundSchema<Subscription>({
+            type: 'subscription.updated',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: subscription,
+          }),
+        ];
+      },
+
+      'BILLING.SUBSCRIPTION.SUSPENDED': async () => {
+        const subscription = paykitSubscriptionWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
+
+        return [
+          paykitEvent$InboundSchema<Subscription>({
+            type: 'subscription.updated',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: subscription,
+          }),
+        ];
+      },
+
+      'BILLING.SUBSCRIPTION.CANCELLED': async () => {
+        const subscription = paykitSubscriptionWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
+
+        return [
+          paykitEvent$InboundSchema<Subscription>({
+            type: 'subscription.canceled',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: subscription,
+          }),
+        ];
+      },
+
+      'BILLING.SUBSCRIPTION.EXPIRED': async () => {
+        const subscription = paykitSubscriptionWebhook$InboundSchema(
+          event.resource as Record<string, unknown>,
+        );
+
+        return [
+          paykitEvent$InboundSchema<Subscription>({
+            type: 'subscription.canceled',
+            created: Date.now() / 1000,
+            id: event.id,
+            data: subscription,
           }),
         ];
       },

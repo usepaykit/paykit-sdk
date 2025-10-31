@@ -90,10 +90,15 @@ export async function POST(request: NextRequest) {
   const body = await request.text();
   const headers = Object.fromEntries(request.headers.entries());
   const url = request.url;
-  await webhook.handle({ body, headers, fullUrl: url });
 
-  // Return immediately, processing happens in background
-  return NextResponse.json({ success: true });
+  try {
+    console.log('Webhook handled');
+    await webhook.handle({ body, headers, fullUrl: url });
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.log('Webhook Error', error);
+    return NextResponse.json({ success: false });
+  }
 }
 ```
 

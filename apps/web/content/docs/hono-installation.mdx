@@ -107,9 +107,14 @@ webhook.post('/webhook', async c => {
   const headers = c.req.raw.headers;
   const url = new URL(c.req.url).toString();
 
-  await w.handle({ body, headers, fullUrl: url });
-
-  return c.json({ success: true });
+  try {
+    await w.handle({ body, headers, fullUrl: url });
+    console.log('Webhook handled');
+    return c.json({ success: true });
+  } catch {
+    console.error('Webhook error:', error);
+    return c.json({ success: false });
+  }
 });
 
 export default webhook;

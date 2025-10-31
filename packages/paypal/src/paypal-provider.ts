@@ -158,7 +158,11 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
           ],
         },
       ],
-      applicationContext: { userAction: OrderApplicationContextUserAction.PayNow },
+      applicationContext: {
+        userAction: OrderApplicationContextUserAction.PayNow,
+        returnUrl: params.success_url,
+        cancelUrl: params.cancel_url,
+      },
       ...(params.provider_metadata && { ...params.provider_metadata }),
     };
 

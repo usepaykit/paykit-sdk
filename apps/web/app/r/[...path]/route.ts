@@ -52,8 +52,8 @@ export async function GET(
   const { path } = await params;
   const fullPath = path.join('/');
 
-  // Handle `/r/registries.json` as an alias for `/r` with file contents
-  if (fullPath === 'registries.json') {
+  // Handle `/r/registry.json` as an alias for `/r` with file contents
+  if (fullPath === 'registry.json') {
     const enriched = await enrichRegistryIndexWithFiles();
     return NextResponse.json(enriched, { headers: CACHE_HEADERS });
   }

@@ -6,6 +6,7 @@ import { LifetimeAccess } from '@/components/lifetime-access';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ReactHooksDemo } from '@/components/react-hooks-demo';
 import { SiteHeader } from '@/components/site-header';
+import { SponsorContact } from '@/components/sponsor-contact';
 import PaypalLogo from '@/public/providers/paypal.webp';
 import PolarLogo from '@/public/providers/polar.jpg';
 import StripeLogo from '@/public/providers/stripe.jpeg';
@@ -133,6 +134,8 @@ const Index = () => {
       <ReactHooksDemo />
 
       <LifetimeAccess />
+
+      <SponsorContact />
 
       <FinalCTA />
 
@@ -272,9 +275,17 @@ const Index = () => {
                 <Link
                   href="https://x.com/devodii_"
                   target="_blank"
-                  className="text-foreground ml-1 font-medium hover:underline"
+                  className="text-foreground ml-1 font-medium underline hover:underline"
                 >
-                  Twitter.
+                  Twitter
+                </Link>{' '}
+                or
+                <Link
+                  href="https://www.linkedin.com/in/emmanuelodii/"
+                  target="_blank"
+                  className="text-foreground ml-1 font-medium underline hover:underline"
+                >
+                  LinkedIn
                 </Link>
               </p>
             </div>

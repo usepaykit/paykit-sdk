@@ -28,6 +28,21 @@ export interface Customer {
    * The metadata of the customer.
    */
   metadata?: Record<string, string>;
+
+  /**
+   * The custom fields of the customer for provider-specific or custom data.
+   */
+  custom_fields?: Record<string, unknown>;
+
+  /**
+   * The created timestamp of the customer.
+   */
+  created_at: Date;
+
+  /**
+   * The last updated timestamp of the customer.
+   */
+  updated_at: Date | null;
 }
 
 export const customerSchema = schema<Customer>()(
@@ -37,6 +52,9 @@ export const customerSchema = schema<Customer>()(
     name: z.string(),
     phone: z.string(),
     metadata: metadataSchema.optional(),
+    custom_fields: z.record(z.string(), z.unknown()).optional(),
+    created_at: z.date(),
+    updated_at: z.date().nullable(),
   }),
 );
 
@@ -51,7 +69,10 @@ export const payeeSchema = schema<Payee>()(
 );
 
 export interface CreateCustomerParams
-  extends OverrideProps<Omit<Customer, 'id'>, { name?: string }> {}
+  extends OverrideProps<
+    Omit<Customer, 'id' | 'custom_fields' | 'created_at' | 'updated_at'>,
+    { name?: string }
+  > {}
 
 export const createCustomerSchema = schema<CreateCustomerParams>()(
   z.object({
@@ -62,7 +83,8 @@ export const createCustomerSchema = schema<CreateCustomerParams>()(
   }),
 );
 
-export interface UpdateCustomerParams extends Partial<Omit<Customer, 'id'>> {
+export interface UpdateCustomerParams
+  extends Partial<Omit<Customer, 'id' | 'custom_fields' | 'created_at' | 'updated_at'>> {
   provider_metadata?: Record<string, unknown>;
 }
 

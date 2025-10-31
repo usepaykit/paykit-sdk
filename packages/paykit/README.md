@@ -15,7 +15,8 @@ import { PayKit } from '@paykit-sdk/core';
 import { createStripe } from '@paykit-sdk/stripe';
 
 // Initialize with a provider
-const paykit = new PayKit(createStripe({ apiKey: process.env.STRIPE_API_KEY }));
+const provider = createStripe({ apiKey: process.env.STRIPE_API_KEY });
+const paykit = new PayKit(provider);
 
 // Create a checkout session
 const checkout = await paykit.checkouts.create({
@@ -23,6 +24,9 @@ const checkout = await paykit.checkouts.create({
   metadata: { plan: 'pro' },
   session_type: 'recurring',
   item_id: 'pri_12345',
+  quantity: 1,
+  cancel_url: 'http://localhost:3000',
+  success_url: 'http://localhost:3000',
   provider_metadata: {},
 });
 ```
@@ -40,7 +44,7 @@ PayKit provides a unified interface for payment operations:
 
 PayKit works with multiple payment providers:
 
-- [`@paykit-sdk/stripe`](../stripe/README.md) - Stripe integration
-- [`@paykit-sdk/polar`](../polar/src/README.md) - Polar integration
-- [`@paykit-sdk/paypal`](../paypal/src/README.md) - PayPal integration
-- [Custom providers](../custom-provider/README.md) - Build your own
+- [`@paykit-sdk/stripe`](https://github.com/usepaykit/paykit-sdk/tree/main/packages/stripe) - Stripe integration
+- [`@paykit-sdk/polar`](https://github.com/usepaykit/paykit-sdk/tree/main/packages/polar) - Polar integration
+- [`@paykit-sdk/paypal`](https://github.com/usepaykit/paykit-sdk/tree/main/packages/paypal) - PayPal integration
+- [Custom providers](https://github.com/usepaykit/paykit-sdk/tree/main/packages/custom-provider) - Build your own

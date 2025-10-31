@@ -93,21 +93,63 @@ export const paykitSubscription$InboundSchema = (
 
   const status = statusMap[subscription.status ?? statusMap.APPROVAL_PENDING];
 
+  // Extract billing interval from cycle_executions or default to 'month'
+  const tenureType =
+    subscription.billing_info?.cycle_executions?.[0]?.tenure_type?.toUpperCase();
+  const billingIntervalMap: Record<string, Subscription['billing_interval']> = {
+    DAY: 'day',
+    WEEK: 'week',
+    MONTH: 'month',
+    YEAR: 'year',
+  };
+
+  const billingInterval =
+    tenureType && billingIntervalMap[tenureType]
+      ? billingIntervalMap[tenureType]
+      : 'month';
+
+  // Calculate period end from start_time + billing interval
+  const periodStart = subscription.start_time
+    ? new Date(subscription.start_time)
+    : new Date();
+
+  const periodEnd = (() => {
+    if (!subscription.start_time) {
+      return new Date();
+    }
+
+    const start = new Date(subscription.start_time);
+    const end = new Date(start);
+
+    switch (billingInterval) {
+      case 'day':
+        end.setDate(end.getDate() + 1);
+        break;
+      case 'week':
+        end.setDate(end.getDate() + 7);
+        break;
+      case 'month':
+        end.setMonth(end.getMonth() + 1);
+        break;
+      case 'year':
+        end.setFullYear(end.getFullYear() + 1);
+        break;
+      default:
+        end.setMonth(end.getMonth() + 1);
+    }
+
+    return end;
+  })();
+
   return {
     id: subscription.id,
     customer: { email: subscription.subscriber?.email_address ?? '' },
     status,
     item_id: subscription.plan_id,
-    current_period_start: subscription.start_time
-      ? new Date(subscription.start_time)
-      : new Date(),
-    current_period_end: subscription.status_update_time
-      ? new Date(subscription.status_update_time)
-      : new Date(), // todo: Would need to calculate based on billing cycle
-    metadata: subscription.customId
-      ? omitInternalMetadata(JSON.parse(subscription.customId))
-      : {},
-    billing_interval: 'month',
+    current_period_start: periodStart,
+    current_period_end: periodEnd,
+    metadata: omitInternalMetadata(JSON.parse(subscription?.customId ?? '{}')),
+    billing_interval: billingInterval,
     amount: 0,
     currency: 'USD',
     custom_fields: null,

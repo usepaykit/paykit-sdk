@@ -51,6 +51,14 @@ export const paykitCustomer$InboundSchema = (customer: Customer): PaykitCustomer
     name: customer.name ?? '',
     phone,
     metadata: omitInternalMetadata(customer.metadata ?? {}),
+    created_at: customer.createdAt,
+    updated_at: customer.modifiedAt ?? null,
+    custom_fields: {
+      emailVerified: customer.emailVerified,
+      taxId: customer.taxId,
+      avatarUrl: customer.avatarUrl,
+      billingAddress: customer.billingAddress,
+    },
   };
 };
 

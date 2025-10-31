@@ -6,6 +6,7 @@ import {
   InvoiceStatus,
   omitInternalMetadata,
   OverrideProps,
+  Payee,
   PAYKIT_METADATA_KEY,
   PaymentStatus,
   Refund,
@@ -25,12 +26,15 @@ export const paykitCheckout$InboundSchema = (
     OverrideProps<Pick<Stripe.LineItem, 'id' | 'quantity'>, { quantity: number }>
   >,
 ): Checkout => {
+  let customer: Payee | null = null;
+
+  if (typeof checkout.customer === 'string') customer = checkout.customer;
+  else if (checkout.customer?.id) customer = checkout.customer.id;
+  else customer = { email: checkout.customer_email ?? '' };
+
   return {
     id: checkout.id,
-    customer:
-      typeof checkout.customer === 'string'
-        ? checkout.customer
-        : (checkout.customer?.id ?? ''),
+    customer,
     session_type: checkout.mode === 'subscription' ? 'recurring' : 'one_time',
     payment_url: checkout.url!,
     products: lineItems.map(item => ({
@@ -54,6 +58,17 @@ export const paykitCustomer$InboundSchema = (customer: Stripe.Customer): Custome
     name: customer.name ?? '',
     phone: customer.phone ?? '',
     metadata: omitInternalMetadata(customer.metadata ?? {}),
+    created_at: new Date(customer.created * 1000),
+    updated_at: null,
+    custom_fields: {
+      default_payment_method:
+        typeof customer.invoice_settings?.default_payment_method === 'string'
+          ? customer.invoice_settings.default_payment_method
+          : (customer.invoice_settings?.default_payment_method?.id ?? null),
+      balance: customer.balance,
+      currency: customer.currency ?? null,
+      delinquent: customer.delinquent ?? false,
+    },
   };
 };
 

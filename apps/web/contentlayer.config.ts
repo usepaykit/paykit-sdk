@@ -1,10 +1,6 @@
 import { defineDocumentType, makeSource } from 'contentlayer/source-files';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import rehypeSlug from 'rehype-slug';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 export const Doc = defineDocumentType(() => ({
   name: 'Doc',
@@ -46,6 +42,10 @@ export const Changelog = defineDocumentType(() => ({
       type: 'string',
       resolve: doc =>
         `/changelog/${doc._raw.flattenedPath.split('/').slice(1).join('/')}`,
+    },
+    slugAsParams: {
+      type: 'string',
+      resolve: doc => doc._raw.flattenedPath.split('/').slice(1).join('/'),
     },
   },
 }));

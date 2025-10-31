@@ -54,7 +54,7 @@
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "shared/routers/hono/router.ts",
+          "path": "shared/routers/hono.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }
@@ -86,7 +86,7 @@
           "target": "src/lib/paykit.ts"
         },
         {
-          "path": "shared/routers/express/router.ts",
+          "path": "shared/routers/express.ts",
           "type": "registry:page",
           "target": "src/routes/paykit.ts"
         }

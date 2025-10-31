@@ -237,7 +237,7 @@ export const CodeBlock = ({
                 )}
               </Button>
             </Tooltip.Trigger>
-            <Tooltip.Content side="left">{copied ? 'Copied' : 'Copy'}</Tooltip.Content>
+            <Tooltip.Content side="top">{copied ? 'Copied' : 'Copy'}</Tooltip.Content>
           </Tooltip.Root>
         </div>
       );

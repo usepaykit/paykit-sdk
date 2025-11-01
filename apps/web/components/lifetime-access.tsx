@@ -72,7 +72,7 @@ export const LifetimeAccess = () => {
                           </div>
 
                           <div className="text-sm font-medium text-green-600/80 dark:text-green-400/80">
-                            🎁 First 50 persons - 47 left
+                            🎁 First 50 persons
                           </div>
                         </div>
                         <Button className="mt-6 w-full" size="lg" asChild>

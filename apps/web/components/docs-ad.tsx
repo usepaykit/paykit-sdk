@@ -21,7 +21,7 @@ export const DocsAd = () => {
             with Supabase, Vercel, and more.
           </p>
           <div className="text-xs font-medium text-green-600 dark:text-green-400">
-            🎁 First 50 persons - 47 left
+            🎁 First 50 persons
           </div>
           <Button className="w-full" size="sm">
             Get Lifetime Access - $49

@@ -1,4 +1,4 @@
-import { Button, Card, buttonVariants, cn } from '@paykit-sdk/ui';
+import { Card, buttonVariants, cn } from '@paykit-sdk/ui';
 import { Mail, MessageCircle, Handshake } from 'lucide-react';
 
 export const SponsorContact = () => {

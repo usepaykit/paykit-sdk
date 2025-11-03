@@ -629,8 +629,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   async createRefund(params: CreateRefundSchema): Promise<Refund> {
     const { error, data } = createRefundSchema.safeParse(params);
 
-    if (error)
+    if (error) {
       throw ValidationError.fromZodError(error, this.providerName, 'createRefund');
+    }
 
     const payment = await this.retrievePayment(data.payment_id);
 

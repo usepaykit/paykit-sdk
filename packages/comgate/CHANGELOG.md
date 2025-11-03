@@ -1,5 +1,16 @@
 # @paykit-sdk/comgate
 
+## 2.0.0
+
+### Minor Changes
+
+- 0bd9f6e: feat: added gopay provider
+
+### Patch Changes
+
+- Updated dependencies [0bd9f6e]
+  - @paykit-sdk/core@1.2.0
+
 ## 1.0.5
 
 ### Patch Changes

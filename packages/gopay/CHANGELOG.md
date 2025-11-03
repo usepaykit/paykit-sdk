@@ -1,5 +1,16 @@
 # @paykit-sdk/gopay
 
+## 2.0.0
+
+### Minor Changes
+
+- ef8e797: feat: added gopay provider
+
+### Patch Changes
+
+- Updated dependencies [ef8e797]
+  - @paykit-sdk/core@1.2.0
+
 ## 1.0.5
 
 ### Patch Changes

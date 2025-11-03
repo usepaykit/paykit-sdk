@@ -1,5 +1,11 @@
 # @paykit-sdk/ui
 
+## 0.2.0
+
+### Minor Changes
+
+- ef8e797: feat: added gopay provider
+
 ## 0.1.12
 
 ### Patch Changes

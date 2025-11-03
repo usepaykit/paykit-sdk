@@ -74,6 +74,16 @@ export interface Subscription {
    * The custom fields of the subscription.
    */
   custom_fields: Record<string, unknown> | null;
+
+  /**
+   * Whether the subscription requires action.
+   */
+  requires_action: boolean;
+
+  /**
+   * The URL to the payment page of the subscription if requires action.
+   */
+  payment_url: string | null;
 }
 
 export const subscriptionSchema = schema<Subscription>()(
@@ -89,6 +99,8 @@ export const subscriptionSchema = schema<Subscription>()(
     billing_interval: subscriptionBillingIntervalSchema,
     metadata: metadataSchema.nullable(),
     custom_fields: z.record(z.string(), z.unknown()).nullable(),
+    requires_action: z.boolean(),
+    payment_url: z.string().nullable(),
   }),
 );
 
@@ -140,12 +152,23 @@ export const deleteSubscriptionSchema = schema<DeleteSubscriptionSchema>()(
 export interface CreateSubscriptionSchema
   extends Omit<
     Subscription,
-    'id' | 'status' | 'custom_fields' | 'current_period_start' | 'current_period_end'
+    | 'id'
+    | 'status'
+    | 'custom_fields'
+    | 'current_period_start'
+    | 'current_period_end'
+    | 'requires_action'
+    | 'payment_url'
   > {
   /**
    * The provider metadata of the subscription.
    */
   provider_metadata?: Record<string, unknown>;
+
+  /**
+   * The quantity of the subscription.
+   */
+  quantity: number;
 }
 
 export const createSubscriptionSchema = schema<CreateSubscriptionSchema>()(
@@ -156,6 +179,11 @@ export const createSubscriptionSchema = schema<CreateSubscriptionSchema>()(
       custom_fields: true,
       current_period_start: true,
       current_period_end: true,
+      requires_action: true,
+      payment_url: true,
     })
-    .extend({ provider_metadata: z.record(z.string(), z.unknown()).optional() }),
+    .extend({
+      provider_metadata: z.record(z.string(), z.unknown()).optional(),
+      quantity: z.number(),
+    }),
 );

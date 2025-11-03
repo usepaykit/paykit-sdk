@@ -290,7 +290,7 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       ...data.provider_metadata,
       ...(defaultPaymentMethod && { default_payment_method: defaultPaymentMethod }),
       customer: data.customer,
-      items: [{ price: data.item_id }],
+      items: [{ price: data.item_id, quantity: data.quantity }],
       metadata: stringifyMetadataValues(data.metadata ?? {}),
       payment_behavior: 'default_incomplete', // customer's default payment method will be used if available
     });

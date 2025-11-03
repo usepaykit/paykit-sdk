@@ -35,13 +35,20 @@ import {
   schema,
   AbstractPayKitProvider,
   PAYKIT_METADATA_KEY,
+  LooseAutoComplete,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
 import * as crypto from 'crypto';
 import { z } from 'zod';
 import { AuthController } from './controllers/auth';
-import { GoPayPaymentRequest, GoPayPaymentResponse } from './schema';
 import {
+  GoPayPaymentRequest,
+  GoPayPaymentBaseResponse,
+  GoPaySubscriptionResponse,
+} from './schema';
+import {
+  decodeHtmlEntities,
+  paykitCheckout$InboundSchema,
   paykitInvoice$InboundSchema,
   paykitPayment$InboundSchema,
   paykitRefund$InboundSchema,
@@ -101,13 +108,15 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const debug = opts.debug ?? true;
 
     this.baseUrl = opts.isSandbox
-      ? 'https://gate.gopay.cz/api'
-      : 'https://gw.sandbox.gopay.com/api';
+      ? 'https://gw.sandbox.gopay.com/api'
+      : 'https://gate.gopay.cz/api';
+
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
       headers: {},
       retryOptions: { max: 3, baseDelay: 1000, debug },
     });
+
     this.authController = new AuthController({ ...opts, baseUrl: this.baseUrl });
   }
 
@@ -134,8 +143,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     if (this.opts.debug) {
       console.info(
-        'Specify `lang` in the provider_metadata of createCheckout to set the language of the checkout, default is `EN`',
+        'Specify `language` in the `provider_metadata` of createCheckout to set the language of the checkout, default is `EN`',
       );
+
       console.info('Creating checkout with metadata:', data.metadata);
     }
 
@@ -164,13 +174,16 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
           type: 'ITEM',
         },
       ],
-      lang: data.provider_metadata?.lang ? (data.provider_metadata.lang as string) : 'EN',
+      lang: data.provider_metadata?.language
+        ? (data.provider_metadata.language as string)
+        : 'EN',
       callback: { return_url: data.success_url, notification_url: this.opts.webhookUrl },
       additional_params: Object.entries({
         ...data.metadata,
         [PAYKIT_METADATA_KEY]: JSON.stringify({
-          itemId: data.item_id,
+          item: data.item_id,
           qty: data.quantity,
+          type: data.session_type,
         }),
       }).map(([name, value]) => ({
         name,
@@ -178,21 +191,31 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       })),
     };
 
-    const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
-      body: JSON.stringify(goPayRequest),
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.post<GoPayPaymentBaseResponse>(
+      '/payments/payment',
+      {
+        body: JSON.stringify(goPayRequest),
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
-    console.dir({ response }, { depth: null });
+    if (!response.ok) {
+      throw new OperationFailedError('createCheckout', this.providerName, {
+        cause: new Error('Failed to create checkout'),
+      });
+    }
 
-    return response.value as unknown as Checkout;
+    return paykitCheckout$InboundSchema(response.value);
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(
+    const response = await this._client.get<GoPayPaymentBaseResponse>(
       `/payments/payment/${id}`,
       {
-        headers: await this.authController.getAuthHeaders(),
+        headers: {
+          ...(await this.authController.getAuthHeaders()),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       },
     );
 
@@ -202,9 +225,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    console.dir({ response }, { depth: null });
-
-    return response.value as unknown as Checkout;
+    return paykitCheckout$InboundSchema(response.value);
   };
 
   updateCheckout = async (
@@ -212,7 +233,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     params: UpdateCheckoutSchema,
   ): Promise<Checkout> => {
     if (this.opts.debug) {
-      console.info("Gopay doesn't support updating checkouts");
+      console.info(
+        "Gopay doesn't support updating checkouts, returning existing checkout",
+      );
     }
 
     const existing = await this.retrieveCheckout(id);
@@ -271,11 +294,25 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const { quantity, success_url } = validateRequiredKeys(
-      ['quantity', 'success_url'],
+    const { success_url } = validateRequiredKeys(
+      ['success_url'],
       data.provider_metadata as Record<string, string>,
       'The following fields must be present in the provider_metadata of createCheckout: {keys}',
     );
+
+    if (this.opts.debug) {
+      if (data.billing_interval == 'year') {
+        console.info(
+          'GoPay does not support yearly subscriptions, using monthly instead',
+        );
+      }
+
+      if (!data.provider_metadata?.description) {
+        console.info(
+          `No description provided for the subscription \`provider_metadata.description\`, using default description \`Subscription by ${data.customer.email}\``,
+        );
+      }
+    }
 
     const intervalMap: Record<
       Subscription['billing_interval'],
@@ -291,9 +328,11 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       if (data.billing_interval === 'day') {
         return new Date(Date.now() + 1 * 24 * 60 * 60 * 1000).toISOString();
       }
+
       if (data.billing_interval === 'week') {
         return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
       }
+
       if (data.billing_interval === 'month') {
         return new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString();
       }
@@ -312,22 +351,35 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       amount: Number(data.amount),
       currency: data.currency ?? 'CZK',
       order_number: crypto.randomBytes(8).toString('hex').slice(0, 15),
-      order_description: data.metadata?.description || 'Subscription',
-      items: [
-        { name: data.item_id, amount: Number(data.amount), count: parseInt(quantity) },
-      ],
+      order_description: data.provider_metadata?.description
+        ? (data.provider_metadata.description as string)
+        : 'Subscription by ' + data.customer.email,
+      items: [{ name: data.item_id, amount: Number(data.amount), count: data.quantity }],
       recurrence: {
         recurrence_cycle: recurrenceCycle,
-        recurrence_period: parseInt(quantity),
+        recurrence_period: data.quantity,
         recurrence_date_to: currentPeriodEnd,
       },
       callback: { return_url: success_url, notification_url: this.opts.webhookUrl },
+      additional_params: Object.entries({
+        ...data.metadata,
+        [PAYKIT_METADATA_KEY]: JSON.stringify({
+          item: data.item_id,
+          qty: data.quantity,
+        }),
+      }).map(([name, value]) => ({
+        name,
+        value: String(value),
+      })),
     };
 
-    const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
-      body: JSON.stringify(goPaySubscriptionOptions),
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.post<GoPaySubscriptionResponse>(
+      '/payments/payment',
+      {
+        body: JSON.stringify(goPaySubscriptionOptions),
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('createSubscription', this.providerName, {
@@ -335,9 +387,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    console.dir({ response }, { depth: 100 });
-
-    return response.value as unknown as Subscription;
+    return paykitSubscription$InboundSchema(response.value);
   };
 
   updateSubscription = async (
@@ -358,24 +408,28 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   cancelSubscription = async (id: string): Promise<Subscription> => {
-    const response = await this._client.post<{ id: number; result: string }>(
-      `/payments/payment/${id}/void-recurrence`,
-      {
-        headers: await this.authController.getAuthHeaders(),
-      },
-    );
+    const existingSubscription = await this.retrieveSubscription(id);
 
-    console.dir({ response }, { depth: 100 });
-
-    const subscription = await this.retrieveSubscription(id);
-
-    if (!subscription) {
+    if (!existingSubscription) {
       throw new OperationFailedError('cancelSubscription', this.providerName, {
         cause: new Error('Failed to retrieve subscription'),
       });
     }
 
-    return { ...subscription, status: 'canceled' };
+    const response = await this._client.post<{
+      id: number;
+      result: LooseAutoComplete<'FINISHED'>;
+    }>(`/payments/payment/${id}/void-recurrence`, {
+      headers: {
+        ...(await this.authController.getAuthHeaders()),
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    });
+
+    return {
+      ...existingSubscription,
+      ...(response.value?.result == 'FINISHED' && { status: 'canceled' }),
+    };
   };
 
   deleteSubscription = async (id: string): Promise<null> => {
@@ -384,7 +438,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   retrieveSubscription = async (id: string): Promise<Subscription | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(
+    const response = await this._client.get<GoPaySubscriptionResponse>(
       `/payments/payment/${id}`,
       {
         headers: await this.authController.getAuthHeaders(),
@@ -397,9 +451,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    console.dir({ response }, { depth: 100 });
-
-    return response.value as unknown as Subscription;
+    return paykitSubscription$InboundSchema(response.value);
   };
 
   createPayment = async (params: CreatePaymentSchema): Promise<Payment> => {
@@ -410,7 +462,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     if (
       typeof data.customer == 'string' ||
-      (typeof data.customer === 'object' && !data.customer.email)
+      (typeof data.customer === 'object' && !data.customer?.email)
     ) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
@@ -450,10 +502,13 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       })),
     };
 
-    const response = await this._client.post<GoPayPaymentResponse>('/payments/payment', {
-      body: JSON.stringify(goPayRequest),
-      headers: await this.authController.getAuthHeaders(),
-    });
+    const response = await this._client.post<GoPayPaymentBaseResponse>(
+      '/payments/payment',
+      {
+        body: JSON.stringify(goPayRequest),
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     if (!response.ok) {
       throw new OperationFailedError('createPayment', this.providerName, {
@@ -461,16 +516,17 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    console.dir({ response }, { depth: 100 });
-
-    return response.value as unknown as Payment;
+    return paykitPayment$InboundSchema(response.value);
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
-    const response = await this._client.get<GoPayPaymentResponse>(
+    const response = await this._client.get<GoPayPaymentBaseResponse>(
       `/payments/payment/${id}`,
       {
-        headers: await this.authController.getAuthHeaders(),
+        headers: {
+          ...(await this.authController.getAuthHeaders()),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       },
     );
 
@@ -480,9 +536,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    console.dir({ response }, { depth: 100 });
-
-    return response.value as unknown as Payment;
+    return paykitPayment$InboundSchema(response.value);
   };
 
   deletePayment = async (id: string): Promise<null> => {
@@ -493,8 +547,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   capturePayment = async (id: string, params: CapturePaymentSchema): Promise<Payment> => {
-    const payment = await this._client.get<GoPayPaymentResponse>(
-      `/payments/payment/${id}`,
+    const payment = await this._client.get<GoPayPaymentBaseResponse>(
+      `/payments/payment/${id}/capture`,
       {
         headers: await this.authController.getAuthHeaders(),
       },
@@ -506,14 +560,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const productId = JSON.parse(
-      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)
-        ?.value ?? '{}',
-    ).itemId;
-    const quantity = JSON.parse(
-      payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)
-        ?.value ?? '{}',
-    ).qty;
+    const { item, qty } = JSON.parse(
+      decodeHtmlEntities(
+        payment.value.additional_params?.find(param => param.name === PAYKIT_METADATA_KEY)
+          ?.value ?? '{}',
+      ),
+    );
 
     if (!payment) {
       throw new OperationFailedError('capturePayment', this.providerName, {
@@ -523,19 +575,22 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const captureBody = {
       amount: params.amount,
-      items: [{ name: productId, amount: params.amount, count: quantity }],
+      items: [{ name: item, amount: params.amount, count: qty }],
     };
 
-    await this._client.post<GoPayPaymentResponse>(`/payments/payment/${id}/capture`, {
-      body: JSON.stringify(captureBody),
-      headers: await this.authController.getAuthHeaders(),
-    });
+    await this._client.post<{ id: number; result: LooseAutoComplete<'FINISHED'> }>(
+      `/payments/payment/${id}/capture`,
+      {
+        body: JSON.stringify(captureBody),
+        headers: await this.authController.getAuthHeaders(),
+      },
+    );
 
     return paykitPayment$InboundSchema(payment.value);
   };
 
   cancelPayment = async (id: string): Promise<Payment> => {
-    const response = await this._client.post<GoPayPaymentResponse>(
+    const response = await this._client.post<GoPayPaymentBaseResponse>(
       `/payments/payment/${id}/void-authorization`,
       {
         headers: await this.authController.getAuthHeaders(),
@@ -586,16 +641,16 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       });
     }
 
-    const response = await this._client.post<{ id: number; result: string }>(
-      `/payments/payment/${data.payment_id}/refund`,
-      {
-        body: new URLSearchParams({ amount: String(data.amount) }).toString(),
-        headers: {
-          ...(await this.authController.getAuthHeaders()),
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
+    const response = await this._client.post<{
+      id: number;
+      result: LooseAutoComplete<'FINISHED'>;
+    }>(`/payments/payment/${data.payment_id}/refund`, {
+      body: new URLSearchParams({ amount: String(data.amount) }).toString(),
+      headers: {
+        ...(await this.authController.getAuthHeaders()),
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-    );
+    });
 
     if (!response.ok) {
       throw new OperationFailedError('createRefund', this.providerName, {
@@ -620,6 +675,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const paymentId = new URL(fullUrl).searchParams.get('id');
     const parentId = new URL(fullUrl).searchParams.get('parent_id'); // For recurring payments i.e subscriptions
 
+    console.log({ paymentId, parentId });
+
     if (!paymentId) {
       throw new WebhookError('Payment ID is required', { provider: this.providerName });
     }
@@ -629,10 +686,15 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     }
 
     const [payment, error] = await tryCatchAsync(
-      this._client.get<GoPayPaymentResponse>(`/payments/payment/${paymentId}`, {
-        headers: await this.authController.getAuthHeaders(),
+      this._client.get<GoPayPaymentBaseResponse>(`/payments/payment/${paymentId}`, {
+        headers: {
+          ...(await this.authController.getAuthHeaders()),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
       }),
     );
+
+    console.log({ payment });
 
     if (error) {
       throw new WebhookError('Failed to retrieve payment', {
@@ -663,7 +725,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const webhookHandlers: Record<
       (typeof statusMap)[keyof typeof statusMap],
-      (data: GoPayPaymentResponse) => Array<WebhookEventPayload>
+      (
+        data: GoPayPaymentBaseResponse | GoPaySubscriptionResponse,
+      ) => Array<WebhookEventPayload>
     > = {
       __INDETERMINATE: data => {
         const isRefundEvent =
@@ -725,8 +789,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
         const payment = paykitPayment$InboundSchema(data);
 
         const isCancellingSubscription =
-          parentId && data.recurrence?.recurrence_state == 'STOPPED';
-        const subscription = paykitSubscription$InboundSchema(data);
+          parentId &&
+          (data as GoPaySubscriptionResponse).recurrence?.recurrence_state == 'STOPPED';
+
+        const subscription = paykitSubscription$InboundSchema(
+          data as GoPaySubscriptionResponse,
+        );
 
         const subscriptionCanceledWebhookEvent = {
           type: 'subscription.canceled' as const,
@@ -762,7 +830,9 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       succeeded: data => {
         const payment = paykitPayment$InboundSchema(data);
         const invoice = paykitInvoice$InboundSchema(data, !!parentId);
-        const subscription = paykitSubscription$InboundSchema(data);
+        const subscription = paykitSubscription$InboundSchema(
+          data as GoPaySubscriptionResponse,
+        );
 
         const subscriptionCreatedWebhookEvent = {
           type: 'subscription.created' as const,

@@ -95,6 +95,8 @@ export const paykitSubscription$InboundSchema = (
     billing_interval: subscription.recurringInterval,
     currency: subscription.currency,
     amount: subscription.amount,
+    requires_action: false,
+    payment_url: null,
   };
 };
 

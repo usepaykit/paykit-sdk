@@ -170,6 +170,8 @@ export const paykitSubscription$InboundSchema = (
     amount: 0,
     currency: 'USD',
     custom_fields: null,
+    requires_action: false,
+    payment_url: null,
   };
 };
 
@@ -412,5 +414,7 @@ export const paykitSubscriptionWebhook$InboundSchema = (
     amount: subscriptionAmount,
     currency,
     custom_fields: null,
+    requires_action: false,
+    payment_url: null,
   };
 };

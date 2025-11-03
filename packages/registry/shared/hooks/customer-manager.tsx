@@ -40,6 +40,7 @@ export const CustomerManager = () => {
       currency: 'USD',
       billing_interval: 'month',
       metadata: { plan: 'pro' },
+      quantity: 1,
     });
 
     if (error) {

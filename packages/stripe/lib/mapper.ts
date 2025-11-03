@@ -108,6 +108,8 @@ export const paykitSubscription$InboundSchema = (
     current_period_end: new Date(subscription.cancel_at!),
     metadata,
     custom_fields: null,
+    requires_action: false,
+    payment_url: null,
   };
 };
 

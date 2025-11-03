@@ -149,7 +149,8 @@ export interface CreateOneTimeCheckoutSchema extends CreateCheckoutBaseSchema {
   subscription?: CheckoutSubscription;
 }
 
-export interface CreateRecurringCheckoutSchema extends CreateCheckoutBaseSchema {
+export interface CreateRecurringCheckoutSchema
+  extends Omit<CreateCheckoutBaseSchema, 'success_url' | 'cancel_url'> {
   /**
    * The session type of the checkout.
    */

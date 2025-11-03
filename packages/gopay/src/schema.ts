@@ -2,7 +2,7 @@ export interface GoPayTokenResponse {
   /**
    * The type of the token
    */
-  token_type: string;
+  token_type: 'bearer';
 
   /**
    * The access token
@@ -15,7 +15,7 @@ export interface GoPayTokenResponse {
   expires_in: number;
 }
 
-export interface GoPayPaymentResponse {
+export interface GoPayPaymentBaseResponse {
   /**
    * The ID of the payment
    */
@@ -40,11 +40,6 @@ export interface GoPayPaymentResponse {
     | 'PARTIALLY_REFUNDED';
 
   /**
-   * The sub state of the payment
-   */
-  sub_state?: string;
-
-  /**
    * The amount of the payment
    */
   amount: number;
@@ -55,59 +50,39 @@ export interface GoPayPaymentResponse {
   currency: string;
 
   /**
-   * The payment instrument of the payment
-   */
-  payment_instrument?: string;
-
-  /**
    * The payer of the payment
    */
-  payer?: any;
+  payer: {
+    /**
+     * The allowed payment instruments of the payer
+     */
+    allowed_payment_instruments: string[];
+
+    /**
+     * The default payment instrument of the payer
+     */
+    default_payment_instrument: string;
+
+    /**
+     * The contact of the payer
+     */
+    contact: { email: string };
+  };
 
   /**
    * The target of the payment
    */
-  target?: any;
-
-  /**
-   * The recurrence of the payment
-   */
-  recurrence?: {
+  target: {
     /**
-     * The recurrence cycle of the payment
+     * The type of the target
      */
-    recurrence_cycle?: string;
+    type: 'ACCOUNT';
 
     /**
-     * The state of the recurrence e.g (STOPPED)
+     * The GoID of the target
      */
-    recurrence_state?: string;
-
-    /**
-     * The recurrence date to of the payment
-     */
-    recurrence_date_to?: string;
-
-    /**
-     * The recurrence date from of the payment
-     */
-    recurrence_date_from?: string;
+    goid: number;
   };
-
-  /**
-   * The preauthorization of the payment
-   */
-  preauthorization?: any;
-
-  /**
-   * The GW URL of the payment
-   */
-  gw_url?: string;
-
-  /**
-   * The language of the payment
-   */
-  lang?: string;
 
   /**
    * The additional parameters of the payment
@@ -123,6 +98,48 @@ export interface GoPayPaymentResponse {
      */
     value: string;
   }>;
+
+  /**
+   * The language of the payment
+   */
+  lang?: string;
+
+  /**
+   * The GW URL of the payment
+   */
+  gw_url?: string;
+}
+
+export interface GoPaySubscriptionResponse extends GoPayPaymentBaseResponse {
+  /**
+   * The payment instrument of the payment
+   */
+  payment_instrument?: string;
+
+  /**
+   * The recurrence of the payment
+   */
+  recurrence: {
+    /**
+     * The recurrence cycle of the payment
+     */
+    recurrence_cycle: string;
+
+    /**
+     * The period of the recurrence, e.g `1`
+     */
+    recurrence_period: number;
+
+    /**
+     * The recurrence date to of the payment
+     */
+    recurrence_date_to: string;
+
+    /**
+     * The state of the recurrence
+     */
+    recurrence_state: 'REQUESTED' | 'STOPPED';
+  };
 }
 
 export interface GoPayPaymentItem {
@@ -263,7 +280,7 @@ export interface GoPayPaymentRequest {
    */
   items?: Array<{
     /**
-     * The name of the item
+     * The name of the item, this resolves to the item_id in PayKit
      */
     name: string;
 

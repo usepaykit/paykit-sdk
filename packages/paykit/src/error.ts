@@ -278,6 +278,7 @@ export class InvalidTypeError extends PayKitError {
         context: { field, expectedType, receivedType },
       },
     );
+    this.stack = undefined;
   }
 }
 

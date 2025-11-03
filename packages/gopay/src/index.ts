@@ -24,5 +24,6 @@ export const gopay = () => {
     goId: envVars.GOPAY_GO_ID,
     isSandbox: envVars.GOPAY_SANDBOX === 'true',
     webhookUrl: envVars.GOPAY_WEBHOOK_URL,
+    debug: true,
   });
 };

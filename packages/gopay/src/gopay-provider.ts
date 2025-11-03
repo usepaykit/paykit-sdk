@@ -394,13 +394,12 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     id: string,
     params: UpdateSubscriptionSchema,
   ): Promise<Subscription> => {
-    console.info("Gopay doesn't support updating subscriptions");
-
     const subscription = await this.retrieveSubscription(id);
 
     if (!subscription) {
-      throw new OperationFailedError('updateSubscription', this.providerName, {
-        cause: new Error('Failed to retrieve subscription'),
+      throw new ProviderNotSupportedError('updateSubscription', this.providerName, {
+        reason: "Gopay doesn't support updating subscriptions",
+        alternative: 'Use the payment API instead and update the subscription manually',
       });
     }
 

@@ -46,6 +46,7 @@ export const docsConfig = {
         { title: 'Stripe', href: '/docs/providers/stripe', items: [] },
         { title: 'Polar', href: '/docs/providers/polar', items: [] },
         { title: 'PayPal', href: '/docs/providers/paypal', items: [] },
+        { title: 'GoPay', href: '/docs/providers/gopay', items: [] },
       ],
     },
     {

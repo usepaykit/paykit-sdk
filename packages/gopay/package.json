@@ -1,6 +1,6 @@
 {
   "name": "@paykit-sdk/gopay",
-  "version": "1.0.5",
+  "version": "1.1.0",
   "description": "GoPay provider for PayKit",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -28,6 +28,8 @@ import {
   AbstractPayKitProvider,
   OperationFailedError,
   Invoice,
+  createCheckoutSchema,
+  ValidationError,
 } from '@paykit-sdk/core';
 import {
   CheckoutPaymentIntent,
@@ -126,7 +128,12 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
    * In PayPal, Order IS the checkout
    */
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    const stringifiedMetadata = JSON.stringify(params.metadata);
+    const { error, data } = createCheckoutSchema.safeParse(params);
+
+    if (error)
+      throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
+
+    const stringifiedMetadata = JSON.stringify(data.metadata);
 
     if (stringifiedMetadata.length > PAYPAL_METADATA_MAX_LENGTH) {
       throw new ConstraintViolationError('Metadata exceeds maximum length', {
@@ -142,21 +149,21 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       itemName = 'Untitled Item',
     } = validateRequiredKeys(
       ['currency', 'amount', 'itemName'],
-      params.provider_metadata as Record<string, string>,
+      data.provider_metadata as Record<string, string>,
       'Missing required parameters in provider_metadata: {keys}',
     );
 
     // Calculate unit amount from total amount and quantity
     const totalAmount = parseFloat(amount);
-    const quantity = params.quantity || 1;
+    const quantity = data.quantity || 1;
     const unitAmount = (totalAmount / quantity).toFixed(2);
 
     const orderOptionsBody: Parameters<OrdersController['createOrder']>[0]['body'] = {
       intent: CheckoutPaymentIntent.Capture,
       payer: {
-        ...(typeof params.customer === 'string' && { payerId: params.customer }),
-        ...(typeof params.customer === 'object' &&
-          'email' in params.customer && { emailAddress: params.customer.email }),
+        ...(typeof data.customer === 'string' && { payerId: data.customer }),
+        ...(typeof data.customer === 'object' &&
+          'email' in data.customer && { emailAddress: data.customer.email }),
       },
       purchaseUnits: [
         {
@@ -168,7 +175,7 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
           customId: stringifiedMetadata,
           items: [
             {
-              sku: params.item_id,
+              sku: data.item_id,
               quantity: quantity.toString(),
               name: itemName,
               unitAmount: { currencyCode: currency, value: unitAmount },
@@ -178,27 +185,27 @@ export class PayPalProvider extends AbstractPayKitProvider implements PayKitProv
       ],
       applicationContext: {
         userAction: OrderApplicationContextUserAction.PayNow,
-        returnUrl: params.success_url,
-        cancelUrl: params.cancel_url,
+        returnUrl: data.success_url,
+        cancelUrl: data.cancel_url,
       },
-      ...(params.provider_metadata && { ...params.provider_metadata }),
+      ...(data.provider_metadata && { ...data.provider_metadata }),
     };
 
-    if (params.billing) {
+    if (data.billing) {
       orderOptionsBody.purchaseUnits[0].shipping = {
-        name: { fullName: params.billing.address.name },
+        name: { fullName: data.billing.address.name },
         address: {
-          addressLine1: params.billing.address.line1,
-          addressLine2: params.billing.address.line2,
-          adminArea1: params.billing.address.city,
-          adminArea2: params.billing.address.state,
-          postalCode: params.billing.address.postal_code,
-          countryCode: params.billing.address.country,
+          addressLine1: data.billing.address.line1,
+          addressLine2: data.billing.address.line2,
+          adminArea1: data.billing.address.city,
+          adminArea2: data.billing.address.state,
+          postalCode: data.billing.address.postal_code,
+          countryCode: data.billing.address.country,
         },
-        ...(params.billing.address.phone && {
+        ...(data.billing.address.phone && {
           phoneNumber: {
-            nationalNumber: params.billing.address.phone,
-            countryCode: params.billing.address.country,
+            nationalNumber: data.billing.address.phone,
+            countryCode: data.billing.address.country,
           },
         }),
       };

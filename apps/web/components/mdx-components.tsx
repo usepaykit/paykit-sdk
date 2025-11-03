@@ -142,6 +142,7 @@ const components = {
   ),
   Callout: ({
     type,
+    children,
     ...props
   }: React.HTMLAttributes<HTMLDivElement> & { type: 'warning' | 'info' }) => (
     <Alert.Root
@@ -152,7 +153,11 @@ const components = {
           type === 'info',
       })}
       {...props}
-    />
+    >
+      <Alert.Description className="[&>p]:m-0 [&>p]:leading-7">
+        {children}
+      </Alert.Description>
+    </Alert.Root>
   ),
   Tabs: Tabs.Root,
   TabsList: Tabs.List,

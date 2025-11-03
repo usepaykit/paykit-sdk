@@ -1,5 +1,13 @@
 # @paykit-sdk/paypal
 
+## 1.0.6
+
+### Patch Changes
+
+- ee8c374: feat: improved gopay apis
+- Updated dependencies [ee8c374]
+  - @paykit-sdk/core@1.1.102
+
 ## 1.0.5
 
 ### Patch Changes

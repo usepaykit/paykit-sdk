@@ -1,5 +1,11 @@
 # @paykit-sdk/core
 
+## 1.1.102
+
+### Patch Changes
+
+- ee8c374: feat: improved gopay apis
+
 ## 1.1.101
 
 ### Patch Changes

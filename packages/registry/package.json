@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "PayKit component registry for shadcn-compatible integrations",
   "type": "module",
+  "private": true,
   "exports": {
     ".": "./registry.json"
   },
@@ -12,9 +13,6 @@
     "paypal",
     "polar"
   ],
-  "publishConfig": {
-    "access": "public"
-  },
   "scripts": {
     "typecheck": "tsc --noEmit"
   },

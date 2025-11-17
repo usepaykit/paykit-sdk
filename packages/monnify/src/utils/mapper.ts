@@ -1,0 +1,44 @@
+import { WebhookEventType } from '@paykit-sdk/core';
+
+export const monnifyToPaykitEventMap: Record<
+  string,
+  string | null | ((eventData: Record<string, unknown>) => WebhookEventType)
+> = {
+  CUSTOMER_CREATED: null,
+  CUSTOMER_UPDATED: null,
+  CUSTOMER_DELETED: null,
+
+  // Subscription (Direct Debit Mandates)
+  MANDATE_UPDATE: (eventData: Record<string, unknown>) => {
+    const status = eventData.mandateStatus;
+
+    if (status === 'ACTIVE' || status === 'PENDING') {
+      return 'subscription.created';
+    }
+
+    if (status === 'CANCELLED') {
+      return 'subscription.canceled';
+    }
+
+    return 'subscription.updated'; // catch-all for mandate changes
+  },
+
+  // Payments
+  SUCCESSFUL_TRANSACTION: 'payment.created',
+
+  REJECTED_PAYMENT: 'payment.updated',
+
+  SETTLEMENT: 'payment.updated',
+
+  // Refunds
+  SUCCESSFUL_REFUND: 'refund.created',
+  FAILED_REFUND: 'refund.created',
+
+  // Disbursements → could map to payout.*, but Paykit does not support payouts yet
+  SUCCESSFUL_DISBURSEMENT: null,
+  FAILED_DISBURSEMENT: null,
+  REVERSED_DISBURSEMENT: null,
+
+  // Offline payments also count as payment.created
+  SUCCESSFUL_TRANSACTION_OFFLINE: 'payment.created',
+};

@@ -1,5 +1,5 @@
 {
-  "name": "@paykit-sdk/moniepoint",
+  "name": "@paykit-sdk/moonify",
   "version": "1.0.0",
   "description": "Moniepoint provider for PayKit",
   "main": "dist/index.js",

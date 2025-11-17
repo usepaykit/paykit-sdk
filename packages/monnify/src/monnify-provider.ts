@@ -22,10 +22,15 @@ import {
   Refund,
   HandleWebhookParams,
   WebhookEventPayload,
+  WebhookError,
+  parseJSON,
+  WebhookEventType,
 } from '@paykit-sdk/core';
+import { sha512 } from 'js-sha512';
 import { z } from 'zod';
+import { monnifyToPaykitEventMap } from './utils/mapper';
 
-export interface MoniepointOptions extends PaykitProviderOptions {
+export interface MonnifyOptions extends PaykitProviderOptions {
   /**
    * The public key for the Moniepoint API
    */
@@ -42,7 +47,7 @@ export interface MoniepointOptions extends PaykitProviderOptions {
   isSandbox: boolean;
 }
 
-const moniepointOptionsSchema = schema<MoniepointOptions>()(
+const monnifyOptionsSchema = schema<MonnifyOptions>()(
   z.object({
     publicKey: z.string(),
     secretKey: z.string(),
@@ -50,22 +55,22 @@ const moniepointOptionsSchema = schema<MoniepointOptions>()(
   }),
 );
 
-const providerName = 'moniepoint';
+const providerName = 'monnify';
 
-export class MoniepointProvider extends AbstractPayKitProvider implements PayKitProvider {
+export class MonnifyProvider extends AbstractPayKitProvider implements PayKitProvider {
   readonly providerName = providerName;
 
   private _client: HTTPClient;
   private baseUrl: string;
 
-  constructor(private readonly opts: MoniepointOptions) {
-    super(moniepointOptionsSchema, opts, providerName);
+  constructor(private readonly opts: MonnifyOptions) {
+    super(monnifyOptionsSchema, opts, providerName);
 
     const debug = opts.debug ?? true;
 
     this.baseUrl = opts.isSandbox
-      ? 'https://sandbox.moniepoint.com/api'
-      : 'https://api.moniepoint.com/api';
+      ? 'https://sandbox.monnify.com/api/v1'
+      : 'https://api.monnify.com/api';
 
     this._client = new HTTPClient({
       baseUrl: this.baseUrl,
@@ -232,9 +237,63 @@ export class MoniepointProvider extends AbstractPayKitProvider implements PayKit
   handleWebhook = async (
     payload: HandleWebhookParams,
   ): Promise<Array<WebhookEventPayload>> => {
-    throw new ProviderNotSupportedError('handleWebhook', 'Moniepoint', {
-      reason: 'Moniepoint does not support handling webhooks',
-      alternative: 'Use the handleWebhook method instead',
-    });
+    const { body, headers, webhookSecret } = payload;
+
+    const receivedHash = headers.get('monnify-signature');
+
+    if (!receivedHash) {
+      throw new WebhookError('Missing Moniepoint signature', {
+        provider: this.providerName,
+      });
+    }
+
+    const computedHash = sha512.hmac(webhookSecret, JSON.stringify(body));
+
+    if (computedHash !== receivedHash)
+      throw new WebhookError('Invalid Moniepoint signature', {
+        provider: this.providerName,
+      });
+
+    const { eventType, eventData } = parseJSON(
+      body,
+      z
+        .object({
+          eventType: z.string(),
+          eventData: z.record(z.any()),
+        })
+        .strict(),
+    );
+
+    const eventMapper = monnifyToPaykitEventMap[eventType];
+
+    if (!eventMapper) {
+      throw new WebhookError('Unknown Monnify event type', {
+        provider: this.providerName,
+      });
+    }
+
+    if (typeof eventMapper === 'function') {
+      const event = eventMapper(eventData);
+
+      return [
+        {
+          type: event,
+          created: new Date().getTime(),
+          id: `paykit:webhook:${Math.random().toString(36).substring(2, 15)}`,
+          data: eventData as any, // todo: add mapper for event data
+        },
+      ];
+    } else {
+      const event = eventMapper as WebhookEventType;
+
+      return [
+        {
+          type: event,
+          created: new Date().getTime(),
+          id: `paykit:webhook:${Math.random().toString(36).substring(2, 15)}`,
+          data: eventData as any, // todo: add mapper for event data
+        },
+      ];
+    }
   };
 }

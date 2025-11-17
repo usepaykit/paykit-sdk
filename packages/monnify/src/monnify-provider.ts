@@ -26,10 +26,14 @@ import {
   parseJSON,
   WebhookEventType,
   OAuth2TokenManager,
+  createCheckoutSchema,
+  ValidationError,
+  validateRequiredKeys,
+  OperationFailedError,
 } from '@paykit-sdk/core';
 import { sha512 } from 'js-sha512';
 import { z } from 'zod';
-import { monnifyToPaykitEventMap } from './utils/mapper';
+import { monnifyToPaykitEventMap, paykitCheckout$InboundSchema } from './utils/mapper';
 
 export interface MonnifyOptions extends PaykitProviderOptions {
   /**
@@ -72,7 +76,7 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
     const debug = opts.debug ?? true;
 
     this.baseUrl = opts.isSandbox
-      ? 'https://sandbox.monnify.com/api/v1'
+      ? 'https://sandbox.monnify.com/api'
       : 'https://api.monnify.com/api';
 
     this._client = new HTTPClient({
@@ -86,7 +90,7 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
     this.tokenManager = new OAuth2TokenManager({
       client: this._client,
       provider: this.providerName,
-      tokenEndpoint: '/auth/login',
+      tokenEndpoint: '/v1/auth/login',
       credentials: { username: opts.apiKey, password: opts.secretKey },
       responseAdapter: response => ({
         accessToken: response.responseBody?.accessToken ?? '',
@@ -97,18 +101,67 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
   }
 
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    const response = await this._client.post<{
-      requestSuccessful: boolean;
-      responseCode: number;
-      responseBody: {
-        paymentReference: string;
-      };
-    }>('/payments/initiate', {
-      body: JSON.stringify(params),
-      headers: await this.tokenManager.getAuthHeaders(),
+    const { error, data } = createCheckoutSchema.safeParse(params);
+
+    if (error) {
+      throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
+    }
+
+    const { amount, currency } = validateRequiredKeys(
+      ['amount', 'currency'],
+      (data.provider_metadata ?? { currency: 'NGN' }) as Record<string, string>,
+      'The following fields must be present in the provider_metadata of createCheckout: {keys}',
+    );
+
+    const paymentReference = crypto.randomUUID();
+
+    const body: Record<string, unknown> = {
+      amount,
+      paymentReference,
+      paymentDescription: `Checkout for ${data.item_id} x ${data.quantity} items`,
+      currencyCode: currency,
+      redirectUrl: data.success_url,
+      paymentMethods: ['CARD', 'ACCOUNT_TRANSFER'],
+      metadata: {
+        ...params.metadata,
+        PAYKIT_METADATA_KEY: JSON.stringify({ item: data.item_id, qty: data.quantity }),
+      },
+    };
+
+    if (typeof data.customer === 'object' && 'email' in data.customer) {
+      body.customerEmail = data.customer.email;
+    } else {
+      body.customerEmail = data.customer;
+    }
+
+    const response = await this._client.post<Record<string, any>>(
+      '/merchant/transactions/init-transaction',
+      {
+        body: JSON.stringify(body),
+        headers: await this.tokenManager.getAuthHeaders(),
+      },
+    );
+
+    if (!response.ok) {
+      throw new OperationFailedError('createCheckout', this.providerName, {
+        cause: new Error(JSON.stringify(response.error ?? response.value)),
+      });
+    }
+
+    const checkoutUrl = new URLSearchParams({
+      paymentReference,
+      transactionReference: response.value?.responseBody?.transactionReference,
     });
 
-    return response.value?.responseBody.paymentReference as any as Checkout;
+    const checkout = await this._client.get<Record<string, any>>(
+      `v2/merchant/transactions/query?${checkoutUrl.toString()}`,
+      { headers: await this.tokenManager.getAuthHeaders() },
+    );
+
+    return paykitCheckout$InboundSchema({
+      ...checkout.value,
+      checkoutUrl: response.value?.responseBody.checkoutUrl as string,
+    });
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {

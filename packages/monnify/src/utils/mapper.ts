@@ -1,4 +1,10 @@
-import { WebhookEventType } from '@paykit-sdk/core';
+import {
+  Checkout,
+  omitInternalMetadata,
+  parseJSON,
+  WebhookEventType,
+} from '@paykit-sdk/core';
+import z from 'zod';
 
 export const monnifyToPaykitEventMap: Record<
   string,
@@ -41,4 +47,24 @@ export const monnifyToPaykitEventMap: Record<
 
   // Offline payments also count as payment.created
   SUCCESSFUL_TRANSACTION_OFFLINE: 'payment.created',
+};
+
+export const paykitCheckout$InboundSchema = (data: Record<string, any>): Checkout => {
+  const { item, qty } = parseJSON(
+    data.metaData,
+    z.object({ item: z.string(), qty: z.number() }),
+  );
+
+  const metadata = omitInternalMetadata(data.metaData as Record<string, unknown>);
+
+  return {
+    id: data.transactionReference,
+    amount: data.paymentReference,
+    currency: data.currency,
+    customer: { email: data?.customer?.email as string },
+    payment_url: data.checkoutUrl,
+    metadata,
+    session_type: 'one_time',
+    products: [{ id: item, quantity: qty }],
+  };
 };

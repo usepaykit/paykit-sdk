@@ -2,7 +2,6 @@ import React from 'react';
 import { CopyButton } from '@/components/copy-button';
 import { FinalCTA } from '@/components/final-cta';
 import { Paykit as PaykitIcon } from '@/components/icons';
-import { LifetimeAccess } from '@/components/lifetime-access';
 import { ProviderDemo } from '@/components/provider-demo';
 import { ReactHooksDemo } from '@/components/react-hooks-demo';
 import { SiteHeader } from '@/components/site-header';
@@ -132,8 +131,6 @@ const Index = () => {
       <ProviderDemo />
 
       <ReactHooksDemo />
-
-      <LifetimeAccess />
 
       <SponsorContact />
 

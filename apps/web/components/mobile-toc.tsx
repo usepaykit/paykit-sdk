@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { DocsAd } from '@/components/docs-ad';
 import { DashboardTableOfContents } from '@/components/toc';
 import { Toc } from '@/lib/toc';
 import { Sheet, Button } from '@paykit-sdk/ui';
@@ -35,7 +34,6 @@ export function MobileToc({ toc }: MobileTocProps) {
             <div className="space-y-4">
               <DashboardTableOfContents toc={toc} />
             </div>
-            <DocsAd />
           </div>
         </div>
       </Sheet.Content>

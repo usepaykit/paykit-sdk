@@ -1,4 +1,3 @@
-import { DocsAd } from '@/components/docs-ad';
 import { Mdx } from '@/components/mdx-components';
 import { MobileToc } from '@/components/mobile-toc';
 import { DocsPager } from '@/components/pager';
@@ -168,7 +167,6 @@ export default async function DocPage({ params }: DocPageProps) {
                 </h4>
                 <DashboardTableOfContents toc={toc} />
               </div>
-              <DocsAd />
             </div>
           </div>
         </div>

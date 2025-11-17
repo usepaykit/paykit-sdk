@@ -36,11 +36,11 @@ import {
   AbstractPayKitProvider,
   PAYKIT_METADATA_KEY,
   LooseAutoComplete,
+  OAuth2TokenManager,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
 import * as crypto from 'crypto';
 import { z } from 'zod';
-import { AuthController } from './controllers/auth';
 import {
   GoPayPaymentRequest,
   GoPayPaymentBaseResponse,
@@ -100,7 +100,8 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
   private _client: HTTPClient;
   private baseUrl: string;
-  private authController: AuthController;
+
+  private tokenManager: OAuth2TokenManager;
 
   constructor(private readonly opts: GoPayOptions) {
     super(gopayOptionsSchema, opts, providerName);
@@ -117,7 +118,26 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       retryOptions: { max: 3, baseDelay: 1000, debug },
     });
 
-    this.authController = new AuthController({ ...opts, baseUrl: this.baseUrl });
+    this.tokenManager = new OAuth2TokenManager({
+      client: this._client,
+      provider: this.providerName,
+      tokenEndpoint: '/oauth2/token',
+      credentials: { username: opts.clientId, password: opts.clientSecret },
+      responseAdapter: response => ({
+        accessToken: response.access_token,
+        expiresIn: response.expires_in,
+      }),
+      expiryBuffer: 5 * 60, // 5 minutes
+      requestBody: 'grant_type=client_credentials&scope=payment-all',
+      requestHeaders: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        Accept: 'application/json',
+      },
+      authHeaders: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    });
   }
 
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
@@ -195,7 +215,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       '/payments/payment',
       {
         body: JSON.stringify(goPayRequest),
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -213,7 +233,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       `/payments/payment/${id}`,
       {
         headers: {
-          ...(await this.authController.getAuthHeaders()),
+          ...(await this.tokenManager.getAuthHeaders()),
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       },
@@ -377,7 +397,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       '/payments/payment',
       {
         body: JSON.stringify(goPaySubscriptionOptions),
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -420,7 +440,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       result: LooseAutoComplete<'FINISHED'>;
     }>(`/payments/payment/${id}/void-recurrence`, {
       headers: {
-        ...(await this.authController.getAuthHeaders()),
+        ...(await this.tokenManager.getAuthHeaders()),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
@@ -440,7 +460,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const response = await this._client.get<GoPaySubscriptionResponse>(
       `/payments/payment/${id}`,
       {
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -505,7 +525,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       '/payments/payment',
       {
         body: JSON.stringify(goPayRequest),
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -523,7 +543,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       `/payments/payment/${id}`,
       {
         headers: {
-          ...(await this.authController.getAuthHeaders()),
+          ...(await this.tokenManager.getAuthHeaders()),
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       },
@@ -549,7 +569,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const payment = await this._client.get<GoPayPaymentBaseResponse>(
       `/payments/payment/${id}/capture`,
       {
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -581,7 +601,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
       `/payments/payment/${id}/capture`,
       {
         body: JSON.stringify(captureBody),
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -592,7 +612,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const response = await this._client.post<GoPayPaymentBaseResponse>(
       `/payments/payment/${id}/void-authorization`,
       {
-        headers: await this.authController.getAuthHeaders(),
+        headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
@@ -647,7 +667,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     }>(`/payments/payment/${data.payment_id}/refund`, {
       body: new URLSearchParams({ amount: String(data.amount) }).toString(),
       headers: {
-        ...(await this.authController.getAuthHeaders()),
+        ...(await this.tokenManager.getAuthHeaders()),
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     });
@@ -688,7 +708,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     const [payment, error] = await tryCatchAsync(
       this._client.get<GoPayPaymentBaseResponse>(`/payments/payment/${paymentId}`, {
         headers: {
-          ...(await this.authController.getAuthHeaders()),
+          ...(await this.tokenManager.getAuthHeaders()),
           'Content-Type': 'application/x-www-form-urlencoded',
         },
       }),

@@ -77,3 +77,4 @@ export * from './paykit-provider';
 export * from './provider-shema';
 export * from './server/create-endpoint-handler';
 export * from './server/endpoints';
+export * from './oauth2-token-manager';

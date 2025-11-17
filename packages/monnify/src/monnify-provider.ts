@@ -25,6 +25,7 @@ import {
   WebhookError,
   parseJSON,
   WebhookEventType,
+  OAuth2TokenManager,
 } from '@paykit-sdk/core';
 import { sha512 } from 'js-sha512';
 import { z } from 'zod';
@@ -32,12 +33,12 @@ import { monnifyToPaykitEventMap } from './utils/mapper';
 
 export interface MonnifyOptions extends PaykitProviderOptions {
   /**
-   * The public key for the Moniepoint API
+   * The API key for the Monnify API
    */
-  publicKey: string;
+  apiKey: string;
 
   /**
-   * The secret key for the Moniepoint API
+   * The secret key for the Monnify API
    */
   secretKey: string;
 
@@ -49,7 +50,7 @@ export interface MonnifyOptions extends PaykitProviderOptions {
 
 const monnifyOptionsSchema = schema<MonnifyOptions>()(
   z.object({
-    publicKey: z.string(),
+    apiKey: z.string(),
     secretKey: z.string(),
     isSandbox: z.boolean(),
   }),
@@ -62,6 +63,8 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
 
   private _client: HTTPClient;
   private baseUrl: string;
+
+  private tokenManager: OAuth2TokenManager;
 
   constructor(private readonly opts: MonnifyOptions) {
     super(monnifyOptionsSchema, opts, providerName);
@@ -76,18 +79,36 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       baseUrl: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
-        'X-Public-Key': opts.publicKey,
-        'X-Secret-Key': opts.secretKey,
       },
       retryOptions: { max: 3, baseDelay: 1000, debug },
+    });
+
+    this.tokenManager = new OAuth2TokenManager({
+      client: this._client,
+      provider: this.providerName,
+      tokenEndpoint: '/auth/login',
+      credentials: { username: opts.apiKey, password: opts.secretKey },
+      responseAdapter: response => ({
+        accessToken: response.responseBody?.accessToken ?? '',
+        expiresIn: response.responseBody?.expiresIn ?? 0,
+      }),
+      expiryBuffer: 5 * 60, // 5 minutes
     });
   }
 
   createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    throw new ProviderNotSupportedError('createCheckout', 'Moniepoint', {
-      reason: 'Moniepoint does not support creating checkouts',
-      alternative: 'Use the createPayment method instead',
+    const response = await this._client.post<{
+      requestSuccessful: boolean;
+      responseCode: number;
+      responseBody: {
+        paymentReference: string;
+      };
+    }>('/payments/initiate', {
+      body: JSON.stringify(params),
+      headers: await this.tokenManager.getAuthHeaders(),
     });
+
+    return response.value?.responseBody.paymentReference as any as Checkout;
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {

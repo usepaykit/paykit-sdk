@@ -30,6 +30,7 @@ import {
   ValidationError,
   validateRequiredKeys,
   OperationFailedError,
+  InvalidTypeError,
 } from '@paykit-sdk/core';
 import { sha512 } from 'js-sha512';
 import { z } from 'zod';
@@ -107,6 +108,16 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
     }
 
+    if (
+      typeof data.customer === 'string' ||
+      (typeof data.customer === 'object' && !data.customer?.email)
+    ) {
+      throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
+        provider: this.providerName,
+        method: 'createCheckout',
+      });
+    }
+
     const { amount, currency } = validateRequiredKeys(
       ['amount', 'currency'],
       (data.provider_metadata ?? { currency: 'NGN' }) as Record<string, string>,
@@ -118,7 +129,7 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
     const body: Record<string, unknown> = {
       amount,
       paymentReference,
-      paymentDescription: `Checkout for ${data.item_id} x ${data.quantity} items`,
+      paymentDescription: `Checkout for ${data.item_id} x ${data.quantity} item${data.quantity > 1 ? 's' : ''}`,
       currencyCode: currency,
       redirectUrl: data.success_url,
       paymentMethods: ['CARD', 'ACCOUNT_TRANSFER'],
@@ -128,11 +139,7 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       },
     };
 
-    if (typeof data.customer === 'object' && 'email' in data.customer) {
-      body.customerEmail = data.customer.email;
-    } else {
-      body.customerEmail = data.customer;
-    }
+    body.customerEmail = data.customer.email;
 
     const response = await this._client.post<Record<string, any>>(
       '/merchant/transactions/init-transaction',

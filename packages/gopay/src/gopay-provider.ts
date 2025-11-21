@@ -147,7 +147,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     if (
       typeof data.customer == 'string' ||
-      (typeof data.customer === 'object' && !data.customer.email)
+      (typeof data.customer === 'object' && !data.customer?.email)
     ) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,

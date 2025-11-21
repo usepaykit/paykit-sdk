@@ -1,20 +1,3 @@
-export interface GoPayTokenResponse {
-  /**
-   * The type of the token
-   */
-  token_type: 'bearer';
-
-  /**
-   * The access token
-   */
-  access_token: string;
-
-  /**
-   * The expiry time of the token
-   */
-  expires_in: number;
-}
-
 export interface GoPayPaymentBaseResponse {
   /**
    * The ID of the payment

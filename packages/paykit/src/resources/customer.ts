@@ -109,3 +109,13 @@ export const retrieveCustomerSchema = schema<RetrieveCustomerParams>()(
     id: z.string(),
   }),
 );
+
+export const isEmailCustomer = (
+  customer: unknown,
+): customer is Pick<Customer, 'email'> => {
+  return typeof customer === 'object' && customer !== null && 'email' in customer;
+};
+
+export const isIdCustomer = (customer: unknown): customer is string => {
+  return typeof customer === 'string' && customer.length > 0;
+};

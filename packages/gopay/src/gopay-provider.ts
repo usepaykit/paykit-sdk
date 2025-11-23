@@ -37,6 +37,7 @@ import {
   PAYKIT_METADATA_KEY,
   LooseAutoComplete,
   OAuth2TokenManager,
+  isEmailCustomer,
 } from '@paykit-sdk/core';
 import { CreateCustomerParams } from '@paykit-sdk/core';
 import * as crypto from 'crypto';
@@ -145,10 +146,7 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
 
     if (error) throw ValidationError.fromZodError(error, 'gopay', 'createCheckout');
 
-    if (
-      typeof data.customer == 'string' ||
-      (typeof data.customer === 'object' && !data.customer?.email)
-    ) {
+    if (!isEmailCustomer(data.customer)) {
       throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
         provider: this.providerName,
         method: 'createCheckout',

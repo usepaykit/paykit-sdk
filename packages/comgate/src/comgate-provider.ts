@@ -30,6 +30,7 @@ import {
   InvalidTypeError,
   schema,
   AbstractPayKitProvider,
+  isIdCustomer,
 } from '@paykit-sdk/core';
 import { CreateCheckoutSchema, CreateCustomerParams } from '@paykit-sdk/core';
 import { Checkout } from '@paykit-sdk/core';
@@ -136,11 +137,16 @@ export class ComgateProvider extends AbstractPayKitProvider implements PayKitPro
 
     if (error) throw new Error(error.message.split('\n').join(' '));
 
-    if (typeof data.customer === 'string') {
-      throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
-        provider: this.providerName,
-        method: 'createCheckout',
-      });
+    if (isIdCustomer(data.customer)) {
+      throw new InvalidTypeError(
+        'customer',
+        'object (customer) with email',
+        'string (customer ID)',
+        {
+          provider: this.providerName,
+          method: 'createCheckout',
+        },
+      );
     }
 
     const requestBody = new URLSearchParams({

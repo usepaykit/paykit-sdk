@@ -45,6 +45,8 @@ import {
   createCheckoutSchema,
   omitInternalMetadata,
   validateRequiredKeys,
+  isIdCustomer,
+  isEmailCustomer,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -117,9 +119,9 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
       };
     }
 
-    if (typeof params.customer === 'string') {
+    if (isIdCustomer(params.customer)) {
       checkoutOptions.customer = params.customer;
-    } else if (typeof params.customer === 'object' && 'email' in params.customer) {
+    } else if (isEmailCustomer(params.customer)) {
       checkoutOptions.customer_email = params.customer.email;
     } else {
       throw new InvalidTypeError(

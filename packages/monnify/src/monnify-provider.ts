@@ -31,6 +31,7 @@ import {
   validateRequiredKeys,
   OperationFailedError,
   InvalidTypeError,
+  isEmailCustomer,
 } from '@paykit-sdk/core';
 import { sha512 } from 'js-sha512';
 import { z } from 'zod';
@@ -93,9 +94,9 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       provider: this.providerName,
       tokenEndpoint: '/v1/auth/login',
       credentials: { username: opts.apiKey, password: opts.secretKey },
-      responseAdapter: response => ({
-        accessToken: response.responseBody?.accessToken ?? '',
-        expiresIn: response.responseBody?.expiresIn ?? 0,
+      responseAdapter: ({ responseBody }) => ({
+        accessToken: responseBody?.accessToken ?? '',
+        expiresIn: responseBody?.expiresIn ?? 0,
       }),
       expiryBuffer: 5 * 60, // 5 minutes
     });
@@ -108,14 +109,16 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
     }
 
-    if (
-      typeof data.customer === 'string' ||
-      (typeof data.customer === 'object' && !data.customer?.email)
-    ) {
-      throw new InvalidTypeError('customer', 'object (customer) with email', 'string', {
-        provider: this.providerName,
-        method: 'createCheckout',
-      });
+    if (!isEmailCustomer(data.customer)) {
+      throw new InvalidTypeError(
+        'customer',
+        'object (customer) with email',
+        'string (customer ID)',
+        {
+          provider: this.providerName,
+          method: 'createCheckout',
+        },
+      );
     }
 
     const { amount, currency } = validateRequiredKeys(

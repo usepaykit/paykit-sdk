@@ -26,7 +26,9 @@ import {
   parseJSON,
   WebhookEventType,
   OAuth2TokenManager,
+  PAYKIT_METADATA_KEY,
   createCheckoutSchema,
+  createRefundSchema,
   ValidationError,
   validateRequiredKeys,
   OperationFailedError,
@@ -35,7 +37,12 @@ import {
 } from '@paykit-sdk/core';
 import { sha512 } from 'js-sha512';
 import { z } from 'zod';
-import { monnifyToPaykitEventMap, paykitCheckout$InboundSchema } from './utils/mapper';
+import {
+  monnifyToPaykitEventMap,
+  paykitCheckout$InboundSchema,
+  paykitPayment$InboundSchema,
+  paykitRefund$InboundSchema,
+} from './utils/mapper';
 
 export interface MonnifyOptions extends PaykitProviderOptions {
   /**
@@ -102,12 +109,68 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
     });
   }
 
-  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
-    const { error, data } = createCheckoutSchema.safeParse(params);
-
+  /**
+   * Validates schema and throws ValidationError if invalid
+   */
+  private validateSchema<T>(schema: z.ZodSchema<T>, params: unknown, method: string): T {
+    const { error, data } = schema.safeParse(params);
     if (error) {
-      throw ValidationError.fromZodError(error, this.providerName, 'createCheckout');
+      throw ValidationError.fromZodError(error, this.providerName, method);
     }
+    return data;
+  }
+
+  /**
+   * Ensures API response is successful and has responseBody
+   */
+  private ensureResponse<T = Record<string, any>>(
+    response: { ok: boolean; value?: { responseBody?: T }; error?: unknown },
+    method: string,
+    errorMessage?: string,
+  ): T {
+    if (!response.ok || !response.value?.responseBody) {
+      throw new OperationFailedError(method, this.providerName, {
+        cause: new Error(
+          errorMessage || JSON.stringify(response.error ?? response.value),
+        ),
+      });
+    }
+    return response.value.responseBody;
+  }
+
+  /**
+   * Queries transaction by transactionReference or paymentReference (with fallback)
+   */
+  private async queryTransaction(
+    id: string,
+    errorMessage = 'Transaction not found',
+  ): Promise<Record<string, any>> {
+    const response = await this._client.get<Record<string, any>>(
+      `/v2/merchant/transactions/query?transactionReference=${id}`,
+      { headers: await this.tokenManager.getAuthHeaders() },
+    );
+
+    if (response.ok && response.value?.responseBody) {
+      return response.value.responseBody;
+    }
+
+    // Fallback to paymentReference
+    const altResponse = await this._client.get<Record<string, any>>(
+      `/v2/merchant/transactions/query?paymentReference=${id}`,
+      { headers: await this.tokenManager.getAuthHeaders() },
+    );
+
+    if (!altResponse.ok || !altResponse.value?.responseBody) {
+      throw new OperationFailedError('queryTransaction', this.providerName, {
+        cause: new Error(errorMessage),
+      });
+    }
+
+    return altResponse.value.responseBody;
+  }
+
+  createCheckout = async (params: CreateCheckoutSchema): Promise<Checkout> => {
+    const data = this.validateSchema(createCheckoutSchema, params, 'createCheckout');
 
     if (!isEmailCustomer(data.customer)) {
       throw new InvalidTypeError(
@@ -138,47 +201,46 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
       paymentMethods: ['CARD', 'ACCOUNT_TRANSFER'],
       metadata: {
         ...params.metadata,
-        PAYKIT_METADATA_KEY: JSON.stringify({ item: data.item_id, qty: data.quantity }),
+        [PAYKIT_METADATA_KEY]: JSON.stringify({ item: data.item_id, qty: data.quantity }),
       },
+      customerEmail: data.customer.email,
     };
 
-    body.customerEmail = data.customer.email;
-
     const response = await this._client.post<Record<string, any>>(
-      '/merchant/transactions/init-transaction',
+      '/v1/merchant/transactions/init-transaction',
       {
         body: JSON.stringify(body),
         headers: await this.tokenManager.getAuthHeaders(),
       },
     );
 
-    if (!response.ok) {
-      throw new OperationFailedError('createCheckout', this.providerName, {
-        cause: new Error(JSON.stringify(response.error ?? response.value)),
-      });
-    }
+    const responseBody = this.ensureResponse(response, 'createCheckout');
 
-    const checkoutUrl = new URLSearchParams({
-      paymentReference,
-      transactionReference: response.value?.responseBody?.transactionReference,
-    });
+    const transactionReference = responseBody.transactionReference;
+    const checkoutUrl = responseBody.checkoutUrl;
 
-    const checkout = await this._client.get<Record<string, any>>(
-      `v2/merchant/transactions/query?${checkoutUrl.toString()}`,
+    // Query the transaction to get full details
+    const checkoutResponse = await this._client.get<Record<string, any>>(
+      `/v2/merchant/transactions/query?paymentReference=${paymentReference}`,
       { headers: await this.tokenManager.getAuthHeaders() },
     );
 
+    const checkoutData = this.ensureResponse(
+      checkoutResponse,
+      'createCheckout',
+      'Failed to retrieve checkout details',
+    );
+
     return paykitCheckout$InboundSchema({
-      ...checkout.value,
-      checkoutUrl: response.value?.responseBody.checkoutUrl as string,
+      ...checkoutData,
+      checkoutUrl,
+      transactionReference,
     });
   };
 
   retrieveCheckout = async (id: string): Promise<Checkout> => {
-    throw new ProviderNotSupportedError('retrieveCheckout', 'Moniepoint', {
-      reason: 'Moniepoint does not support retrieving checkouts',
-      alternative: 'Use the retrievePayment method instead',
-    });
+    const transactionData = await this.queryTransaction(id, 'Checkout not found');
+    return paykitCheckout$InboundSchema(transactionData);
   };
 
   updateCheckout = async (
@@ -277,10 +339,12 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
   };
 
   retrievePayment = async (id: string): Promise<Payment | null> => {
-    throw new ProviderNotSupportedError('retrievePayment', 'Moniepoint', {
-      reason: 'Moniepoint does not support retrieving payments',
-      alternative: 'Use the retrievePayment method instead',
-    });
+    try {
+      const transactionData = await this.queryTransaction(id);
+      return paykitPayment$InboundSchema(transactionData);
+    } catch {
+      return null;
+    }
   };
 
   updatePayment = async (id: string, params: UpdatePaymentSchema): Promise<Payment> => {
@@ -312,9 +376,37 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
   };
 
   createRefund = async (params: CreateRefundSchema): Promise<Refund> => {
-    throw new ProviderNotSupportedError('createRefund', 'Moniepoint', {
-      reason: 'Moniepoint does not support creating refunds',
-      alternative: 'Use the createRefund method instead',
+    const data = this.validateSchema(createRefundSchema, params, 'createRefund');
+
+    // First, retrieve the payment to get transactionReference
+    const payment = await this.retrievePayment(data.payment_id);
+
+    if (!payment) {
+      throw new OperationFailedError('createRefund', this.providerName, {
+        cause: new Error('Payment not found'),
+      });
+    }
+
+    const body: Record<string, unknown> = {
+      transactionReference: data.payment_id,
+      refundAmount: data.amount,
+      refundReason: data.reason ?? 'Customer request',
+      ...(data.provider_metadata || {}),
+    };
+
+    const response = await this._client.post<Record<string, any>>(
+      '/v1/merchant/transactions/refund',
+      {
+        body: JSON.stringify(body),
+        headers: await this.tokenManager.getAuthHeaders(),
+      },
+    );
+
+    const responseBody = this.ensureResponse(response, 'createRefund');
+
+    return paykitRefund$InboundSchema({
+      ...responseBody,
+      metadata: data.metadata ?? null,
     });
   };
 

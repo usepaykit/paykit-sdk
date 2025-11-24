@@ -1,0 +1,29 @@
+{
+  "name": "api",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.19.6",
+    "drizzle-orm": "^0.30.10",
+    "hono": "^4.10.6",
+    "postgres": "^3.4.7",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "@paykit-sdk/comgate": "workspace:*",
+    "@paykit-sdk/core": "workspace:*",
+    "@paykit-sdk/gopay": "workspace:*",
+    "@paykit-sdk/monnify": "workspace:*",
+    "@paykit-sdk/paypal": "workspace:*",
+    "@paykit-sdk/polar": "workspace:*",
+    "@paykit-sdk/stripe": "workspace:*",
+    "@types/node": "^20.11.17",
+    "tsx": "^4.7.1",
+    "typescript": "^5.8.3",
+    "zod": "^3.24.2"
+  }
+}

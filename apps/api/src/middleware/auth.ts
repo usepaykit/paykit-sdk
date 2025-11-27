@@ -13,19 +13,19 @@ export async function authMiddleware(c: Context, next: Next) {
     });
   }
 
-  const apiKeyRecord = await db
+  const apiKeyRecords = await db
     .select()
     .from(apiKeys)
     .where(eq(apiKeys.apiKey, apiKey))
     .limit(1);
 
-  if (!apiKeyRecord) {
+  if (!apiKeyRecords) {
     throw new HTTPException(401, {
       message: 'Invalid API key',
     });
   }
 
-  c.set('userId', apiKeyRecord.userId);
+  c.set('userId', apiKeyRecords[0].userId);
 
   await next();
 }

@@ -6,15 +6,15 @@ import { polar } from '@paykit-sdk/polar';
 import { stripe } from '@paykit-sdk/stripe';
 import { sql } from 'drizzle-orm';
 import { pgTable, text, timestamp, jsonb, index, uuid } from 'drizzle-orm/pg-core';
-import { pgEnum } from 'drizzle-orm/pg-core';
+import { z } from 'zod';
 
-export const providerEnum = pgEnum('provider', [
-  stripe().providerName,
+const providerNames = z.enum([
+  comgate().providerName,
   gopay().providerName,
   monnify().providerName,
   paypal().providerName,
   polar().providerName,
-  comgate().providerName,
+  stripe().providerName,
 ]);
 
 export const customers = pgTable(
@@ -26,7 +26,7 @@ export const customers = pgTable(
     name: text('name').notNull(),
     phone: text('phone'),
     metadata: jsonb('metadata'),
-    provider: providerEnum('provider').notNull(),
+    provider: text('provider').notNull().$type<z.infer<typeof providerNames>>(),
     createdAt: timestamp('created_at').defaultNow().notNull(),
     updatedAt: timestamp('updated_at').defaultNow().notNull(),
   },

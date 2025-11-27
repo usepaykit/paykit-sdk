@@ -39,7 +39,7 @@ export class CustomerClient {
     const response = await this.client.get<Customer>(`/v1/customers/${id}`);
 
     if (!response.ok) {
-      if (response.error?.status === 404) return null;
+      if ((response.error as { status?: number })?.status === 404) return null;
       throw new Error('Failed to retrieve customer');
     }
 
@@ -52,7 +52,7 @@ export class CustomerClient {
     );
 
     if (!response.ok) {
-      if (response.error?.status === 404) return null;
+      if ((response.error as { status?: number })?.status === 404) return null;
       throw new Error('Failed to retrieve customer');
     }
 

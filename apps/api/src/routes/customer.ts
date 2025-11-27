@@ -10,7 +10,7 @@ const customersRoute = new Hono();
 
 // POST /v1/customers - Create customer
 customersRoute.post('/', async c => {
-  const apiKey = c.get('apiKey' as unknown as never);
+  const apiKey = c.get('apiKey' as unknown as never) as string;
   const body = await c.req.json();
 
   const validated = createCustomerSchema.parse(body);
@@ -43,7 +43,7 @@ customersRoute.post('/', async c => {
 
 // GET /v1/customers/:id - Retrieve customer
 customersRoute.get('/:id', async c => {
-  const apiKey = c.get('apiKey' as unknown as never);
+  const apiKey = c.get('apiKey' as unknown as never) as string;
   const id = c.req.param('id');
 
   const [customer] = await db
@@ -68,7 +68,7 @@ customersRoute.get('/', async c => {
     })
     .parse(c.req.query());
 
-  const apiKey = c.get('apiKey' as unknown as never);
+  const apiKey = c.get('apiKey' as unknown as never) as string;
 
   const [customer] = await db
     .select()
@@ -85,7 +85,7 @@ customersRoute.get('/', async c => {
 
 // PATCH /v1/customers/:id - Update customer
 customersRoute.patch('/:id', async c => {
-  const apiKey = c.get('apiKey');
+  const apiKey = c.get('apiKey' as unknown as never) as string;
   const id = c.req.param('id');
   const body = await c.req.json();
 
@@ -109,7 +109,7 @@ customersRoute.patch('/:id', async c => {
 
 // DELETE /v1/customers/:id - Delete customer
 customersRoute.delete('/:id', async c => {
-  const apiKey = c.get('apiKey' as unknown as never);
+  const apiKey = c.get('apiKey' as unknown as never) as string;
   const id = c.req.param('id');
 
   const [deleted] = await db

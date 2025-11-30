@@ -197,3 +197,34 @@ export const getURLFromHeaders = (headers: Record<string, string>) => {
 
   return '';
 };
+
+export const refundReasonMatcher = (matcher: string) => {
+  // Match "duplicate" patterns
+  if (
+    /duplicate|duplicated|double.*charge|charged.*twice/i.test(
+      matcher.toLowerCase().trim(),
+    )
+  ) {
+    return 'duplicate';
+  }
+
+  // Match "fraudulent" patterns
+  if (
+    /fraud|fraudulent|unauthorized|scam|stolen.*card|not.*authorized/i.test(
+      matcher.toLowerCase().trim(),
+    )
+  ) {
+    return 'fraudulent';
+  }
+
+  // Match "requested_by_customer" patterns
+  if (
+    /customer.*request|requested.*customer|customer.*want|cancel|refund.*request|changed.*mind/i.test(
+      matcher.toLowerCase().trim(),
+    )
+  ) {
+    return 'requested_by_customer';
+  }
+
+  return 'other';
+};

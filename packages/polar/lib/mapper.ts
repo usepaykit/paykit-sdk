@@ -162,25 +162,6 @@ export const paykitPayment$InboundSchema = (checkout: Checkout): Payment => {
 /**
  * Refund
  */
-export const mapRefundReason = (debug: boolean, reason: string): RefundReason => {
-  const reasonMap: Record<string, RefundReason> = {
-    duplicate: 'duplicate',
-    fraudulent: 'fraudulent',
-    requested_by_customer: 'customer_request',
-    customer_request: 'customer_request',
-  };
-
-  const mapped = reasonMap[reason.toLowerCase()] ?? 'other';
-
-  if (debug && mapped === 'other' && !reason.toLowerCase().includes('other')) {
-    console.warn(
-      `[Polar Provider] Unmapped refund reason: "${reason}" -> defaulting to "other"`,
-    );
-  }
-
-  return mapped;
-};
-
 export const paykitRefund$InboundSchema = (refund: Refund): PaykitRefund => {
   return {
     id: refund.id,

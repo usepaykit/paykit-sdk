@@ -261,13 +261,21 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
+    if (this.cloudClient) {
+      return this.cloudClient.customers.create(params);
+    }
+
     throw new ProviderNotSupportedError('createCustomer', 'Moniepoint', {
-      reason: 'Moniepoint does not support creating customers',
-      alternative: 'Use the createCustomer method instead',
+      reason:
+        'Moniepoint does not support creating customers, use the cloud API instead by setting `cloudApiKey` in the options to create a customer in the cloud',
     });
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
+    if (this.cloudClient) {
+      return this.cloudClient.customers.retrieve(id, id);
+    }
+
     throw new ProviderNotSupportedError('retrieveCustomer', 'Moniepoint', {
       reason: 'Moniepoint does not support retrieving customers',
       alternative: 'Use the retrieveCustomer method instead',
@@ -278,6 +286,10 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
     id: string,
     params: UpdateCustomerParams,
   ): Promise<Customer> => {
+    if (this.cloudClient) {
+      await this.cloudClient.customers.update(id, params, id);
+    }
+
     throw new ProviderNotSupportedError('updateCustomer', 'Moniepoint', {
       reason: 'Moniepoint does not support updating customers',
       alternative: 'Use the updateCustomer method instead',
@@ -285,6 +297,10 @@ export class MonnifyProvider extends AbstractPayKitProvider implements PayKitPro
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
+    if (this.cloudClient) {
+      await this.cloudClient.customers.delete(id, id);
+    }
+
     throw new ProviderNotSupportedError('deleteCustomer', 'Moniepoint', {
       reason: 'Moniepoint does not support deleting customers',
       alternative: 'Use the deleteCustomer method instead',

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { PayKitCloudClient } from './cloud/client';
 import { ConfigurationError } from './error';
 import {
   Checkout,
@@ -23,6 +24,7 @@ import {
   UpdateSubscriptionSchema,
 } from './resources/subscription';
 import { WebhookEventPayload } from './resources/webhook';
+import { PaykitProviderOptions } from './types';
 import { HandleWebhookParams } from './webhook-provider';
 
 export interface PayKitProvider {
@@ -79,6 +81,8 @@ export interface PayKitProvider {
 }
 
 export class AbstractPayKitProvider {
+  protected cloudClient: PayKitCloudClient | undefined;
+
   protected constructor(
     schema: z.ZodType<Record<string, unknown>>,
     options: unknown,
@@ -90,6 +94,16 @@ export class AbstractPayKitProvider {
       throw new ConfigurationError(`Invalid ${providerName} configuration`, {
         provider: providerName,
         missingKeys: Object.keys(error.flatten().fieldErrors ?? {}),
+      });
+    }
+
+    const opts = options as PaykitProviderOptions;
+
+    if (opts?.cloudApiKey && opts.cloudApiKey.trim() !== '') {
+      this.cloudClient = new PayKitCloudClient({
+        cloudApiKey: opts.cloudApiKey.trim(),
+        isSandbox: opts.debug ?? true,
+        provider: providerName,
       });
     }
   }

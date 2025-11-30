@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { schema } from '../tools';
 import { OverrideProps } from '../types';
+import { BillingInfo, billingSchema } from './billing';
 import { metadataSchema } from './metadata';
 
 export interface Customer {
@@ -70,8 +71,8 @@ export const payeeSchema = schema<Payee>()(
 
 export interface CreateCustomerParams
   extends OverrideProps<
-    Omit<Customer, 'id' | 'custom_fields' | 'created_at' | 'updated_at'>,
-    { name?: string }
+    Pick<Customer, 'email' | 'name' | 'phone' | 'metadata'>,
+    { name?: string; billing: BillingInfo | null }
   > {}
 
 export const createCustomerSchema = schema<CreateCustomerParams>()(
@@ -80,12 +81,14 @@ export const createCustomerSchema = schema<CreateCustomerParams>()(
     name: z.string().optional(),
     phone: z.string(),
     metadata: metadataSchema.optional(),
+    billing: billingSchema.nullable(),
   }),
 );
 
 export interface UpdateCustomerParams
-  extends Partial<Omit<Customer, 'id' | 'custom_fields' | 'created_at' | 'updated_at'>> {
+  extends Partial<Pick<Customer, 'email' | 'name' | 'phone' | 'metadata'>> {
   provider_metadata?: Record<string, unknown>;
+  billing?: BillingInfo | null;
 }
 
 export const updateCustomerSchema = schema<UpdateCustomerParams>()(

@@ -42,6 +42,7 @@ import {
   AbstractPayKitProvider,
   PAYKIT_METADATA_KEY,
   stringifyMetadataValues,
+  refundReasonMatcher,
 } from '@paykit-sdk/core';
 import { Polar, SDKOptions, ServerList } from '@polar-sh/sdk';
 import { CountryAlpha2Input } from '@polar-sh/sdk/models/components/addressinput.js';
@@ -49,6 +50,7 @@ import { CheckoutCreate } from '@polar-sh/sdk/models/components/checkoutcreate.j
 import { Customer as PolarCustomer } from '@polar-sh/sdk/models/components/customer.js';
 import { Order as PolarOrder } from '@polar-sh/sdk/models/components/order.js';
 import { Refund as PolarRefund } from '@polar-sh/sdk/models/components/refund.js';
+import { RefundReason } from '@polar-sh/sdk/models/components/refundreason.js';
 import { Subscription as PolarSubscription } from '@polar-sh/sdk/models/components/subscription.js';
 import { SubscriptionUpdate } from '@polar-sh/sdk/models/components/subscriptionupdate.js';
 import { SubscriptionUpdateDiscount } from '@polar-sh/sdk/models/components/subscriptionupdatediscount.js';
@@ -58,7 +60,6 @@ import { Refunds } from '@polar-sh/sdk/sdk/refunds.js';
 import { validateEvent } from '@polar-sh/sdk/webhooks';
 import { z } from 'zod';
 import {
-  mapRefundReason,
   paykitCheckout$InboundSchema,
   paykitCustomer$InboundSchema,
   paykitInvoice$InboundSchema,
@@ -227,6 +228,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       },
     });
 
+    if (this.cloudClient) void this.cloudClient.customers.create(params, response.id);
+
     return paykitCustomer$InboundSchema(response);
   };
 
@@ -242,6 +245,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
 
     const { email, name, metadata, provider_metadata } = data;
 
+    if (this.cloudClient) void this.cloudClient.customers.update(id, params);
+
     const response = await this.polar.customers.update({
       id,
       customerUpdate: {
@@ -251,6 +256,8 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
         ...provider_metadata,
       },
     });
+
+    if (this.cloudClient) void this.cloudClient.customers.update(id, params, id);
 
     return paykitCustomer$InboundSchema(response);
   };
@@ -268,7 +275,14 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
-    await this.polar.customers.delete({ id });
+    const customer = await this.polar.customers.get({ id });
+
+    if (customer) await this.polar.customers.delete({ id });
+
+    if (this.cloudClient) {
+      const customers = await this.cloudClient.customers.query({ email: customer.email });
+      if (customers.length > 0) await this.cloudClient.customers.delete(customers[0].id);
+    }
 
     return null;
   };
@@ -468,11 +482,26 @@ export class PolarProvider extends AbstractPayKitProvider implements PayKitProvi
       throw new ResourceNotFoundError('Order', data.payment_id, this.providerName);
     }
 
+    const matched = refundReasonMatcher(data.reason ?? '');
+
+    const reasonMap: Record<string, RefundReason> = {
+      duplicate: 'duplicate',
+      fraudulent: 'fraudulent',
+      requested_by_customer: 'customer_request',
+      customer_request: 'customer_request',
+    };
+
+    const reason = reasonMap[matched] ?? 'other';
+
+    if (reason === 'other') {
+      console.warn(
+        `[Polar Provider] Unmapped refund reason: "${data.reason}" -> defaulting to "other"`,
+      );
+    }
+
     const refund = await this.refunds.create({
       orderId: order.id,
-      reason: data.reason
-        ? mapRefundReason(this.config.debug ?? true, data.reason)
-        : 'other',
+      reason,
       amount: data.amount,
       ...(data.provider_metadata && { ...data.provider_metadata }),
     });

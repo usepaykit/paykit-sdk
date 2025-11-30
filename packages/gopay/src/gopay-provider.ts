@@ -73,11 +73,6 @@ export interface GoPayOptions extends PaykitProviderOptions {
   goId: string;
 
   /**
-   * Whether to use the sandbox environment
-   */
-  isSandbox: boolean;
-
-  /**
    * The webhook URL for the GoPay API
    */
   webhookUrl: string;
@@ -269,8 +264,13 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
   };
 
   createCustomer = async (params: CreateCustomerParams): Promise<Customer> => {
+    if (this.cloudClient) {
+      return this.cloudClient.customers.create(params);
+    }
+
     throw new ProviderNotSupportedError('createCustomer', 'gopay', {
-      reason: "Gopay doesn't support creating customers",
+      reason:
+        "Gopay doesn't support creating customers, use the cloud API instead by setting `cloudApiKey` in the options",
     });
   };
 
@@ -278,20 +278,36 @@ export class GoPayProvider extends AbstractPayKitProvider implements PayKitProvi
     id: string,
     params: UpdateCustomerParams,
   ): Promise<Customer> => {
+    if (this.cloudClient) {
+      return this.cloudClient.customers.update(id, params);
+    }
+
     throw new ProviderNotSupportedError('updateCustomer', 'gopay', {
-      reason: "Gopay doesn't support updating customers",
+      reason:
+        "Gopay doesn't support updating customers, use the cloud API instead by setting `cloudApiKey` in the options",
     });
   };
 
   deleteCustomer = async (id: string): Promise<null> => {
+    if (this.cloudClient) {
+      this.cloudClient.customers.delete(id);
+      return null;
+    }
+
     throw new ProviderNotSupportedError('deleteCustomer', 'gopay', {
-      reason: "Gopay doesn't support deleting customers",
+      reason:
+        "Gopay doesn't support deleting customers, use the cloud API instead by setting `cloudApiKey` in the options",
     });
   };
 
   retrieveCustomer = async (id: string): Promise<Customer | null> => {
+    if (this.cloudClient) {
+      return this.cloudClient.customers.retrieve(id);
+    }
+
     throw new ProviderNotSupportedError('retrieveCustomer', 'gopay', {
-      reason: "Gopay doesn't support retrieving customers",
+      reason:
+        "Gopay doesn't support retrieving customers, use the cloud API instead by setting `cloudApiKey` in the options",
     });
   };
 

@@ -1,55 +1,82 @@
 import { createCustomerSchema, updateCustomerSchema } from '@paykit-sdk/core';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, ilike } from 'drizzle-orm';
+import { sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';
 import { db } from '../db/client.js';
 import { customers } from '../db/schema.js';
+import { authMiddleware } from '../middleware/auth.js';
+import type { Variables } from '../schema.js';
 
-const customersRoute = new Hono();
+const customersRoute = new Hono<{ Variables: Variables }>();
 
-// POST /v1/customers - Create customer
+customersRoute.use('*', authMiddleware);
+
 customersRoute.post('/', async c => {
-  const apiKey = c.get('apiKey' as unknown as never) as string;
+  const organizationId = c.get('organizationId');
+  const provider = c.req.header('X-Provider') as string;
+
+  const { _pId } = z.object({ _pId: z.string().optional() }).parse(c.req.query());
+
+  if (!provider) {
+    throw new HTTPException(400, { message: 'Missing provider header' });
+  }
+
   const body = await c.req.json();
 
   const validated = createCustomerSchema.parse(body);
 
-  // Check if customer already exists
-  const existing = await db
+  const customer = await db
     .select()
     .from(customers)
-    .where(and(eq(customers.apiKey, apiKey), eq(customers.email, validated.email)))
-    .limit(1);
+    .where(
+      and(
+        eq(customers.organizationId, organizationId),
+        eq(customers.email, validated.email),
+      ),
+    )
+    .limit(1)
+    .then(result => result[0]);
 
-  if (existing.length > 0) {
-    return c.json(existing[0], 200);
-  }
+  if (customer) return c.json(customer, 200);
 
-  // Create new customer
-  const [customer] = await db
-    .insert(customers)
-    .values({
-      apiKey,
-      email: validated.email,
-      name: validated.name,
-      phone: validated.phone,
-      metadata: validated.metadata,
-    })
-    .returning();
+  const result = await db.execute(sql`
+    INSERT INTO customers (organization_id, email, name, phone, app_metadata, metadata, billing)
+    VALUES (
+      ${organizationId}, 
+      ${validated.email}, 
+      ${validated.name}, 
+      ${validated.phone}, 
+      ${{ providers: JSON.stringify({ [`${provider}Name`]: provider, [`${provider}Id`]: _pId ?? null }) }}, 
+      ${validated.metadata}, 
+      ${validated.billing}
+    )
+    RETURNING *
+  `);
 
-  return c.json(customer, 201);
+  return c.json(result, 201);
 });
 
-// GET /v1/customers/:id - Retrieve customer
 customersRoute.get('/:id', async c => {
-  const apiKey = c.get('apiKey' as unknown as never) as string;
+  const organizationId = c.get('organizationId');
   const id = c.req.param('id');
+
+  const { _pId } = z.object({ _pId: z.string().optional() }).parse(c.req.query());
+
+  const provider = c.req.header('X-Provider') as string;
 
   const [customer] = await db
     .select()
     .from(customers)
-    .where(and(eq(customers.id, id), eq(customers.apiKey, apiKey)))
+    .where(
+      and(
+        ...(_pId
+          ? [sql`${customers.appMetadata}->'providers'->>${provider + 'Id'} = ${_pId}`]
+          : [eq(customers.id, id)]),
+        eq(customers.organizationId, organizationId),
+      ),
+    )
     .limit(1);
 
   if (!customer) {
@@ -59,67 +86,92 @@ customersRoute.get('/:id', async c => {
   return c.json(customer);
 });
 
-// GET /v1/customers?email=...&provider=... - Find by email
-customersRoute.get('/', async c => {
-  const { email, provider } = z
+customersRoute.get('/query', async c => {
+  const { email, phone, name, _pId } = z
     .object({
-      email: z.string().email(),
-      provider: z.string().optional(),
+      email: z.string().optional(),
+      phone: z.string().optional(),
+      name: z.string().optional(),
+      _pId: z.string().optional(),
     })
     .parse(c.req.query());
 
-  const apiKey = c.get('apiKey' as unknown as never) as string;
+  const organizationId = c.get('organizationId');
+  const provider = c.req.header('X-Provider') as string;
 
-  const [customer] = await db
+  const result = await db
     .select()
     .from(customers)
-    .where(and(eq(customers.apiKey, apiKey), eq(customers.email, email)))
-    .limit(1);
+    .where(
+      and(
+        eq(customers.organizationId, organizationId),
+        ...(email ? [eq(customers.email, email)] : []),
+        ...(phone ? [eq(customers.phone, phone)] : []),
+        ...(name ? [ilike(customers.name, `%${name}%`)] : []),
+        ...(_pId
+          ? [sql`${customers.appMetadata}->'providers'->>${provider + 'Id'} = ${_pId}`]
+          : []),
+      ),
+    )
+    .limit(1)
+    .then(result => result[0]);
 
-  if (!customer) {
-    throw new HTTPException(404, { message: 'Customer not found' });
-  }
+  if (!result) throw new HTTPException(404, { message: 'Customer not found' });
 
-  return c.json(customer);
+  return c.json(result);
 });
 
-// PATCH /v1/customers/:id - Update customer
 customersRoute.patch('/:id', async c => {
-  const apiKey = c.get('apiKey' as unknown as never) as string;
+  const organizationId = c.get('organizationId');
   const id = c.req.param('id');
-  const body = await c.req.json();
+  const provider = c.req.header('X-Provider') as string;
 
-  const validated = updateCustomerSchema.omit({ provider_metadata: true }).parse(body);
+  const { _pId } = z.object({ _pId: z.string().optional() }).parse(c.req.query());
 
-  const [customer] = await db
+  const validated = updateCustomerSchema
+    .omit({ provider_metadata: true })
+    .parse(await c.req.json());
+
+  const result = await db
     .update(customers)
-    .set({
-      ...validated,
-      updatedAt: new Date(),
-    })
-    .where(and(eq(customers.id, id), eq(customers.apiKey, apiKey)))
-    .returning();
+    .set({ ...validated, updatedAt: new Date() })
+    .where(
+      and(
+        ...(_pId
+          ? [sql`${customers.appMetadata}->'providers'->>${provider + 'Id'} = ${_pId}`]
+          : [eq(customers.id, id)]),
+        eq(customers.organizationId, organizationId),
+      ),
+    )
+    .returning()
+    .then(result => result[0]);
 
-  if (!customer) {
-    throw new HTTPException(404, { message: 'Customer not found' });
-  }
+  if (!result) throw new HTTPException(404, { message: 'Customer not found' });
 
-  return c.json(customer);
+  return c.json(result);
 });
 
-// DELETE /v1/customers/:id - Delete customer
 customersRoute.delete('/:id', async c => {
-  const apiKey = c.get('apiKey' as unknown as never) as string;
+  const organizationId = c.get('organizationId');
   const id = c.req.param('id');
+  const provider = c.req.header('X-Provider') as string;
 
-  const [deleted] = await db
+  const { _pId } = z.object({ _pId: z.string().optional() }).parse(c.req.query());
+
+  const result = await db
     .delete(customers)
-    .where(and(eq(customers.id, id), eq(customers.apiKey, apiKey)))
-    .returning();
+    .where(
+      and(
+        eq(customers.organizationId, organizationId),
+        ...(_pId
+          ? [sql`${customers.appMetadata}->'providers'->>${provider + 'Id'} = ${_pId}`]
+          : [eq(customers.id, id)]),
+      ),
+    )
+    .returning()
+    .then(result => result[0]);
 
-  if (!deleted) {
-    throw new HTTPException(404, { message: 'Customer not found' });
-  }
+  if (!result) throw new HTTPException(404, { message: 'Customer not found' });
 
   return c.json({ success: true }, 200);
 });

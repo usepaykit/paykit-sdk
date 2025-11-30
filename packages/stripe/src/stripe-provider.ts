@@ -47,6 +47,7 @@ import {
   validateRequiredKeys,
   isIdCustomer,
   isEmailCustomer,
+  refundReasonMatcher,
 } from '@paykit-sdk/core';
 import Stripe from 'stripe';
 import { z } from 'zod';
@@ -56,7 +57,6 @@ import {
   paykitInvoice$InboundSchema,
   paykitPayment$InboundSchema,
   paykitRefund$InboundSchema,
-  paykitRefundReason$OutboundSchema,
   paykitSubscription$InboundSchema,
 } from '../lib/mapper';
 
@@ -611,9 +611,18 @@ export class StripeProvider extends AbstractPayKitProvider implements PayKitProv
 
     const { provider_metadata, ...rest } = data;
 
+    const reason = refundReasonMatcher(rest.reason ?? '');
+
+    const reasonMap: Record<string, Stripe.RefundCreateParams.Reason> = {
+      duplicate: 'duplicate',
+      fraudulent: 'fraudulent',
+      requested_by_customer: 'requested_by_customer',
+      other: 'requested_by_customer',
+    };
+
     const stripeRefundOptions: Stripe.RefundCreateParams = {
       ...provider_metadata,
-      reason: paykitRefundReason$OutboundSchema(rest.reason),
+      reason: reasonMap[reason],
       amount: rest.amount,
       metadata: stringifyMetadataValues(rest.metadata ?? {}),
     };

@@ -7,8 +7,8 @@ export const createStripe = (config: StripeOptions) => {
 
 export const stripe = () => {
   const envVars = validateRequiredKeys(
-    ['STRIPE_API_KEY'],
-    process.env as Record<string, string>,
+    ['STRIPE_API_KEY', 'PAYKIT_CLOUD_API_KEY'],
+    (process.env as Record<string, string>) ?? { PAYKIT_CLOUD_API_KEY: '' },
     'Missing required environment variables: {keys}',
   );
 
@@ -16,7 +16,9 @@ export const stripe = () => {
 
   return createStripe({
     apiKey: envVars.STRIPE_API_KEY,
+    isSandbox,
     debug: isSandbox,
     apiVersion: '2025-07-30.basil',
+    cloudApiKey: envVars.PAYKIT_CLOUD_API_KEY,
   });
 };

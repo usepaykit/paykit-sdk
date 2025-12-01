@@ -7,8 +7,8 @@ export const createPolar = (config: PolarOptions) => {
 
 export const polar = () => {
   const envVars = validateRequiredKeys(
-    ['POLAR_ACCESS_TOKEN', 'POLAR_SANDBOX'],
-    process.env as Record<string, string>,
+    ['POLAR_ACCESS_TOKEN', 'POLAR_SANDBOX', 'PAYKIT_CLOUD_API_KEY'],
+    (process.env as Record<string, string>) ?? { PAYKIT_CLOUD_API_KEY: '' },
     'Missing required environment variables: {keys}',
   );
 
@@ -16,5 +16,6 @@ export const polar = () => {
     debug: true,
     accessToken: envVars.POLAR_ACCESS_TOKEN,
     isSandbox: envVars.POLAR_SANDBOX == 'true',
+    cloudApiKey: envVars.PAYKIT_CLOUD_API_KEY,
   });
 };

@@ -1,6 +1,5 @@
 import { createCustomerSchema, updateCustomerSchema } from '@paykit-sdk/core';
-import { eq, and, ilike } from 'drizzle-orm';
-import { sql } from 'drizzle-orm';
+import { eq, and, ilike, sql } from 'drizzle-orm';
 import { Hono } from 'hono';
 import { HTTPException } from 'hono/http-exception';
 import { z } from 'zod';

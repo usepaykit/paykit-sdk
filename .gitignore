@@ -5,3 +5,7 @@ packages/*/node_modules
 packages/*/*/node_modules
 packages/*/*/dist
 playground/*
+
+# Bun (only used in apps/api)
+bun.lock
+apps/api/bun.lock

@@ -1,4 +1,3 @@
-import { serve } from '@hono/node-server';
 import { Hono } from 'hono';
 import customersRoute from './routes/customer.js';
 
@@ -10,12 +9,11 @@ app.get('/', c => {
 
 app.route('/v1/customers', customersRoute);
 
-serve(
-  {
-    fetch: app.fetch,
-    port: 3000,
-  },
-  info => {
-    console.log(`Server is running on http://localhost:${info.port}`);
-  },
-);
+const port = Bun.env.PORT ? parseInt(Bun.env.PORT) : 3000;
+
+Bun.serve({
+  port,
+  fetch: app.fetch,
+});
+
+console.log(`Server is running on http://localhost:${port}`);

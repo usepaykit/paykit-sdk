@@ -1,0 +1,20 @@
+services:
+  database:
+    image: postgres:15
+    container_name: paykit_database
+    ports:
+      - '5445:5432'
+    environment:
+      POSTGRES_DB: cloud
+      POSTGRES_USER: paykit
+      POSTGRES_PASSWORD: password
+    volumes:
+      - paykit_postgres_data:/var/lib/postgresql/data
+    networks:
+      - paykit_network
+    restart: unless-stopped
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres']
+      interval: 10s
+      timeout: 5s
+      retries: 5
